@@ -1,3 +1,38 @@
+#' Validate the shared arguments of a `fill_*()` helper
+#'
+#' Internal helper shared by every `fill_*()` pattern-fill constructor.
+#'
+#' @param angle,spacing,aspect The arguments of the same name from the
+#'   calling `fill_*()` function.
+#' @noRd
+validate_fill_args <- function(angle, spacing, aspect) {
+  if (!is.numeric(spacing) || length(spacing) != 1 || spacing <= 0) {
+    rlang::abort("spacing must be a single positive number")
+  }
+  if (!is.numeric(aspect) || length(aspect) != 1 || aspect <= 0) {
+    rlang::abort("aspect must be a single positive number")
+  }
+  if (!is.numeric(angle) || length(angle) != 1) {
+    rlang::abort("angle must be a single number")
+  }
+}
+
+#' Tile dimensions that render a corner-to-corner diagonal at a given angle
+#'
+#' Internal helper. See [fill_hatch()] details for why the rendered angle of
+#' a [grid::pattern()] tile is controlled via its `width`/`height` ratio
+#' rather than the slope of the content drawn inside it.
+#'
+#' @param theta Angle in radians, already reduced to `[0, pi)`.
+#' @param spacing,aspect As in [fill_hatch()].
+#' @noRd
+hatch_tile_dims <- function(theta, spacing, aspect) {
+  c(
+    width  = spacing * abs(cos(theta)),
+    height = spacing * abs(sin(theta)) * aspect
+  )
+}
+
 #' Diagonal hatch pattern fill
 #'
 #' `fill_hatch()` builds a [grid::pattern()] fill value that renders a
@@ -46,17 +81,7 @@ fill_hatch <- function(angle = 45,
                         color = "black",
                         linewidth = 1,
                         extend = "repeat") {
-  if (!is.numeric(spacing) || length(spacing) != 1 || spacing <= 0) {
-    rlang::abort("spacing must be a single positive number")
-  }
-  if (!is.numeric(aspect) || length(aspect) != 1 || aspect <= 0) {
-    rlang::abort("aspect must be a single positive number")
-  }
-  if (!is.numeric(angle) || length(angle) != 1) {
-    rlang::abort("angle must be a single number")
-  }
-
-  theta <- (angle %% 180) * pi / 180
+  validate_fill_args(angle, spacing, aspect)
 
   # exactly horizontal/vertical: a straight line tiles seamlessly regardless
   # of tile aspect, so skip the diagonal construction entirely
@@ -77,8 +102,8 @@ fill_hatch <- function(angle = 45,
     return(grid::pattern(seg, width = spacing, height = spacing, extend = extend))
   }
 
-  width <- spacing * abs(cos(theta))
-  height <- spacing * abs(sin(theta)) * aspect
+  theta <- (angle %% 180) * pi / 180
+  dims <- hatch_tile_dims(theta, spacing, aspect)
 
   if (sin(theta) * cos(theta) >= 0) {
     seg <- grid::segmentsGrob(
@@ -94,14 +119,91 @@ fill_hatch <- function(angle = 45,
     )
   }
 
-  grid::pattern(seg, width = width, height = height, extend = extend)
+  grid::pattern(seg, width = dims["width"], height = dims["height"], extend = extend)
+}
+
+#' Crosshatch pattern fill
+#'
+#' `fill_crosshatch()` builds a [grid::pattern()] fill value that renders two
+#' mirror-symmetric hatch lines, at `angle` and `-angle`, forming an "X"
+#' inside each tile. It shares [fill_hatch()]'s tile-shape technique: both
+#' lines are drawn as the two corner-to-corner diagonals of a single
+#' rectangular tile (rather than at an arbitrary baked-in slope), so both
+#' tile seamlessly under `extend = "repeat"`, and the tile's `width`/`height`
+#' ratio -- not the diagonals' own coordinates -- determines the rendered
+#' angle. See [fill_hatch()]'s details for why this matters.
+#'
+#' Because both lines share one tile shape, they are only *perpendicular*
+#' when `angle = 45` (the classic crosshatch look); for other angles the two
+#' lines are symmetric about the horizontal axis but not at right angles to
+#' each other. Genuinely perpendicular hatching at an arbitrary angle would
+#' need two differently-shaped tiles layered as separate fills, which this
+#' function does not attempt.
+#'
+#' At `angle` a multiple of 90 degrees, the two mirrored diagonals would
+#' coincide, so this case is handled separately by drawing a horizontal line
+#' and a vertical line instead (a simple grid).
+#'
+#' @inheritParams fill_hatch
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @export
+fill_crosshatch <- function(angle = 45,
+                             spacing = 0.1,
+                             aspect = 1,
+                             color = "black",
+                             linewidth = 1,
+                             extend = "repeat") {
+  validate_fill_args(angle, spacing, aspect)
+
+  # a multiple of 90 degrees: the mirrored diagonals would coincide, so draw
+  # a horizontal + vertical grid instead
+  if (isTRUE(all.equal(angle %% 90, 0))) {
+    content <- grid::grobTree(
+      grid::gList(
+        grid::segmentsGrob(
+          x0 = 0, y0 = 0.5, x1 = 1, y1 = 0.5,
+          default.units = "npc",
+          gp = grid::gpar(col = color, lwd = linewidth)
+        ),
+        grid::segmentsGrob(
+          x0 = 0.5, y0 = 0, x1 = 0.5, y1 = 1,
+          default.units = "npc",
+          gp = grid::gpar(col = color, lwd = linewidth)
+        )
+      )
+    )
+    return(grid::pattern(content, width = spacing, height = spacing, extend = extend))
+  }
+
+  theta <- (angle %% 180) * pi / 180
+  dims <- hatch_tile_dims(theta, spacing, aspect)
+
+  content <- grid::grobTree(
+    grid::gList(
+      grid::segmentsGrob(
+        x0 = 0, y0 = 0, x1 = 1, y1 = 1,
+        default.units = "npc",
+        gp = grid::gpar(col = color, lwd = linewidth)
+      ),
+      grid::segmentsGrob(
+        x0 = 0, y0 = 1, x1 = 1, y1 = 0,
+        default.units = "npc",
+        gp = grid::gpar(col = color, lwd = linewidth)
+      )
+    )
+  )
+
+  grid::pattern(content, width = dims["width"], height = dims["height"], extend = extend)
 }
 
 #' Bounding-box aspect ratio of a drawable
 #'
 #' Internal helper. Computes the width-to-height ratio of a [drawable]
 #' object's own points, for use as the `aspect` argument to fill helpers
-#' like [fill_hatch()].
+#' like [fill_hatch()] and [fill_crosshatch()].
 #'
 #' @param object A [drawable] object.
 #'
