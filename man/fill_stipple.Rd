@@ -58,6 +58,7 @@ width-to-height ratio as \code{aspect} to keep dots circular; the default
 Other fill helpers:
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_hatch]{fill_hatch()}},
+\code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_solid]{fill_solid()}}
 }
 \concept{fill helpers}

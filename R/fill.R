@@ -303,6 +303,123 @@ fill_stipple <- function(radius = 0.15,
   )
 }
 
+#' Simplex/fractal noise texture fill
+#'
+#' `fill_noise()` builds a [grid::pattern()] fill value from a rasterised
+#' simplex/fractal noise field, using the same noise machinery as
+#' [blob()]'s wobbly outline (`ambient::fracture()` /
+#' `ambient::gen_simplex()` / `ambient::fbm()`, with matching `frequency`,
+#' `octaves`, and `seed` arguments), so a noise-filled shape and a
+#' noise-wobbled outline share one visual vocabulary.
+#'
+#' Noise is rendered as varying opacity of a single `color`, from fully
+#' transparent at the noise field's minimum to `alpha` at its maximum --
+#' a mottled, cloud-like texture rather than a hard-edged one.
+#'
+#' A raster tile has no baked-in direction the way a hatch line does, so
+#' [fill_hatch()]'s tile-edge "dashing" problem doesn't apply directly, but
+#' an *ordinary* noise field still isn't periodic, and [grid::pattern()]'s
+#' `extend = "repeat"` will visibly seam wherever one tile edge fails to
+#' match the next. `fill_noise()` avoids this by sampling the noise on a
+#' torus: each raster pixel's `(u, v)` tile coordinate is mapped onto a pair
+#' of circles (`ambient::gen_simplex()`'s 4 dimensions, `x`/`y` for `u` and
+#' `z`/`t` for `v`) rather than sampled directly, so the field is
+#' mathematically periodic in both directions and tiles with no visible
+#' seam, at the cost of the noise "wrapping around" within each tile rather
+#' than varying smoothly across a larger area.
+#'
+#' In practice, a very faint seam can still be visible at tile boundaries on
+#' some devices, even though the underlying field is exactly periodic; this
+#' appears to be an artifact of how the graphics device samples a repeated
+#' raster tile (it persists regardless of `interpolate` and doesn't improve
+#' with higher `resolution`), not a flaw in the noise field itself, and is
+#' far subtler than the tile-edge mismatch [fill_hatch()] has to actively
+#' avoid.
+#'
+#' @param color Fill colour. Default `"black"`.
+#' @param resolution Raster resolution (pixels per tile edge). Must be a
+#'   positive integer of at least `2L`. Default `32L`.
+#' @param alpha Maximum opacity, at the noise field's peak. Must be a number
+#'   in `(0, 1]`. Default `1`.
+#' @param frequency Noise frequency, as in [blob()]. Must be non-negative.
+#'   Default `1`.
+#' @param octaves Number of noise octaves, as in [blob()]. Must be a
+#'   positive integer. Default `2L`.
+#' @param seed Integer seed for the noise field, as in [blob()]. Default
+#'   `1L`.
+#' @inheritParams fill_hatch
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_noise <- function(color = "black",
+                        spacing = 0.5,
+                        aspect = 1,
+                        resolution = 32L,
+                        alpha = 1,
+                        frequency = 1,
+                        octaves = 2L,
+                        seed = 1L,
+                        extend = "repeat") {
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.character(color) || length(color) != 1) {
+    rlang::abort("color must be a single string")
+  }
+  if (!is.numeric(resolution) || length(resolution) != 1 ||
+        resolution < 2 || resolution != round(resolution)) {
+    rlang::abort("resolution must be a single integer of at least 2")
+  }
+  if (!is.numeric(alpha) || length(alpha) != 1 || alpha <= 0 || alpha > 1) {
+    rlang::abort("alpha must be a single number in (0, 1]")
+  }
+  if (!is.numeric(frequency) || length(frequency) != 1 || frequency < 0) {
+    rlang::abort("frequency must be a single non-negative number")
+  }
+  if (!is.numeric(octaves) || length(octaves) != 1 ||
+        octaves < 1 || octaves != round(octaves)) {
+    rlang::abort("octaves must be a single positive integer")
+  }
+  if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
+    rlang::abort("seed must be a single integer")
+  }
+
+  resolution <- as.integer(resolution)
+  u <- (seq_len(resolution) - 0.5) / resolution
+  v <- (seq_len(resolution) - 0.5) / resolution
+  uv <- expand.grid(v = v, u = u)
+
+  # sample on a torus (two circles, one per tile axis) rather than directly
+  # in (u, v), so the field is exactly periodic and tiles with no seam
+  theta_u <- 2 * pi * uv$u
+  theta_v <- 2 * pi * uv$v
+
+  noise <- ambient::fracture(
+    noise = ambient::gen_simplex,
+    fractal = ambient::fbm,
+    x = cos(theta_u) * frequency,
+    y = sin(theta_u) * frequency,
+    z = cos(theta_v) * frequency,
+    t = sin(theta_v) * frequency,
+    seed = as.integer(seed),
+    octaves = as.integer(octaves)
+  ) |>
+    ambient::normalize(to = c(0, alpha))
+
+  rgb <- grDevices::col2rgb(color) / 255
+  pixels <- matrix(
+    grDevices::rgb(rgb["red", ], rgb["green", ], rgb["blue", ], alpha = noise),
+    nrow = resolution, ncol = resolution
+  )
+  raster <- grid::rasterGrob(
+    pixels, width = 1, height = 1,
+    default.units = "npc", interpolate = TRUE
+  )
+
+  grid::pattern(raster, width = spacing, height = spacing * aspect, extend = extend)
+}
+
 #' Bounding-box aspect ratio of a drawable
 #'
 #' Internal helper. Computes the width-to-height ratio of a [drawable]

@@ -92,3 +92,39 @@ test_that("fill_stipple() is reproducible for a given seed", {
   expect_identical(extract_x(fill_a), extract_x(fill_b))
   expect_false(identical(extract_x(fill_a), extract_x(fill_c)))
 })
+
+test_that("fill_noise() returns a grid pattern object", {
+  fill <- fill_noise()
+  expect_s3_class(fill, "GridPattern")
+})
+
+test_that("fill_noise() validates its arguments", {
+  expect_error(fill_noise(spacing = 0), "spacing")
+  expect_error(fill_noise(spacing = -1), "spacing")
+  expect_error(fill_noise(aspect = 0), "aspect")
+  expect_error(fill_noise(aspect = -1), "aspect")
+  expect_error(fill_noise(color = 1), "color")
+  expect_error(fill_noise(color = c("red", "blue")), "color")
+  expect_error(fill_noise(resolution = 1), "resolution")
+  expect_error(fill_noise(resolution = 4.5), "resolution")
+  expect_error(fill_noise(alpha = 0), "alpha")
+  expect_error(fill_noise(alpha = 1.5), "alpha")
+  expect_error(fill_noise(frequency = -1), "frequency")
+  expect_error(fill_noise(octaves = 0), "octaves")
+  expect_error(fill_noise(octaves = 1.5), "octaves")
+  expect_error(fill_noise(seed = 1.5), "seed")
+})
+
+test_that("fill_noise() works with a non-default aspect ratio", {
+  fill <- fill_noise(aspect = 2.33)
+  expect_s3_class(fill, "GridPattern")
+})
+
+test_that("fill_noise() is reproducible for a given seed", {
+  extract_raster <- function(fill) environment(fill$f)$grob$raster
+  fill_a <- fill_noise(seed = 481L, resolution = 8L)
+  fill_b <- fill_noise(seed = 481L, resolution = 8L)
+  fill_c <- fill_noise(seed = 482L, resolution = 8L)
+  expect_identical(extract_raster(fill_a), extract_raster(fill_b))
+  expect_false(identical(extract_raster(fill_a), extract_raster(fill_c)))
+})
