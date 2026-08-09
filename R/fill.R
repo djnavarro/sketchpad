@@ -302,6 +302,24 @@ fill_checker <- function(color1 = "black",
 #' width-to-height ratio as `aspect` to keep dots circular; the default
 #' `aspect = 1` is only exact for a square bounding box.
 #'
+#' @section Known rendering risk with multiple dots: On this package's
+#'   development R build (4.6.1, a very recent/development version),
+#'   [grid::pattern()] tiles whose content is a *group* of several
+#'   [grid::circleGrob()]s (i.e. `n > 1`) were found, in some cases, to
+#'   render individual dots visibly distorted -- clipped into crescents or
+#'   otherwise not circular -- even though each dot's own coordinates are
+#'   correct and a single dot (`n = 1`) always renders correctly. This
+#'   reproduced in a fresh R session (so it isn't specific to a long
+#'   interactive session), across multiple `n` and `radius` values, with
+#'   no clean rule found for exactly when it triggers; it appeared on both
+#'   an interactive device and `ragg::agg_png()`. No fix or reliable
+#'   workaround was found -- this looks like an upstream `grid`/Cairo
+#'   issue with multi-shape pattern tile content, not something specific
+#'   to how this function builds its content. **Visually check rendered
+#'   output** before relying on `fill_stipple()` (or [fill_scatter()]/
+#'   [fill_halftone()], which share this risk) for anything beyond casual
+#'   use, especially on unfamiliar R/`grid`/graphics-device versions.
+#'
 #' @param radius Dot radius, as a `"npc"` fraction of the tile. Must be a
 #'   positive number. Default `0.15`.
 #' @param n Number of dots scattered per tile. Must be a positive integer.
@@ -407,7 +425,13 @@ fill_stipple <- function(radius = 0.15,
 #'   defaults to `1` here (one tile spans the whole shape, scattering all
 #'   `n` copies across it at once) rather than the smaller, densely-tiled
 #'   defaults used elsewhere; setting `spacing < 1` is still possible for
-#'   a repeating scattered motif, but may show this distortion.
+#'   a repeating scattered motif, but may show this distortion. (Later
+#'   testing on [fill_stipple()] found the same *actually-repeated tile
+#'   with multiple shapes* combination distorts circleGrob content too,
+#'   not just polygons -- see its "Known rendering risk" section. A
+#'   single tile with multiple shapes, as used by this function's
+#'   default, was never observed to have the problem; only real
+#'   repetition, `spacing < 1`, was.)
 #'
 #' @param unit A small [drawable] to scatter copies of. Default
 #'   `circle(radius = 1)`.
@@ -488,6 +512,85 @@ fill_scatter <- function(unit = circle(radius = 1),
     )
   })
   content <- grid::grobTree(do.call(grid::gList, stamps))
+
+  grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+}
+
+#' Halftone dot pattern fill
+#'
+#' `fill_halftone()` is [fill_stipple()]'s other variant: instead of
+#' scattering dots of one fixed size, each dot's radius is drawn
+#' uniformly at random from `radius`, giving a mottled halftone-print
+#' look rather than a uniform stipple. Like [fill_stipple()] (and unlike
+#' [fill_scatter()]), it scatters plain [grid::circleGrob()]s, so it's
+#' immune to the *polygon*-specific rendering problems documented at
+#' [fill_scatter()] -- but it shares [fill_stipple()]'s own, separate
+#' "Known rendering risk with multiple dots" (repeated tiles containing
+#' several `circleGrob`s were, in testing, sometimes visibly distorted on
+#' this package's development R build; see that section for details).
+#' There is no known way to avoid this while still getting a genuine
+#' scattered-dot texture, so **check rendered output visually** here too.
+#'
+#' As with [fill_stipple()], the target's bounding-box aspect ratio needs
+#' to be passed as `aspect` to keep the dots circular rather than
+#' elliptical; the default `aspect = 1` is only exact for a square
+#' bounding box. Dot centres are kept at least `max(radius)` from each
+#' tile edge, so even the largest possible dot isn't clipped away near a
+#' boundary.
+#'
+#' @param radius Dot radius range, as a length-2 numeric vector giving the
+#'   `"npc"`-fraction-of-tile minimum and maximum (a dot's actual radius is
+#'   drawn uniformly from this range). Both values must be positive, and
+#'   the first must be no larger than the second. Default `c(0.05, 0.2)`.
+#' @inheritParams fill_stipple
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_halftone <- function(radius = c(0.05, 0.2),
+                           spacing = 0.3,
+                           aspect = 1,
+                           n = 4L,
+                           seed = 1L,
+                           color = "black",
+                           extend = "repeat") {
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.numeric(radius) || length(radius) != 2 || any(radius <= 0)) {
+    rlang::abort("radius must be a length-2 vector of positive numbers")
+  }
+  if (radius[1] > radius[2]) {
+    rlang::abort("radius[1] must be no larger than radius[2]")
+  }
+  if (radius[2] >= 0.5) {
+    rlang::abort("radius[2] must be less than 0.5, so dots fit within a tile")
+  }
+  if (!is.numeric(n) || length(n) != 1 || n < 1 || n != round(n)) {
+    rlang::abort("n must be a single positive integer")
+  }
+  if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
+    rlang::abort("seed must be a single integer")
+  }
+
+  margin <- radius[2]
+  withr::with_seed(
+    seed = as.integer(seed),
+    code = {
+      x <- stats::runif(n, margin, 1 - margin)
+      y <- stats::runif(n, margin, 1 - margin)
+      r <- stats::runif(n, radius[1], radius[2])
+    }
+  )
+
+  dots <- purrr::pmap(list(x, y, r), function(cx, cy, cr) {
+    grid::circleGrob(
+      x = cx, y = cy, r = cr,
+      default.units = "npc",
+      gp = grid::gpar(col = NA, fill = color)
+    )
+  })
+  content <- grid::grobTree(do.call(grid::gList, dots))
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
 }

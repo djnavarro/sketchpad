@@ -54,11 +54,32 @@ whenever that bounding box isn't square. Pass the bounding box's
 width-to-height ratio as \code{aspect} to keep dots circular; the default
 \code{aspect = 1} is only exact for a square bounding box.
 }
+\section{Known rendering risk with multiple dots}{
+ On this package's
+development R build (4.6.1, a very recent/development version),
+\code{\link[grid:pattern]{grid::pattern()}} tiles whose content is a \emph{group} of several
+\code{\link[grid:circleGrob]{grid::circleGrob()}}s (i.e. \code{n > 1}) were found, in some cases, to
+render individual dots visibly distorted -- clipped into crescents or
+otherwise not circular -- even though each dot's own coordinates are
+correct and a single dot (\code{n = 1}) always renders correctly. This
+reproduced in a fresh R session (so it isn't specific to a long
+interactive session), across multiple \code{n} and \code{radius} values, with
+no clean rule found for exactly when it triggers; it appeared on both
+an interactive device and \code{ragg::agg_png()}. No fix or reliable
+workaround was found -- this looks like an upstream \code{grid}/Cairo
+issue with multi-shape pattern tile content, not something specific
+to how this function builds its content. \strong{Visually check rendered
+output} before relying on \code{fill_stipple()} (or \code{\link[=fill_scatter]{fill_scatter()}}/
+\code{\link[=fill_halftone]{fill_halftone()}}, which share this risk) for anything beyond casual
+use, especially on unfamiliar R/\code{grid}/graphics-device versions.
+}
+
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_gradient]{fill_gradient()}},
+\code{\link[=fill_halftone]{fill_halftone()}},
 \code{\link[=fill_hatch]{fill_hatch()}},
 \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_scatter]{fill_scatter()}},

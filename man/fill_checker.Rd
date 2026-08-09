@@ -51,6 +51,7 @@ squaring technique \code{\link[=fill_stipple]{fill_stipple()}} uses for its dots
 Other fill helpers:
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_gradient]{fill_gradient()}},
+\code{\link[=fill_halftone]{fill_halftone()}},
 \code{\link[=fill_hatch]{fill_hatch()}},
 \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_scatter]{fill_scatter()}},

@@ -85,7 +85,13 @@ the family, but arbitrary polygon geometry did. \code{spacing} therefore
 defaults to \code{1} here (one tile spans the whole shape, scattering all
 \code{n} copies across it at once) rather than the smaller, densely-tiled
 defaults used elsewhere; setting \code{spacing < 1} is still possible for
-a repeating scattered motif, but may show this distortion.
+a repeating scattered motif, but may show this distortion. (Later
+testing on \code{\link[=fill_stipple]{fill_stipple()}} found the same \emph{actually-repeated tile
+with multiple shapes} combination distorts circleGrob content too,
+not just polygons -- see its "Known rendering risk" section. A
+single tile with multiple shapes, as used by this function's
+default, was never observed to have the problem; only real
+repetition, \code{spacing < 1}, was.)
 }
 }
 \seealso{
@@ -93,6 +99,7 @@ Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_gradient]{fill_gradient()}},
+\code{\link[=fill_halftone]{fill_halftone()}},
 \code{\link[=fill_hatch]{fill_hatch()}},
 \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_solid]{fill_solid()}},

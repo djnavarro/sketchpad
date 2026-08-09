@@ -266,3 +266,55 @@ plotting device, which correctly reported
 on this signal would false-positive on exactly the standard file devices
 users need for real output, which is worse than not warning at all. If
 revisited, would need a more reliable signal than `dev.capabilities()`.
+
+## Adding `fill_checker()`, `fill_stripe()`, `fill_scatter()`, `fill_halftone()`
+
+Four more `fill_*()` helpers, each testing the limits of the family's
+established tile-shape/aspect-correction technique:
+
+`fill_checker()` was the cheapest addition -- a checkerboard square has no
+direction, so there's no analogue of `fill_hatch()`'s corner-to-corner
+diagonal requirement; it's just four quadrant rectangles, plus the usual
+tile-squaring correction.
+
+`fill_stripe()` (solid alternating bands) turned out *not* to be a simple
+reskin of `fill_hatch()`, despite looking like one. A filled band, unlike
+a thin hatch line, needs every point along a tile edge to match its
+neighbour, not just the points a thin line crosses, so a single diagonal
+tile split doesn't tile seamlessly at an arbitrary angle. Solved
+differently: a short two-colour `grid::linearGradient()` with hard colour
+stops and its own `extend = "repeat"`, which repeats *itself* along its
+axis rather than relying on `grid::pattern()`'s tile-copy repetition at
+all.
+
+`fill_scatter()` (generalizing `fill_stipple()` to an arbitrary
+`drawable`) surfaced two new problems neither circles nor rectangles had:
+(1) the usual tile-squaring correction isn't enough for polygon vertex
+content -- a `polygonGrob`/`pathGrob` renders as though it inherits the
+target's *uncorrected* bounding-box distortion directly, confirmed by
+comparing a hand-built circular polygon against an equivalent
+`circleGrob` in the same corrected tile (circle stayed circular, polygon
+became an ellipse) -- fixed with a second explicit correction on the
+unit's own vertex x-coordinates; and (2) repeated (`spacing < 1`) polygon
+content can render with visible clipping once the tile actually repeats,
+matching `grid::pattern()`'s own documented Cairo clipping-distortion
+warning. Fixed by defaulting `spacing = 1` (all copies scattered across
+one tile spanning the whole shape) rather than the smaller tiled
+defaults used elsewhere.
+
+`fill_halftone()` (`fill_stipple()` with randomized dot radius) is where
+problem (2) above turned out to be broader than first thought. Testing
+in a completely fresh R session (ruling out session-specific
+degradation) found that repeated tiles containing *multiple circleGrobs*
+-- not just polygons -- can render individual dots visibly distorted,
+across a range of `n`/`radius` combinations with no clean rule for
+exactly when it triggers. Unlike `fill_scatter()`, there's no `spacing =
+1` escape hatch available: `fill_stipple()`'s whole purpose is a texture
+that repeats many small dots across a large shape, which requires
+genuine tile repetition. After discussing the scope of the problem,
+documented as a known, unresolved rendering risk directly on
+`fill_stipple()` (cross-referenced from `fill_scatter()`/
+`fill_halftone()`) rather than attempting a fix -- no parameter change
+was found to reliably avoid it, and it looks like an upstream `grid`/
+Cairo bug rather than something wrong in this package's own code. See
+the matching Gotchas entry in `AGENTS.md`.

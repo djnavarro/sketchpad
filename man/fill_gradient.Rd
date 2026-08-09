@@ -72,6 +72,7 @@ for a repeating pattern of small gradient motifs instead.
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
+\code{\link[=fill_halftone]{fill_halftone()}},
 \code{\link[=fill_hatch]{fill_hatch()}},
 \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_scatter]{fill_scatter()}},

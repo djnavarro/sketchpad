@@ -167,6 +167,25 @@ full debugging narrative):
 - **`sketch` was not available as the package name.** It's an existing
   CRAN package (an R-to-JavaScript/p5.js transpiler) -- installing both
   would collide. Named this package `sketchpad` instead.
+- **`grid::pattern()` tiles containing *multiple* shapes can render
+  visibly distorted once the tile actually repeats.** Found while
+  building `fill_stipple()`/`fill_scatter()`/`fill_halftone()`: a single
+  shape (one `circleGrob`, or a single tile spanning the whole target via
+  `spacing = 1`, so `extend = "repeat"` never actually triggers) always
+  renders correctly, but several separate shapes (e.g. `n` scattered
+  dots) inside a tile that's genuinely repeated (`spacing < 1`) can come
+  out clipped into crescents or otherwise non-circular -- reproduced on
+  this package's development R build (4.6.1) on both an interactive
+  device and `ragg::agg_png()`, in a fresh R session (so it isn't session
+  degradation), across multiple `n`/`radius` combinations with no clean
+  rule for exactly when it triggers. This looks like an upstream
+  `grid`/Cairo bug with multi-shape pattern tile content, not something
+  fixable from this package's code -- don't spend more time chasing a
+  root cause or a parameter combination that "avoids" it without
+  re-verifying on a released (non-development) R version first. Documented
+  on the affected functions themselves (`fill_stipple()`'s "Known
+  rendering risk" section); no default was found that's provably safe,
+  since `fill_stipple()`'s whole purpose requires genuine tile repetition.
 - **`grDevices::dev.capabilities()$patterns` is not a reliable signal
   for whether a device supports pattern/gradient fills.** It returned
   `NA` for `cairo_pdf()`, `pdf()`, and `svg()` alike when tested -- not

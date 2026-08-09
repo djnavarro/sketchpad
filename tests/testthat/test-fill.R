@@ -191,6 +191,47 @@ test_that("fill_scatter() is reproducible for a given seed", {
   expect_false(identical(extract_x(fill_a), extract_x(fill_c)))
 })
 
+test_that("fill_halftone() returns a grid pattern object", {
+  expect_s3_class(fill_halftone(), "GridPattern")
+})
+
+test_that("fill_halftone() validates its arguments", {
+  expect_error(fill_halftone(spacing = 0), "spacing")
+  expect_error(fill_halftone(spacing = -1), "spacing")
+  expect_error(fill_halftone(aspect = 0), "aspect")
+  expect_error(fill_halftone(aspect = -1), "aspect")
+  expect_error(fill_halftone(radius = 0.1), "radius")
+  expect_error(fill_halftone(radius = c(0.1, 0.2, 0.3)), "radius")
+  expect_error(fill_halftone(radius = c(-0.1, 0.2)), "radius")
+  expect_error(fill_halftone(radius = c(0.3, 0.1)), "radius")
+  expect_error(fill_halftone(radius = c(0.1, 0.6)), "radius")
+  expect_error(fill_halftone(n = 0), "n")
+  expect_error(fill_halftone(n = 1.5), "n")
+  expect_error(fill_halftone(seed = 1.5), "seed")
+})
+
+test_that("fill_halftone() works with a non-default aspect ratio", {
+  expect_s3_class(fill_halftone(aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_halftone() dot radii vary within the requested range", {
+  fill <- fill_halftone(radius = c(0.05, 0.2), n = 10L, seed = 481L)
+  radii <- purrr::map_dbl(environment(fill$f)$grob$children, \(g) as.numeric(g$r))
+  expect_true(all(radii >= 0.05 & radii <= 0.2))
+  expect_gt(length(unique(radii)), 1)
+})
+
+test_that("fill_halftone() is reproducible for a given seed", {
+  extract_r <- function(fill) {
+    unname(purrr::map_dbl(environment(fill$f)$grob$children, \(g) as.numeric(g$r)))
+  }
+  fill_a <- fill_halftone(seed = 481L)
+  fill_b <- fill_halftone(seed = 481L)
+  fill_c <- fill_halftone(seed = 482L)
+  expect_identical(extract_r(fill_a), extract_r(fill_b))
+  expect_false(identical(extract_r(fill_a), extract_r(fill_c)))
+})
+
 test_that("fill_noise() returns a grid pattern object", {
   fill <- fill_noise()
   expect_s3_class(fill, "GridPattern")
