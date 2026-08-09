@@ -21,31 +21,23 @@ immediately after `shape_bezier.R` in `Collate`.
 constructor -- see `.agents/HISTORY.md`'s "Renaming drawable
 constructors to a shared `shape_*` prefix" entry.
 
-## Deferred: a `curve_*()` constructor family using `drawable`'s `geometry` property
+## Deferred: rest of the `curve_*()` constructor family
 
-`drawable` now has a `geometry` property (`"polygon"`/`"path"`/`"points"`,
-default `"polygon"`) and `draw()` dispatches on it via an internal
-`geometry_grob()` helper -- see `.agents/HISTORY.md`'s "Adding a
-`geometry` property to `drawable`" entry for the settled design and a
-gotcha hit while implementing it. No constructor sets `geometry = "path"`
-or `"points"` yet.
+`curve_bezier()` (see `.agents/HISTORY.md`) is the first `curve_*()`
+constructor, proving out `drawable`'s `geometry = "path"` end to end:
+`curve_bezier()`/`shape_bezier()` share their geometry computation and
+argument validation via two internal helpers factored into
+`R/shape_bezier.R` (`bezier_curve_points()`, `validate_bezier_args()`),
+differing only in which `drawable(geometry = ...)` they construct from.
 
-`style` already gained `linetype`/`linejoin` (see `.agents/HISTORY.md`)
-ahead of any `curve_*()` constructor, since both already have visible
-effect on today's closed `shape_*()` polygons -- `linejoin` on any
-low-vertex or thick-stroked shape, `linetype` as a self-contained dashed-
-outline effect. `lineend`/`linemitre` were deliberately left out of that
-addition: `lineend` only matters at a genuinely free stroke end, which
-doesn't exist without an open-path constructor, and `linemitre` is only
-relevant paired with `linejoin = "mitre"`, so both are deferred until a
-real `curve_*()` constructor exists to validate cap behavior against.
-
-Still open: what a `curve_*()` family looks like concretely
-(`curve_bezier()`, `curve_line()`, `curve_spiral()`, `curve_scribble()`
-were floated -- `curve_bezier()` and `curve_scribble()` can likely reuse
-existing geometry/helpers almost unchanged, while `curve_line()`/
-`curve_spiral()` need new geometry), and whether `lineend`/`linemitre`
-need to be added to `style` at the same time. A `"points"`-geometry
+Still open: `curve_line()` and `curve_spiral()` need genuinely new
+geometry (no `shape_*()` counterpart to share code with), and
+`curve_scribble()` would promote `fill_scribble()`'s internal
+`scribble_lines()` helper from private to a public path generator. Also
+still open: whether `lineend`/`linemitre` need to be added to `style()`
+once one of these produces a path with actual visible free ends or sharp
+corners at high `linewidth` (`curve_bezier()`'s curve doesn't have sharp
+corners, so it didn't force this decision). A `"points"`-geometry
 constructor (e.g. a scatter-of-markers primitive) hasn't been designed at
 all yet -- `geometry = "points"` was reserved on the dimensional reading
 `points`(0D)/`path`(1D)/`polygon`(2D), not because a concrete constructor

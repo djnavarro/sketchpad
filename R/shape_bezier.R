@@ -19,15 +19,49 @@ bernstein <- function(beta, t = seq(0, 1, .01)) {
   b
 }
 
-#' A Bezier curve
+#' Validate the shared arguments of a Bezier-based drawable
+#'
+#' Internal helper shared by [shape_bezier] and [curve_bezier], whose
+#' constructors take identical `x`/`y`/`n` arguments and differ only in
+#' `geometry` (closed polygon vs. open path).
+#'
+#' @param x,y,n The arguments of the same name from the calling
+#'   constructor.
+#' @return An error message string, or `NULL` if valid.
+#' @noRd
+validate_bezier_args <- function(x, y, n) {
+  if (length(x) != length(y)) return("x and y must be the same length")
+  if (length(x) < 2) return("at least two control points are required")
+  if (length(n) != 1) return("n must be length 1")
+  if (n < 1L) return("n must be a positive integer")
+  NULL
+}
+
+#' Sample a Bezier curve's points
+#'
+#' Internal helper shared by [shape_bezier] and [curve_bezier]: evaluates
+#' both coordinate axes via `bernstein()` at `n` evenly-spaced parameter
+#' values.
+#'
+#' @param x,y,n The arguments of the same name from the calling
+#'   constructor.
+#' @return A [point_set].
+#' @noRd
+bezier_curve_points <- function(x, y, n) {
+  t <- seq(0, 1, length.out = n)
+  point_set(x = bernstein(x, t), y = bernstein(y, t))
+}
+
+#' A closed Bezier curve
 #'
 #' `shape_bezier` is a [drawable] whose outline follows a Bezier curve
 #' defined by an arbitrary number of control points (`x`, `y`). With two
 #' control points this is a straight line; with four, a cubic Bezier of
 #' the kind used to build ribbons and other flowing shapes. Since
-#' [draw()] always renders a `drawable`'s `points` as a closed polygon,
-#' the curve is implicitly closed from its last control point back to
-#' its first.
+#' [draw()] renders every `"polygon"`-geometry `drawable`'s `points` as a
+#' closed polygon, the curve is implicitly closed from its last control
+#' point back to its first -- for an open Bezier curve/path instead, see
+#' [curve_bezier()].
 #'
 #' @param x,y Numeric vectors of control point coordinates. Must be the
 #'   same length, with at least two control points.
@@ -44,21 +78,10 @@ shape_bezier <- S7::new_class(
     n = S7::class_integer,
     points = S7::new_property(
       class = point_set,
-      getter = function(self) {
-        t <- seq(0, 1, length.out = self@n)
-        point_set(
-          x = bernstein(self@x, t),
-          y = bernstein(self@y, t)
-        )
-      }
+      getter = function(self) bezier_curve_points(self@x, self@y, self@n)
     )
   ),
-  validator = function(self) {
-    if (length(self@x) != length(self@y)) return("x and y must be the same length")
-    if (length(self@x) < 2) return("at least two control points are required")
-    if (length(self@n) != 1) return("n must be length 1")
-    if (self@n < 1L) return("n must be a positive integer")
-  },
+  validator = function(self) validate_bezier_args(self@x, self@y, self@n),
   constructor = function(x, y, n = 100L, ...) {
     S7::new_object(
       drawable(),

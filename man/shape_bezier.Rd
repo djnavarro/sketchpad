@@ -2,7 +2,7 @@
 % Please edit documentation in R/shape_bezier.R
 \name{shape_bezier}
 \alias{shape_bezier}
-\title{A Bezier curve}
+\title{A closed Bezier curve}
 \usage{
 shape_bezier(x, y, n = 100L, ...)
 }
@@ -19,7 +19,8 @@ same length, with at least two control points.}
 defined by an arbitrary number of control points (\code{x}, \code{y}). With two
 control points this is a straight line; with four, a cubic Bezier of
 the kind used to build ribbons and other flowing shapes. Since
-\code{\link[=draw]{draw()}} always renders a \code{drawable}'s \code{points} as a closed polygon,
-the curve is implicitly closed from its last control point back to
-its first.
+\code{\link[=draw]{draw()}} renders every \code{"polygon"}-geometry \code{drawable}'s \code{points} as a
+closed polygon, the curve is implicitly closed from its last control
+point back to its first -- for an open Bezier curve/path instead, see
+\code{\link[=curve_bezier]{curve_bezier()}}.
 }

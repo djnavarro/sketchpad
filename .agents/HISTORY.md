@@ -574,3 +574,53 @@ constructor, which errors) since no public constructor exposes
 passed (10 new: default-geometry coverage across every `shape_*()`,
 validator rejection, and `draw()` exercising the `"path"`/`"points"`
 branches).
+
+## Adding `curve_bezier()`, the first `curve_*()`/`geometry = "path"` constructor
+
+The first concrete `curve_*()` constructor, proving out the `geometry`
+property end to end (see the "Adding a `geometry` property to
+`drawable`" entry above). `curve_bezier()` is an open Bezier path: same
+Bernstein-polynomial curve as `shape_bezier()`, but constructed from
+`drawable(geometry = "path")` instead of bare `drawable()`, so it's
+rendered as an open `grid::polylineGrob()` rather than a closed
+`grid::polygonGrob()` -- confirmed visually with a dashed, coloured,
+thick-stroked curve that stops at its last control point rather than
+looping back to its first.
+
+Since `curve_bezier()` and `shape_bezier()` differ *only* in which
+`drawable(...)` they build from -- identical `x`/`y`/`n` arguments,
+identical points computation, identical validation -- their shared logic
+was factored out of `shape_bezier.R` into two internal helpers,
+`bezier_curve_points()` (the Bernstein-based points getter) and
+`validate_bezier_args()` (the length/positivity checks), rather than
+duplicating either across two files. `curve_bezier` itself lives in its
+own file, `R/curve_bezier.R`, collated immediately after
+`shape_bezier.R` (which still owns `bernstein()` and the two new shared
+helpers) in `DESCRIPTION`'s `Collate` field -- this is the established
+pattern for genuinely shared internal machinery (see `fill.R`'s
+`validate_fill_args()`), balanced against the package's usual "one file
+per constructor" convention: the constructors get separate files (since
+they're conceptually distinct, differently-named, differently-documented
+public APIs), but their identical internals don't.
+
+This also settled a naming question left open in `PLAN.md`: closed
+(`geometry = "polygon"`) drawable constructors keep the `shape_*` prefix,
+while open (`geometry = "path"`) ones get a new `curve_*` prefix --
+visually distinct even where, as here, the underlying geometry is
+shared. `AGENTS.md`'s "Rendering model" section (which had gone stale
+since the `geometry` property landed, still describing every `drawable`
+as unconditionally rendering via `grid::polygonGrob()`) was corrected
+alongside this.
+
+`curve_bezier()` doesn't expose `geometry` as a constructor argument --
+it's fixed to `"path"` at construction, the same way `shape_bezier()`
+doesn't expose it either (fixed to the inherited `"polygon"` default).
+`style@fill` is still accepted via `curve_bezier()`'s `...` (forwarded to
+`style()` like any other argument) but has no visible effect, consistent
+with `drawable`'s existing "`style` is a superset of features not every
+`geometry` consumes" design.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 313 tests
+passed (11 new, in a new `tests/testthat/test-curve.R`), including one
+asserting `curve_bezier()` and `shape_bezier()` compute byte-identical
+`points` for the same inputs.
