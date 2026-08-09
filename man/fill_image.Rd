@@ -23,8 +23,9 @@ first with e.g. \code{png::readPNG()}, \code{jpeg::readJPEG()}, or
 pixel aspect ratio (\code{TRUE}), or stretch it to exactly fill each tile
 (\code{FALSE}). Default \code{TRUE}.}
 
-\item{spacing}{Baseline tile size, as a fraction of the target's bounding
-box. Must be a positive number. Default \code{0.1}.}
+\item{spacing}{Tile size, as a fraction of the target's bounding box.
+Must be a positive number. Default \code{1} (one tile spans the whole
+shape).}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
 Must be a positive number. Default \code{1} (a square bounding box).}

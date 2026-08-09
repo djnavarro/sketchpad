@@ -371,3 +371,53 @@ technique in this package currently does. Shipped instead with
 `direction` restricted to `"horizontal"` or `"vertical"` (a fixed
 transpose of the same construction), documented as a known limitation on
 `fill_scribble()` itself rather than attempting the harder general case.
+
+## Pre-merge review of the whole `fill_*()` family
+
+Before merging the full fifteen-helper `fill_*()` family, did a naming/
+docs consistency pass across all of `R/fill.R` rather than treating each
+helper's own review (above) as sufficient in isolation. Found and fixed:
+
+- **Several inherited `@param spacing` docs stated the wrong default.**
+  `@inheritParams` copies doc *text* verbatim, including literal
+  "Default `X`" wording, with no check that the borrowing function's own
+  default actually matches -- see the matching `AGENTS.md` Gotchas entry
+  for the general lesson. Concretely, `fill_checker()` (real default
+  `0.2`), `fill_stipple()` (`0.3`), `fill_scribble()` (`0.25`),
+  `fill_noise()` (`0.5`), and `fill_image()` (`1`) all inherited
+  `fill_hatch()`'s (or, for `fill_image()`, `fill_noise()`'s) `spacing`
+  doc unchanged, including its `0.1` default text. Fixed by giving each
+  its own explicit `@param spacing`; `fill_halftone()` and
+  `fill_marble()`/`fill_flow()` needed no separate edit since they
+  inherit from `fill_stipple()`/`fill_noise()` respectively and picked up
+  the corrected text automatically once those were fixed.
+- **`fill_marble()`'s `octaves` doc said "Default `2L`"** (inherited from
+  `fill_noise()`) **but its own actual default is `3L`.** Fixed with its
+  own explicit `@param octaves`.
+- **`fill_stipple()`'s (and, by inheritance, `fill_halftone()`'s)
+  `color` doc said "Line colour"**, inherited unchanged from
+  `fill_hatch()` -- inaccurate, since both actually fill dots
+  (`gpar(col = NA, fill = color)`), not stroke a line. Fixed with an
+  explicit `@param color` reading "Dot colour" instead.
+- **`fill_stripe()`'s inherited `extend` doc said "Passed to
+  `grid::pattern()`"**, but its implementation actually threads `extend`
+  through to the *inner* `grid::linearGradient()`; the outer
+  `grid::pattern()` call always hardcodes `extend = "repeat"`. Fixed
+  with its own explicit `@param extend` describing the real behaviour
+  (mirroring how `fill_gradient()` already documented the same pattern
+  correctly).
+- **`fill_vignette()` had no `extend` parameter at all**, unlike every
+  other `fill_*()` helper -- its outer `grid::pattern()` call always
+  hardcoded `"repeat"`. Added `extend = "repeat"` to its signature and
+  threaded it through, for parity with the rest of the family.
+- **`linewidth` was never validated** in `fill_hatch()`,
+  `fill_crosshatch()`, or `fill_scribble()`, unlike every other
+  parameter in the family. Added a positive-number check to all three.
+
+Considered but deliberately left alone: the family has no single fixed
+rule for where a `color`/`color1`/`color2` parameter sits relative to
+`spacing`/`aspect` in the argument list (sometimes first, sometimes
+after `n`/`seed`). Reordering existing parameters would be a real,
+if low-risk, breaking change across all fifteen signatures for a purely
+cosmetic gain, and wasn't judged worth doing without discussing scope
+first.

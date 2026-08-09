@@ -4,7 +4,13 @@
 \alias{fill_vignette}
 \title{Vignette fill}
 \usage{
-fill_vignette(color = "black", background = NA, spacing = 1, aspect = 1)
+fill_vignette(
+  color = "black",
+  background = NA,
+  spacing = 1,
+  aspect = 1,
+  extend = "repeat"
+)
 }
 \arguments{
 \item{color}{Fill colour at the tile's centre. Default \code{"black"}.}
@@ -19,6 +25,8 @@ shape).}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
 Must be a positive number. Default \code{1} (a square bounding box).}
+
+\item{extend}{Passed to \code{\link[grid:pattern]{grid::pattern()}}. Default \code{"repeat"}.}
 }
 \value{
 A pattern object as returned by \code{\link[grid:pattern]{grid::pattern()}}, suitable for

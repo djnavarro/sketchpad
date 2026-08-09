@@ -94,7 +94,7 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' @param aspect Width-to-height ratio of the target polygon's bounding box.
 #'   Must be a positive number. Default `1` (a square bounding box).
 #' @param color Line colour. Default `"black"`.
-#' @param linewidth Line width. Default `1`.
+#' @param linewidth Line width. Must be a positive number. Default `1`.
 #' @param extend Passed to [grid::pattern()]. Default `"repeat"`.
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -109,6 +109,9 @@ fill_hatch <- function(angle = 45,
                         linewidth = 1,
                         extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
+  if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
+    rlang::abort("linewidth must be a single positive number")
+  }
 
   # exactly horizontal/vertical: a straight line tiles seamlessly regardless
   # of tile aspect, so skip the diagonal construction entirely
@@ -185,6 +188,9 @@ fill_crosshatch <- function(angle = 45,
                              linewidth = 1,
                              extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
+  if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
+    rlang::abort("linewidth must be a single positive number")
+  }
 
   # a multiple of 90 degrees: the mirrored diagonals would coincide, so draw
   # a horizontal + vertical grid instead
@@ -248,6 +254,8 @@ fill_crosshatch <- function(angle = 45,
 #'
 #' @param color1,color2 The two checker colours. Defaults `"black"` and
 #'   `"white"`.
+#' @param spacing Baseline tile size, as a fraction of the target's bounding
+#'   box. Must be a positive number. Default `0.2`.
 #' @inheritParams fill_hatch
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -322,9 +330,12 @@ fill_checker <- function(color1 = "black",
 #'
 #' @param radius Dot radius, as a `"npc"` fraction of the tile. Must be a
 #'   positive number. Default `0.15`.
+#' @param spacing Baseline tile size, as a fraction of the target's bounding
+#'   box. Must be a positive number. Default `0.3`.
 #' @param n Number of dots scattered per tile. Must be a positive integer.
 #'   Default `4L`.
 #' @param seed Integer seed for the dot positions. Default `1L`.
+#' @param color Dot colour. Default `"black"`.
 #' @inheritParams fill_hatch
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -695,7 +706,9 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #' @param resolution Number of points sampled along each line. Must be a
 #'   positive integer of at least `2L`. Default `200L`.
 #' @param color Line colour. Default `"black"`.
-#' @param linewidth Line width. Default `1`.
+#' @param linewidth Line width. Must be a positive number. Default `1`.
+#' @param spacing Baseline tile size, as a fraction of the target's bounding
+#'   box. Must be a positive number. Default `0.25`.
 #' @param seed Integer seed for the random harmonics. Default `1L`.
 #' @inheritParams fill_hatch
 #'
@@ -734,6 +747,9 @@ fill_scribble <- function(direction = c("horizontal", "vertical"),
   }
   if (!is.character(color) || length(color) != 1) {
     rlang::abort("color must be a single string")
+  }
+  if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
+    rlang::abort("linewidth must be a single positive number")
   }
   if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
     rlang::abort("seed must be a single integer")
@@ -854,6 +870,8 @@ torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
 #' avoid.
 #'
 #' @param color Fill colour. Default `"black"`.
+#' @param spacing Baseline tile size, as a fraction of the target's bounding
+#'   box. Must be a positive number. Default `0.5`.
 #' @param resolution Raster resolution (pixels per tile edge). Must be a
 #'   positive integer of at least `2L`. Default `32L`.
 #' @param alpha Maximum opacity, at the noise field's peak. Must be a number
@@ -957,6 +975,8 @@ fill_noise <- function(color = "black",
 #'   turbulence displacement. Must be a positive integer. Default `3L`.
 #' @param warp Turbulence amplitude, in radians of displacement along the
 #'   band coordinate. Must be a non-negative number. Default `4`.
+#' @param octaves Number of turbulence octaves, as in [blob()]. Must be a
+#'   positive integer. Default `3L`.
 #' @inheritParams fill_noise
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -1185,6 +1205,9 @@ fill_flow <- function(color = "black",
 #'   pixel aspect ratio (`TRUE`), or stretch it to exactly fill each tile
 #'   (`FALSE`). Default `TRUE`.
 #' @param interpolate Passed to [grid::rasterGrob()]. Default `TRUE`.
+#' @param spacing Tile size, as a fraction of the target's bounding box.
+#'   Must be a positive number. Default `1` (one tile spans the whole
+#'   shape).
 #' @inheritParams fill_noise
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -1383,6 +1406,7 @@ fill_gradient <- function(colors = c("white", "black"),
 #'   shape).
 #' @param aspect Width-to-height ratio of the target polygon's bounding box.
 #'   Must be a positive number. Default `1` (a square bounding box).
+#' @param extend Passed to [grid::pattern()]. Default `"repeat"`.
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
@@ -1392,7 +1416,8 @@ fill_gradient <- function(colors = c("white", "black"),
 fill_vignette <- function(color = "black",
                            background = NA,
                            spacing = 1,
-                           aspect = 1) {
+                           aspect = 1,
+                           extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   if (!is.character(color) || length(color) != 1) {
     rlang::abort("color must be a single string")
@@ -1427,7 +1452,7 @@ fill_vignette <- function(color = "black",
     grid::gTree(children = grid::gList(bg, fg))
   }
 
-  grid::pattern(content, width = spacing, height = spacing * aspect, extend = "repeat")
+  grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
 }
 
 #' Striped pattern fill
@@ -1460,6 +1485,10 @@ fill_vignette <- function(color = "black",
 #' @param spacing One stripe period (`color1` band plus `color2` band), as
 #'   a fraction of the target's bounding box. Must be a positive number.
 #'   Default `0.2`.
+#' @param extend Passed to the inner [grid::linearGradient()], controlling
+#'   what happens beyond the colour stops -- *not* to the outer
+#'   [grid::pattern()] call, which always uses `extend = "repeat"` (see
+#'   details). Default `"repeat"`.
 #' @inheritParams fill_hatch
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for

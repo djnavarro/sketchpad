@@ -21,6 +21,8 @@ test_that("fill_hatch() validates its arguments", {
   expect_error(fill_hatch(aspect = 0), "aspect")
   expect_error(fill_hatch(aspect = -1), "aspect")
   expect_error(fill_hatch(angle = c(1, 2)), "angle")
+  expect_error(fill_hatch(linewidth = 0), "linewidth")
+  expect_error(fill_hatch(linewidth = -1), "linewidth")
 })
 
 test_that("fill_hatch() handles axis-aligned angles without error", {
@@ -45,6 +47,8 @@ test_that("fill_crosshatch() validates its arguments", {
   expect_error(fill_crosshatch(aspect = 0), "aspect")
   expect_error(fill_crosshatch(aspect = -1), "aspect")
   expect_error(fill_crosshatch(angle = c(1, 2)), "angle")
+  expect_error(fill_crosshatch(linewidth = 0), "linewidth")
+  expect_error(fill_crosshatch(linewidth = -1), "linewidth")
 })
 
 test_that("fill_crosshatch() handles angles that are multiples of 90 without error", {
@@ -110,6 +114,19 @@ test_that("fill_stripe() tile content is filled with a hard-stop linear gradient
   gradient <- environment(fill_stripe()$f)$grob$gp$fill
   expect_s3_class(gradient, "GridLinearGradient")
   expect_identical(gradient$stops, c(0, 0.5, 0.5, 1))
+})
+
+test_that("fill_stripe()'s extend argument reaches the inner gradient, not the outer pattern", {
+  fill_default <- fill_stripe()
+  fill_custom <- fill_stripe(extend = "pad")
+  # the outer pattern() call always uses "repeat" -- see fill_stripe() details
+  expect_identical(fill_default$extend, "repeat")
+  expect_identical(fill_custom$extend, "repeat")
+  # extend itself is threaded through to the inner linearGradient()
+  gradient_default <- environment(fill_default$f)$grob$gp$fill
+  gradient_custom <- environment(fill_custom$f)$grob$gp$fill
+  expect_identical(gradient_default$extend, "repeat")
+  expect_identical(gradient_custom$extend, "pad")
 })
 
 test_that("fill_stipple() returns a grid pattern object", {
@@ -252,6 +269,8 @@ test_that("fill_scribble() validates its arguments", {
   expect_error(fill_scribble(resolution = 4.5), "resolution")
   expect_error(fill_scribble(color = 1), "color")
   expect_error(fill_scribble(color = c("red", "blue")), "color")
+  expect_error(fill_scribble(linewidth = 0), "linewidth")
+  expect_error(fill_scribble(linewidth = -1), "linewidth")
   expect_error(fill_scribble(seed = 1.5), "seed")
 })
 
@@ -530,4 +549,10 @@ test_that("fill_vignette() draws a background layer only when requested", {
   with_bg_children <- environment(fill_vignette(background = "white")$f)$grob$children
   expect_length(no_bg_children, 1)
   expect_length(with_bg_children, 2)
+})
+
+test_that("fill_vignette() exposes and forwards an extend argument", {
+  expect_identical(fill_vignette()$extend, "repeat")
+  expect_identical(fill_vignette(extend = "pad")$extend, "pad")
+  expect_identical(fill_vignette(extend = "none")$extend, "none")
 })

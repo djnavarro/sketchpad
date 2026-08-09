@@ -23,7 +23,7 @@ fill_marble(
 \code{"white"} and \code{"black"}.}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's bounding
-box. Must be a positive number. Default \code{0.1}.}
+box. Must be a positive number. Default \code{0.5}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
 Must be a positive number. Default \code{1} (a square bounding box).}
@@ -40,8 +40,8 @@ band coordinate. Must be a non-negative number. Default \code{4}.}
 \item{frequency}{Noise frequency, as in \code{\link[=blob]{blob()}}. Must be non-negative.
 Default \code{1}.}
 
-\item{octaves}{Number of noise octaves, as in \code{\link[=blob]{blob()}}. Must be a
-positive integer. Default \code{2L}.}
+\item{octaves}{Number of turbulence octaves, as in \code{\link[=blob]{blob()}}. Must be a
+positive integer. Default \code{3L}.}
 
 \item{seed}{Integer seed for the noise field, as in \code{\link[=blob]{blob()}}. Default
 \code{1L}.}

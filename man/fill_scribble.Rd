@@ -38,10 +38,10 @@ positive integer of at least \code{2L}. Default \code{200L}.}
 
 \item{color}{Line colour. Default \code{"black"}.}
 
-\item{linewidth}{Line width. Default \code{1}.}
+\item{linewidth}{Line width. Must be a positive number. Default \code{1}.}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's bounding
-box. Must be a positive number. Default \code{0.1}.}
+box. Must be a positive number. Default \code{0.25}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
 Must be a positive number. Default \code{1} (a square bounding box).}

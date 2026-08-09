@@ -25,7 +25,7 @@ Must be a positive number. Default \code{1} (a square bounding box).}
 
 \item{color}{Line colour. Default \code{"black"}.}
 
-\item{linewidth}{Line width. Default \code{1}.}
+\item{linewidth}{Line width. Must be a positive number. Default \code{1}.}
 
 \item{extend}{Passed to \code{\link[grid:pattern]{grid::pattern()}}. Default \code{"repeat"}.}
 }

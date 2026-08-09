@@ -171,6 +171,20 @@ full debugging narrative):
   references point at each other and none of their `.Rd` files exist
   yet; a second `document()` call resolves them all. Don't chase this
   warning by rewording the docs.
+- **`@inheritParams` copies the *literal doc text* of the source
+  function, including any "Default `X`" wording -- it does not check
+  that the borrowing function's own default actually matches `X`.** A
+  pre-merge audit of the `fill_*()` family (all of which lean on
+  `@inheritParams fill_hatch()`/`fill_noise()`/`fill_stipple()` for
+  `spacing`/`aspect`/`color`/`extend`) found several silently-wrong
+  inherited defaults this way -- e.g. `fill_noise()`'s real `spacing`
+  default is `0.5`, but its docs said `0.1` (fill_hatch()'s own
+  default) until fixed. Whenever a new `fill_*()` helper's own default
+  differs from the function it inherits params from, give that
+  parameter its own explicit `@param` overriding the inherited text
+  (as `fill_scatter()`/`fill_gradient()`/`fill_vignette()`/
+  `fill_stripe()` already do for `spacing`) rather than relying on
+  `@inheritParams` to get the number right.
 - **`@export` on an individual `method(generic, class) <- function(...)`
   assignment generates its own `.Rd` page with a `\usage` section that
   won't match hand-written `@param` docs** (e.g. a method's `xlim`/

@@ -17,7 +17,7 @@ fill_checker(
 \code{"white"}.}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's bounding
-box. Must be a positive number. Default \code{0.1}.}
+box. Must be a positive number. Default \code{0.2}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
 Must be a positive number. Default \code{1} (a square bounding box).}

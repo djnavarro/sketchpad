@@ -32,7 +32,10 @@ Default \code{0.2}.}
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
 Must be a positive number. Default \code{1} (a square bounding box).}
 
-\item{extend}{Passed to \code{\link[grid:pattern]{grid::pattern()}}. Default \code{"repeat"}.}
+\item{extend}{Passed to the inner \code{\link[grid:linearGradient]{grid::linearGradient()}}, controlling
+what happens beyond the colour stops -- \emph{not} to the outer
+\code{\link[grid:pattern]{grid::pattern()}} call, which always uses \code{extend = "repeat"} (see
+details). Default \code{"repeat"}.}
 }
 \value{
 A pattern object as returned by \code{\link[grid:pattern]{grid::pattern()}}, suitable for
