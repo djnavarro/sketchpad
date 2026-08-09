@@ -183,12 +183,12 @@ test_that("fill_scatter() validates its arguments", {
 })
 
 test_that("fill_scatter() accepts an arbitrary drawable as the scattered unit", {
-  expect_s3_class(fill_scatter(unit = blob(radius = 1, seed = 7L)), "GridPattern")
-  expect_s3_class(fill_scatter(unit = bezier(x = c(0, 1, 0), y = c(0, 1, 2))), "GridPattern")
+  expect_s3_class(fill_scatter(unit = shape_blob(radius = 1, seed = 7L)), "GridPattern")
+  expect_s3_class(fill_scatter(unit = shape_bezier(x = c(0, 1, 0), y = c(0, 1, 2))), "GridPattern")
 })
 
 test_that("fill_scatter() accepts a unit whose own fill is another fill_*() pattern", {
-  nested_unit <- circle(radius = 1, fill = fill_hatch())
+  nested_unit <- shape_circle(radius = 1, fill = fill_hatch())
   expect_s3_class(fill_scatter(unit = nested_unit), "GridPattern")
 })
 

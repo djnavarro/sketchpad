@@ -1,6 +1,6 @@
 #' A circle
 #'
-#' `circle` is a [drawable] defined by a centroid and a radius; its
+#' `shape_circle` is a [drawable] defined by a centroid and a radius; its
 #' vertices are computed as evenly spaced points around the circumference.
 #'
 #' @param x,y Centroid coordinates. Default `0`.
@@ -9,8 +9,8 @@
 #' @param ... Arguments passed to [style()].
 #'
 #' @export
-circle <- S7::new_class(
-  name = "circle",
+shape_circle <- S7::new_class(
+  name = "shape_circle",
   parent = drawable,
   properties = list(
     x      = S7::class_numeric,

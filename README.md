@@ -15,9 +15,9 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 sketchpad is a lightweight, [p5.js](https://p5js.org/)-inspired drawing
 system for generative art, built on
 [S7](https://rconsortium.github.io/S7/) classes and `grid` graphics. It
-provides a small set of `drawable` shapes (`circle()`, `blob()`,
-`ribbon()`, `twist()`) that can be composed into a `sketch()` and
-rendered with `draw()`.
+provides a small set of `drawable` shapes (`shape_circle()`,
+`shape_blob()`, `shape_ribbon()`, `shape_twist()`) that can be composed
+into a `sketch()` and rendered with `draw()`.
 
 ## Installation
 
@@ -31,8 +31,8 @@ pak::pak("djnavarro/sketchpad")
 
 ## A ring of blobs
 
-A `blob()` is a circle whose radius is perturbed by simplex noise. Here
-six blobs are arranged around a ring, one per colour:
+A `shape_blob()` is a circle whose radius is perturbed by simplex noise.
+Here six blobs are arranged around a ring, one per colour:
 
 ``` r
 library(sketchpad)
@@ -49,7 +49,7 @@ values <- tibble::tibble(
   fill = c("#e50000", "#ff8d00", "#ffee00", "#028121", "#004cff", "#770088"),
   color = fill
 )
-blobs <- purrr::pmap(values, blob)
+blobs <- purrr::pmap(values, shape_blob)
 blobs |> sketch() |> draw()
 ```
 
@@ -73,7 +73,7 @@ values <- tibble::tibble(
   range = runif(n_blobs, min = 0, max = .5),
   color = fill
 )
-blobs <- purrr::pmap(values, blob)
+blobs <- purrr::pmap(values, shape_blob)
 blobs |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 ```
 
@@ -81,7 +81,7 @@ blobs |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 
 ## Ribbons
 
-A `ribbon()` is a tapered, noise-displaced band drawn between two
+A `shape_ribbon()` is a tapered, noise-displaced band drawn between two
 points:
 
 ``` r
@@ -98,7 +98,7 @@ values <- tibble::tibble(
   fill = sample(palette, n_ribbons, replace = TRUE),
   color = fill
 )
-ribbons <- purrr::pmap(values, ribbon)
+ribbons <- purrr::pmap(values, shape_ribbon)
 ribbons |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 ```
 
@@ -106,8 +106,8 @@ ribbons |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 
 ## Twists
 
-A `twist()` is like a ribbon, but follows a Brownian bridge instead of a
-straight line, giving it a wandering, twisted appearance:
+A `shape_twist()` is like a ribbon, but follows a Brownian bridge
+instead of a straight line, giving it a wandering, twisted appearance:
 
 ``` r
 set.seed(1)
@@ -124,7 +124,7 @@ values <- tibble::tibble(
   fill = sample(palette, n_twists, replace = TRUE),
   color = fill
 )
-twists <- purrr::pmap(values, twist)
+twists <- purrr::pmap(values, shape_twist)
 twists |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 ```
 

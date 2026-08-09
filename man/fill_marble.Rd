@@ -37,13 +37,13 @@ turbulence displacement. Must be a positive integer. Default \code{3L}.}
 \item{warp}{Turbulence amplitude, in radians of displacement along the
 band coordinate. Must be a non-negative number. Default \code{4}.}
 
-\item{frequency}{Noise frequency, as in \code{\link[=blob]{blob()}}. Must be non-negative.
+\item{frequency}{Noise frequency, as in \code{\link[=shape_blob]{shape_blob()}}. Must be non-negative.
 Default \code{1}.}
 
-\item{octaves}{Number of turbulence octaves, as in \code{\link[=blob]{blob()}}. Must be a
+\item{octaves}{Number of turbulence octaves, as in \code{\link[=shape_blob]{shape_blob()}}. Must be a
 positive integer. Default \code{3L}.}
 
-\item{seed}{Integer seed for the noise field, as in \code{\link[=blob]{blob()}}. Default
+\item{seed}{Integer seed for the noise field, as in \code{\link[=shape_blob]{shape_blob()}}. Default
 \code{1L}.}
 
 \item{extend}{Passed to \code{\link[grid:pattern]{grid::pattern()}}. Default \code{"repeat"}.}

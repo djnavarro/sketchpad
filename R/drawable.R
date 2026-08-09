@@ -3,7 +3,8 @@
 #' `drawable` enforces structure on its subclasses: every drawable must
 #' carry a [style] and expose a computed [points] property. It is not
 #' intended to be instantiated directly; use one of its subclasses
-#' ([shape], [circle], [blob], [ribbon], [twist]) instead.
+#' ([shape_raw], [shape_circle], [shape_blob], [shape_ribbon],
+#' [shape_twist]) instead.
 #'
 #' @param ... Arguments passed to [style()].
 #'

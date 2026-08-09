@@ -1,6 +1,6 @@
 #' Evaluate a Bezier curve via Bernstein polynomials
 #'
-#' Internal helper used by [bezier] to evaluate one coordinate axis of a
+#' Internal helper used by [shape_bezier] to evaluate one coordinate axis of a
 #' Bezier curve at a vector of parameter values, using the Bernstein
 #' polynomial basis (rather than De Casteljau's algorithm).
 #'
@@ -21,12 +21,13 @@ bernstein <- function(beta, t = seq(0, 1, .01)) {
 
 #' A Bezier curve
 #'
-#' `bezier` is a [drawable] whose outline follows a Bezier curve defined
-#' by an arbitrary number of control points (`x`, `y`). With two control
-#' points this is a straight line; with four, a cubic Bezier of the kind
-#' used to build ribbons and other flowing shapes. Since [draw()] always
-#' renders a `drawable`'s `points` as a closed polygon, the curve is
-#' implicitly closed from its last control point back to its first.
+#' `shape_bezier` is a [drawable] whose outline follows a Bezier curve
+#' defined by an arbitrary number of control points (`x`, `y`). With two
+#' control points this is a straight line; with four, a cubic Bezier of
+#' the kind used to build ribbons and other flowing shapes. Since
+#' [draw()] always renders a `drawable`'s `points` as a closed polygon,
+#' the curve is implicitly closed from its last control point back to
+#' its first.
 #'
 #' @param x,y Numeric vectors of control point coordinates. Must be the
 #'   same length, with at least two control points.
@@ -34,8 +35,8 @@ bernstein <- function(beta, t = seq(0, 1, .01)) {
 #' @param ... Arguments passed to [style()].
 #'
 #' @export
-bezier <- S7::new_class(
-  name = "bezier",
+shape_bezier <- S7::new_class(
+  name = "shape_bezier",
   parent = drawable,
   properties = list(
     x = S7::class_numeric,

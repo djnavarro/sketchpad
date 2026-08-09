@@ -16,6 +16,6 @@ test_that("style() rejects a fill that is neither a string nor a GridPattern", {
 })
 
 test_that("drawable constructors forward fill_*() outputs to style() unchanged", {
-  b <- blob(fill = fill_stipple())
+  b <- shape_blob(fill = fill_stipple())
   expect_true(inherits(b@style@fill, "GridPattern"))
 })

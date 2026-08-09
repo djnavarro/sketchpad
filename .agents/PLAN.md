@@ -9,16 +9,22 @@ rather than marked "done" in place.
 ## Deferred: port `bezier_ribbon` from series-lissajous
 
 `series-lissajous`'s `bezier_ribbon` combines a Bezier path with the same
-noise-perturbed perpendicular-offset logic `ribbon`/`twist` already use,
-giving a curved (rather than straight or Brownian-bridge) ribbon. Not
-ported yet -- `bezier` (the plain curve) was the requested unit of work.
-Would slot in as `R/bezier_ribbon.R`, immediately after `bezier.R` in
-`Collate`.
+noise-perturbed perpendicular-offset logic `shape_ribbon`/`shape_twist`
+already use, giving a curved (rather than straight or Brownian-bridge)
+ribbon. Not ported yet -- `shape_bezier` (the plain curve) was the
+requested unit of work. Would slot in as `R/shape_bezier_ribbon.R`,
+immediately after `shape_bezier.R` in `Collate`.
+
+**Naming note:** when this is ported, name the constructor
+`shape_bezier_ribbon()` (not bare `bezier_ribbon()`), to match the
+`shape_*` prefix convention adopted for every drawable-producing
+constructor -- see `.agents/HISTORY.md`'s "Renaming drawable
+constructors to a shared `shape_*` prefix" entry.
 
 ## Deferred: open/stroked curve support
 
 Every `drawable` currently renders as a closed `grid::polygonGrob()`.
-`bezier` in particular would also be useful as an open, stroked path
+`shape_bezier` in particular would also be useful as an open, stroked path
 (`grid::polylineGrob()` or `grid::linesGrob()`) rather than always
 implicitly closing back to its first control point. No concrete need has
 forced a decision on the API shape yet (a `closed = TRUE/FALSE` property
@@ -48,7 +54,7 @@ sketchbook independent of the package's release cycle.
 ## Deferred: decide what belongs in sketchpad vs. stays series-specific
 
 Series repos (e.g. `series-lissajous`) extend the core drawing system
-with series-specific classes. `bezier` was pulled into the shared
+with series-specific classes. `shape_bezier` was pulled into the shared
 package; other series-specific shapes have not been reviewed for
 candidacy. No process yet for deciding "shared primitive" vs.
 "series-specific one-off."
@@ -62,10 +68,10 @@ to pick up, reject, or refine later -- none are scheduled.
 
 ### Additional primitive shapes
 
-`rectangle`/`square`, `polygon` (regular n-gon), `ellipse` (`circle` is
-currently radius-only, with no independent x/y radii), `arc`/`wedge` (a
+`rectangle`/`square`, `polygon` (regular n-gon), `ellipse` (`shape_circle`
+is currently radius-only, with no independent x/y radii), `arc`/`wedge` (a
 partial circle/annulus), `star`, a bare `line` (an open segment, distinct
-from `ribbon`'s width), and `spiral` -- several `series-*` repo names
+from `shape_ribbon`'s width), and `spiral` -- several `series-*` repo names
 (e.g. `series-nautilus`) suggest spirals recur often enough across
 projects to be worth a shared primitive rather than a one-off.
 
@@ -81,7 +87,7 @@ currently uses.
 
 (See also the existing "Deferred: open/stroked curve support" item
 above -- these overlap, kept separate since one is scoped narrowly to
-`bezier` and this one is the more general open-vs-closed rendering
+`shape_bezier` and this one is the more general open-vs-closed rendering
 question for any `drawable`.) Would also want line styling beyond the
 current single `linewidth`: dash patterns, line caps/joins.
 
@@ -127,7 +133,7 @@ would mirror that same example's use case.
 
 Building many shapes currently always goes through `purrr::pmap()` over
 a tibble of parameters (see every `README.Rmd` example). A plural
-constructor (e.g. `circles(x = ..., y = ..., ...)`, vectorized over its
+constructor (e.g. `shape_circles(x = ..., y = ..., ...)`, vectorized over its
 arguments) could return a `sketch` directly instead.
 
 ### `print`/`format` methods
@@ -145,9 +151,10 @@ every series/example inlining its own palette vector (as all four
 
 ### Broader test coverage and runnable examples
 
-Test coverage is currently concentrated on `bezier` plus a few
-`sketch`-level tests (`+`, validation, `convert()`); `circle`/`blob`/
-`ribbon`/`twist` have no dedicated tests. Most `@examples` blocks are
+Test coverage is currently concentrated on `shape_bezier` plus a few
+`sketch`-level tests (`+`, validation, `convert()`); `shape_circle`/
+`shape_blob`/`shape_ribbon`/`shape_twist` have no dedicated tests. Most
+`@examples` blocks are
 `\dontrun{}` or absent entirely; per-drawable runnable examples would
 both document and exercise the geometry.
 

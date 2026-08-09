@@ -41,8 +41,8 @@ use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 \code{fill_stipple()} builds a \code{\link[grid:pattern]{grid::pattern()}} fill value that scatters a
 handful of dots at random positions inside each tile, using
 \code{\link[withr:with_seed]{withr::with_seed()}} so the same \code{seed} always reproduces the same
-scatter (the same convention used by \code{\link[=blob]{blob()}}, \code{\link[=ribbon]{ribbon()}}, and
-\code{\link[=twist]{twist()}}'s noise fields).
+scatter (the same convention used by \code{\link[=shape_blob]{shape_blob()}}, \code{\link[=shape_ribbon]{shape_ribbon()}},
+and \code{\link[=shape_twist]{shape_twist()}}'s noise fields).
 }
 \details{
 Unlike \code{\link[=fill_hatch]{fill_hatch()}}/\code{\link[=fill_crosshatch]{fill_crosshatch()}}, a dot has no direction, so

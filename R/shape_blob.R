@@ -1,8 +1,8 @@
 #' An irregular, "blobby" circle
 #'
-#' `blob` is a [drawable] similar to [circle], except that its radius
-#' varies smoothly around the circumference according to Perlin/simplex
-#' noise generated with \pkg{ambient}.
+#' `shape_blob` is a [drawable] similar to [shape_circle], except that its
+#' radius varies smoothly around the circumference according to
+#' Perlin/simplex noise generated with \pkg{ambient}.
 #'
 #' @param x,y Centroid coordinates. Default `0`.
 #' @param radius Mean radius. Must be non-negative. Default `1`.
@@ -16,8 +16,8 @@
 #' @param ... Arguments passed to [style()].
 #'
 #' @export
-blob <- S7::new_class(
-  name = "blob",
+shape_blob <- S7::new_class(
+  name = "shape_blob",
   parent = drawable,
   properties = list(
     x          = S7::class_numeric,

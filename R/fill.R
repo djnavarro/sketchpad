@@ -298,8 +298,8 @@ fill_checker <- function(color1 = "black",
 #' `fill_stipple()` builds a [grid::pattern()] fill value that scatters a
 #' handful of dots at random positions inside each tile, using
 #' [withr::with_seed()] so the same `seed` always reproduces the same
-#' scatter (the same convention used by [blob()], [ribbon()], and
-#' [twist()]'s noise fields).
+#' scatter (the same convention used by [shape_blob()], [shape_ribbon()],
+#' and [shape_twist()]'s noise fields).
 #'
 #' Unlike [fill_hatch()]/[fill_crosshatch()], a dot has no direction, so
 #' there's no analogue of their tile-edge "dashing" problem here. There's
@@ -445,7 +445,7 @@ fill_stipple <- function(color = "black",
 #'   repetition, `spacing < 1`, was.)
 #'
 #' @param unit A small [drawable] to scatter copies of. Default
-#'   `circle(radius = 1)`.
+#'   `shape_circle(radius = 1)`.
 #' @param n Number of copies scattered per tile. Must be a positive
 #'   integer. Default `6L`.
 #' @param size `unit`'s rescaled size, as a `"npc"` fraction of the tile.
@@ -464,7 +464,7 @@ fill_stipple <- function(color = "black",
 #'
 #' @family fill helpers
 #' @export
-fill_scatter <- function(unit = circle(radius = 1),
+fill_scatter <- function(unit = shape_circle(radius = 1),
                           n = 6L,
                           size = 0.2,
                           spacing = 1,
@@ -840,7 +840,7 @@ torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
 #'
 #' `fill_noise()` builds a [grid::pattern()] fill value from a rasterised
 #' simplex/fractal noise field, using the same noise machinery as
-#' [blob()]'s wobbly outline (`ambient::fracture()` /
+#' [shape_blob()]'s wobbly outline (`ambient::fracture()` /
 #' `ambient::gen_simplex()` / `ambient::fbm()`, with matching `frequency`,
 #' `octaves`, and `seed` arguments), so a noise-filled shape and a
 #' noise-wobbled outline share one visual vocabulary.
@@ -876,11 +876,11 @@ torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
 #'   positive integer of at least `2L`. Default `32L`.
 #' @param alpha Maximum opacity, at the noise field's peak. Must be a number
 #'   in `(0, 1]`. Default `1`.
-#' @param frequency Noise frequency, as in [blob()]. Must be non-negative.
+#' @param frequency Noise frequency, as in [shape_blob()]. Must be non-negative.
 #'   Default `1`.
-#' @param octaves Number of noise octaves, as in [blob()]. Must be a
+#' @param octaves Number of noise octaves, as in [shape_blob()]. Must be a
 #'   positive integer. Default `2L`.
-#' @param seed Integer seed for the noise field, as in [blob()]. Default
+#' @param seed Integer seed for the noise field, as in [shape_blob()]. Default
 #'   `1L`.
 #' @inheritParams fill_hatch
 #'
@@ -975,7 +975,7 @@ fill_noise <- function(color = "black",
 #'   turbulence displacement. Must be a positive integer. Default `3L`.
 #' @param warp Turbulence amplitude, in radians of displacement along the
 #'   band coordinate. Must be a non-negative number. Default `4`.
-#' @param octaves Number of turbulence octaves, as in [blob()]. Must be a
+#' @param octaves Number of turbulence octaves, as in [shape_blob()]. Must be a
 #'   positive integer. Default `3L`.
 #' @inheritParams fill_noise
 #'

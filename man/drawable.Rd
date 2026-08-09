@@ -13,5 +13,6 @@ drawable(...)
 \code{drawable} enforces structure on its subclasses: every drawable must
 carry a \link{style} and expose a computed \link{points} property. It is not
 intended to be instantiated directly; use one of its subclasses
-(\link{shape}, \link{circle}, \link{blob}, \link{ribbon}, \link{twist}) instead.
+(\link{shape_raw}, \link{shape_circle}, \link{shape_blob}, \link{shape_ribbon},
+\link{shape_twist}) instead.
 }

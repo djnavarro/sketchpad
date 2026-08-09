@@ -14,6 +14,6 @@ points(x = integer(0), y = integer(0))
 \description{
 \code{points} represents the vertices of a polygon as parallel \code{x} and \code{y}
 coordinate vectors. Most \link{drawable} subclasses expose \code{points} as a
-computed property; \link{shape} is the exception, where the user supplies
-\code{x}/\code{y} directly.
+computed property; \link{shape_raw} is the exception, where the user
+supplies \code{x}/\code{y} directly.
 }

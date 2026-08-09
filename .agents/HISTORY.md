@@ -450,3 +450,38 @@ from `fill_stipple()` via `@inheritParams`, and roxyger2 orders
 just the formal was enough); `fill_hatch()`/`fill_stipple()`/
 `fill_scribble()`'s own `@param color` lines were moved to match, for
 source readability, though this has no effect on the generated Rd.
+
+## Renaming drawable constructors to a shared `shape_*` prefix
+
+The five concrete drawable constructors (`circle`, `blob`, `ribbon`,
+`twist`, `bezier`) plus the trivial `shape` constructor were, before this
+change, a set of bare top-level names with no shared prefix -- unlike
+the `fill_*()` texture family, nothing in their names signalled "these
+all construct a drawable polygon." Renamed to `shape_circle`,
+`shape_blob`, `shape_ribbon`, `shape_twist`, `shape_bezier`, and
+`shape_raw` (the last replacing bare `shape`, since leaving one function
+in the family unprefixed would have undercut the point of the scheme).
+Considered `draw_*` (rejected: collides conceptually with the existing
+`draw()` rendering generic), `poly_*` (rejected: introduces a new term
+not otherwise used in the package's vocabulary), and `drawable_*`
+(rejected: accurate but more verbose than `fill_*()`'s own prefix
+length). `shape_*` was preferred because "shape" was already the
+package's own word for this concept (see `drawable`'s own roxygen docs
+pre-rename, and `fill_scatter()`'s docs).
+
+Renaming the S7 class generator variable (e.g. `circle <- S7::new_class(name
+= "circle", ...)`) automatically renames both the constructor function and
+the class itself, since S7 class generators serve both roles -- so class
+names changed too (`"sketchpad::shape_circle"`, not
+`"sketchpad::circle"`), including the dispatch class used by
+`convert()`'s `method(convert, list(drawable, shape_raw))`. The six
+per-drawable source files were renamed to match (`R/circle.R` ->
+`R/shape_circle.R`, etc.), with `DESCRIPTION`'s `Collate` field updated
+to the new filenames in the same relative order. Every call site across
+`R/` (`fill.R`'s `fill_scatter()` default unit, cross-referencing
+roxygen `[links]`), `tests/testthat/`, and `README.Rmd` was updated;
+`devtools::document()` needed two passes (per the existing "could not
+resolve link" gotcha) before all cross-references between the renamed
+topics resolved cleanly, and `R CMD check` was re-run to confirm 0
+errors/warnings/notes. No deprecation shim was added for the old names,
+since the package has never been released.

@@ -1,22 +1,60 @@
-#' A tapered ribbon between two points
+#' Generate a smoothed Brownian bridge
 #'
-#' `ribbon` is a [drawable] polygon that follows a straight line between
-#' `(x, y)` and `(xend, yend)`, with a width that tapers at both ends and
-#' varies along its length according to simplex noise.
+#' Internal helper used by [shape_twist] to displace its path away from a
+#' straight line. Generates a Brownian bridge on `n` points over `[0, 1]`
+#' (a discretized Wiener process pinned to `0` at both ends, matching
+#' `e1071::rbridge()`'s construction but implemented directly to avoid
+#' the dependency), scales it, and optionally smooths it with repeated
+#' local averaging.
+#'
+#' @param n Number of points in the bridge.
+#' @param scale Multiplicative scale applied to the bridge.
+#' @param smooth Number of smoothing passes (`0` = no smoothing).
+#' @param seed Integer seed.
+#'
+#' @return Numeric vector of length `n`.
+#' @noRd
+smooth_bridge <- function(n, scale = .1, smooth = 0, seed = 1L) {
+  withr::with_seed(
+    seed = seed,
+    code = {
+      # Discretized Wiener process on n - 1 steps over (0, 1], then
+      # subtract the line through the origin and its own endpoint to
+      # pin both ends to 0 (the definition of a Brownian bridge).
+      z <- cumsum(stats::rnorm(n - 1) / sqrt(n - 1))
+      t <- seq_len(n - 1) / (n - 1)
+      b <- c(0, z - t * z[n - 1])
+    }
+  )
+  b <- b * scale
+  if (smooth > 0) {
+    for (i in 1:smooth) {
+      b <- (b + c(b[-1], 0) / 2 + c(0, b[-n]) / 2) / 2
+    }
+  }
+  b
+}
+
+#' A twisted ribbon following a random path
+#'
+#' `shape_twist` is like [shape_ribbon], but the underlying path is a
+#' Brownian bridge rather than a straight line, giving the polygon a
+#' wandering, twisted appearance.
 #'
 #' @param x,y Start point. Default `0`.
 #' @param xend,yend End point. Default `1`.
 #' @param width Maximum width. Must be non-negative. Default `0.2`.
+#' @param smooth Number of smoothing passes applied to the path. Default `3L`.
 #' @param n Number of points used along the path. Default `100L`.
 #' @param frequency Noise frequency. Must be non-negative. Default `1`.
 #' @param octaves Number of noise octaves. Must be a positive integer.
 #'   Default `2L`.
-#' @param seed Integer seed for the noise field. Default `1L`.
+#' @param seed Integer seed for the noise field and path. Default `1L`.
 #' @param ... Arguments passed to [style()].
 #'
 #' @export
-ribbon <- S7::new_class(
-  name = "ribbon",
+shape_twist <- S7::new_class(
+  name = "shape_twist",
   parent = drawable,
   properties = list(
     x          = S7::class_numeric,
@@ -24,15 +62,39 @@ ribbon <- S7::new_class(
     xend       = S7::class_numeric,
     yend       = S7::class_numeric,
     width      = S7::class_numeric,
+    smooth     = S7::class_numeric,
     n          = S7::class_integer,
     frequency  = S7::class_numeric,
     octaves    = S7::class_integer,
     seed       = S7::class_integer,
+    path = S7::new_property(
+      class = points,
+      getter = function(self) {
+        x_base <- seq(self@x, self@xend, length.out = self@n)
+        y_base <- seq(self@y, self@yend, length.out = self@n)
+        x_disp <- smooth_bridge(
+          n = self@n,
+          smooth = self@smooth,
+          scale = 0.1 * self@width,
+          seed = self@seed
+        )
+        y_disp <- smooth_bridge(
+          n = self@n,
+          smooth = self@smooth,
+          scale = 0.1 * self@width,
+          seed = self@seed + 1
+        )
+        points(
+          x = x_base + x_disp,
+          y = y_base + y_disp
+        )
+      }
+    ),
     points = S7::new_property(
       class = points,
       getter = function(self) {
-        x <- seq(self@x, self@xend, length.out = self@n)
-        y <- seq(self@y, self@yend, length.out = self@n)
+        x <- self@path@x
+        y <- self@path@y
         displacement <- ambient::fracture(
           noise = ambient::gen_simplex,
           fractal = ambient::fbm,
@@ -61,6 +123,7 @@ ribbon <- S7::new_class(
                          xend = 1,
                          yend = 1,
                          width = 0.2,
+                         smooth = 3L,
                          n = 100L,
                          frequency = 1,
                          octaves = 2L,
@@ -73,6 +136,7 @@ ribbon <- S7::new_class(
       xend = xend,
       yend = yend,
       width = width,
+      smooth = smooth,
       n = n,
       frequency = frequency,
       octaves = octaves,

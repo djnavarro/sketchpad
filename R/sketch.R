@@ -2,13 +2,14 @@
 #'
 #' `sketch` is a list of [drawable] objects that can be rendered together
 #' with a single call to [draw()]. Sketches can be built up incrementally
-#' using the `+` operator, e.g. `sketch() + circle() + circle(x = 2)`.
+#' using the `+` operator, e.g.
+#' `sketch() + shape_circle() + shape_circle(x = 2)`.
 #'
 #' @param shapes A list of [drawable]-classed objects. Default `list()`.
 #'
 #' @examples
 #' \dontrun{
-#' s <- sketch() + circle(radius = 1) + circle(x = 2, radius = 0.5)
+#' s <- sketch() + shape_circle(radius = 1) + shape_circle(x = 2, radius = 0.5)
 #' draw(s)
 #' }
 #'

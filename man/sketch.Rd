@@ -12,11 +12,12 @@ sketch(shapes = list())
 \description{
 \code{sketch} is a list of \link{drawable} objects that can be rendered together
 with a single call to \code{\link[=draw]{draw()}}. Sketches can be built up incrementally
-using the \code{+} operator, e.g. \code{sketch() + circle() + circle(x = 2)}.
+using the \code{+} operator, e.g.
+\code{sketch() + shape_circle() + shape_circle(x = 2)}.
 }
 \examples{
 \dontrun{
-s <- sketch() + circle(radius = 1) + circle(x = 2, radius = 0.5)
+s <- sketch() + shape_circle(radius = 1) + shape_circle(x = 2, radius = 0.5)
 draw(s)
 }
 

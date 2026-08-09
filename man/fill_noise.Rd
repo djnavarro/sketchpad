@@ -31,13 +31,13 @@ positive integer of at least \code{2L}. Default \code{32L}.}
 \item{alpha}{Maximum opacity, at the noise field's peak. Must be a number
 in \verb{(0, 1]}. Default \code{1}.}
 
-\item{frequency}{Noise frequency, as in \code{\link[=blob]{blob()}}. Must be non-negative.
+\item{frequency}{Noise frequency, as in \code{\link[=shape_blob]{shape_blob()}}. Must be non-negative.
 Default \code{1}.}
 
-\item{octaves}{Number of noise octaves, as in \code{\link[=blob]{blob()}}. Must be a
+\item{octaves}{Number of noise octaves, as in \code{\link[=shape_blob]{shape_blob()}}. Must be a
 positive integer. Default \code{2L}.}
 
-\item{seed}{Integer seed for the noise field, as in \code{\link[=blob]{blob()}}. Default
+\item{seed}{Integer seed for the noise field, as in \code{\link[=shape_blob]{shape_blob()}}. Default
 \code{1L}.}
 
 \item{extend}{Passed to \code{\link[grid:pattern]{grid::pattern()}}. Default \code{"repeat"}.}
@@ -49,7 +49,7 @@ use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 \description{
 \code{fill_noise()} builds a \code{\link[grid:pattern]{grid::pattern()}} fill value from a rasterised
 simplex/fractal noise field, using the same noise machinery as
-\code{\link[=blob]{blob()}}'s wobbly outline (\code{ambient::fracture()} /
+\code{\link[=shape_blob]{shape_blob()}}'s wobbly outline (\code{ambient::fracture()} /
 \code{ambient::gen_simplex()} / \code{ambient::fbm()}, with matching \code{frequency},
 \code{octaves}, and \code{seed} arguments), so a noise-filled shape and a
 noise-wobbled outline share one visual vocabulary.

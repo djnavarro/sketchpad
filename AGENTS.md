@@ -5,11 +5,12 @@
 sketchpad is a lightweight, p5.js-inspired drawing system for generative
 art, built on [S7](https://rconsortium.github.io/S7/) classes and `grid`
 graphics. It bypasses ggplot2 entirely: a small set of `drawable` shapes
-(`circle`, `blob`, `ribbon`, `twist`, `bezier`) expose a computed `points`
-property, are composed into a `sketch`, and rendered with `draw()`. It is
-the shared foundation extracted from the author's personal generative-art
-sketchbook (`sketches` repo) and is intended to be depended on by the
-various `series-*` generative art project repos.
+(`shape_circle`, `shape_blob`, `shape_ribbon`, `shape_twist`,
+`shape_bezier`) expose a computed `points` property, are composed into a
+`sketch`, and rendered with `draw()`. It is the shared foundation
+extracted from the author's personal generative-art sketchbook (`sketches`
+repo) and is intended to be depended on by the various `series-*`
+generative art project repos.
 
 ## Architecture reference (current state)
 
@@ -28,45 +29,53 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 - **`drawable`** -- parent class of every shape. Declares two properties:
   `style` (default `style()`) and a computed `points` property that
   subclasses override. Not meant to be instantiated directly.
-- **`shape`** -- the trivial drawable: `x`/`y` supplied directly as
+- **`shape_raw`** -- the trivial drawable: `x`/`y` supplied directly as
   `points`. Usually produced by `convert()`, not constructed by hand.
-- **`circle`** -- centroid + radius + `n` (point count); `points` is
-  `n` evenly-spaced points around the circumference.
-- **`blob`** -- like `circle`, but the radius is perturbed by simplex
-  noise (`ambient::fracture()`/`ambient::gen_simplex()`/`ambient::fbm()`),
-  giving an irregular outline. `range` controls noise amplitude,
-  `frequency`/`octaves`/`seed` control the noise field.
-- **`ribbon`** -- a tapered band between `(x, y)` and `(xend, yend)`,
-  width modulated by simplex noise and a `sqrt` taper that goes to zero
-  at both ends.
-- **`twist`** -- like `ribbon`, but the underlying path is a smoothed
-  Brownian bridge (built directly from `stats::rnorm()` via the internal
-  `smooth_bridge()` helper -- no longer a dependency on `e1071::rbridge()`,
-  which it reproduces bit-for-bit for the same seed) rather than a
-  straight line.
-- **`bezier`** -- outline follows a Bezier curve through an arbitrary
-  number of control points (`x`/`y`), evaluated via the Bernstein
-  polynomial basis (internal `bernstein()` helper, *not* De Casteljau's
-  algorithm). Ported from `series-lissajous`, but redesigned: the
-  original was a bare `S7_object` producing a `curve` data frame,
+- **`shape_circle`** -- centroid + radius + `n` (point count); `points`
+  is `n` evenly-spaced points around the circumference.
+- **`shape_blob`** -- like `shape_circle`, but the radius is perturbed by
+  simplex noise (`ambient::fracture()`/`ambient::gen_simplex()`/
+  `ambient::fbm()`), giving an irregular outline. `range` controls noise
+  amplitude, `frequency`/`octaves`/`seed` control the noise field.
+- **`shape_ribbon`** -- a tapered band between `(x, y)` and
+  `(xend, yend)`, width modulated by simplex noise and a `sqrt` taper
+  that goes to zero at both ends.
+- **`shape_twist`** -- like `shape_ribbon`, but the underlying path is a
+  smoothed Brownian bridge (built directly from `stats::rnorm()` via the
+  internal `smooth_bridge()` helper -- no longer a dependency on
+  `e1071::rbridge()`, which it reproduces bit-for-bit for the same seed)
+  rather than a straight line.
+- **`shape_bezier`** -- outline follows a Bezier curve through an
+  arbitrary number of control points (`x`/`y`), evaluated via the
+  Bernstein polynomial basis (internal `bernstein()` helper, *not* De
+  Casteljau's algorithm). Ported from `series-lissajous`, but redesigned:
+  the original was a bare `S7_object` producing a `curve` data frame,
   consumed internally by a separate `bezier_ribbon` drawable. Here
-  `bezier` itself has `parent = drawable`, so it's directly usable with
-  `draw()` -- at the cost of always rendering as a closed polygon (the
-  curve's last point connects straight back to its first), since every
-  `drawable`'s `points` are drawn with `grid::polygonGrob()`. There is no
-  open/stroked-curve option. `bezier_ribbon` itself has not been ported;
-  see PLAN.md.
+  `shape_bezier` itself has `parent = drawable`, so it's directly usable
+  with `draw()` -- at the cost of always rendering as a closed polygon
+  (the curve's last point connects straight back to its first), since
+  every `drawable`'s `points` are drawn with `grid::polygonGrob()`. There
+  is no open/stroked-curve option. `bezier_ribbon` itself has not been
+  ported; see PLAN.md.
 - **`sketch`** -- a list of `drawable`s (`shapes` property). Built up
-  with `sketch() + circle() + blob(...)`; the `+` method requires an S7
-  method registration, not an S3 `` `+.sketch` `` (see "Gotchas").
+  with `sketch() + shape_circle() + shape_blob(...)`; the `+` method
+  requires an S7 method registration, not an S3 `` `+.sketch` `` (see
+  "Gotchas").
 - **`draw()`** -- S7 generic, `dispatch_args = "object"`. Methods for
   `drawable` (single shape) and `sketch` (renders every shape into one
   shared, equal-aspect viewport); a catch-all method on `class_any` warns
   and returns `invisible(NULL)` for anything else. `xlim`/`ylim` default
   to the range of the object's own points.
 - **`convert()`** -- S7's own generic (not defined by this package); a
-  `method(convert, list(drawable, shape))` "freezes" any drawable's
-  computed points into a plain `shape`, preserving `style`.
+  `method(convert, list(drawable, shape_raw))` "freezes" any drawable's
+  computed points into a plain `shape_raw`, preserving `style`.
+
+All constructor functions for concrete drawables share the `shape_*`
+prefix (`shape_circle()`, `shape_blob()`, `shape_ribbon()`,
+`shape_twist()`, `shape_bezier()`, and the trivial `shape_raw()`),
+mirroring the `fill_*()` family below -- this groups the "produces a
+drawable polygon" functions under one discoverable, greppable prefix
+distinct from the `fill_*()`, `draw()`, and `convert()` families.
 
 ### Rendering model
 
@@ -92,7 +101,7 @@ checkerboard), `fill_stripe()` (solid alternating bands via a
 self-repeating hard-stop `grid::linearGradient()`, not tile repetition),
 `fill_stipple()`/`fill_scatter()`/`fill_halftone()` (scattered dots /
 arbitrary drawables / randomised-radius dots, all seeded via
-`withr::with_seed()` like `blob()`'s noise -- see "Known rendering risk"
+`withr::with_seed()` like `shape_blob()`'s noise -- see "Known rendering risk"
 in `fill_stipple()`'s docs), `fill_scribble()` (wandering lines built from
 random integer-frequency sine harmonics via the internal
 `scribble_lines()` helper -- periodic by construction, so tiles with no
@@ -156,17 +165,17 @@ full debugging narrative):
   fine under `devtools::load_all()` but silently fail to dispatch once
   the package is actually installed -- this only surfaced under
   `devtools::check()`, not interactive development.
-- **A drawable's `shape(x = ..., y = ..., style = from@style)`
-  shortcut doesn't work.** `shape()`'s constructor only has named
+- **A drawable's `shape_raw(x = ..., y = ..., style = from@style)`
+  shortcut doesn't work.** `shape_raw()`'s constructor only has named
   `x`/`y` parameters; everything else in `...` is forwarded to
   `style(...)`, so passing `style = <a style object>` tries to call
   `style(style = <...>)` and errors. `convert()` instead builds the
   shape from `x`/`y` alone, then reassigns `@style` afterward.
 - **R sources `R/*.R` alphabetically by default, which breaks subclass
-  definitions.** `blob.R` needs `drawable` (from `drawable.R`) to exist
-  first, but "blob.R" < "drawable.R" alphabetically. Fixed with an
-  explicit `Collate` field in `DESCRIPTION` (see "Structure" below for
-  the required order) rather than `@include` tags.
+  definitions.** `shape_blob.R` needs `drawable` (from `drawable.R`) to
+  exist first, but "shape_blob.R" < "drawable.R" alphabetically. Fixed
+  with an explicit `Collate` field in `DESCRIPTION` (see "Structure"
+  below for the required order) rather than `@include` tags.
 - **The first `devtools::document()` pass after adding a new
   cross-referencing class emits "could not resolve link" warnings.**
   This is expected roxygen2 behavior when several classes' `[link]`
@@ -237,19 +246,22 @@ full debugging narrative):
   `fill_solid()` to exist for its own property default.
 - `R/style.R`, `R/points.R`, `R/drawable.R` -- foundation classes, in
   load order (each depends on the previous).
-- `R/bezier.R`, `R/shape.R`, `R/circle.R`, `R/blob.R`, `R/ribbon.R`,
-  `R/twist.R` -- the concrete `drawable` subclasses, one file each.
+- `R/shape_bezier.R`, `R/shape_raw.R`, `R/shape_circle.R`,
+  `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R` -- the concrete
+  `drawable` subclasses, one file each. Every constructor function shares
+  the `shape_*` prefix (see "Class hierarchy" above), and each file is
+  named to match its constructor.
 - `R/sketch.R` -- the `sketch` class and its `+` method.
 - `R/draw.R` -- the `draw` generic and its three methods.
-- `R/convert.R` -- the `convert(drawable, shape)` method.
+- `R/convert.R` -- the `convert(drawable, shape_raw)` method.
 - `R/sketchpad-package.R` -- package-level doc, `#' @import S7`, the
   `.onLoad()` calling `S7::methods_register()`, and the
   `globalVariables("properties")` workaround.
 - `DESCRIPTION`'s `Collate` field pins the load order above explicitly
-  (fill -> style -> points -> drawable -> bezier -> shape -> circle ->
-  blob -> ribbon -> twist -> sketch -> draw -> convert ->
-  sketchpad-package). **Any new drawable subclass must be added to
-  `Collate` after `drawable.R`**, or `devtools::load_all()`/
+  (fill -> style -> points -> drawable -> shape_bezier -> shape_raw ->
+  shape_circle -> shape_blob -> shape_ribbon -> shape_twist -> sketch ->
+  draw -> convert -> sketchpad-package). **Any new drawable subclass must
+  be added to `Collate` after `drawable.R`**, or `devtools::load_all()`/
   `R CMD check` will fail with an "object 'drawable' not found" error.
 
 ## Conventions
@@ -266,8 +278,8 @@ full debugging narrative):
   (`color`, `fill`, `linewidth`) are always accepted via `...` without
   each subclass needing to declare them.
 - A computed geometry property (`points`, and `bezier`/`path` on
-  `twist`) is a `new_property()` with only a `getter` -- geometry is
-  always derived, never stored and mutated in place.
+  `shape_twist`) is a `new_property()` with only a `getter` -- geometry
+  is always derived, never stored and mutated in place.
 - Every scalar numeric/integer constructor argument gets an explicit
   `length(x) != 1` check in `validator`; every non-negative-only
   argument (`radius`, `width`, `range`, `frequency`) gets a `< 0` check;

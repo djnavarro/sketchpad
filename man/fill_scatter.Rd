@@ -5,7 +5,7 @@
 \title{Scattered-shape pattern fill}
 \usage{
 fill_scatter(
-  unit = circle(radius = 1),
+  unit = shape_circle(radius = 1),
   n = 6L,
   size = 0.2,
   spacing = 1,
@@ -16,7 +16,7 @@ fill_scatter(
 }
 \arguments{
 \item{unit}{A small \link{drawable} to scatter copies of. Default
-\code{circle(radius = 1)}.}
+\code{shape_circle(radius = 1)}.}
 
 \item{n}{Number of copies scattered per tile. Must be a positive
 integer. Default \code{6L}.}

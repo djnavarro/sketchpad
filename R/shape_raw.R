@@ -1,17 +1,17 @@
 #' A polygon defined directly by its vertices
 #'
-#' `shape` is the simplest [drawable]: the user supplies `x` and `y`
+#' `shape_raw` is the simplest [drawable]: the user supplies `x` and `y`
 #' coordinates directly, and `points` is computed trivially from them.
 #' It is most often produced by [convert()]ing a more complex drawable
-#' (e.g. a [blob] or [twist]) down to its raw vertices.
+#' (e.g. a [shape_blob] or [shape_twist]) down to its raw vertices.
 #'
 #' @param x Numeric vector of x coordinates.
 #' @param y Numeric vector of y coordinates.
 #' @param ... Arguments passed to [style()].
 #'
 #' @export
-shape <- S7::new_class(
-  name = "shape",
+shape_raw <- S7::new_class(
+  name = "shape_raw",
   parent = drawable,
   properties = list(
     x = S7::class_numeric,
