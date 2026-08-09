@@ -34,6 +34,7 @@ Other fill helpers:
 \code{\link[=fill_marble]{fill_marble()}},
 \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_scatter]{fill_scatter()}},
+\code{\link[=fill_scribble]{fill_scribble()}},
 \code{\link[=fill_stipple]{fill_stipple()}},
 \code{\link[=fill_stripe]{fill_stripe()}},
 \code{\link[=fill_vignette]{fill_vignette()}}

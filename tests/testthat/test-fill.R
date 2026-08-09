@@ -232,6 +232,70 @@ test_that("fill_halftone() is reproducible for a given seed", {
   expect_false(identical(extract_r(fill_a), extract_r(fill_c)))
 })
 
+test_that("fill_scribble() returns a grid pattern object", {
+  expect_s3_class(fill_scribble(), "GridPattern")
+  expect_s3_class(fill_scribble(direction = "vertical"), "GridPattern")
+})
+
+test_that("fill_scribble() validates its arguments", {
+  expect_error(fill_scribble(direction = "diagonal"))
+  expect_error(fill_scribble(spacing = 0), "spacing")
+  expect_error(fill_scribble(spacing = -1), "spacing")
+  expect_error(fill_scribble(aspect = 0), "aspect")
+  expect_error(fill_scribble(aspect = -1), "aspect")
+  expect_error(fill_scribble(n_lines = 0), "n_lines")
+  expect_error(fill_scribble(n_lines = 1.5), "n_lines")
+  expect_error(fill_scribble(n_harmonics = 0), "n_harmonics")
+  expect_error(fill_scribble(n_harmonics = 1.5), "n_harmonics")
+  expect_error(fill_scribble(amplitude = -1), "amplitude")
+  expect_error(fill_scribble(resolution = 1), "resolution")
+  expect_error(fill_scribble(resolution = 4.5), "resolution")
+  expect_error(fill_scribble(color = 1), "color")
+  expect_error(fill_scribble(color = c("red", "blue")), "color")
+  expect_error(fill_scribble(seed = 1.5), "seed")
+})
+
+test_that("fill_scribble() works with a non-default aspect ratio", {
+  expect_s3_class(fill_scribble(aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_scribble() draws n_lines separate strokes", {
+  fill <- fill_scribble(n_lines = 7L)
+  children <- environment(fill$f)$grob$children
+  expect_length(children, 7)
+})
+
+test_that("fill_scribble() is reproducible for a given seed", {
+  extract_y <- function(fill) {
+    children <- environment(fill$f)$grob$children
+    unname(purrr::map_dbl(children, \(g) mean(as.numeric(g$y))))
+  }
+  fill_a <- fill_scribble(seed = 481L)
+  fill_b <- fill_scribble(seed = 481L)
+  fill_c <- fill_scribble(seed = 482L)
+  expect_identical(extract_y(fill_a), extract_y(fill_b))
+  expect_false(identical(extract_y(fill_a), extract_y(fill_c)))
+})
+
+test_that("fill_scribble() each line meets itself exactly at the tile edge", {
+  lines <- scribble_lines(
+    n_lines = 4L, n_harmonics = 3L, amplitude = 0.4, resolution = 50L, seed = 481L
+  )
+  gaps <- vapply(lines, \(ln) abs(ln$across[1] - ln$across[length(ln$across)]), numeric(1))
+  expect_true(all(gaps < 1e-10))
+})
+
+test_that("fill_scribble() horizontal and vertical transpose x/y", {
+  h <- fill_scribble(direction = "horizontal", seed = 481L)
+  v <- fill_scribble(direction = "vertical", seed = 481L)
+  h_x <- as.numeric(environment(h$f)$grob$children[[1]]$x)
+  h_y <- as.numeric(environment(h$f)$grob$children[[1]]$y)
+  v_x <- as.numeric(environment(v$f)$grob$children[[1]]$x)
+  v_y <- as.numeric(environment(v$f)$grob$children[[1]]$y)
+  expect_identical(h_x, v_y)
+  expect_identical(h_y, v_x)
+})
+
 test_that("fill_noise() returns a grid pattern object", {
   fill <- fill_noise()
   expect_s3_class(fill, "GridPattern")

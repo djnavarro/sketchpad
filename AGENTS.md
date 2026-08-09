@@ -82,7 +82,7 @@ is passed straight through either way.
 
 ### The `fill_*()` texture family
 
-`R/fill.R` holds fourteen `fill_*()` constructors for `style@fill`:
+`R/fill.R` holds fifteen `fill_*()` constructors for `style@fill`:
 `fill_solid()` (a validated colour string, no `grid::pattern()` involved),
 `fill_hatch()`/`fill_crosshatch()` (diagonal hatching, sharing a
 tile-shape technique -- see below), `fill_checker()` (a two-colour
@@ -91,8 +91,13 @@ self-repeating hard-stop `grid::linearGradient()`, not tile repetition),
 `fill_stipple()`/`fill_scatter()`/`fill_halftone()` (scattered dots /
 arbitrary drawables / randomised-radius dots, all seeded via
 `withr::with_seed()` like `blob()`'s noise -- see "Known rendering risk"
-in `fill_stipple()`'s docs), `fill_noise()` (a rasterised `ambient`
-simplex/fractal field, sampled on a torus for seamless tiling),
+in `fill_stipple()`'s docs), `fill_scribble()` (wandering lines built from
+random integer-frequency sine harmonics via the internal
+`scribble_lines()` helper -- periodic by construction, so tiles with no
+seam; `direction` is fixed to `"horizontal"` or `"vertical"` only, not an
+arbitrary angle -- see its "Known limitation" docs section),
+`fill_noise()` (a rasterised `ambient` simplex/fractal field, sampled on a
+torus for seamless tiling),
 `fill_marble()`/`fill_flow()` (variants of `fill_noise()` sharing its
 internal `torus_grid()`/`torus_noise()` helpers: `fill_marble()` displaces
 sinusoidal bands by torus-periodic turbulence for a veined look;

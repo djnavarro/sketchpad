@@ -318,3 +318,56 @@ documented as a known, unresolved rendering risk directly on
 was found to reliably avoid it, and it looks like an upstream `grid`/
 Cairo bug rather than something wrong in this package's own code. See
 the matching Gotchas entry in `AGENTS.md`.
+
+## `fill_marble()`/`fill_flow()`: sharing `fill_noise()`'s torus machinery
+
+Both are domain-warped variants of `fill_noise()`'s own torus-periodic
+field, so its `(theta_u, theta_v)`-mapping and `ambient::fracture()`
+sampling code were pulled out into two internal helpers
+(`torus_grid()`/`torus_noise()`), reused by all three rather than
+duplicated. `fill_marble()` adds a `sin(theta_u * stripes + warp *
+turbulence)` band pattern (turbulence itself sampled via `torus_noise()`,
+so it stays periodic); `fill_flow()` instead displaces the *final*
+field's own `theta_u`/`theta_v` inputs by a second, independent
+torus-periodic field before sampling (the classic "fBm of fBm"
+domain-warp recipe) -- periodicity survives because displacing a
+periodic coordinate by another periodic-in-the-same-variable field still
+returns to the same value after one full period. The two displacement
+fields needed to be decorrelated from the final field and from each
+other, but `ambient::gen_simplex()`'s 4 input dimensions were already
+fully spent on the `(theta_u, theta_v)` torus trick, leaving no spare
+dimension to offset -- solved by sampling them at `seed + 104729L`/`seed
++ 200003L` instead (arbitrary large primes, not a principled choice,
+just unlikely to collide with a user's own nearby seed).
+
+## `fill_scribble()`: a wandering line that has to close the loop on itself
+
+Flagged early on as the hardest candidate `fill_*()` helper to build,
+because an open wandering line -- unlike every other helper's content --
+can't just stay clear of the tile edge; it has to run to it and pick up
+again at exactly the right point on the opposite edge, or the seam shows
+as a visible kink. Investigated before committing to an API (see the
+conversation that led to this entry for the full exploration): the
+working technique turned out to be building each line as a random finite
+sum of sine harmonics at *integer* frequencies only, so that over one
+full period the sum always returns exactly to its starting value and
+slope (to floating-point precision) -- pulled out as the internal
+`scribble_lines()` helper. Tested empirically for the Cairo multi-shape
+clipping distortion that affects `fill_stipple()`/`fill_scatter()`/
+`fill_halftone()`'s closed-shape content under genuine tile repetition;
+open polyline content showed no such distortion.
+
+Tried and rejected: reusing `fill_hatch()`'s angle trick
+(`hatch_tile_dims()`, rendering an arbitrary angle by reshaping the tile
+around content that's a plain corner-to-corner diagonal) to give
+`fill_scribble()` an `angle` parameter for free. Reshaping the tile
+around a *wandering* line just anisotropically stretched its wiggle
+rather than rotating it -- confirmed visually, the line stayed
+horizontal under a 30-degree tile shape, just squashed. That trick is
+specific to genuinely straight diagonal content; a rotated wandering
+line would need the tile built as a rotated/sheared parallelogram with
+edge-matching worked out for a curve rather than a segment, which no
+technique in this package currently does. Shipped instead with
+`direction` restricted to `"horizontal"` or `"vertical"` (a fixed
+transpose of the same construction), documented as a known limitation on
+`fill_scribble()` itself rather than attempting the harder general case.

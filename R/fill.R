@@ -595,6 +595,176 @@ fill_halftone <- function(radius = c(0.05, 0.2),
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
 }
 
+#' Build the (along, across) coordinates of a random-harmonic wander line
+#'
+#' Internal helper for [fill_scribble()]. Each line is a random finite sum
+#' of sine harmonics, all at *integer* frequencies, in `across =
+#' f(along)` form: `along` runs from `0` to `1`, and by construction
+#' `f(0) == f(1)` to full floating-point precision (an integer number of
+#' full periods always closes exactly), and likewise for the function's
+#' derivative -- so the line always meets itself, in both position and
+#' tangent direction, at the two ends of `along`. That's what makes it
+#' tile seamlessly under [grid::pattern()]'s `extend = "repeat"`: each
+#' tile's copy of the line picks up exactly where the previous tile's left
+#' off. See [fill_scribble()] details for the rest of the periodicity
+#' argument.
+#'
+#' @param n_lines,n_harmonics,amplitude,resolution,seed As in
+#'   [fill_scribble()].
+#' @return A list of `n_lines` elements, each a list with numeric vectors
+#'   `along` and `across`, both length `resolution`.
+#' @noRd
+scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
+  along <- seq(0, 1, length.out = resolution)
+  withr::with_seed(
+    seed = as.integer(seed),
+    code = {
+      lines <- vector("list", n_lines)
+      for (i in seq_len(n_lines)) {
+        baseline <- stats::runif(1, 0.15, 0.85)
+        # integer frequencies only -- required for across(0) == across(1)
+        freq <- sample.int(4, n_harmonics, replace = TRUE)
+        amp <- stats::runif(n_harmonics, 0, amplitude) / n_harmonics
+        phase <- stats::runif(n_harmonics, 0, 2 * pi)
+        across <- baseline
+        for (j in seq_len(n_harmonics)) {
+          across <- across + amp[j] * sin(2 * pi * freq[j] * along + phase[j])
+        }
+        lines[[i]] <- list(along = along, across = across)
+      }
+    }
+  )
+  lines
+}
+
+#' Wandering-line scribble texture fill
+#'
+#' `fill_scribble()` builds a [grid::pattern()] fill value from several
+#' randomly wandering lines, each a random finite sum of sine harmonics
+#' (see the internal `scribble_lines()` helper) rather than a smooth noise
+#' field or a scattered discrete motif -- giving a loose, hand-drawn
+#' scribble texture built from genuinely continuous strokes.
+#'
+#' A wandering *open* line poses a tiling problem none of the other
+#' `fill_*()` helpers have: [fill_hatch()]'s diagonal and [fill_noise()]'s
+#' raster both tile by construction (a straight corner-to-corner line, or
+#' an already-periodic field), and [fill_stipple()]/[fill_scatter()]/
+#' [fill_halftone()] sidestep the problem entirely by keeping their
+#' scattered content margined well clear of the tile edge. A wandering
+#' line that's meant to look continuous *can't* stay clear of the edge --
+#' it has to run all the way to it, and pick up again at exactly the right
+#' place, in both position and slope, on the opposite edge, or the seam
+#' shows as a visible kink. `fill_scribble()` gets this for free by
+#' building each line as a random sum of sine harmonics at *integer*
+#' frequencies only: over one full period, such a sum always returns
+#' exactly to its starting value and slope (to floating-point precision),
+#' so consecutive tile copies join with no visible seam -- confirmed
+#' visually with `extend = "repeat"` at small `spacing`, including
+#' repeated copies (unlike the polygon-in-a-genuinely-repeated-tile issue
+#' documented at [fill_scatter()], open-line content showed no clipping or
+#' distortion in testing).
+#'
+#' @section Known limitation -- direction is fixed, not an arbitrary angle:
+#'   Every other angled helper ([fill_hatch()]/[fill_crosshatch()]/
+#'   [fill_stripe()]) achieves an arbitrary angle by reshaping the *tile*
+#'   itself (via `hatch_tile_dims()`) around content that's a plain
+#'   corner-to-corner diagonal. That trick was tried here first and found
+#'   not to generalize: reshaping the tile around a *wandering* line just
+#'   anisotropically stretches its wiggle rather than rotating it, since
+#'   the line's content isn't a bare diagonal the tile shape can
+#'   reinterpret. A genuinely rotated wandering line would need the tile
+#'   built as a rotated/sheared parallelogram with edge-matching worked
+#'   out for a curve rather than a segment -- no such technique exists in
+#'   this package yet. `direction` is therefore restricted to `"horizontal"`
+#'   (lines run left-right, periodic tiling along that axis) or
+#'   `"vertical"` (lines run top-bottom instead, i.e. `along`/`across` from
+#'   `scribble_lines()` mapped to `y`/`x` rather than `x`/`y`) -- there is
+#'   no `angle` argument. Revisit if a real sketch needs an arbitrary
+#'   angle.
+#'
+#' @param direction Either `"horizontal"` (lines run left-right) or
+#'   `"vertical"` (lines run top-bottom). Default `"horizontal"`.
+#' @param n_lines Number of wandering lines per tile. Must be a positive
+#'   integer. Default `5L`.
+#' @param n_harmonics Number of sine harmonics summed per line. Must be a
+#'   positive integer. Default `3L`.
+#' @param amplitude Maximum total wiggle amplitude, as a `"npc"` fraction
+#'   of the tile, split across `n_harmonics` (so more harmonics each
+#'   contribute proportionally less). Must be a non-negative number.
+#'   Default `0.35`.
+#' @param resolution Number of points sampled along each line. Must be a
+#'   positive integer of at least `2L`. Default `200L`.
+#' @param color Line colour. Default `"black"`.
+#' @param linewidth Line width. Default `1`.
+#' @param seed Integer seed for the random harmonics. Default `1L`.
+#' @inheritParams fill_hatch
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_scribble <- function(direction = c("horizontal", "vertical"),
+                           n_lines = 5L,
+                           n_harmonics = 3L,
+                           amplitude = 0.35,
+                           resolution = 200L,
+                           color = "black",
+                           linewidth = 1,
+                           spacing = 0.25,
+                           aspect = 1,
+                           seed = 1L,
+                           extend = "repeat") {
+  direction <- match.arg(direction)
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.numeric(n_lines) || length(n_lines) != 1 ||
+        n_lines < 1 || n_lines != round(n_lines)) {
+    rlang::abort("n_lines must be a single positive integer")
+  }
+  if (!is.numeric(n_harmonics) || length(n_harmonics) != 1 ||
+        n_harmonics < 1 || n_harmonics != round(n_harmonics)) {
+    rlang::abort("n_harmonics must be a single positive integer")
+  }
+  if (!is.numeric(amplitude) || length(amplitude) != 1 || amplitude < 0) {
+    rlang::abort("amplitude must be a single non-negative number")
+  }
+  if (!is.numeric(resolution) || length(resolution) != 1 ||
+        resolution < 2 || resolution != round(resolution)) {
+    rlang::abort("resolution must be a single integer of at least 2")
+  }
+  if (!is.character(color) || length(color) != 1) {
+    rlang::abort("color must be a single string")
+  }
+  if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
+    rlang::abort("seed must be a single integer")
+  }
+
+  lines <- scribble_lines(
+    n_lines = round(n_lines),
+    n_harmonics = round(n_harmonics),
+    amplitude = amplitude,
+    resolution = round(resolution),
+    seed = seed
+  )
+
+  strokes <- lapply(lines, function(ln) {
+    if (direction == "horizontal") {
+      x <- ln$along
+      y <- ln$across
+    } else {
+      x <- ln$across
+      y <- ln$along
+    }
+    grid::linesGrob(
+      x = x, y = y, default.units = "npc",
+      gp = grid::gpar(col = color, lwd = linewidth)
+    )
+  })
+  content <- grid::grobTree(do.call(grid::gList, strokes))
+
+  grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+}
+
 #' Torus-mapped tile coordinates for a periodic raster fill
 #'
 #' Internal helper shared by [fill_noise()], [fill_marble()], and
