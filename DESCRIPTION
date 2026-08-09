@@ -1,0 +1,24 @@
+Package: sketchpad
+Title: A Minimal Drawing System For Generative Art
+Version: 0.0.0.9000
+Authors@R: 
+    person("Danielle", "Navarro", , "djnavarro@protonmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-7648-6578"))
+Description: A lightweight, p5.js-inspired drawing system built on S7
+    classes and grid graphics, used as the shared foundation for the
+    author's generative art sketches.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.0.0
+Imports: 
+    ambient,
+    e1071,
+    grid,
+    purrr,
+    rlang,
+    S7,
+    withr
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
