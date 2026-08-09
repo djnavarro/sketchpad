@@ -1,8 +1,8 @@
 # Parent class for all drawable objects
 
 `drawable` enforces structure on its subclasses: every drawable must
-carry a [style](https://sketchpad.djnavarro.net/reference/style.md) and
-expose a computed `points` property, of class
+carry a [style](https://sketchpad.djnavarro.net/reference/style.md), a
+`geometry`, and expose a computed `points` property, of class
 [point_set](https://sketchpad.djnavarro.net/reference/point_set.md). It
 is not intended to be instantiated directly; use one of its subclasses
 ([shape_raw](https://sketchpad.djnavarro.net/reference/shape_raw.md),
@@ -15,7 +15,7 @@ instead.
 ## Usage
 
 ``` r
-drawable(...)
+drawable(..., geometry = "polygon")
 ```
 
 ## Arguments
@@ -24,3 +24,23 @@ drawable(...)
 
   Arguments passed to
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md).
+
+- geometry:
+
+  One of `"polygon"` (default), `"path"`, or `"points"`. Not currently
+  exposed by any concrete `shape_*()` constructor – see details.
+
+## Details
+
+`geometry` tells
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) which
+[grid](https://rdrr.io/r/graphics/grid.html) grob a drawable's `points`
+map to, following a dimensional reading: `"points"` (0D,
+[`grid::pointsGrob()`](https://rdrr.io/r/grid/grid.points.html)),
+`"path"` (1D, an open
+[`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html)), or
+`"polygon"` (2D, a closed
+[`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html) – the
+default, and the only value any current `shape_*()` constructor uses).
+`style@fill` is ignored for `"points"`/`"path"` geometries, since only a
+closed polygon has an interior to fill.

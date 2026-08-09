@@ -34,11 +34,20 @@ how the API got here, see
   `drawable`’s `points` *property* (see below) is still called `points`,
   since a property isn’t a top-level exported name and can’t mask
   anything.
-- **`drawable`** – parent class of every shape. Declares two properties:
-  `style` (default
-  [`style()`](https://sketchpad.djnavarro.net/reference/style.md)) and a
-  computed `points` property that subclasses override. Not meant to be
-  instantiated directly.
+- **`drawable`** – parent class of every shape. Declares three
+  properties: `style` (default
+  [`style()`](https://sketchpad.djnavarro.net/reference/style.md)),
+  `geometry` (a validated string, one of
+  `"polygon"`/`"path"`/`"points"`, default `"polygon"` – tells
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) which
+  grob type to build, on a dimensional reading: `"points"` is 0D,
+  `"path"` is 1D, `"polygon"` is 2D and the only value any current
+  `shape_*()` constructor uses), and a computed `points` property that
+  subclasses override. Not meant to be instantiated directly.
+  `drawable`’s own `constructor` sets `geometry`’s default explicitly
+  (as an argument default, not just a `new_property(default = ...)`
+  spec) because it bypasses S7’s auto-generated constructor – see
+  “Gotchas”.
 - **`shape_raw`** – the trivial drawable: `x`/`y` supplied directly as
   `points`. Usually produced by `convert()`, not constructed by hand.
 - **`shape_circle`** – centroid + radius + `n` (point count); `points`
@@ -83,7 +92,16 @@ how the API got here, see
   shape) and `sketch` (renders every shape into one shared, equal-aspect
   viewport); a catch-all method on `class_any` warns and returns
   `invisible(NULL)` for anything else. `xlim`/`ylim` default to the
-  range of the object’s own points.
+  range of the object’s own points. Both methods build their grob via
+  the internal `geometry_grob()` helper (`R/draw.R`), which switches on
+  a drawable’s `geometry` property:
+  [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html) for
+  `"polygon"`,
+  [`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html) for
+  `"path"`,
+  [`grid::pointsGrob()`](https://rdrr.io/r/grid/grid.points.html) for
+  `"points"` – `style@fill` is omitted from `gpar()` for the latter two,
+  since only a closed polygon has an interior to fill.
 - **`convert()`** – S7’s own generic (not defined by this package); a
   `method(convert, list(drawable, shape_raw))` “freezes” any drawable’s
   computed points into a plain `shape_raw`, preserving `style`.
@@ -240,6 +258,19 @@ full debugging narrative):
   but silently fail to dispatch once the package is actually installed –
   this only surfaced under `devtools::check()`, not interactive
   development.
+- **A custom `constructor` that calls
+  `S7::new_object(S7::S7_object(), ...)` does not auto-fill a property’s
+  `default` for any property left unnamed in that call.** `drawable`’s
+  constructor bypasses S7’s own auto-generated one, so when `geometry`
+  was added as a `new_property(default = "polygon")`-only spec, every
+  `shape_*()` call failed with
+  `@geometry must be <character>, not <NULL>` – confirmed with a minimal
+  non-package reprex that this is real S7 behavior, not a
+  `drawable`-specific bug. Fixed by giving `drawable`’s own constructor
+  an explicit `geometry = "polygon"` argument default and passing it
+  through to `new_object()` by name. **Any future property added to
+  `drawable` needs the same treatment** as long as its constructor keeps
+  bypassing the auto-generated one.
 - **A drawable’s `shape_raw(x = ..., y = ..., style = from@style)`
   shortcut doesn’t work.**
   [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)’s
