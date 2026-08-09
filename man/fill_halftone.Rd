@@ -5,16 +5,18 @@
 \title{Halftone dot pattern fill}
 \usage{
 fill_halftone(
+  color = "black",
   radius = c(0.05, 0.2),
   spacing = 0.3,
   aspect = 1,
   n = 4L,
   seed = 1L,
-  color = "black",
   extend = "repeat"
 )
 }
 \arguments{
+\item{color}{Dot colour. Default \code{"black"}.}
+
 \item{radius}{Dot radius range, as a length-2 numeric vector giving the
 \code{"npc"}-fraction-of-tile minimum and maximum (a dot's actual radius is
 drawn uniformly from this range). Both values must be positive, and
@@ -30,8 +32,6 @@ Must be a positive number. Default \code{1} (a square bounding box).}
 Default \code{4L}.}
 
 \item{seed}{Integer seed for the dot positions. Default \code{1L}.}
-
-\item{color}{Dot colour. Default \code{"black"}.}
 
 \item{extend}{Passed to \code{\link[grid:pattern]{grid::pattern()}}. Default \code{"repeat"}.}
 }

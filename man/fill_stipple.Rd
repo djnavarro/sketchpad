@@ -5,16 +5,18 @@
 \title{Stippled dot pattern fill}
 \usage{
 fill_stipple(
+  color = "black",
   radius = 0.15,
   spacing = 0.3,
   aspect = 1,
   n = 4L,
   seed = 1L,
-  color = "black",
   extend = "repeat"
 )
 }
 \arguments{
+\item{color}{Dot colour. Default \code{"black"}.}
+
 \item{radius}{Dot radius, as a \code{"npc"} fraction of the tile. Must be a
 positive number. Default \code{0.15}.}
 
@@ -28,8 +30,6 @@ Must be a positive number. Default \code{1} (a square bounding box).}
 Default \code{4L}.}
 
 \item{seed}{Integer seed for the dot positions. Default \code{1L}.}
-
-\item{color}{Dot colour. Default \code{"black"}.}
 
 \item{extend}{Passed to \code{\link[grid:pattern]{grid::pattern()}}. Default \code{"repeat"}.}
 }

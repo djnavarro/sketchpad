@@ -5,12 +5,12 @@
 \title{Wandering-line scribble texture fill}
 \usage{
 fill_scribble(
+  color = "black",
   direction = c("horizontal", "vertical"),
   n_lines = 5L,
   n_harmonics = 3L,
   amplitude = 0.35,
   resolution = 200L,
-  color = "black",
   linewidth = 1,
   spacing = 0.25,
   aspect = 1,
@@ -19,6 +19,8 @@ fill_scribble(
 )
 }
 \arguments{
+\item{color}{Line colour. Default \code{"black"}.}
+
 \item{direction}{Either \code{"horizontal"} (lines run left-right) or
 \code{"vertical"} (lines run top-bottom). Default \code{"horizontal"}.}
 
@@ -35,8 +37,6 @@ Default \code{0.35}.}
 
 \item{resolution}{Number of points sampled along each line. Must be a
 positive integer of at least \code{2L}. Default \code{200L}.}
-
-\item{color}{Line colour. Default \code{"black"}.}
 
 \item{linewidth}{Line width. Must be a positive number. Default \code{1}.}
 

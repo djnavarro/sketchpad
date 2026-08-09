@@ -87,13 +87,13 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' a special case, since a straight (non-diagonal) line tiles seamlessly at
 #' any tile aspect ratio.
 #'
+#' @param color Line colour. Default `"black"`.
 #' @param angle Hatch angle in degrees, measured counterclockwise from the
 #'   positive x-axis. Default `45`.
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
 #'   box. Must be a positive number. Default `0.1`.
 #' @param aspect Width-to-height ratio of the target polygon's bounding box.
 #'   Must be a positive number. Default `1` (a square bounding box).
-#' @param color Line colour. Default `"black"`.
 #' @param linewidth Line width. Must be a positive number. Default `1`.
 #' @param extend Passed to [grid::pattern()]. Default `"repeat"`.
 #'
@@ -102,10 +102,10 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #'
 #' @family fill helpers
 #' @export
-fill_hatch <- function(angle = 45,
+fill_hatch <- function(color = "black",
+                        angle = 45,
                         spacing = 0.1,
                         aspect = 1,
-                        color = "black",
                         linewidth = 1,
                         extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
@@ -181,10 +181,10 @@ fill_hatch <- function(angle = 45,
 #'
 #' @family fill helpers
 #' @export
-fill_crosshatch <- function(angle = 45,
+fill_crosshatch <- function(color = "black",
+                             angle = 45,
                              spacing = 0.1,
                              aspect = 1,
-                             color = "black",
                              linewidth = 1,
                              extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
@@ -328,6 +328,7 @@ fill_checker <- function(color1 = "black",
 #'   [fill_halftone()], which share this risk) for anything beyond casual
 #'   use, especially on unfamiliar R/`grid`/graphics-device versions.
 #'
+#' @param color Dot colour. Default `"black"`.
 #' @param radius Dot radius, as a `"npc"` fraction of the tile. Must be a
 #'   positive number. Default `0.15`.
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
@@ -335,7 +336,6 @@ fill_checker <- function(color1 = "black",
 #' @param n Number of dots scattered per tile. Must be a positive integer.
 #'   Default `4L`.
 #' @param seed Integer seed for the dot positions. Default `1L`.
-#' @param color Dot colour. Default `"black"`.
 #' @inheritParams fill_hatch
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -343,12 +343,12 @@ fill_checker <- function(color1 = "black",
 #'
 #' @family fill helpers
 #' @export
-fill_stipple <- function(radius = 0.15,
+fill_stipple <- function(color = "black",
+                          radius = 0.15,
                           spacing = 0.3,
                           aspect = 1,
                           n = 4L,
                           seed = 1L,
-                          color = "black",
                           extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   if (!is.numeric(radius) || length(radius) != 1 || radius <= 0) {
@@ -560,12 +560,12 @@ fill_scatter <- function(unit = circle(radius = 1),
 #'
 #' @family fill helpers
 #' @export
-fill_halftone <- function(radius = c(0.05, 0.2),
+fill_halftone <- function(color = "black",
+                           radius = c(0.05, 0.2),
                            spacing = 0.3,
                            aspect = 1,
                            n = 4L,
                            seed = 1L,
-                           color = "black",
                            extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   if (!is.numeric(radius) || length(radius) != 2 || any(radius <= 0)) {
@@ -693,6 +693,7 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #'   no `angle` argument. Revisit if a real sketch needs an arbitrary
 #'   angle.
 #'
+#' @param color Line colour. Default `"black"`.
 #' @param direction Either `"horizontal"` (lines run left-right) or
 #'   `"vertical"` (lines run top-bottom). Default `"horizontal"`.
 #' @param n_lines Number of wandering lines per tile. Must be a positive
@@ -705,7 +706,6 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #'   Default `0.35`.
 #' @param resolution Number of points sampled along each line. Must be a
 #'   positive integer of at least `2L`. Default `200L`.
-#' @param color Line colour. Default `"black"`.
 #' @param linewidth Line width. Must be a positive number. Default `1`.
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
 #'   box. Must be a positive number. Default `0.25`.
@@ -717,12 +717,12 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #'
 #' @family fill helpers
 #' @export
-fill_scribble <- function(direction = c("horizontal", "vertical"),
+fill_scribble <- function(color = "black",
+                           direction = c("horizontal", "vertical"),
                            n_lines = 5L,
                            n_harmonics = 3L,
                            amplitude = 0.35,
                            resolution = 200L,
-                           color = "black",
                            linewidth = 1,
                            spacing = 0.25,
                            aspect = 1,

@@ -5,15 +5,17 @@
 \title{Diagonal hatch pattern fill}
 \usage{
 fill_hatch(
+  color = "black",
   angle = 45,
   spacing = 0.1,
   aspect = 1,
-  color = "black",
   linewidth = 1,
   extend = "repeat"
 )
 }
 \arguments{
+\item{color}{Line colour. Default \code{"black"}.}
+
 \item{angle}{Hatch angle in degrees, measured counterclockwise from the
 positive x-axis. Default \code{45}.}
 
@@ -22,8 +24,6 @@ box. Must be a positive number. Default \code{0.1}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
 Must be a positive number. Default \code{1} (a square bounding box).}
-
-\item{color}{Line colour. Default \code{"black"}.}
 
 \item{linewidth}{Line width. Must be a positive number. Default \code{1}.}
 

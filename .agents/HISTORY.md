@@ -414,10 +414,39 @@ helper's own review (above) as sufficient in isolation. Found and fixed:
   `fill_crosshatch()`, or `fill_scribble()`, unlike every other
   parameter in the family. Added a positive-number check to all three.
 
-Considered but deliberately left alone: the family has no single fixed
-rule for where a `color`/`color1`/`color2` parameter sits relative to
-`spacing`/`aspect` in the argument list (sometimes first, sometimes
-after `n`/`seed`). Reordering existing parameters would be a real,
-if low-risk, breaking change across all fifteen signatures for a purely
-cosmetic gain, and wasn't judged worth doing without discussing scope
-first.
+Considered but deliberately left alone at the time: the family had no
+single fixed rule for where a `color`/`color1`/`color2` parameter sits
+relative to `spacing`/`aspect` in the argument list (sometimes first,
+sometimes after `n`/`seed`). Flagged rather than fixed immediately,
+since reordering existing parameters is a real, if low-risk, breaking
+change across every signature -- worth confirming was wanted before
+touching all of them.
+
+## Standardizing color parameter position across `fill_*()`
+
+Followed up on the item above: adopted **"color parameter(s) always
+first"** as the convention, since it was already the majority pattern
+(`fill_checker()`, `fill_noise()`, `fill_marble()`, `fill_flow()`,
+`fill_gradient()`, `fill_vignette()`, `fill_stripe()` all had `color`/
+`color1`/`color2`/`colors` as their very first argument already) and
+gives one predictable place to look for the most commonly-tweaked
+cosmetic knob across all twelve `fill_*()` helpers that have a colour
+parameter. Before making the change, grepped every call site in the
+package (`tests/`, `R/`) to confirm nothing calls these functions
+positionally -- confirmed, everything already uses named arguments --
+so reordering formals was judged safe pre-merge (the package has never
+been released).
+
+Applied to the five holdouts: `fill_hatch()`, `fill_crosshatch()`,
+`fill_stipple()`, `fill_halftone()`, `fill_scribble()`. All other
+parameter order was left untouched (e.g. `linewidth` still stays where
+it was, immediately before `spacing`/`aspect` or wherever it already
+sat) -- only the color parameter's position moved, since that's the
+specific inconsistency being resolved, not a full signature reshuffle.
+`fill_halftone()` needed no doc changes (its `color` doc is inherited
+from `fill_stipple()` via `@inheritParams`, and roxyger2 orders
+`\arguments` by the function's own formal order regardless of the
+`@inheritParams`/`@param` declaration order in the source, so moving
+just the formal was enough); `fill_hatch()`/`fill_stipple()`/
+`fill_scribble()`'s own `@param color` lines were moved to match, for
+source readability, though this has no effect on the generated Rd.
