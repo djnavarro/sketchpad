@@ -2,7 +2,7 @@
 #'
 #' `sketch` is a list of [drawable] objects that can be rendered together
 #' with a single call to [draw()]. Sketches can be built up incrementally
-#' using the `+` operator.
+#' using the `+` operator, e.g. `sketch() + circle() + circle(x = 2)`.
 #'
 #' @param shapes A list of [drawable]-classed objects. Default `list()`.
 #'
@@ -25,13 +25,8 @@ sketch <- S7::new_class(
   }
 )
 
-#' Add a drawable to a sketch
-#'
-#' @param e1 A [sketch] object.
-#' @param e2 A [drawable] object to append to `e1`.
-#' @return The updated [sketch].
-#' @name plus-sketch
 #' @export
+#' @noRd
 method(`+`, list(sketch, drawable)) <- function(e1, e2) {
   e1@shapes <- c(e1@shapes, e2)
   e1

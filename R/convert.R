@@ -10,6 +10,7 @@
 #' @param ... Currently unused.
 #'
 #' @export
+#' @noRd
 method(convert, list(drawable, shape)) <- function(from, to, ...) {
   out <- shape(x = from@points@x, y = from@points@y)
   out@style <- from@style

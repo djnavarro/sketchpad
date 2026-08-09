@@ -12,7 +12,7 @@ sketch(shapes = list())
 \description{
 \code{sketch} is a list of \link{drawable} objects that can be rendered together
 with a single call to \code{\link[=draw]{draw()}}. Sketches can be built up incrementally
-using the \code{+} operator.
+using the \code{+} operator, e.g. \code{sketch() + circle() + circle(x = 2)}.
 }
 \examples{
 \dontrun{

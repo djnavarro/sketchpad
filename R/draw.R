@@ -1,17 +1,18 @@
 #' Draw a drawable or sketch
 #'
 #' `draw()` is a generic function that renders a [drawable] or [sketch]
-#' object to the current graphics device using \pkg{grid}.
+#' object to the current graphics device using \pkg{grid}. Methods accept
+#' optional `xlim`/`ylim` arguments giving axis limits; if omitted, limits
+#' are computed from the object's points.
 #'
 #' @param object A [drawable] or [sketch] object.
-#' @param xlim,ylim Optional axis limits. If `NULL` (the default), limits
-#'   are computed from the object's points.
-#' @param ... Currently unused.
+#' @param ... Passed to methods, e.g. `xlim`/`ylim`.
 #'
 #' @export
 draw <- S7::new_generic("draw", dispatch_args = "object")
 
 #' @export
+#' @noRd
 S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
 
   # plotting area is a single viewport with equal-axis scaling
@@ -45,6 +46,7 @@ S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
 }
 
 #' @export
+#' @noRd
 S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
 
   # set default axis limits
@@ -90,6 +92,7 @@ S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
 }
 
 #' @export
+#' @noRd
 S7::method(draw, S7::class_any) <- function(object, ...) {
   rlang::warn("Non-drawable objects ignored by draw()")
   return(invisible(NULL))

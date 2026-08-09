@@ -9,12 +9,11 @@ draw(object, ...)
 \arguments{
 \item{object}{A \link{drawable} or \link{sketch} object.}
 
-\item{...}{Currently unused.}
-
-\item{xlim, ylim}{Optional axis limits. If \code{NULL} (the default), limits
-are computed from the object's points.}
+\item{...}{Passed to methods, e.g. \code{xlim}/\code{ylim}.}
 }
 \description{
 \code{draw()} is a generic function that renders a \link{drawable} or \link{sketch}
-object to the current graphics device using \pkg{grid}.
+object to the current graphics device using \pkg{grid}. Methods accept
+optional \code{xlim}/\code{ylim} arguments giving axis limits; if omitted, limits
+are computed from the object's points.
 }
