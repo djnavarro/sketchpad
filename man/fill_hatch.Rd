@@ -63,6 +63,7 @@ any tile aspect ratio.
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_gradient]{fill_gradient()}},
 \code{\link[=fill_noise]{fill_noise()}},

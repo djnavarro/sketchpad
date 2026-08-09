@@ -227,6 +227,64 @@ fill_crosshatch <- function(angle = 45,
   grid::pattern(content, width = dims["width"], height = dims["height"], extend = extend)
 }
 
+#' Checkerboard pattern fill
+#'
+#' `fill_checker()` builds a [grid::pattern()] fill value that renders a
+#' two-colour checkerboard. It's the cheapest member of the hatch family to
+#' build: a checkerboard square has no direction the way a hatch line does
+#' (compare [fill_hatch()]'s corner-to-corner diagonal, needed specifically
+#' to tile a *sloped* line seamlessly), so the tile content here is just
+#' four plain quadrant rectangles -- the same two-colour-grid special case
+#' [fill_crosshatch()] already falls back to when `angle` is a multiple of
+#' 90 degrees, pulled out into its own helper.
+#'
+#' As with the other `fill_*()` helpers, [grid::pattern()] tiles are sized
+#' as a fraction of the target polygon's own bounding box rather than a
+#' fixed physical square, so the checker squares would render as
+#' rectangles, not squares, on a non-square bounding box. Pass the target's
+#' width-to-height ratio as `aspect` to correct for this -- the same tile-
+#' squaring technique [fill_stipple()] uses for its dots -- so the default
+#' `aspect = 1` is only exact for a square bounding box.
+#'
+#' @param color1,color2 The two checker colours. Defaults `"black"` and
+#'   `"white"`.
+#' @inheritParams fill_hatch
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_checker <- function(color1 = "black",
+                          color2 = "white",
+                          spacing = 0.2,
+                          aspect = 1,
+                          extend = "repeat") {
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.character(color1) || length(color1) != 1) {
+    rlang::abort("color1 must be a single string")
+  }
+  if (!is.character(color2) || length(color2) != 1) {
+    rlang::abort("color2 must be a single string")
+  }
+
+  quadrant <- function(x, y, color) {
+    grid::rectGrob(
+      x = x, y = y, width = 0.5, height = 0.5,
+      default.units = "npc",
+      gp = grid::gpar(fill = color, col = NA)
+    )
+  }
+  content <- grid::grobTree(
+    grid::gList(
+      quadrant(0.25, 0.75, color1), quadrant(0.75, 0.75, color2),
+      quadrant(0.25, 0.25, color2), quadrant(0.75, 0.25, color1)
+    )
+  )
+
+  grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+}
+
 #' Stippled dot pattern fill
 #'
 #' `fill_stipple()` builds a [grid::pattern()] fill value that scatters a

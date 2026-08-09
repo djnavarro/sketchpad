@@ -59,6 +59,30 @@ test_that("fill_crosshatch() works with a non-default aspect ratio", {
   expect_s3_class(fill, "GridPattern")
 })
 
+test_that("fill_checker() returns a grid pattern object", {
+  expect_s3_class(fill_checker(), "GridPattern")
+})
+
+test_that("fill_checker() validates its arguments", {
+  expect_error(fill_checker(spacing = 0), "spacing")
+  expect_error(fill_checker(spacing = -1), "spacing")
+  expect_error(fill_checker(aspect = 0), "aspect")
+  expect_error(fill_checker(aspect = -1), "aspect")
+  expect_error(fill_checker(color1 = 1), "color1")
+  expect_error(fill_checker(color1 = c("red", "blue")), "color1")
+  expect_error(fill_checker(color2 = 1), "color2")
+  expect_error(fill_checker(color2 = c("red", "blue")), "color2")
+})
+
+test_that("fill_checker() works with a non-default aspect ratio", {
+  expect_s3_class(fill_checker(aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_checker() tile content has four quadrant rectangles", {
+  children <- environment(fill_checker()$f)$grob$children
+  expect_length(children, 4)
+})
+
 test_that("fill_stipple() returns a grid pattern object", {
   fill <- fill_stipple()
   expect_s3_class(fill, "GridPattern")
