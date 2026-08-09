@@ -517,6 +517,89 @@ fill_gradient <- function(colors = c("white", "black"),
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = "repeat")
 }
 
+#' Vignette fill
+#'
+#' `fill_vignette()` builds a [grid::pattern()] fill value that fades a
+#' colour out towards the edges of each tile, using [grid::as.mask()] --
+#' the one `grid` capability the rest of the `fill_*()` family doesn't
+#' touch. A solid `color` layer is masked by a radial alpha mask (opaque at
+#' the tile centre, fully transparent at its edge), optionally revealing a
+#' solid `background` layer underneath rather than true transparency.
+#'
+#' As with [fill_gradient()], the fade shape is kept circular by correcting
+#' the *tile* to be physically square via `aspect` (the target's
+#' bounding-box width-to-height ratio), the same technique [fill_stipple()]
+#' uses for its dots -- once the tile is square, a mask specified inside it
+#' in plain `"npc"` needs no further correction.
+#'
+#' A mask must always be built with [grid::as.mask()] and an explicit
+#' `type = "alpha"` here, rather than passed as a bare grob (which defaults
+#' to an alpha mask anyway) -- during prototyping, a bare mask grob whose
+#' own fill was a [grid::radialGradient()] intermittently triggered an
+#' "Ignored luminance mask (not supported on this device)" warning on this
+#' session's device, even though the rendered result was visually correct
+#' either way. Being explicit with `as.mask(..., type = "alpha")` avoided
+#' the warning entirely with an identical render, so that's what's used
+#' here; true [grid::as.mask()] luminance masks were found not to work at
+#' all in this nested tile context (silently ignored, regardless of
+#' explicitness), so `fill_vignette()` only offers the alpha variant.
+#'
+#' @param color Fill colour at the tile's centre. Default `"black"`.
+#' @param background Fill colour revealed as `color` fades out, or `NA` for
+#'   true transparency (showing whatever is drawn behind the target shape).
+#'   Default `NA`.
+#' @param spacing Tile size, as a fraction of the target's bounding box.
+#'   Must be a positive number. Default `1` (one tile spans the whole
+#'   shape).
+#' @param aspect Width-to-height ratio of the target polygon's bounding box.
+#'   Must be a positive number. Default `1` (a square bounding box).
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_vignette <- function(color = "black",
+                           background = NA,
+                           spacing = 1,
+                           aspect = 1) {
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.character(color) || length(color) != 1) {
+    rlang::abort("color must be a single string")
+  }
+  if (length(background) != 1 || !(is.na(background) || is.character(background))) {
+    rlang::abort("background must be a single string, or NA")
+  }
+
+  mask_grob <- grid::circleGrob(
+    x = 0.5, y = 0.5, r = 0.5,
+    gp = grid::gpar(fill = grid::radialGradient(colours = c(color, "transparent")), col = NA)
+  )
+  fg <- grid::gTree(
+    children = grid::gList(
+      grid::rectGrob(
+        x = 0.5, y = 0.5, width = 1, height = 1,
+        default.units = "npc",
+        gp = grid::gpar(fill = color, col = NA)
+      )
+    ),
+    vp = grid::viewport(mask = grid::as.mask(mask_grob, type = "alpha"))
+  )
+
+  content <- if (is.na(background)) {
+    fg
+  } else {
+    bg <- grid::rectGrob(
+      x = 0.5, y = 0.5, width = 1, height = 1,
+      default.units = "npc",
+      gp = grid::gpar(fill = background, col = NA)
+    )
+    grid::gTree(children = grid::gList(bg, fg))
+  }
+
+  grid::pattern(content, width = spacing, height = spacing * aspect, extend = "repeat")
+}
+
 #' Bounding-box aspect ratio of a drawable
 #'
 #' Internal helper. Computes the width-to-height ratio of a [drawable]

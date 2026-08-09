@@ -162,3 +162,30 @@ test_that("fill_gradient() tile content uses the requested gradient type", {
   expect_s3_class(linear_content, "GridLinearGradient")
   expect_s3_class(radial_content, "GridRadialGradient")
 })
+
+test_that("fill_vignette() returns a grid pattern object", {
+  expect_s3_class(fill_vignette(), "GridPattern")
+  expect_s3_class(fill_vignette(background = "white"), "GridPattern")
+})
+
+test_that("fill_vignette() validates its arguments", {
+  expect_error(fill_vignette(spacing = 0), "spacing")
+  expect_error(fill_vignette(spacing = -1), "spacing")
+  expect_error(fill_vignette(aspect = 0), "aspect")
+  expect_error(fill_vignette(aspect = -1), "aspect")
+  expect_error(fill_vignette(color = 1), "color")
+  expect_error(fill_vignette(color = c("red", "blue")), "color")
+  expect_error(fill_vignette(background = 1), "background")
+  expect_error(fill_vignette(background = c("red", "blue")), "background")
+})
+
+test_that("fill_vignette() works with a non-default aspect ratio", {
+  expect_s3_class(fill_vignette(aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_vignette() draws a background layer only when requested", {
+  no_bg_children <- environment(fill_vignette()$f)$grob$children
+  with_bg_children <- environment(fill_vignette(background = "white")$f)$grob$children
+  expect_length(no_bg_children, 1)
+  expect_length(with_bg_children, 2)
+})
