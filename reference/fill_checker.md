@@ -77,6 +77,7 @@ Other fill helpers:
 [`fill_image()`](https://sketchpad.djnavarro.net/reference/fill_image.md),
 [`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md),
 [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md),
+[`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md),
 [`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md),
 [`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md),
 [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md),

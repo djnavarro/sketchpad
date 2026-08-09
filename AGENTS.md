@@ -122,10 +122,17 @@ needs no special-casing for pattern/gradient fills:
 
 ### The `fill_*()` texture family
 
-`R/fill.R` holds fifteen `fill_*()` constructors for `style@fill`:
+`R/fill.R` holds sixteen `fill_*()` constructors for `style@fill`:
 [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
 (a validated colour string, no
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) involved),
+[`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md)
+(a thin `fill_solid(NA_character_)` wrapper – `NA` is already a valid,
+transparent [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html) colour,
+but the wrapper reads more clearly at a call site; note it still renders
+as a *closed* unfilled outline, since every `drawable` currently draws a
+closed [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html)
+– see “Deferred: open/stroked curve support” in `.agents/PLAN.md`),
 [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)/[`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)
 (diagonal hatching, sharing a tile-shape technique – see below),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)

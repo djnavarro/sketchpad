@@ -155,6 +155,8 @@ twists |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
   : Marbled, veined texture fill
 - [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)
   : Simplex/fractal noise texture fill
+- [`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md)
+  : Unfilled (transparent) fill
 - [`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)
   : Scattered-shape pattern fill
 - [`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)

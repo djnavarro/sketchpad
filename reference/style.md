@@ -22,6 +22,7 @@ style(color = "black", fill = "black", linewidth = 1)
   Fill colour or pattern. Either a plain colour string, or the output of
   a `fill_*()` helper –
   [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md),
+  [`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md),
   [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md),
   [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),
   [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
