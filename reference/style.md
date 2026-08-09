@@ -8,7 +8,13 @@ is drawn.
 ## Usage
 
 ``` r
-style(color = "black", fill = "black", linewidth = 1)
+style(
+  color = "black",
+  fill = "black",
+  linewidth = 1,
+  linetype = "solid",
+  linejoin = "round"
+)
 ```
 
 ## Arguments
@@ -35,3 +41,23 @@ style(color = "black", fill = "black", linewidth = 1)
 - linewidth:
 
   Line width. Default `1`.
+
+- linetype:
+
+  Line dash pattern, forwarded to
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)'s `lty`. Either a
+  named type (`"solid"`, `"dashed"`, `"dotted"`, `"dotdash"`,
+  `"longdash"`, `"twodash"`, `"blank"`), an integer code `0:6`, or a
+  custom hex dash-pattern string (e.g. `"13"`) – see
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html) and
+  [`graphics::par()`](https://rdrr.io/r/graphics/par.html)'s `lty` for
+  the full set of accepted forms, which aren't independently
+  re-validated here. Default `"solid"`.
+
+- linejoin:
+
+  Line join style at each vertex, forwarded to
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)'s `linejoin`. One
+  of `"round"`, `"mitre"`, or `"bevel"`. Most visible on closed shapes
+  with few, sharp vertices, or on any drawable stroked with a thick
+  `linewidth`. Default `"round"`.
