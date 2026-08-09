@@ -23,18 +23,22 @@ how the API got here, see
 ### Class hierarchy
 
 - **`style`** – container for `color`/`fill`/`linewidth`/`linetype`/
-  `linejoin`, forwarded to
+  `linejoin`/`lineend`/`linemitre`, forwarded to
   [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html). `fill` accepts
   either a plain colour string or the output of a `fill_*()` helper (see
   “The `fill_*()` texture family” below); default is
   `fill_solid("black")` (i.e. `"black"`). `linetype` (default `"solid"`,
-  forwarded to `lty`) and `linejoin` (default `"round"`, validated as
-  one of `"round"`/ `"mitre"`/`"bevel"`) are not independently
-  re-validated beyond `linejoin`’s enum check – `linetype` accepts
+  forwarded to `lty`) is not independently re-validated – it accepts
   anything [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s `lty`
-  does (named types, integer codes, or a custom hex dash string) and any
-  further validation is left to `grid` at draw time. `lineend`/
-  `linemitre` are deliberately not yet exposed – see `.agents/PLAN.md`.
+  does (named types, integer codes, or a custom hex dash string), left
+  to `grid` at draw time. `linejoin` (default `"round"`) is validated as
+  one of `"round"`/`"mitre"`/ `"bevel"`; `lineend` (default `"round"`)
+  as one of `"round"`/`"butt"`/ `"square"`; `linemitre` (default `10`,
+  matching [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s own
+  default) must be at least `1`. `lineend` only has a visible effect on
+  `"path"`-geometry drawables (free endpoints); `linemitre` only takes
+  effect when `linejoin = "mitre"`, truncating a corner sharper than the
+  limit allows into a bevel instead.
 - **`point_set`** – a polygon’s vertices (`x`/`y` numeric vectors, equal
   length). Named `point_set` rather than `points` so the exported
   constructor doesn’t mask
@@ -58,6 +62,9 @@ how the API got here, see
   “Gotchas”.
 - **`shape_raw`** – the trivial drawable: `x`/`y` supplied directly as
   `points`. Usually produced by `convert()`, not constructed by hand.
+  `curve_raw`/`points_raw` are its `"path"`/`"points"`-geometry analogs
+  (see below) – together the three form a “raw” family covering all
+  three `geometry` values with the same trivial constructor shape.
 - **`shape_circle`** – centroid + radius + `n` (point count); `points`
   is `n` evenly-spaced points around the circumference.
 - **`shape_blob`** – like `shape_circle`, but the radius is perturbed by
@@ -102,6 +109,42 @@ how the API got here, see
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md) like
   any other drawable) but has no visible effect, per `drawable`’s
   `geometry` docs.
+- **`curve_line`** – an open polyline through an arbitrary number (at
+  least two) of control points `(x, y)`, connected by straight segments
+  in order. Unlike every other drawable, its `points` getter does no
+  computation at all (`point_set(x = self@x, y = self@y)` directly), so
+  there’s no `n` argument.
+- **`curve_spiral`** – centroid (`x`/`y`) + `radius_start`/`radius_end`
+  - `turns` + `n`; angle sweeps `2 * pi * turns` radians while radius
+    interpolates linearly from `radius_start` to `radius_end`, giving an
+    Archimedean-style spiral. Structurally closest to `shape_circle`,
+    but needed its own file since the angle range and non-constant
+    radius are both new.
+- **`curve_scribble`** – a single random wandering line (a finite sum of
+  sine harmonics), built from the internal `scribble_lines()` generator
+  [`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)
+  already used for its tile texture (`R/fill.R`, shared rather than
+  duplicated), but scaled here into an arbitrary `x`/`y` +
+  `width`/`height` bounding box on the sketch’s own coordinate plane
+  instead of tiled inside a fill pattern. `direction` (`"horizontal"`/
+  `"vertical"`) controls which axis `along`/`across` map to, mirroring
+  [`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)’s
+  own `direction` argument.
+- **`curve_raw`** – `shape_raw`’s `"path"`-geometry analog: `x`/`y`
+  supplied directly as `points`, connected by straight segments with no
+  smoothing/resampling/closing edge. Unlike `curve_line`, places no
+  minimum on `length(x)` (matching `shape_raw`’s own leniency), since
+  its primary role is as a `convert()` target for “freezing” any
+  `"path"`-geometry drawable (no such `convert()` method exists yet,
+  mirroring `shape_raw`’s).
+- **`points_raw`** – `shape_raw`’s `"points"`-geometry analog, and the
+  first concrete constructor to use `geometry = "points"` (previously
+  reserved on the dimensional reading with no constructor exposing it).
+  `x`/`y` supplied directly as `points`, rendered as unconnected
+  markers; every line-related `style` property
+  (`linewidth`/`linetype`/`linejoin`/ `lineend`/`linemitre`) and `fill`
+  have no effect, per `drawable`’s `geometry` docs – only `style@color`
+  is used, as the marker colour.
 - **`sketch`** – a list of `drawable`s (`shapes` property). Built up
   with `sketch() + shape_circle() + shape_blob(...)`; the `+` method
   requires an S7 method registration, not an S3 `` `+.sketch` `` (see
@@ -121,9 +164,12 @@ how the API got here, see
   [`grid::pointsGrob()`](https://rdrr.io/r/grid/grid.points.html) for
   `"points"` – `style@fill` is omitted from `gpar()` for the latter two,
   since only a closed polygon has an interior to fill.
-  `style@linetype`/`style@linejoin` are forwarded to `gpar()` for both
-  stroked geometries (`"polygon"`, `"path"`) but not `"points"`, which
-  has no line to dash or join.
+  `style@linetype`/`style@linejoin`/`style@lineend`/`style@linemitre`
+  are forwarded to `gpar()` for both stroked geometries (`"polygon"`,
+  `"path"`) but not `"points"`, which has no line to dash, join, cap, or
+  mitre – `lineend`/`linemitre` are simply inert for `"polygon"`, which
+  has no free endpoint and no mitred corner sharp enough in practice to
+  hit the default limit.
 - **`convert()`** – S7’s own generic (not defined by this package); a
   `method(convert, list(drawable, shape_raw))` “freezes” any drawable’s
   computed points into a plain `shape_raw`, preserving `style`.
@@ -403,7 +449,8 @@ full debugging narrative):
   to exist for its own property default.
 - `R/style.R`, `R/point_set.R`, `R/drawable.R` – foundation classes, in
   load order (each depends on the previous).
-- `R/shape_bezier.R`, `R/curve_bezier.R`, `R/shape_raw.R`,
+- `R/shape_bezier.R`, `R/curve_bezier.R`, `R/curve_line.R`,
+  `R/curve_spiral.R`, `R/curve_scribble.R`, `R/shape_raw.R`,
   `R/shape_circle.R`, `R/shape_blob.R`, `R/shape_ribbon.R`,
   `R/shape_twist.R` – the concrete `drawable` subclasses, one file each.
   Every closed constructor shares the `shape_*` prefix, every open one
@@ -412,6 +459,13 @@ full debugging narrative):
   immediately after `shape_bezier.R` since it shares that file’s
   `bernstein()`/`bezier_curve_points()`/`validate_bezier_args()`
   internal helpers rather than duplicating them.
+  `curve_line.R`/`curve_spiral.R` need no such sharing (each is
+  genuinely new geometry with no `shape_*()` counterpart), so they’re
+  ordinary standalone constructor files. `curve_scribble.R` shares
+  `R/fill.R`’s internal `scribble_lines()` helper (rather than
+  duplicating it) but still needs its own file, since it depends on
+  `drawable` (defined after `fill.R` in `Collate`) – `fill.R` itself has
+  no dependency on `drawable` and loads first.
 - `R/sketch.R` – the `sketch` class and its `+` method.
 - `R/draw.R` – the `draw` generic and its three methods.
 - `R/convert.R` – the `convert(drawable, shape_raw)` method.
@@ -421,12 +475,12 @@ full debugging narrative):
   and the `globalVariables("properties")` workaround.
 - `DESCRIPTION`’s `Collate` field pins the load order above explicitly
   (fill -\> style -\> point_set -\> drawable -\> shape_bezier -\>
-  curve_bezier -\> shape_raw -\> shape_circle -\> shape_blob -\>
-  shape_ribbon -\> shape_twist -\> sketch -\> draw -\> convert -\>
-  sketchpad-package). **Any new drawable subclass must be added to
-  `Collate` after `drawable.R`**, or
-  `devtools::load_all()`/`R CMD check` will fail with an “object
-  ‘drawable’ not found” error.
+  curve_bezier -\> curve_line -\> curve_spiral -\> curve_scribble -\>
+  shape_raw -\> shape_circle -\> shape_blob -\> shape_ribbon -\>
+  shape_twist -\> sketch -\> draw -\> convert -\> sketchpad-package).
+  **Any new drawable subclass must be added to `Collate` after
+  `drawable.R`**, or `devtools::load_all()`/`R CMD check` will fail with
+  an “object ‘drawable’ not found” error.
 
 ## Conventions
 

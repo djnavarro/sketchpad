@@ -3,11 +3,11 @@
 carry a style, a geometry, and expose a computed points property, of
 class point_set. It is not intended to be instantiated directly; use one
 of its subclasses (shape_raw, shape_circle, shape_blob,
-shape_ribbon, shape_twist) instead."><meta property="og:description" content="drawable enforces structure on its subclasses: every drawable must
+shape_ribbon, shape_twist, curve_raw, points_raw, ...) instead."><meta property="og:description" content="drawable enforces structure on its subclasses: every drawable must
 carry a style, a geometry, and expose a computed points property, of
 class point_set. It is not intended to be instantiated directly; use one
 of its subclasses (shape_raw, shape_circle, shape_blob,
-shape_ribbon, shape_twist) instead."></head><body>
+shape_ribbon, shape_twist, curve_raw, points_raw, ...) instead."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -44,7 +44,7 @@ shape_ribbon, shape_twist) instead."></head><body>
 carry a <a href="style.html">style</a>, a <code>geometry</code>, and expose a computed <code>points</code> property, of
 class <a href="point_set.html">point_set</a>. It is not intended to be instantiated directly; use one
 of its subclasses (<a href="shape_raw.html">shape_raw</a>, <a href="shape_circle.html">shape_circle</a>, <a href="shape_blob.html">shape_blob</a>,
-<a href="shape_ribbon.html">shape_ribbon</a>, <a href="shape_twist.html">shape_twist</a>) instead.</p>
+<a href="shape_ribbon.html">shape_ribbon</a>, <a href="shape_twist.html">shape_twist</a>, <a href="curve_raw.html">curve_raw</a>, <a href="points_raw.html">points_raw</a>, ...) instead.</p>
     </div>
 
     <div class="section level2">
@@ -62,17 +62,19 @@ of its subclasses (<a href="shape_raw.html">shape_raw</a>, <a href="shape_circle
 
 <dt id="arg-geometry">geometry<a class="anchor" aria-label="anchor" href="#arg-geometry"></a></dt>
 <dd><p>One of <code>"polygon"</code> (default), <code>"path"</code>, or <code>"points"</code>.
-Not currently exposed by any concrete <code>shape_*()</code> constructor – see
-details.</p></dd>
+Not exposed as a constructor argument by any concrete drawable –
+each <code>shape_*()</code>/<code>curve_*()</code>/<code><a href="points_raw.html">points_raw()</a></code> constructor fixes one
+value internally instead (see details).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>geometry</code> tells <code><a href="draw.html">draw()</a></code> which <a href="https://rdrr.io/r/graphics/grid.html" class="external-link">grid</a> grob a drawable's <code>points</code> map to,
-following a dimensional reading: <code>"points"</code> (0D, <code><a href="https://rdrr.io/r/grid/grid.points.html" class="external-link">grid::pointsGrob()</a></code>),
-<code>"path"</code> (1D, an open <code><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">grid::polylineGrob()</a></code>), or <code>"polygon"</code> (2D, a
-closed <code><a href="https://rdrr.io/r/grid/grid.polygon.html" class="external-link">grid::polygonGrob()</a></code> – the default, and the only value any
-current <code>shape_*()</code> constructor uses). <code>style@fill</code> is ignored for
+following a dimensional reading: <code>"points"</code> (0D, <code><a href="https://rdrr.io/r/grid/grid.points.html" class="external-link">grid::pointsGrob()</a></code>,
+e.g. <code><a href="points_raw.html">points_raw()</a></code>), <code>"path"</code> (1D, an open <code><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">grid::polylineGrob()</a></code>, e.g.
+<code><a href="curve_line.html">curve_line()</a></code>/<code><a href="curve_raw.html">curve_raw()</a></code>), or <code>"polygon"</code> (2D, a closed
+<code><a href="https://rdrr.io/r/grid/grid.polygon.html" class="external-link">grid::polygonGrob()</a></code> – the default, and the only value any
+<code>shape_*()</code> constructor uses). <code>style@fill</code> is ignored for
 <code>"points"</code>/<code>"path"</code> geometries, since only a closed polygon has an
 interior to fill.</p>
     </div>

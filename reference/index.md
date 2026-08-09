@@ -4,6 +4,14 @@
 
 - [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)
   : An open Bezier curve
+- [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md)
+  : An open polyline
+- [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md)
+  : An open path defined directly by its vertices
+- [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md)
+  : A wandering scribble curve
+- [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md)
+  : An open spiral
 - [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) : Draw a
   drawable or sketch
 - [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md)
@@ -42,6 +50,8 @@
   : Vignette fill
 - [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md)
   : A set of polygon vertices
+- [`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
+  : A scatter of points defined directly by their coordinates
 - [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
   : A closed Bezier curve
 - [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)

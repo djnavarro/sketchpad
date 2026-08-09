@@ -9,8 +9,10 @@ is not intended to be instantiated directly; use one of its subclasses
 [shape_circle](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [shape_blob](https://sketchpad.djnavarro.net/reference/shape_blob.md),
 [shape_ribbon](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
-[shape_twist](https://sketchpad.djnavarro.net/reference/shape_twist.md))
-instead.
+[shape_twist](https://sketchpad.djnavarro.net/reference/shape_twist.md),
+[curve_raw](https://sketchpad.djnavarro.net/reference/curve_raw.md),
+[points_raw](https://sketchpad.djnavarro.net/reference/points_raw.md),
+...) instead.
 
 ## Usage
 
@@ -27,8 +29,10 @@ drawable(..., geometry = "polygon")
 
 - geometry:
 
-  One of `"polygon"` (default), `"path"`, or `"points"`. Not currently
-  exposed by any concrete `shape_*()` constructor – see details.
+  One of `"polygon"` (default), `"path"`, or `"points"`. Not exposed as
+  a constructor argument by any concrete drawable – each
+  `shape_*()`/`curve_*()`/[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
+  constructor fixes one value internally instead (see details).
 
 ## Details
 
@@ -36,11 +40,13 @@ drawable(..., geometry = "polygon")
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) which
 [grid](https://rdrr.io/r/graphics/grid.html) grob a drawable's `points`
 map to, following a dimensional reading: `"points"` (0D,
-[`grid::pointsGrob()`](https://rdrr.io/r/grid/grid.points.html)),
+[`grid::pointsGrob()`](https://rdrr.io/r/grid/grid.points.html), e.g.
+[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)),
 `"path"` (1D, an open
-[`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html)), or
-`"polygon"` (2D, a closed
+[`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html), e.g.
+[`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md)/[`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md)),
+or `"polygon"` (2D, a closed
 [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html) – the
-default, and the only value any current `shape_*()` constructor uses).
+default, and the only value any `shape_*()` constructor uses).
 `style@fill` is ignored for `"points"`/`"path"` geometries, since only a
 closed polygon has an interior to fill.

@@ -45,7 +45,9 @@ grid::gpar() when a drawable object is drawn."></head><body>
 <span>  fill <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  linewidth <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  linetype <span class="op">=</span> <span class="st">"solid"</span>,</span>
-<span>  linejoin <span class="op">=</span> <span class="st">"round"</span></span>
+<span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
+<span>  lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
+<span>  linemitre <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -83,6 +85,23 @@ aren't independently re-validated here. Default <code>"solid"</code>.</p></dd>
 <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code>'s <code>linejoin</code>. One of <code>"round"</code>, <code>"mitre"</code>, or <code>"bevel"</code>.
 Most visible on closed shapes with few, sharp vertices, or on any
 drawable stroked with a thick <code>linewidth</code>. Default <code>"round"</code>.</p></dd>
+
+
+<dt id="arg-lineend">lineend<a class="anchor" aria-label="anchor" href="#arg-lineend"></a></dt>
+<dd><p>Line end style at a path's free endpoints, forwarded to
+<code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code>'s <code>lineend</code>. One of <code>"round"</code>, <code>"butt"</code>, or <code>"square"</code>.
+Only visible on <code>"path"</code>-geometry drawables (e.g. <code><a href="curve_line.html">curve_line()</a></code>,
+<code><a href="curve_bezier.html">curve_bezier()</a></code>) – a <code>"polygon"</code>-geometry drawable has no free
+endpoint, since its outline closes back on itself. Most visible at a
+thick <code>linewidth</code>. Default <code>"round"</code>.</p></dd>
+
+
+<dt id="arg-linemitre">linemitre<a class="anchor" aria-label="anchor" href="#arg-linemitre"></a></dt>
+<dd><p>Mitre limit, forwarded to <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code>'s <code>linemitre</code>.
+Only takes effect when <code>linejoin = "mitre"</code>: at a vertex sharper than
+this limit allows, the mitred corner is truncated to a bevel instead,
+to avoid an arbitrarily long spike. Must be at least <code>1</code>. Default <code>10</code>,
+matching <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code>'s own default.</p></dd>
 
 </dl></div>
 

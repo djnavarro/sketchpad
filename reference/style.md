@@ -13,7 +13,9 @@ style(
   fill = "black",
   linewidth = 1,
   linetype = "solid",
-  linejoin = "round"
+  linejoin = "round",
+  lineend = "round",
+  linemitre = 10
 )
 ```
 
@@ -61,3 +63,25 @@ style(
   of `"round"`, `"mitre"`, or `"bevel"`. Most visible on closed shapes
   with few, sharp vertices, or on any drawable stroked with a thick
   `linewidth`. Default `"round"`.
+
+- lineend:
+
+  Line end style at a path's free endpoints, forwarded to
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)'s `lineend`. One of
+  `"round"`, `"butt"`, or `"square"`. Only visible on `"path"`-geometry
+  drawables (e.g.
+  [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
+  [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md))
+  – a `"polygon"`-geometry drawable has no free endpoint, since its
+  outline closes back on itself. Most visible at a thick `linewidth`.
+  Default `"round"`.
+
+- linemitre:
+
+  Mitre limit, forwarded to
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)'s `linemitre`. Only
+  takes effect when `linejoin = "mitre"`: at a vertex sharper than this
+  limit allows, the mitred corner is truncated to a bevel instead, to
+  avoid an arbitrarily long spike. Must be at least `1`. Default `10`,
+  matching [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)'s own
+  default.

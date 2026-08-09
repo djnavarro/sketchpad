@@ -6,6 +6,10 @@
 <url><loc>https://sketchpad.djnavarro.net/authors.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/index.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/curve_bezier.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/curve_line.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/curve_raw.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/curve_scribble.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/curve_spiral.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/draw.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/drawable.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/fill_checker.html</loc></url>
@@ -26,6 +30,7 @@
 <url><loc>https://sketchpad.djnavarro.net/reference/fill_vignette.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/index.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/point_set.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/points_raw.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_bezier.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_blob.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_circle.html</loc></url>
