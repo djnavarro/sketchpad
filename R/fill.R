@@ -658,6 +658,80 @@ fill_vignette <- function(color = "black",
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = "repeat")
 }
 
+#' Striped pattern fill
+#'
+#' `fill_stripe()` builds a [grid::pattern()] fill value that renders
+#' repeating solid bands of two colours, at a given `angle`.
+#'
+#' Unlike [fill_hatch()], this doesn't use the corner-to-corner-diagonal
+#' tile-shape technique at all -- because a *filled* band, unlike a thin
+#' hatch *line*, needs every point along a tile's edge to match its
+#' neighbour, not just the points where a thin line happens to cross, a
+#' single diagonal split of a tile turns out not to tile seamlessly at an
+#' arbitrary angle the way a thin hatch line does. Instead, `fill_stripe()`
+#' sidesteps [grid::pattern()]'s tile-copy repetition altogether: the
+#' stripe angle and period come from a short two-colour
+#' [grid::linearGradient()] with hard colour stops (no smooth transition)
+#' and `extend = "repeat"`, which repeats *itself* continuously along its
+#' own axis -- a fundamentally different (and for this purpose, simpler)
+#' mechanism than tiling a rasterised copy. [grid::pattern()] is still used
+#' around this gradient, but only once, as a single square (aspect-
+#' corrected) tile spanning the whole target shape, exactly as
+#' [fill_gradient()] does by default -- not to create repetition, which the
+#' gradient already provides.
+#'
+#' @param color1,color2 The two stripe colours. Defaults `"black"` and
+#'   `"white"`.
+#' @param width Fraction of each stripe period that is `color1` (the rest
+#'   is `color2`). Must be a number strictly between `0` and `1`. Default
+#'   `0.5` (equal bands).
+#' @param spacing One stripe period (`color1` band plus `color2` band), as
+#'   a fraction of the target's bounding box. Must be a positive number.
+#'   Default `0.2`.
+#' @inheritParams fill_hatch
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_stripe <- function(color1 = "black",
+                         color2 = "white",
+                         angle = 45,
+                         width = 0.5,
+                         spacing = 0.2,
+                         aspect = 1,
+                         extend = "repeat") {
+  validate_fill_args(angle, spacing, aspect)
+  if (!is.character(color1) || length(color1) != 1) {
+    rlang::abort("color1 must be a single string")
+  }
+  if (!is.character(color2) || length(color2) != 1) {
+    rlang::abort("color2 must be a single string")
+  }
+  if (!is.numeric(width) || length(width) != 1 || width <= 0 || width >= 1) {
+    rlang::abort("width must be a single number strictly between 0 and 1")
+  }
+
+  theta <- angle * pi / 180
+  half <- spacing / 2
+  gradient <- grid::linearGradient(
+    colours = c(color1, color1, color2, color2),
+    stops = c(0, width, width, 1),
+    x1 = 0.5 - half * cos(theta), y1 = 0.5 - half * sin(theta),
+    x2 = 0.5 + half * cos(theta), y2 = 0.5 + half * sin(theta),
+    extend = extend
+  )
+
+  content <- grid::rectGrob(
+    x = 0.5, y = 0.5, width = 1, height = 1,
+    default.units = "npc",
+    gp = grid::gpar(fill = gradient, col = NA)
+  )
+
+  grid::pattern(content, width = 1, height = aspect, extend = "repeat")
+}
+
 #' Bounding-box aspect ratio of a drawable
 #'
 #' Internal helper. Computes the width-to-height ratio of a [drawable]

@@ -83,6 +83,35 @@ test_that("fill_checker() tile content has four quadrant rectangles", {
   expect_length(children, 4)
 })
 
+test_that("fill_stripe() returns a grid pattern object", {
+  expect_s3_class(fill_stripe(), "GridPattern")
+})
+
+test_that("fill_stripe() validates its arguments", {
+  expect_error(fill_stripe(spacing = 0), "spacing")
+  expect_error(fill_stripe(spacing = -1), "spacing")
+  expect_error(fill_stripe(aspect = 0), "aspect")
+  expect_error(fill_stripe(aspect = -1), "aspect")
+  expect_error(fill_stripe(angle = c(1, 2)), "angle")
+  expect_error(fill_stripe(color1 = 1), "color1")
+  expect_error(fill_stripe(color1 = c("red", "blue")), "color1")
+  expect_error(fill_stripe(color2 = 1), "color2")
+  expect_error(fill_stripe(color2 = c("red", "blue")), "color2")
+  expect_error(fill_stripe(width = 0), "width")
+  expect_error(fill_stripe(width = 1), "width")
+  expect_error(fill_stripe(width = -0.5), "width")
+})
+
+test_that("fill_stripe() works with a non-default aspect ratio", {
+  expect_s3_class(fill_stripe(aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_stripe() tile content is filled with a hard-stop linear gradient", {
+  gradient <- environment(fill_stripe()$f)$grob$gp$fill
+  expect_s3_class(gradient, "GridLinearGradient")
+  expect_identical(gradient$stops, c(0, 0.5, 0.5, 1))
+})
+
 test_that("fill_stipple() returns a grid pattern object", {
   fill <- fill_stipple()
   expect_s3_class(fill, "GridPattern")
