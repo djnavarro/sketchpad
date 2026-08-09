@@ -128,3 +128,37 @@ test_that("fill_noise() is reproducible for a given seed", {
   expect_identical(extract_raster(fill_a), extract_raster(fill_b))
   expect_false(identical(extract_raster(fill_a), extract_raster(fill_c)))
 })
+
+test_that("fill_gradient() returns a grid pattern object", {
+  expect_s3_class(fill_gradient(), "GridPattern")
+  expect_s3_class(fill_gradient(type = "radial"), "GridPattern")
+})
+
+test_that("fill_gradient() validates its arguments", {
+  expect_error(fill_gradient(spacing = 0), "spacing")
+  expect_error(fill_gradient(spacing = -1), "spacing")
+  expect_error(fill_gradient(aspect = 0), "aspect")
+  expect_error(fill_gradient(aspect = -1), "aspect")
+  expect_error(fill_gradient(colors = "black"), "colors")
+  expect_error(fill_gradient(colors = 1), "colors")
+  expect_error(fill_gradient(stops = 0.5), "stops")
+  expect_error(fill_gradient(angle = c(1, 2)), "angle")
+  expect_error(fill_gradient(type = "diagonal"))
+})
+
+test_that("fill_gradient() accepts custom stops", {
+  fill <- fill_gradient(colors = c("red", "white", "blue"), stops = c(0, 0.2, 1))
+  expect_s3_class(fill, "GridPattern")
+})
+
+test_that("fill_gradient() works with a non-default aspect ratio", {
+  expect_s3_class(fill_gradient(aspect = 2.33), "GridPattern")
+  expect_s3_class(fill_gradient(type = "radial", aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_gradient() tile content uses the requested gradient type", {
+  linear_content <- environment(fill_gradient(type = "linear")$f)$grob$gp$fill
+  radial_content <- environment(fill_gradient(type = "radial")$f)$grob$gp$fill
+  expect_s3_class(linear_content, "GridLinearGradient")
+  expect_s3_class(radial_content, "GridRadialGradient")
+})

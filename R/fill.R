@@ -420,6 +420,103 @@ fill_noise <- function(color = "black",
   grid::pattern(raster, width = spacing, height = spacing * aspect, extend = extend)
 }
 
+#' Gradient fill
+#'
+#' `fill_gradient()` builds a [grid::pattern()] fill value whose tile content
+#' is a single rectangle filled with a [grid::linearGradient()] or
+#' [grid::radialGradient()], depending on `type`.
+#'
+#' Like the other `fill_*()` helpers, this needs the target's bounding-box
+#' aspect ratio (`aspect`) to render true rather than stretched -- but the
+#' correction is applied differently here. Rather than adjusting the
+#' gradient's own coordinates (the way [fill_hatch()] adjusts a segment's
+#' direction), `fill_gradient()` corrects the *tile* itself to be physically
+#' square, exactly as [fill_stipple()] does for its dots: once the tile is
+#' square, a gradient specified inside it in plain `"npc"` needs no further
+#' correction to render at the requested `angle`, or as a true circle for
+#' `type = "radial"`.
+#'
+#' This also means a gradient tile has none of [fill_hatch()]'s periodicity
+#' concerns: adjacent tiles are simply identical copies of the same square
+#' gradient, with nothing analogous to a hatch line's tile-edge dashing to
+#' avoid.
+#'
+#' With the default `spacing = 1`, one tile spans (and, for a non-square
+#' bounding box, slightly overshoots) the target's entire bounding box,
+#' giving a single smooth gradient across the whole shape -- the overshoot
+#' is invisibly clipped away by the target's own outline. Set `spacing < 1`
+#' for a repeating pattern of small gradient motifs instead.
+#'
+#' @param colors Two or more colours to interpolate between.
+#' @param type Either `"linear"` or `"radial"`. Default `"linear"`.
+#' @param angle Gradient direction in degrees, for `type = "linear"` only
+#'   (ignored for `"radial"`). Default `45`.
+#' @param stops Colour stop positions, as a numeric vector the same length
+#'   as `colors`, or `NULL` to space them evenly (the default used by
+#'   [grid::linearGradient()]/[grid::radialGradient()]). Default `NULL`.
+#' @param spacing Tile size, as a fraction of the target's bounding box.
+#'   Must be a positive number. Default `1` (one tile spans the whole
+#'   shape).
+#' @param aspect Width-to-height ratio of the target polygon's bounding box.
+#'   Must be a positive number. Default `1` (a square bounding box).
+#' @param extend Passed to the inner [grid::linearGradient()]/
+#'   [grid::radialGradient()], controlling what happens beyond the colour
+#'   stops. Default `"pad"`.
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_gradient <- function(colors = c("white", "black"),
+                           type = c("linear", "radial"),
+                           angle = 45,
+                           stops = NULL,
+                           spacing = 1,
+                           aspect = 1,
+                           extend = "pad") {
+  type <- match.arg(type)
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.character(colors) || length(colors) < 2) {
+    rlang::abort("colors must be a character vector of at least length 2")
+  }
+  if (!is.null(stops) && (!is.numeric(stops) || length(stops) != length(colors))) {
+    rlang::abort("stops must be NULL, or a numeric vector the same length as colors")
+  }
+  if (!is.numeric(angle) || length(angle) != 1) {
+    rlang::abort("angle must be a single number")
+  }
+
+  gradient_args <- list(colours = colors, extend = extend)
+  if (!is.null(stops)) {
+    gradient_args$stops <- stops
+  }
+
+  if (type == "linear") {
+    theta <- angle * pi / 180
+    gradient <- do.call(grid::linearGradient, c(
+      gradient_args,
+      list(
+        x1 = 0.5 - 0.5 * cos(theta), y1 = 0.5 - 0.5 * sin(theta),
+        x2 = 0.5 + 0.5 * cos(theta), y2 = 0.5 + 0.5 * sin(theta)
+      )
+    ))
+  } else {
+    gradient <- do.call(grid::radialGradient, c(
+      gradient_args,
+      list(cx1 = 0.5, cy1 = 0.5, r1 = 0, cx2 = 0.5, cy2 = 0.5, r2 = 0.5)
+    ))
+  }
+
+  content <- grid::rectGrob(
+    x = 0.5, y = 0.5, width = 1, height = 1,
+    default.units = "npc",
+    gp = grid::gpar(fill = gradient, col = NA)
+  )
+
+  grid::pattern(content, width = spacing, height = spacing * aspect, extend = "repeat")
+}
+
 #' Bounding-box aspect ratio of a drawable
 #'
 #' Internal helper. Computes the width-to-height ratio of a [drawable]
