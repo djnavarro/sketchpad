@@ -79,12 +79,6 @@ current single `linewidth`: dash patterns, line caps/joins.
 transparency control, a fairly basic omission for layered generative
 work where overlapping semi-transparent shapes are a common effect.
 
-### Gradient fills
-
-`grid` supports gradient fills (`grid::linearGradient()`/
-`radialGradient()` as of R 4.2); `style`'s `fill` is currently a plain
-color string only.
-
 ### Transform helpers
 
 Translate/rotate/scale/reflect a single `drawable` or an entire `sketch`

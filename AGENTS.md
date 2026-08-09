@@ -20,7 +20,9 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 ### Class hierarchy
 
 - **`style`** -- container for `color`/`fill`/`linewidth`, forwarded to
-  `grid::gpar()`.
+  `grid::gpar()`. `fill` accepts either a plain colour string or the
+  output of a `fill_*()` helper (see "The `fill_*()` texture family"
+  below); default is `fill_solid("black")` (i.e. `"black"`).
 - **`points`** -- a polygon's vertices (`x`/`y` numeric vectors, equal
   length).
 - **`drawable`** -- parent class of every shape. Declares two properties:
@@ -73,6 +75,48 @@ device's own aspect ratio). `draw(sketch)` computes one shared
 viewport/axis-range across every shape's points, then draws each shape's
 polygon into it in list order -- later shapes are drawn on top.
 
+`draw()` itself needs no special-casing for pattern/gradient fills:
+`grid::gpar(fill = ...)` already accepts a colour string or a
+`"GridPattern"`-inheriting object interchangeably, so `object@style@fill`
+is passed straight through either way.
+
+### The `fill_*()` texture family
+
+`R/fill.R` holds seven `fill_*()` constructors for `style@fill`:
+`fill_solid()` (a validated colour string, no `grid::pattern()` involved),
+`fill_hatch()`/`fill_crosshatch()` (diagonal hatching, sharing a
+tile-shape technique -- see below), `fill_stipple()` (scattered dots,
+seeded via `withr::with_seed()` like `blob()`'s noise), `fill_noise()`
+(a rasterised `ambient` simplex/fractal field, sampled on a torus for
+seamless tiling), `fill_gradient()` (linear/radial via
+`grid::linearGradient()`/`radialGradient()`), and `fill_vignette()` (a
+colour faded via a `grid::as.mask()` alpha mask -- the only helper using
+masks). All but `fill_solid()` return an object from `grid::pattern()`,
+sharing the base S3 class `"GridPattern"`.
+
+The unifying design constraint across all of them: `grid::pattern()`
+tiles are sized as a fraction of the *target polygon's own bounding box*,
+not a fixed physical square, so every helper takes an `aspect` argument
+(the target's bounding-box width/height ratio) to correct for this --
+computed via the internal `bbox_aspect()` helper. Two different
+corrections are needed depending on what's drawn:
+
+- Directional content that must tile seamlessly (`fill_hatch()`/
+  `fill_crosshatch()`) draws a plain corner-to-corner diagonal and
+  controls the *rendered* angle via the tile's own `width`/`height`
+  ratio (the internal `hatch_tile_dims()` helper) -- never via a raw
+  direction vector baked into the segment's coordinates. `extend =
+  "repeat"` only translates tile copies by whole tile-widths/heights, so
+  any slope other than exactly 1 (corner-to-corner) leaves a visible
+  mismatch at every tile edge.
+- Content with no periodicity constraint (`fill_stipple()`'s dots,
+  `fill_gradient()`, `fill_vignette()`'s mask) instead makes the *tile
+  itself* physically square (`height = spacing * aspect`), so content
+  drawn in plain `"npc"` inside it needs no further correction.
+
+Shared argument validation lives in the internal `validate_fill_args()`
+(spacing/aspect, with an optional angle check via `angle = NULL`).
+
 ## Gotchas worth remembering
 
 A handful of non-obvious S7 behaviors that would bite a future edit if
@@ -123,9 +167,21 @@ full debugging narrative):
 - **`sketch` was not available as the package name.** It's an existing
   CRAN package (an R-to-JavaScript/p5.js transpiler) -- installing both
   would collide. Named this package `sketchpad` instead.
+- **`grDevices::dev.capabilities()$patterns` is not a reliable signal
+  for whether a device supports pattern/gradient fills.** It returned
+  `NA` for `cairo_pdf()`, `pdf()`, and `svg()` alike when tested -- not
+  just genuinely unsupported devices -- and only reported real values
+  (`c("LinearGradient", "RadialGradient", "TilingPattern")`) on
+  Positron's own live plotting device. A `draw()`-time warning built on
+  this was implemented and then reverted for exactly this reason (see
+  HISTORY.md); don't re-attempt a capability check on this API without
+  first finding a more reliable signal.
 
 ## Structure
 
+- `R/fill.R` -- the `fill_*()` texture family, loaded first: no
+  compile-time dependency on any other class, but `style.R` needs
+  `fill_solid()` to exist for its own property default.
 - `R/style.R`, `R/points.R`, `R/drawable.R` -- foundation classes, in
   load order (each depends on the previous).
 - `R/bezier.R`, `R/shape.R`, `R/circle.R`, `R/blob.R`, `R/ribbon.R`,
@@ -137,11 +193,11 @@ full debugging narrative):
   `.onLoad()` calling `S7::methods_register()`, and the
   `globalVariables("properties")` workaround.
 - `DESCRIPTION`'s `Collate` field pins the load order above explicitly
-  (style -> points -> drawable -> bezier -> shape -> circle -> blob ->
-  ribbon -> twist -> sketch -> draw -> convert -> sketchpad-package).
-  **Any new drawable subclass must be added to `Collate` after
-  `drawable.R`**, or `devtools::load_all()`/`R CMD check` will fail with
-  an "object 'drawable' not found" error.
+  (fill -> style -> points -> drawable -> bezier -> shape -> circle ->
+  blob -> ribbon -> twist -> sketch -> draw -> convert ->
+  sketchpad-package). **Any new drawable subclass must be added to
+  `Collate` after `drawable.R`**, or `devtools::load_all()`/
+  `R CMD check` will fail with an "object 'drawable' not found" error.
 
 ## Conventions
 

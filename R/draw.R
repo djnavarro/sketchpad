@@ -97,4 +97,3 @@ S7::method(draw, S7::class_any) <- function(object, ...) {
   rlang::warn("Non-drawable objects ignored by draw()")
   return(invisible(NULL))
 }
-

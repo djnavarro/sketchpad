@@ -177,3 +177,92 @@ as expected; a 4-control-point cubic renders as a filled arc closed back
 to its baseline). `bezier_ribbon` itself was deliberately left for a
 separate future addition (see PLAN.md) rather than folded into this one,
 since it's a materially different, more complex shape.
+
+## Building the `fill_*()` texture family and wiring it into `style@fill`
+
+Explored `grid`'s native gradient/pattern/mask support (`grid::pattern()`,
+`linearGradient()`/`radialGradient()`, `as.mask()`) as an alternative to
+reimplementing pattern geometry by hand the way `ggpattern` does. Built
+seven helpers in `R/fill.R` -- `fill_solid()`, `fill_hatch()`,
+`fill_crosshatch()`, `fill_stipple()`, `fill_noise()`, `fill_gradient()`,
+`fill_vignette()` -- then widened `style@fill` to accept either a plain
+colour string or any of their outputs.
+
+**`grid::pattern()`'s tile coordinates are npc-relative to the *target's*
+bounding box, not a fixed physical square.** This one fact drove most of
+the family's design and is worth remembering in full:
+
+- A tile that's square in that relative sense is a stretched rectangle in
+  absolute terms whenever the target's bounding box isn't square, which
+  distorts any angle/circularity baked directly into the pattern content.
+  Every helper takes an `aspect` argument (the target's bounding-box
+  width/height ratio) to correct for this -- but the correction is applied
+  two different ways depending on what's being drawn:
+  - For directional content that must *tile* correctly (`fill_hatch()`,
+    `fill_crosshatch()`), the correction has to go on the **tile's own
+    `width`/`height`**, not the content's coordinates -- see the next
+    point for why.
+  - For content with no periodicity constraint (`fill_stipple()`'s dots,
+    `fill_noise()`'s raster, `fill_gradient()`, `fill_vignette()`'s mask),
+    the fix is simpler: make the tile physically square via
+    `height = spacing * aspect`, then draw the content in plain `npc`
+    inside it with no further correction needed.
+- **`extend = "repeat"` only tiles seamlessly when a line's local slope is
+  exactly 1** (corner-to-corner across the tile). It just translates tile
+  copies by whole tile-widths/heights with no blending, so any other slope
+  baked into a segment's own coordinates leaves a real mismatch at every
+  tile edge ("dashing") -- confirmed by testing that neither longer
+  segments nor more copies fixed it, only changing the slope did. Fixed by
+  always drawing a plain corner-to-corner diagonal and controlling the
+  *rendered* angle entirely via the tile's `width`/`height` ratio instead.
+  This is why `fill_hatch()`/`fill_crosshatch()` don't take a raw direction
+  vector.
+- A raster content grob has the same seamlessness problem in a different
+  guise: `fill_noise()` solves it by sampling `ambient::gen_simplex()`'s
+  noise on a torus (mapping each tile pixel's `(u, v)` onto a pair of
+  circles across the noise function's 4 dimensions) rather than sampling
+  directly, making the field exactly periodic. Even so, a faint seam is
+  still visible at tile boundaries in practice, independent of
+  `resolution` or `interpolate` -- documented as an open, not-fully-solved
+  rendering-level caveat rather than silently claimed fixed.
+
+**`grid::mask()` doesn't exist** -- masking is a viewport property
+(`as.mask()` + `viewport(mask = ...)`), not a `fill` value the other
+helpers could plug in directly. `fill_vignette()` works around this by
+nesting a masked viewport inside the pattern tile's own content `gTree`.
+Two mask-specific surprises: a bare mask grob whose own fill was a
+`radialGradient()` intermittently emitted an "Ignored luminance mask (not
+supported on this device)" warning even though the render was visually
+correct regardless; being explicit with `as.mask(mask_grob, type =
+"alpha")` avoided the warning with an identical result (isolated via a
+solid-colour mask grob, which never triggered it, to confirm the cause was
+the gradient specifically, not masking in general). True `type =
+"luminance"` masks were separately found not to render at all in this
+nested-tile context, so only the alpha variant is offered.
+
+**Wiring into `style@fill`:** since `grid::gpar(fill = ...)` already
+accepts a colour string or a `"GridPattern"`-inheriting object
+interchangeably (every `fill_*()` helper except `fill_solid()` returns an
+object sharing that one base S3 class, confirmed across `pattern()`/
+`linearGradient()`/`radialGradient()`), `draw()`'s rendering code needed no
+changes at all. The only change was widening `style`'s `fill` property to
+`S7::new_union(S7::class_character, S7::new_S3_class("GridPattern"))`, with
+default `fill_solid("black")` (requiring `fill.R` to move before `style.R`
+in `Collate`, which was safe since `fill.R` has no compile-time dependency
+on `style`/`drawable`/`points`). Every drawable constructor already
+forwards `...` straight to `style(...)`, so `blob(fill = fill_hatch())`
+etc. needed no per-drawable changes either.
+
+**Rejected: warning when the active device might not support pattern
+fills.** `grid::pattern()`'s own docs note unsupported devices silently
+render a transparent fill instead of erroring, which seemed worth
+surfacing via `grDevices::dev.capabilities()$patterns`. Implemented, then
+reverted after testing revealed the check is unreliable in practice: in
+this environment, `dev.capabilities()$patterns` returned `NA` on
+`cairo_pdf()`, `pdf()`, *and* `svg()` alike -- not just genuinely
+unsupported devices -- with the single exception of Positron's own live
+plotting device, which correctly reported
+`c("LinearGradient", "RadialGradient", "TilingPattern")`. A warning built
+on this signal would false-positive on exactly the standard file devices
+users need for real output, which is worse than not warning at all. If
+revisited, would need a more reliable signal than `dev.capabilities()`.
