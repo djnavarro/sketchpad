@@ -1,0 +1,25 @@
+#' Parent class for all drawable objects
+#'
+#' `drawable` enforces structure on its subclasses: every drawable must
+#' carry a [style] and expose a computed [points] property. It is not
+#' intended to be instantiated directly; use one of its subclasses
+#' ([shape], [circle], [blob], [ribbon], [twist]) instead.
+#'
+#' @param ... Arguments passed to [style()].
+#'
+#' @export
+drawable <- S7::new_class(
+  name = "drawable",
+  properties = list(
+    style = S7::new_property(
+      class = style,
+      default = style()
+    ),
+    points = S7::new_property(
+      class = points,
+      getter = function(self) points(x = numeric(0L), y = numeric(0L))
+    )
+  ),
+  constructor = function(...) S7::new_object(S7::S7_object(), style = style(...))
+)
+

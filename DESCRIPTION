@@ -22,3 +22,15 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Collate: 'style.R'
+    'points.R'
+    'drawable.R'
+    'shape.R'
+    'circle.R'
+    'blob.R'
+    'ribbon.R'
+    'twist.R'
+    'sketch.R'
+    'draw.R'
+    'convert.R'
+    'sketchpad-package.R'
