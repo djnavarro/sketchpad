@@ -268,6 +268,99 @@ test_that("fill_noise() is reproducible for a given seed", {
   expect_false(identical(extract_raster(fill_a), extract_raster(fill_c)))
 })
 
+test_that("fill_marble() returns a grid pattern object", {
+  expect_s3_class(fill_marble(), "GridPattern")
+})
+
+test_that("fill_marble() validates its arguments", {
+  expect_error(fill_marble(spacing = 0), "spacing")
+  expect_error(fill_marble(spacing = -1), "spacing")
+  expect_error(fill_marble(aspect = 0), "aspect")
+  expect_error(fill_marble(aspect = -1), "aspect")
+  expect_error(fill_marble(color1 = 1), "color1")
+  expect_error(fill_marble(color1 = c("red", "blue")), "color1")
+  expect_error(fill_marble(color2 = 1), "color2")
+  expect_error(fill_marble(color2 = c("red", "blue")), "color2")
+  expect_error(fill_marble(resolution = 1), "resolution")
+  expect_error(fill_marble(resolution = 4.5), "resolution")
+  expect_error(fill_marble(stripes = 0), "stripes")
+  expect_error(fill_marble(stripes = 1.5), "stripes")
+  expect_error(fill_marble(warp = -1), "warp")
+  expect_error(fill_marble(frequency = -1), "frequency")
+  expect_error(fill_marble(octaves = 0), "octaves")
+  expect_error(fill_marble(octaves = 1.5), "octaves")
+  expect_error(fill_marble(seed = 1.5), "seed")
+})
+
+test_that("fill_marble() works with a non-default aspect ratio", {
+  expect_s3_class(fill_marble(aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_marble() is reproducible for a given seed", {
+  extract_raster <- function(fill) environment(fill$f)$grob$raster
+  fill_a <- fill_marble(seed = 481L, resolution = 8L)
+  fill_b <- fill_marble(seed = 481L, resolution = 8L)
+  fill_c <- fill_marble(seed = 482L, resolution = 8L)
+  expect_identical(extract_raster(fill_a), extract_raster(fill_b))
+  expect_false(identical(extract_raster(fill_a), extract_raster(fill_c)))
+})
+
+test_that("fill_marble() uses only color1/color2 in its raster", {
+  fill <- fill_marble(color1 = "white", color2 = "black", resolution = 8L)
+  raster <- environment(fill$f)$grob$raster
+  channels <- t(grDevices::col2rgb(as.vector(raster)))
+  expect_true(all(channels[, 1] == channels[, 2] & channels[, 2] == channels[, 3]))
+})
+
+test_that("fill_flow() returns a grid pattern object", {
+  expect_s3_class(fill_flow(), "GridPattern")
+})
+
+test_that("fill_flow() validates its arguments", {
+  expect_error(fill_flow(spacing = 0), "spacing")
+  expect_error(fill_flow(spacing = -1), "spacing")
+  expect_error(fill_flow(aspect = 0), "aspect")
+  expect_error(fill_flow(aspect = -1), "aspect")
+  expect_error(fill_flow(color = 1), "color")
+  expect_error(fill_flow(color = c("red", "blue")), "color")
+  expect_error(fill_flow(resolution = 1), "resolution")
+  expect_error(fill_flow(resolution = 4.5), "resolution")
+  expect_error(fill_flow(alpha = 0), "alpha")
+  expect_error(fill_flow(alpha = 1.5), "alpha")
+  expect_error(fill_flow(warp = -1), "warp")
+  expect_error(fill_flow(warp_frequency = -1), "warp_frequency")
+  expect_error(fill_flow(warp_octaves = 0), "warp_octaves")
+  expect_error(fill_flow(warp_octaves = 1.5), "warp_octaves")
+  expect_error(fill_flow(frequency = -1), "frequency")
+  expect_error(fill_flow(octaves = 0), "octaves")
+  expect_error(fill_flow(octaves = 1.5), "octaves")
+  expect_error(fill_flow(seed = 1.5), "seed")
+})
+
+test_that("fill_flow() works with a non-default aspect ratio", {
+  expect_s3_class(fill_flow(aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_flow() is reproducible for a given seed", {
+  extract_raster <- function(fill) environment(fill$f)$grob$raster
+  fill_a <- fill_flow(seed = 481L, resolution = 8L)
+  fill_b <- fill_flow(seed = 481L, resolution = 8L)
+  fill_c <- fill_flow(seed = 482L, resolution = 8L)
+  expect_identical(extract_raster(fill_a), extract_raster(fill_b))
+  expect_false(identical(extract_raster(fill_a), extract_raster(fill_c)))
+})
+
+test_that("fill_flow() differs from fill_noise() at the same seed (domain-warped)", {
+  extract_raster <- function(fill) environment(fill$f)$grob$raster
+  flow <- fill_flow(seed = 481L, resolution = 8L, warp = 2)
+  noise <- fill_noise(seed = 481L, resolution = 8L)
+  expect_false(identical(extract_raster(flow), extract_raster(noise)))
+})
+
+test_that("fill_flow() with warp = 0 still returns a valid pattern", {
+  expect_s3_class(fill_flow(warp = 0), "GridPattern")
+})
+
 test_that("fill_image() returns a grid pattern object", {
   img <- matrix(c("red", "blue", "green", "white"), nrow = 2)
   expect_s3_class(fill_image(img), "GridPattern")

@@ -26,10 +26,12 @@ accept -- including for its own default -- once it's extended to take
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
+\code{\link[=fill_flow]{fill_flow()}},
 \code{\link[=fill_gradient]{fill_gradient()}},
 \code{\link[=fill_halftone]{fill_halftone()}},
 \code{\link[=fill_hatch]{fill_hatch()}},
 \code{\link[=fill_image]{fill_image()}},
+\code{\link[=fill_marble]{fill_marble()}},
 \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_scatter]{fill_scatter()}},
 \code{\link[=fill_stipple]{fill_stipple()}},

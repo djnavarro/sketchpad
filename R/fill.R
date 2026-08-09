@@ -595,6 +595,61 @@ fill_halftone <- function(radius = c(0.05, 0.2),
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
 }
 
+#' Torus-mapped tile coordinates for a periodic raster fill
+#'
+#' Internal helper shared by [fill_noise()], [fill_marble()], and
+#' [fill_flow()]. Builds a `resolution`-by-`resolution` grid of tile pixel
+#' centres, in both plain `(u, v) \eqn{\in} [0, 1]` form and mapped onto a
+#' pair of circles (`theta_u`/`theta_v`, in radians) -- the latter is what
+#' `torus_noise()` samples from, so a noise field built on it is exactly
+#' periodic in both tile directions. See [fill_noise()] details for why
+#' this matters.
+#'
+#' @param resolution As in [fill_noise()].
+#' @return A list with elements `u`, `v`, `theta_u`, `theta_v`, each a
+#'   numeric vector of length `resolution^2`.
+#' @noRd
+torus_grid <- function(resolution) {
+  u <- (seq_len(resolution) - 0.5) / resolution
+  v <- (seq_len(resolution) - 0.5) / resolution
+  uv <- expand.grid(v = v, u = u)
+  list(
+    u = uv$u, v = uv$v,
+    theta_u = 2 * pi * uv$u, theta_v = 2 * pi * uv$v
+  )
+}
+
+#' Sample a torus-periodic simplex/fractal noise field
+#'
+#' Internal helper shared by [fill_noise()], [fill_marble()], and
+#' [fill_flow()]. Thin wrapper around `ambient::fracture()`/
+#' `ambient::gen_simplex()`/`ambient::fbm()` that maps a pair of tile
+#' angles (`theta_u`/`theta_v`, as produced by `torus_grid()`, optionally
+#' already warped -- see [fill_flow()]) onto `ambient::gen_simplex()`'s 4
+#' input dimensions (`x`/`y` for `theta_u`'s circle, `z`/`t` for
+#' `theta_v`'s), so the result is exactly periodic in both tile directions
+#' regardless of what `theta_u`/`theta_v` were derived from. Returns the
+#' raw (unnormalized) field -- callers apply their own
+#' `ambient::normalize()`.
+#'
+#' @param theta_u,theta_v Tile angles in radians, as produced by
+#'   `torus_grid()` (or a warped variant of them).
+#' @param frequency,octaves,seed As in [fill_noise()].
+#' @return A numeric vector the same length as `theta_u`/`theta_v`.
+#' @noRd
+torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
+  ambient::fracture(
+    noise = ambient::gen_simplex,
+    fractal = ambient::fbm,
+    x = cos(theta_u) * frequency,
+    y = sin(theta_u) * frequency,
+    z = cos(theta_v) * frequency,
+    t = sin(theta_v) * frequency,
+    seed = as.integer(seed),
+    octaves = as.integer(octaves)
+  )
+}
+
 #' Simplex/fractal noise texture fill
 #'
 #' `fill_noise()` builds a [grid::pattern()] fill value from a rasterised
@@ -678,25 +733,236 @@ fill_noise <- function(color = "black",
   }
 
   resolution <- as.integer(resolution)
-  u <- (seq_len(resolution) - 0.5) / resolution
-  v <- (seq_len(resolution) - 0.5) / resolution
-  uv <- expand.grid(v = v, u = u)
-
   # sample on a torus (two circles, one per tile axis) rather than directly
   # in (u, v), so the field is exactly periodic and tiles with no seam
-  theta_u <- 2 * pi * uv$u
-  theta_v <- 2 * pi * uv$v
+  grid_uv <- torus_grid(resolution)
 
-  noise <- ambient::fracture(
-    noise = ambient::gen_simplex,
-    fractal = ambient::fbm,
-    x = cos(theta_u) * frequency,
-    y = sin(theta_u) * frequency,
-    z = cos(theta_v) * frequency,
-    t = sin(theta_v) * frequency,
-    seed = as.integer(seed),
-    octaves = as.integer(octaves)
-  ) |>
+  noise <- torus_noise(grid_uv$theta_u, grid_uv$theta_v, frequency, octaves, seed) |>
+    ambient::normalize(to = c(0, alpha))
+
+  rgb <- grDevices::col2rgb(color) / 255
+  pixels <- matrix(
+    grDevices::rgb(rgb["red", ], rgb["green", ], rgb["blue", ], alpha = noise),
+    nrow = resolution, ncol = resolution
+  )
+  raster <- grid::rasterGrob(
+    pixels, width = 1, height = 1,
+    default.units = "npc", interpolate = TRUE
+  )
+
+  grid::pattern(raster, width = spacing, height = spacing * aspect, extend = extend)
+}
+
+#' Marbled, veined texture fill
+#'
+#' `fill_marble()` builds a [grid::pattern()] fill value resembling veined
+#' marble: a set of `stripes` parallel bands running around the tile's `u`
+#' axis, displaced by a [fill_noise()]-style torus-periodic turbulence
+#' field (via the shared internal `torus_grid()`/`torus_noise()` helpers)
+#' rather than left straight -- the classic "sine of a coordinate plus
+#' turbulence" recipe for procedural marble.
+#'
+#' Periodicity needs two things, both already true here: the undisplaced
+#' bands (`sin(theta_u * stripes)`) are periodic in `u` for any *integer*
+#' `stripes`, since `theta_u` itself advances by exactly `2 * pi` over one
+#' tile width; and the turbulence added on top is periodic in both `u` and
+#' `v` because it comes from `torus_noise()`, the same torus-sampling
+#' technique [fill_noise()] uses for its own field. Adding one periodic
+#' function to another (here, inside a further `sin()`) stays periodic, so
+#' the combined result still tiles with no seam.
+#'
+#' Unlike [fill_noise()] (opacity of one colour), the banding is rendered
+#' as a blend between `color1` and `color2`, since a marble texture's
+#' visual interest is the veining pattern itself rather than a fade to
+#' transparency.
+#'
+#' [fill_noise()]'s own faint tile-boundary rasterization seam (see its
+#' details) can be more noticeable here: `sin()` turns a small mismatch in
+#' the turbulence field into a visibly sharper edge in a band than the
+#' same mismatch would produce in a plain opacity fade.
+#'
+#' @param color1,color2 The two colours blended across each band. Defaults
+#'   `"white"` and `"black"`.
+#' @param stripes Number of bands running around the tile's `u` axis before
+#'   turbulence displacement. Must be a positive integer. Default `3L`.
+#' @param warp Turbulence amplitude, in radians of displacement along the
+#'   band coordinate. Must be a non-negative number. Default `4`.
+#' @inheritParams fill_noise
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_marble <- function(color1 = "white",
+                         color2 = "black",
+                         spacing = 0.5,
+                         aspect = 1,
+                         resolution = 32L,
+                         stripes = 3L,
+                         warp = 4,
+                         frequency = 1,
+                         octaves = 3L,
+                         seed = 1L,
+                         extend = "repeat") {
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.character(color1) || length(color1) != 1) {
+    rlang::abort("color1 must be a single string")
+  }
+  if (!is.character(color2) || length(color2) != 1) {
+    rlang::abort("color2 must be a single string")
+  }
+  if (!is.numeric(resolution) || length(resolution) != 1 ||
+        resolution < 2 || resolution != round(resolution)) {
+    rlang::abort("resolution must be a single integer of at least 2")
+  }
+  if (!is.numeric(stripes) || length(stripes) != 1 ||
+        stripes < 1 || stripes != round(stripes)) {
+    rlang::abort("stripes must be a single positive integer")
+  }
+  if (!is.numeric(warp) || length(warp) != 1 || warp < 0) {
+    rlang::abort("warp must be a single non-negative number")
+  }
+  if (!is.numeric(frequency) || length(frequency) != 1 || frequency < 0) {
+    rlang::abort("frequency must be a single non-negative number")
+  }
+  if (!is.numeric(octaves) || length(octaves) != 1 ||
+        octaves < 1 || octaves != round(octaves)) {
+    rlang::abort("octaves must be a single positive integer")
+  }
+  if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
+    rlang::abort("seed must be a single integer")
+  }
+
+  resolution <- as.integer(resolution)
+  grid_uv <- torus_grid(resolution)
+
+  turbulence <- torus_noise(grid_uv$theta_u, grid_uv$theta_v, frequency, octaves, seed) |>
+    ambient::normalize(to = c(-1, 1))
+
+  # bands run around theta_u; adding periodic turbulence before sin() keeps
+  # the whole expression periodic in both tile directions -- see details
+  value <- (sin(grid_uv$theta_u * round(stripes) + warp * turbulence) + 1) / 2
+
+  rgb1 <- grDevices::col2rgb(color1) / 255
+  rgb2 <- grDevices::col2rgb(color2) / 255
+  pixels <- matrix(
+    grDevices::rgb(
+      rgb1["red", ] * (1 - value) + rgb2["red", ] * value,
+      rgb1["green", ] * (1 - value) + rgb2["green", ] * value,
+      rgb1["blue", ] * (1 - value) + rgb2["blue", ] * value
+    ),
+    nrow = resolution, ncol = resolution
+  )
+  raster <- grid::rasterGrob(
+    pixels, width = 1, height = 1,
+    default.units = "npc", interpolate = TRUE
+  )
+
+  grid::pattern(raster, width = spacing, height = spacing * aspect, extend = extend)
+}
+
+#' Domain-warped noise texture fill
+#'
+#' `fill_flow()` is a swirlier variant of [fill_noise()]: before sampling
+#' the final noise field, the tile's own `(theta_u, theta_v)` angles (see
+#' [fill_noise()] details for why angles, not raw `(u, v)`) are displaced
+#' by a second, independent torus-periodic noise field -- the "fBm of fBm"
+#' domain-warping recipe popularized for flowing, curl-noise-like
+#' textures, adapted here so the warp field is itself torus-periodic
+#' rather than sampled directly, keeping the whole result seamless.
+#'
+#' The warp field needs to be decorrelated from the final field and from
+#' itself along each axis, but `ambient::gen_simplex()`'s 4 input
+#' dimensions are already fully spent on the `(theta_u, theta_v)` torus
+#' trick, leaving no spare dimension to offset. `fill_flow()` decorrelates
+#' by seed instead: the `u`- and `v`-displacement fields are sampled at
+#' `seed + 104729L` and `seed + 200003L` respectively (arbitrary large
+#' primes, chosen only to make collisions with a user's own nearby seed
+#' choices unlikely), before the final field is sampled at `seed` itself.
+#'
+#' Displacing a periodic field's own periodic coordinates by another
+#' periodic field preserves periodicity: shifting `u` from `0` to `1`
+#' still advances `theta_u` by exactly `2 * pi` (a full turn), and the
+#' warp added at each end is identical since it's sampled from a field
+#' that's periodic in `u` itself -- so the warped angle wraps around
+#' exactly as the unwarped one did, with no seam.
+#'
+#' As with [fill_noise()], a faint tile-boundary rasterization seam can
+#' still be visible on some devices despite the field being exactly
+#' periodic (see its details); larger `warp` values tend to make this
+#' more noticeable, for the same reason described at [fill_marble()].
+#'
+#' @param warp Warp amplitude, in radians of angular displacement. Must be
+#'   a non-negative number. Default `2`.
+#' @param warp_frequency Frequency of the two warp-displacement noise
+#'   fields. Must be non-negative. Default `1`.
+#' @param warp_octaves Number of octaves for the warp-displacement noise
+#'   fields. Must be a positive integer. Default `1L`.
+#' @inheritParams fill_noise
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_flow <- function(color = "black",
+                       spacing = 0.5,
+                       aspect = 1,
+                       resolution = 32L,
+                       alpha = 1,
+                       warp = 2,
+                       warp_frequency = 1,
+                       warp_octaves = 1L,
+                       frequency = 1,
+                       octaves = 2L,
+                       seed = 1L,
+                       extend = "repeat") {
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.character(color) || length(color) != 1) {
+    rlang::abort("color must be a single string")
+  }
+  if (!is.numeric(resolution) || length(resolution) != 1 ||
+        resolution < 2 || resolution != round(resolution)) {
+    rlang::abort("resolution must be a single integer of at least 2")
+  }
+  if (!is.numeric(alpha) || length(alpha) != 1 || alpha <= 0 || alpha > 1) {
+    rlang::abort("alpha must be a single number in (0, 1]")
+  }
+  if (!is.numeric(warp) || length(warp) != 1 || warp < 0) {
+    rlang::abort("warp must be a single non-negative number")
+  }
+  if (!is.numeric(warp_frequency) || length(warp_frequency) != 1 || warp_frequency < 0) {
+    rlang::abort("warp_frequency must be a single non-negative number")
+  }
+  if (!is.numeric(warp_octaves) || length(warp_octaves) != 1 ||
+        warp_octaves < 1 || warp_octaves != round(warp_octaves)) {
+    rlang::abort("warp_octaves must be a single positive integer")
+  }
+  if (!is.numeric(frequency) || length(frequency) != 1 || frequency < 0) {
+    rlang::abort("frequency must be a single non-negative number")
+  }
+  if (!is.numeric(octaves) || length(octaves) != 1 ||
+        octaves < 1 || octaves != round(octaves)) {
+    rlang::abort("octaves must be a single positive integer")
+  }
+  if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
+    rlang::abort("seed must be a single integer")
+  }
+
+  resolution <- as.integer(resolution)
+  grid_uv <- torus_grid(resolution)
+  seed <- as.integer(seed)
+
+  # decorrelate the two displacement fields (and the final field) by seed,
+  # since gen_simplex()'s 4 dimensions are already fully spent on the
+  # (theta_u, theta_v) torus trick -- see details
+  warp_u <- torus_noise(grid_uv$theta_u, grid_uv$theta_v, warp_frequency, warp_octaves, seed + 104729L) |>
+    ambient::normalize(to = c(-1, 1)) * warp
+  warp_v <- torus_noise(grid_uv$theta_u, grid_uv$theta_v, warp_frequency, warp_octaves, seed + 200003L) |>
+    ambient::normalize(to = c(-1, 1)) * warp
+
+  noise <- torus_noise(grid_uv$theta_u + warp_u, grid_uv$theta_v + warp_v, frequency, octaves, seed) |>
     ambient::normalize(to = c(0, alpha))
 
   rgb <- grDevices::col2rgb(color) / 255

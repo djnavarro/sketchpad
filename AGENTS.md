@@ -82,7 +82,7 @@ is passed straight through either way.
 
 ### The `fill_*()` texture family
 
-`R/fill.R` holds twelve `fill_*()` constructors for `style@fill`:
+`R/fill.R` holds fourteen `fill_*()` constructors for `style@fill`:
 `fill_solid()` (a validated colour string, no `grid::pattern()` involved),
 `fill_hatch()`/`fill_crosshatch()` (diagonal hatching, sharing a
 tile-shape technique -- see below), `fill_checker()` (a two-colour
@@ -93,12 +93,19 @@ arbitrary drawables / randomised-radius dots, all seeded via
 `withr::with_seed()` like `blob()`'s noise -- see "Known rendering risk"
 in `fill_stipple()`'s docs), `fill_noise()` (a rasterised `ambient`
 simplex/fractal field, sampled on a torus for seamless tiling),
-`fill_image()` (a caller-supplied raster, letterboxed by default to
-preserve its own pixel aspect ratio), `fill_gradient()` (linear/radial
-via `grid::linearGradient()`/`radialGradient()`), and `fill_vignette()`
-(a colour faded via a `grid::as.mask()` alpha mask -- the only helper
-using masks). All but `fill_solid()` return an object from
-`grid::pattern()`, sharing the base S3 class `"GridPattern"`.
+`fill_marble()`/`fill_flow()` (variants of `fill_noise()` sharing its
+internal `torus_grid()`/`torus_noise()` helpers: `fill_marble()` displaces
+sinusoidal bands by torus-periodic turbulence for a veined look;
+`fill_flow()` domain-warps the final field's own tile angles by a second,
+seed-decorrelated torus-periodic field for a swirlier, curl-noise-like
+look -- both share `fill_noise()`'s occasional faint tile-boundary
+rasterization seam, more visible here since `sin()`/warping amplify small
+mismatches), `fill_image()` (a caller-supplied raster, letterboxed by
+default to preserve its own pixel aspect ratio), `fill_gradient()`
+(linear/radial via `grid::linearGradient()`/`radialGradient()`), and
+`fill_vignette()` (a colour faded via a `grid::as.mask()` alpha mask --
+the only helper using masks). All but `fill_solid()` return an object
+from `grid::pattern()`, sharing the base S3 class `"GridPattern"`.
 
 The unifying design constraint across all of them: `grid::pattern()`
 tiles are sized as a fraction of the *target polygon's own bounding box*,
