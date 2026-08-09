@@ -82,17 +82,23 @@ is passed straight through either way.
 
 ### The `fill_*()` texture family
 
-`R/fill.R` holds seven `fill_*()` constructors for `style@fill`:
+`R/fill.R` holds twelve `fill_*()` constructors for `style@fill`:
 `fill_solid()` (a validated colour string, no `grid::pattern()` involved),
 `fill_hatch()`/`fill_crosshatch()` (diagonal hatching, sharing a
-tile-shape technique -- see below), `fill_stipple()` (scattered dots,
-seeded via `withr::with_seed()` like `blob()`'s noise), `fill_noise()`
-(a rasterised `ambient` simplex/fractal field, sampled on a torus for
-seamless tiling), `fill_gradient()` (linear/radial via
-`grid::linearGradient()`/`radialGradient()`), and `fill_vignette()` (a
-colour faded via a `grid::as.mask()` alpha mask -- the only helper using
-masks). All but `fill_solid()` return an object from `grid::pattern()`,
-sharing the base S3 class `"GridPattern"`.
+tile-shape technique -- see below), `fill_checker()` (a two-colour
+checkerboard), `fill_stripe()` (solid alternating bands via a
+self-repeating hard-stop `grid::linearGradient()`, not tile repetition),
+`fill_stipple()`/`fill_scatter()`/`fill_halftone()` (scattered dots /
+arbitrary drawables / randomised-radius dots, all seeded via
+`withr::with_seed()` like `blob()`'s noise -- see "Known rendering risk"
+in `fill_stipple()`'s docs), `fill_noise()` (a rasterised `ambient`
+simplex/fractal field, sampled on a torus for seamless tiling),
+`fill_image()` (a caller-supplied raster, letterboxed by default to
+preserve its own pixel aspect ratio), `fill_gradient()` (linear/radial
+via `grid::linearGradient()`/`radialGradient()`), and `fill_vignette()`
+(a colour faded via a `grid::as.mask()` alpha mask -- the only helper
+using masks). All but `fill_solid()` return an object from
+`grid::pattern()`, sharing the base S3 class `"GridPattern"`.
 
 The unifying design constraint across all of them: `grid::pattern()`
 tiles are sized as a fraction of the *target polygon's own bounding box*,

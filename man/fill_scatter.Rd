@@ -101,6 +101,7 @@ Other fill helpers:
 \code{\link[=fill_gradient]{fill_gradient()}},
 \code{\link[=fill_halftone]{fill_halftone()}},
 \code{\link[=fill_hatch]{fill_hatch()}},
+\code{\link[=fill_image]{fill_image()}},
 \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_solid]{fill_solid()}},
 \code{\link[=fill_stipple]{fill_stipple()}},

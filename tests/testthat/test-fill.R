@@ -268,6 +268,52 @@ test_that("fill_noise() is reproducible for a given seed", {
   expect_false(identical(extract_raster(fill_a), extract_raster(fill_c)))
 })
 
+test_that("fill_image() returns a grid pattern object", {
+  img <- matrix(c("red", "blue", "green", "white"), nrow = 2)
+  expect_s3_class(fill_image(img), "GridPattern")
+  expect_s3_class(fill_image(grDevices::as.raster(img)), "GridPattern")
+
+  arr <- array(c(0.9, 0.1, 0.2, 0.8, 0.3, 0.7), dim = c(1, 2, 3))
+  expect_s3_class(fill_image(arr), "GridPattern")
+})
+
+test_that("fill_image() validates its arguments", {
+  img <- matrix(c("red", "blue", "green", "white"), nrow = 2)
+  expect_error(fill_image(img, spacing = 0), "spacing")
+  expect_error(fill_image(img, spacing = -1), "spacing")
+  expect_error(fill_image(img, aspect = 0), "aspect")
+  expect_error(fill_image(img, aspect = -1), "aspect")
+  expect_error(fill_image("not an image"), "image")
+  expect_error(fill_image(list(1, 2)), "image")
+  expect_error(fill_image(1:5), "image")
+  expect_error(fill_image(array(2, dim = c(1, 1, 3))), "as.raster")
+  expect_error(fill_image(img, preserve_aspect = "yes"), "preserve_aspect")
+  expect_error(fill_image(img, preserve_aspect = NA), "preserve_aspect")
+  expect_error(fill_image(img, interpolate = "yes"), "interpolate")
+  expect_error(fill_image(img, interpolate = NA), "interpolate")
+})
+
+test_that("fill_image() letterboxes a non-square image by default", {
+  wide_img <- matrix(c("red", "blue"), nrow = 1) # 1 row x 2 cols -> aspect 2
+  fill <- fill_image(wide_img)
+  grob <- environment(fill$f)$grob
+  expect_equal(as.numeric(grob$width), 1)
+  expect_equal(as.numeric(grob$height), 0.5)
+})
+
+test_that("fill_image() stretches to fill the tile when preserve_aspect = FALSE", {
+  wide_img <- matrix(c("red", "blue"), nrow = 1)
+  fill <- fill_image(wide_img, preserve_aspect = FALSE)
+  grob <- environment(fill$f)$grob
+  expect_equal(as.numeric(grob$width), 1)
+  expect_equal(as.numeric(grob$height), 1)
+})
+
+test_that("fill_image() works with a non-default aspect ratio", {
+  img <- matrix(c("red", "blue", "green", "white"), nrow = 2)
+  expect_s3_class(fill_image(img, aspect = 2.33), "GridPattern")
+})
+
 test_that("fill_gradient() returns a grid pattern object", {
   expect_s3_class(fill_gradient(), "GridPattern")
   expect_s3_class(fill_gradient(type = "radial"), "GridPattern")

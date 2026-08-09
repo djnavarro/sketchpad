@@ -74,6 +74,7 @@ Other fill helpers:
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_halftone]{fill_halftone()}},
 \code{\link[=fill_hatch]{fill_hatch()}},
+\code{\link[=fill_image]{fill_image()}},
 \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_scatter]{fill_scatter()}},
 \code{\link[=fill_solid]{fill_solid()}},
