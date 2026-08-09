@@ -8,6 +8,13 @@
 \description{
 A lightweight, p5.js-inspired drawing system built on S7 classes and grid graphics, used as the shared foundation for the author's generative art sketches.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://sketchpad.djnavarro.net/}
+}
+
+}
 \author{
 \strong{Maintainer}: Danielle Navarro \email{djnavarro@protonmail.com} (\href{https://orcid.org/0000-0001-7648-6578}{ORCID})
 
