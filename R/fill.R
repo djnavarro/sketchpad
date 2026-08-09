@@ -25,9 +25,11 @@ fill_solid <- function(color = "black") {
 #' Validate the shared arguments of a `fill_*()` helper
 #'
 #' Internal helper shared by every `fill_*()` pattern-fill constructor.
+#' `spacing`/`aspect` are common to all of them; `angle` is specific to the
+#' hatch-family helpers, so pass `NULL` to skip that check.
 #'
 #' @param angle,spacing,aspect The arguments of the same name from the
-#'   calling `fill_*()` function.
+#'   calling `fill_*()` function. `angle = NULL` skips the angle check.
 #' @noRd
 validate_fill_args <- function(angle, spacing, aspect) {
   if (!is.numeric(spacing) || length(spacing) != 1 || spacing <= 0) {
@@ -36,7 +38,7 @@ validate_fill_args <- function(angle, spacing, aspect) {
   if (!is.numeric(aspect) || length(aspect) != 1 || aspect <= 0) {
     rlang::abort("aspect must be a single positive number")
   }
-  if (!is.numeric(angle) || length(angle) != 1) {
+  if (!is.null(angle) && (!is.numeric(angle) || length(angle) != 1)) {
     rlang::abort("angle must be a single number")
   }
 }
@@ -223,6 +225,82 @@ fill_crosshatch <- function(angle = 45,
   )
 
   grid::pattern(content, width = dims["width"], height = dims["height"], extend = extend)
+}
+
+#' Stippled dot pattern fill
+#'
+#' `fill_stipple()` builds a [grid::pattern()] fill value that scatters a
+#' handful of dots at random positions inside each tile, using
+#' [withr::with_seed()] so the same `seed` always reproduces the same
+#' scatter (the same convention used by [blob()], [ribbon()], and
+#' [twist()]'s noise fields).
+#'
+#' Unlike [fill_hatch()]/[fill_crosshatch()], a dot has no direction, so
+#' there's no analogue of their tile-edge "dashing" problem here. There's
+#' still a circularity problem to correct for, though: [grid::pattern()]
+#' tiles are sized as a fraction of the target polygon's own bounding box,
+#' so a dot drawn with an `npc`-relative radius renders as an ellipse
+#' whenever that bounding box isn't square. Pass the bounding box's
+#' width-to-height ratio as `aspect` to keep dots circular; the default
+#' `aspect = 1` is only exact for a square bounding box.
+#'
+#' @param radius Dot radius, as a `"npc"` fraction of the tile. Must be a
+#'   positive number. Default `0.15`.
+#' @param n Number of dots scattered per tile. Must be a positive integer.
+#'   Default `4L`.
+#' @param seed Integer seed for the dot positions. Default `1L`.
+#' @inheritParams fill_hatch
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_stipple <- function(radius = 0.15,
+                          spacing = 0.3,
+                          aspect = 1,
+                          n = 4L,
+                          seed = 1L,
+                          color = "black",
+                          extend = "repeat") {
+  validate_fill_args(NULL, spacing, aspect)
+  if (!is.numeric(radius) || length(radius) != 1 || radius <= 0) {
+    rlang::abort("radius must be a single positive number")
+  }
+  if (!is.numeric(n) || length(n) != 1 || n < 1 || n != round(n)) {
+    rlang::abort("n must be a single positive integer")
+  }
+  if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
+    rlang::abort("seed must be a single integer")
+  }
+
+  # dot centres kept at least `radius` from the tile edge, so dots aren't
+  # clipped away when they fall near a boundary
+  withr::with_seed(
+    seed = as.integer(seed),
+    code = {
+      x <- stats::runif(n, radius, 1 - radius)
+      y <- stats::runif(n, radius, 1 - radius)
+    }
+  )
+
+  dots <- purrr::map2(x, y, function(cx, cy) {
+    grid::circleGrob(
+      x = cx, y = cy, r = radius,
+      default.units = "npc",
+      gp = grid::gpar(col = NA, fill = color)
+    )
+  })
+  content <- grid::grobTree(do.call(grid::gList, dots))
+
+  # the aspect correction here mirrors fill_hatch()'s: it keeps the tile
+  # physically square (in bbox-relative terms) so a circular dot doesn't
+  # render as an ellipse
+  grid::pattern(
+    content,
+    width = spacing, height = spacing * aspect,
+    extend = extend
+  )
 }
 
 #' Bounding-box aspect ratio of a drawable

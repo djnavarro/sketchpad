@@ -58,3 +58,37 @@ test_that("fill_crosshatch() works with a non-default aspect ratio", {
   fill <- fill_crosshatch(angle = 30, aspect = 2.33)
   expect_s3_class(fill, "GridPattern")
 })
+
+test_that("fill_stipple() returns a grid pattern object", {
+  fill <- fill_stipple()
+  expect_s3_class(fill, "GridPattern")
+})
+
+test_that("fill_stipple() validates its arguments", {
+  expect_error(fill_stipple(spacing = 0), "spacing")
+  expect_error(fill_stipple(spacing = -1), "spacing")
+  expect_error(fill_stipple(aspect = 0), "aspect")
+  expect_error(fill_stipple(aspect = -1), "aspect")
+  expect_error(fill_stipple(radius = 0), "radius")
+  expect_error(fill_stipple(radius = -1), "radius")
+  expect_error(fill_stipple(n = 0), "n")
+  expect_error(fill_stipple(n = 1.5), "n")
+  expect_error(fill_stipple(seed = 1.5), "seed")
+})
+
+test_that("fill_stipple() works with a non-default aspect ratio", {
+  fill <- fill_stipple(aspect = 2.33)
+  expect_s3_class(fill, "GridPattern")
+})
+
+test_that("fill_stipple() is reproducible for a given seed", {
+  extract_x <- function(fill) {
+    children <- environment(fill$f)$grob$children
+    unname(purrr::map_dbl(children, \(g) as.numeric(g$x)))
+  }
+  fill_a <- fill_stipple(seed = 481L)
+  fill_b <- fill_stipple(seed = 481L)
+  fill_c <- fill_stipple(seed = 482L)
+  expect_identical(extract_x(fill_a), extract_x(fill_b))
+  expect_false(identical(extract_x(fill_a), extract_x(fill_c)))
+})
