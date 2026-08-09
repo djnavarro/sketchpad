@@ -30,14 +30,22 @@ default `"polygon"`) and `draw()` dispatches on it via an internal
 gotcha hit while implementing it. No constructor sets `geometry = "path"`
 or `"points"` yet.
 
+`style` already gained `linetype`/`linejoin` (see `.agents/HISTORY.md`)
+ahead of any `curve_*()` constructor, since both already have visible
+effect on today's closed `shape_*()` polygons -- `linejoin` on any
+low-vertex or thick-stroked shape, `linetype` as a self-contained dashed-
+outline effect. `lineend`/`linemitre` were deliberately left out of that
+addition: `lineend` only matters at a genuinely free stroke end, which
+doesn't exist without an open-path constructor, and `linemitre` is only
+relevant paired with `linejoin = "mitre"`, so both are deferred until a
+real `curve_*()` constructor exists to validate cap behavior against.
+
 Still open: what a `curve_*()` family looks like concretely
 (`curve_bezier()`, `curve_line()`, `curve_spiral()`, `curve_scribble()`
 were floated -- `curve_bezier()` and `curve_scribble()` can likely reuse
 existing geometry/helpers almost unchanged, while `curve_line()`/
-`curve_spiral()` need new geometry), and whether stroke styling
-(`style`'s single `linewidth` vs. dash patterns/line caps/joins) needs to
-grow at the same time, since those matter more once a path is visibly
-open rather than just an edge of a filled shape. A `"points"`-geometry
+`curve_spiral()` need new geometry), and whether `lineend`/`linemitre`
+need to be added to `style` at the same time. A `"points"`-geometry
 constructor (e.g. a scatter-of-markers primitive) hasn't been designed at
 all yet -- `geometry = "points"` was reserved on the dimensional reading
 `points`(0D)/`path`(1D)/`polygon`(2D), not because a concrete constructor

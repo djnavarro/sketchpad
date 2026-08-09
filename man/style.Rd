@@ -4,7 +4,13 @@
 \alias{style}
 \title{Graphical style for a drawable object}
 \usage{
-style(color = "black", fill = "black", linewidth = 1)
+style(
+  color = "black",
+  fill = "black",
+  linewidth = 1,
+  linetype = "solid",
+  linejoin = "round"
+)
 }
 \arguments{
 \item{color}{Stroke colour. Default \code{"black"}.}
@@ -16,6 +22,18 @@ output of a \verb{fill_*()} helper -- \code{\link[=fill_solid]{fill_solid()}}, \
 (i.e. \code{"black"}).}
 
 \item{linewidth}{Line width. Default \code{1}.}
+
+\item{linetype}{Line dash pattern, forwarded to \code{\link[grid:gpar]{grid::gpar()}}'s \code{lty}.
+Either a named type (\code{"solid"}, \code{"dashed"}, \code{"dotted"}, \code{"dotdash"},
+\code{"longdash"}, \code{"twodash"}, \code{"blank"}), an integer code \code{0:6}, or a
+custom hex dash-pattern string (e.g. \code{"13"}) -- see \code{\link[grid:gpar]{grid::gpar()}} and
+\code{graphics::par()}'s \code{lty} for the full set of accepted forms, which
+aren't independently re-validated here. Default \code{"solid"}.}
+
+\item{linejoin}{Line join style at each vertex, forwarded to
+\code{\link[grid:gpar]{grid::gpar()}}'s \code{linejoin}. One of \code{"round"}, \code{"mitre"}, or \code{"bevel"}.
+Most visible on closed shapes with few, sharp vertices, or on any
+drawable stroked with a thick \code{linewidth}. Default \code{"round"}.}
 }
 \description{
 \code{style} is a container for the graphical properties passed to

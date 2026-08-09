@@ -17,7 +17,9 @@ draw <- S7::new_generic("draw", dispatch_args = "object")
 #' drawable's `geometry` property to build the [grid] grob appropriate to
 #' each of the three dimensional cases documented on [drawable]. `fill` is
 #' only meaningful for `"polygon"`, so it's omitted from `gpar()` for the
-#' other two geometries.
+#' other two geometries. `linetype`/`linejoin` are meaningful for both
+#' stroked geometries (`"polygon"`, `"path"`) but not `"points"`, which has
+#' no line to dash or join.
 #'
 #' @param points A [point_set].
 #' @param sty A [style].
@@ -31,9 +33,11 @@ geometry_grob <- function(points, sty, geometry, vp) {
       x = points@x,
       y = points@y,
       gp = grid::gpar(
-        col  = sty@color,
-        fill = sty@fill,
-        lwd  = sty@linewidth
+        col      = sty@color,
+        fill     = sty@fill,
+        lwd      = sty@linewidth,
+        lty      = sty@linetype,
+        linejoin = sty@linejoin
       ),
       vp = vp,
       default.units = "native"
@@ -42,8 +46,10 @@ geometry_grob <- function(points, sty, geometry, vp) {
       x = points@x,
       y = points@y,
       gp = grid::gpar(
-        col = sty@color,
-        lwd = sty@linewidth
+        col      = sty@color,
+        lwd      = sty@linewidth,
+        lty      = sty@linetype,
+        linejoin = sty@linejoin
       ),
       vp = vp,
       default.units = "native"

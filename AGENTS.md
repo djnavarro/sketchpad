@@ -20,10 +20,18 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 
 ### Class hierarchy
 
-- **`style`** -- container for `color`/`fill`/`linewidth`, forwarded to
-  `grid::gpar()`. `fill` accepts either a plain colour string or the
-  output of a `fill_*()` helper (see "The `fill_*()` texture family"
-  below); default is `fill_solid("black")` (i.e. `"black"`).
+- **`style`** -- container for `color`/`fill`/`linewidth`/`linetype`/
+  `linejoin`, forwarded to `grid::gpar()`. `fill` accepts either a plain
+  colour string or the output of a `fill_*()` helper (see "The
+  `fill_*()` texture family" below); default is `fill_solid("black")`
+  (i.e. `"black"`). `linetype` (default `"solid"`, forwarded to `lty`)
+  and `linejoin` (default `"round"`, validated as one of `"round"`/
+  `"mitre"`/`"bevel"`) are not independently re-validated beyond
+  `linejoin`'s enum check -- `linetype` accepts anything `grid::gpar()`'s
+  `lty` does (named types, integer codes, or a custom hex dash string) and
+  any further validation is left to `grid` at draw time. `lineend`/
+  `linemitre` are deliberately not yet exposed -- see
+  `.agents/PLAN.md`.
 - **`point_set`** -- a polygon's vertices (`x`/`y` numeric vectors, equal
   length). Named `point_set` rather than `points` so the exported
   constructor doesn't mask `graphics::points()`; every `drawable`'s
@@ -81,6 +89,9 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `"polygon"`, `grid::polylineGrob()` for `"path"`, `grid::pointsGrob()`
   for `"points"` -- `style@fill` is omitted from `gpar()` for the latter
   two, since only a closed polygon has an interior to fill.
+  `style@linetype`/`style@linejoin` are forwarded to `gpar()` for both
+  stroked geometries (`"polygon"`, `"path"`) but not `"points"`, which has
+  no line to dash or join.
 - **`convert()`** -- S7's own generic (not defined by this package); a
   `method(convert, list(drawable, shape_raw))` "freezes" any drawable's
   computed points into a plain `shape_raw`, preserving `style`.

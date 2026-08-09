@@ -19,3 +19,29 @@ test_that("drawable constructors forward fill_*() outputs to style() unchanged",
   b <- shape_blob(fill = fill_stipple())
   expect_true(inherits(b@style@fill, "GridPattern"))
 })
+
+test_that("style()'s linetype/linejoin default to \"solid\"/\"round\"", {
+  expect_identical(style()@linetype, "solid")
+  expect_identical(style()@linejoin, "round")
+})
+
+test_that("style() accepts named, integer, and custom hex linetypes", {
+  expect_identical(style(linetype = "dashed")@linetype, "dashed")
+  expect_identical(style(linetype = 2)@linetype, 2)
+  expect_identical(style(linetype = "13")@linetype, "13")
+})
+
+test_that("style() accepts every valid linejoin value", {
+  expect_identical(style(linejoin = "round")@linejoin, "round")
+  expect_identical(style(linejoin = "mitre")@linejoin, "mitre")
+  expect_identical(style(linejoin = "bevel")@linejoin, "bevel")
+})
+
+test_that("style() rejects an invalid linejoin", {
+  expect_error(style(linejoin = "curvy"), "linejoin")
+})
+
+test_that("style() rejects a non-scalar linetype or linejoin", {
+  expect_error(style(linetype = c("solid", "dashed")), "linetype")
+  expect_error(style(linejoin = c("round", "mitre")), "linejoin")
+})

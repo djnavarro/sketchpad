@@ -36,6 +36,14 @@ test_that("draw() renders path and points geometries without error", {
   expect_no_error(draw(points_shape))
 })
 
+test_that("draw() renders custom linetype/linejoin without error", {
+  local_null_device()
+  expect_no_error(draw(shape_circle(linetype = "dashed", linejoin = "mitre")))
+  path_shape <- shape_circle(linetype = "dotdash", linejoin = "bevel")
+  S7::prop(path_shape, "geometry") <- "path"
+  expect_no_error(draw(path_shape))
+})
+
 test_that("draw() rejects an invalid geometry at draw time", {
   local_null_device()
   # bypass the drawable validator to exercise geometry_grob()'s own guard
