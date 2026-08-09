@@ -4,8 +4,8 @@
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) fill value
 from a rasterised simplex/fractal noise field, using the same noise
 machinery as
-[`blob()`](https://sketchpad.djnavarro.net/reference/blob.md)'s wobbly
-outline
+[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)'s
+wobbly outline
 ([`ambient::fracture()`](https://ambient.data-imaginist.com/reference/fracture.html)
 /
 [`ambient::gen_simplex()`](https://ambient.data-imaginist.com/reference/noise_simplex.html)
@@ -60,20 +60,20 @@ fill_noise(
 - frequency:
 
   Noise frequency, as in
-  [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md). Must be
-  non-negative. Default `1`.
+  [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md).
+  Must be non-negative. Default `1`.
 
 - octaves:
 
   Number of noise octaves, as in
-  [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md). Must be
-  a positive integer. Default `2L`.
+  [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md).
+  Must be a positive integer. Default `2L`.
 
 - seed:
 
   Integer seed for the noise field, as in
-  [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md). Default
-  `1L`.
+  [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md).
+  Default `1L`.
 
 - extend:
 

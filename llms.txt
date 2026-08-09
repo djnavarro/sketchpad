@@ -4,11 +4,11 @@ sketchpad is a lightweight, [p5.js](https://p5js.org/)-inspired drawing
 system for generative art, built on
 [S7](https://rconsortium.github.io/S7/) classes and `grid` graphics. It
 provides a small set of `drawable` shapes
-([`circle()`](https://sketchpad.djnavarro.net/reference/circle.md),
-[`blob()`](https://sketchpad.djnavarro.net/reference/blob.md),
-[`ribbon()`](https://sketchpad.djnavarro.net/reference/ribbon.md),
-[`twist()`](https://sketchpad.djnavarro.net/reference/twist.md)) that
-can be composed into a
+([`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
+[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md))
+that can be composed into a
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md) and
 rendered with
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md).
@@ -26,9 +26,10 @@ pak::pak("djnavarro/sketchpad")
 
 ## A ring of blobs
 
-A [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md) is a
-circle whose radius is perturbed by simplex noise. Here six blobs are
-arranged around a ring, one per colour:
+A
+[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
+is a circle whose radius is perturbed by simplex noise. Here six blobs
+are arranged around a ring, one per colour:
 
 ``` r
 
@@ -46,7 +47,7 @@ values <- tibble::tibble(
   fill = c("#e50000", "#ff8d00", "#ffee00", "#028121", "#004cff", "#770088"),
   color = fill
 )
-blobs <- purrr::pmap(values, blob)
+blobs <- purrr::pmap(values, shape_blob)
 blobs |> sketch() |> draw()
 ```
 
@@ -71,7 +72,7 @@ values <- tibble::tibble(
   range = runif(n_blobs, min = 0, max = .5),
   color = fill
 )
-blobs <- purrr::pmap(values, blob)
+blobs <- purrr::pmap(values, shape_blob)
 blobs |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 ```
 
@@ -79,8 +80,9 @@ blobs |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 
 ## Ribbons
 
-A [`ribbon()`](https://sketchpad.djnavarro.net/reference/ribbon.md) is a
-tapered, noise-displaced band drawn between two points:
+A
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
+is a tapered, noise-displaced band drawn between two points:
 
 ``` r
 
@@ -97,7 +99,7 @@ values <- tibble::tibble(
   fill = sample(palette, n_ribbons, replace = TRUE),
   color = fill
 )
-ribbons <- purrr::pmap(values, ribbon)
+ribbons <- purrr::pmap(values, shape_ribbon)
 ribbons |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 ```
 
@@ -105,9 +107,10 @@ ribbons |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 
 ## Twists
 
-A [`twist()`](https://sketchpad.djnavarro.net/reference/twist.md) is
-like a ribbon, but follows a Brownian bridge instead of a straight line,
-giving it a wandering, twisted appearance:
+A
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+is like a ribbon, but follows a Brownian bridge instead of a straight
+line, giving it a wandering, twisted appearance:
 
 ``` r
 
@@ -125,7 +128,7 @@ values <- tibble::tibble(
   fill = sample(palette, n_twists, replace = TRUE),
   color = fill
 )
-twists <- purrr::pmap(values, twist)
+twists <- purrr::pmap(values, shape_twist)
 twists |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 ```
 
@@ -135,12 +138,6 @@ twists |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 
 ## All functions
 
-- [`bezier()`](https://sketchpad.djnavarro.net/reference/bezier.md) : A
-  Bezier curve
-- [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md) : An
-  irregular, "blobby" circle
-- [`circle()`](https://sketchpad.djnavarro.net/reference/circle.md) : A
-  circle
 - [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) : Draw a
   drawable or sketch
 - [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md)
@@ -177,14 +174,20 @@ twists |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
   : Vignette fill
 - [`points()`](https://sketchpad.djnavarro.net/reference/points.md) :
   Polygon vertices
-- [`ribbon()`](https://sketchpad.djnavarro.net/reference/ribbon.md) : A
-  tapered ribbon between two points
-- [`shape()`](https://sketchpad.djnavarro.net/reference/shape.md) : A
-  polygon defined directly by its vertices
+- [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
+  : A Bezier curve
+- [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
+  : An irregular, "blobby" circle
+- [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
+  : A circle
+- [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)
+  : A polygon defined directly by its vertices
+- [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
+  : A tapered ribbon between two points
+- [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+  : A twisted ribbon following a random path
 - [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md) : A
   collection of drawable objects
 - [`style()`](https://sketchpad.djnavarro.net/reference/style.md) :
   Graphical style for a drawable object
-- [`twist()`](https://sketchpad.djnavarro.net/reference/twist.md) : A
-  twisted ribbon following a random path
 

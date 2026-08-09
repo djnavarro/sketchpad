@@ -16,7 +16,7 @@ does.
 
 ``` r
 fill_scatter(
-  unit = circle(radius = 1),
+  unit = shape_circle(radius = 1),
   n = 6L,
   size = 0.2,
   spacing = 1,
@@ -32,7 +32,7 @@ fill_scatter(
 
   A small
   [drawable](https://sketchpad.djnavarro.net/reference/drawable.md) to
-  scatter copies of. Default `circle(radius = 1)`.
+  scatter copies of. Default `shape_circle(radius = 1)`.
 
 - n:
 

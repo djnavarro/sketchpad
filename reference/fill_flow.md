@@ -74,20 +74,20 @@ fill_flow(
 - frequency:
 
   Noise frequency, as in
-  [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md). Must be
-  non-negative. Default `1`.
+  [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md).
+  Must be non-negative. Default `1`.
 
 - octaves:
 
   Number of noise octaves, as in
-  [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md). Must be
-  a positive integer. Default `2L`.
+  [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md).
+  Must be a positive integer. Default `2L`.
 
 - seed:
 
   Integer seed for the noise field, as in
-  [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md). Default
-  `1L`.
+  [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md).
+  Default `1L`.
 
 - extend:
 

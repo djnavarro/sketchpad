@@ -7,10 +7,11 @@ using
 [`withr::with_seed()`](https://withr.r-lib.org/reference/with_seed.html)
 so the same `seed` always reproduces the same scatter (the same
 convention used by
-[`blob()`](https://sketchpad.djnavarro.net/reference/blob.md),
-[`ribbon()`](https://sketchpad.djnavarro.net/reference/ribbon.md), and
-[`twist()`](https://sketchpad.djnavarro.net/reference/twist.md)'s noise
-fields).
+[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
+and
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)'s
+noise fields).
 
 ## Usage
 

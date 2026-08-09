@@ -5,7 +5,7 @@
 objects that can be rendered together with a single call to
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md). Sketches
 can be built up incrementally using the `+` operator, e.g.
-`sketch() + circle() + circle(x = 2)`.
+`sketch() + shape_circle() + shape_circle(x = 2)`.
 
 ## Usage
 
@@ -25,7 +25,7 @@ sketch(shapes = list())
 
 ``` r
 if (FALSE) { # \dontrun{
-s <- sketch() + circle(radius = 1) + circle(x = 2, radius = 0.5)
+s <- sketch() + shape_circle(radius = 1) + shape_circle(x = 2, radius = 0.5)
 draw(s)
 } # }
 ```

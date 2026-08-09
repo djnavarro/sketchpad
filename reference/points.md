@@ -4,8 +4,8 @@
 coordinate vectors. Most
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
 subclasses expose `points` as a computed property;
-[shape](https://sketchpad.djnavarro.net/reference/shape.md) is the
-exception, where the user supplies `x`/`y` directly.
+[shape_raw](https://sketchpad.djnavarro.net/reference/shape_raw.md) is
+the exception, where the user supplies `x`/`y` directly.
 
 ## Usage
 
