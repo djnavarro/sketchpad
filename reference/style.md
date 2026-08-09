@@ -85,3 +85,11 @@ style(
   avoid an arbitrarily long spike. Must be at least `1`. Default `10`,
   matching [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)'s own
   default.
+
+## See also
+
+Other core structure:
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
+[`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
+[`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
+[`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md)

@@ -33,3 +33,12 @@ shape_bezier(x, y, n = 100L, ...)
 
   Arguments passed to
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md).
+
+## See also
+
+Other 2D shapes:
+[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
+[`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
+[`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)

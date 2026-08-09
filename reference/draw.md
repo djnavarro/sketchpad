@@ -23,3 +23,11 @@ draw(object, ...)
 - ...:
 
   Passed to methods, e.g. `xlim`/`ylim`.
+
+## See also
+
+Other core structure:
+[`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
+[`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
+[`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
+[`style()`](https://sketchpad.djnavarro.net/reference/style.md)

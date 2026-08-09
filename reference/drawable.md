@@ -50,3 +50,11 @@ or `"polygon"` (2D, a closed
 default, and the only value any `shape_*()` constructor uses).
 `style@fill` is ignored for `"points"`/`"path"` geometries, since only a
 closed polygon has an interior to fill.
+
+## See also
+
+Other core structure:
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
+[`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
+[`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
+[`style()`](https://sketchpad.djnavarro.net/reference/style.md)

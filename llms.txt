@@ -131,7 +131,42 @@ twists |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
 
 # Package index
 
-## All functions
+## Core structure
+
+The classes and generics that define how a sketch is built and rendered,
+independent of any specific drawable.
+
+- [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md) : A
+  collection of drawable objects
+- [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md)
+  : Parent class for all drawable objects
+- [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) : Draw a
+  drawable or sketch
+- [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md)
+  : A set of polygon vertices
+- [`style()`](https://sketchpad.djnavarro.net/reference/style.md) :
+  Graphical style for a drawable object
+
+## 2D shapes
+
+Closed, fillable `drawable`s (`geometry = "polygon"`).
+
+- [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
+  : A closed Bezier curve
+- [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
+  : An irregular, "blobby" circle
+- [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
+  : A circle
+- [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)
+  : A polygon defined directly by its vertices
+- [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
+  : A tapered ribbon between two points
+- [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+  : A twisted ribbon following a random path
+
+## 1D curves
+
+Open, stroked `drawable`s (`geometry = "path"`).
 
 - [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)
   : An open Bezier curve
@@ -143,10 +178,20 @@ twists |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
   : A wandering scribble curve
 - [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md)
   : An open spiral
-- [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) : Draw a
-  drawable or sketch
-- [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md)
-  : Parent class for all drawable objects
+
+## 0D points
+
+Unconnected marker `drawable`s (`geometry = "points"`).
+
+- [`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
+  : A scatter of points defined directly by their coordinates
+
+## Fills
+
+Textures and patterns for
+[`style()`](https://sketchpad.djnavarro.net/reference/style.md)’s `fill`
+argument, used by 2D shapes.
+
 - [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)
   : Checkerboard pattern fill
 - [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)
@@ -179,24 +224,4 @@ twists |> sketch() |> draw(xlim = c(-2, 2), ylim = c(-2, 2))
   : Striped pattern fill
 - [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
   : Vignette fill
-- [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md)
-  : A set of polygon vertices
-- [`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
-  : A scatter of points defined directly by their coordinates
-- [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
-  : A closed Bezier curve
-- [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
-  : An irregular, "blobby" circle
-- [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
-  : A circle
-- [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)
-  : A polygon defined directly by its vertices
-- [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
-  : A tapered ribbon between two points
-- [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
-  : A twisted ribbon following a random path
-- [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md) : A
-  collection of drawable objects
-- [`style()`](https://sketchpad.djnavarro.net/reference/style.md) :
-  Graphical style for a drawable object
 

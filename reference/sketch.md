@@ -21,6 +21,14 @@ sketch(shapes = list())
   [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)-classed
   objects. Default [`list()`](https://rdrr.io/r/base/list.html).
 
+## See also
+
+Other core structure:
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
+[`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
+[`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
+[`style()`](https://sketchpad.djnavarro.net/reference/style.md)
+
 ## Examples
 
 ``` r
