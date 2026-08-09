@@ -632,20 +632,23 @@ fill_halftone <- function(color = "black",
 
 #' Build the (along, across) coordinates of a random-harmonic wander line
 #'
-#' Internal helper for [fill_scribble()]. Each line is a random finite sum
-#' of sine harmonics, all at *integer* frequencies, in `across =
-#' f(along)` form: `along` runs from `0` to `1`, and by construction
-#' `f(0) == f(1)` to full floating-point precision (an integer number of
-#' full periods always closes exactly), and likewise for the function's
-#' derivative -- so the line always meets itself, in both position and
-#' tangent direction, at the two ends of `along`. That's what makes it
-#' tile seamlessly under [grid::pattern()]'s `extend = "repeat"`: each
-#' tile's copy of the line picks up exactly where the previous tile's left
-#' off. See [fill_scribble()] details for the rest of the periodicity
+#' Internal helper shared by [fill_scribble()] and [curve_scribble()]. Each
+#' line is a random finite sum of sine harmonics, all at *integer*
+#' frequencies, in `across = f(along)` form: `along` runs from `0` to `1`,
+#' and by construction `f(0) == f(1)` to full floating-point precision (an
+#' integer number of full periods always closes exactly), and likewise for
+#' the function's derivative -- so the line always meets itself, in both
+#' position and tangent direction, at the two ends of `along`. That's what
+#' makes it tile seamlessly under [grid::pattern()]'s `extend = "repeat"`:
+#' each tile's copy of the line picks up exactly where the previous tile's
+#' left off (periodicity irrelevant to [curve_scribble()], which draws a
+#' single standalone line rather than a repeating tile, but harmless there
+#' too). See [fill_scribble()] details for the rest of the periodicity
 #' argument.
 #'
 #' @param n_lines,n_harmonics,amplitude,resolution,seed As in
-#'   [fill_scribble()].
+#'   [fill_scribble()]. [curve_scribble()] always calls this with
+#'   `n_lines = 1`.
 #' @return A list of `n_lines` elements, each a list with numeric vectors
 #'   `along` and `across`, both length `resolution`.
 #' @noRd

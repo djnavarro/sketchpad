@@ -98,6 +98,14 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   Archimedean-style spiral. Structurally closest to `shape_circle`, but
   needed its own file since the angle range and non-constant radius are
   both new.
+- **`curve_scribble`** -- a single random wandering line (a finite sum of
+  sine harmonics), built from the internal `scribble_lines()` generator
+  `fill_scribble()` already used for its tile texture (`R/fill.R`, shared
+  rather than duplicated), but scaled here into an arbitrary `x`/`y` +
+  `width`/`height` bounding box on the sketch's own coordinate plane
+  instead of tiled inside a fill pattern. `direction` (`"horizontal"`/
+  `"vertical"`) controls which axis `along`/`across` map to, mirroring
+  `fill_scribble()`'s own `direction` argument.
 - **`sketch`** -- a list of `drawable`s (`shapes` property). Built up
   with `sketch() + shape_circle() + shape_blob(...)`; the `+` method
   requires an S7 method registration, not an S3 `` `+.sketch` `` (see
@@ -328,17 +336,22 @@ full debugging narrative):
 - `R/style.R`, `R/point_set.R`, `R/drawable.R` -- foundation classes, in
   load order (each depends on the previous).
 - `R/shape_bezier.R`, `R/curve_bezier.R`, `R/curve_line.R`,
-  `R/curve_spiral.R`, `R/shape_raw.R`, `R/shape_circle.R`,
-  `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R` -- the concrete
-  `drawable` subclasses, one file each. Every closed constructor shares
-  the `shape_*` prefix, every open one the `curve_*` prefix (see "Class
-  hierarchy" above), and each file is named to match its constructor --
-  except `curve_bezier.R`, kept immediately after `shape_bezier.R` since
-  it shares that file's `bernstein()`/`bezier_curve_points()`/
-  `validate_bezier_args()` internal helpers rather than duplicating
-  them. `curve_line.R`/`curve_spiral.R` need no such sharing (each is
-  genuinely new geometry with no `shape_*()` counterpart), so they're
-  ordinary standalone constructor files.
+  `R/curve_spiral.R`, `R/curve_scribble.R`, `R/shape_raw.R`,
+  `R/shape_circle.R`, `R/shape_blob.R`, `R/shape_ribbon.R`,
+  `R/shape_twist.R` -- the concrete `drawable` subclasses, one file each.
+  Every closed constructor shares the `shape_*` prefix, every open one
+  the `curve_*` prefix (see "Class hierarchy" above), and each file is
+  named to match its constructor -- except `curve_bezier.R`, kept
+  immediately after `shape_bezier.R` since it shares that file's
+  `bernstein()`/`bezier_curve_points()`/`validate_bezier_args()` internal
+  helpers rather than duplicating them. `curve_line.R`/`curve_spiral.R`
+  need no such sharing (each is genuinely new geometry with no
+  `shape_*()` counterpart), so they're ordinary standalone constructor
+  files. `curve_scribble.R` shares `R/fill.R`'s internal
+  `scribble_lines()` helper (rather than duplicating it) but still needs
+  its own file, since it depends on `drawable` (defined after `fill.R`
+  in `Collate`) -- `fill.R` itself has no dependency on `drawable` and
+  loads first.
 - `R/sketch.R` -- the `sketch` class and its `+` method.
 - `R/draw.R` -- the `draw` generic and its three methods.
 - `R/convert.R` -- the `convert(drawable, shape_raw)` method.
@@ -347,11 +360,12 @@ full debugging narrative):
   `globalVariables("properties")` workaround.
 - `DESCRIPTION`'s `Collate` field pins the load order above explicitly
   (fill -> style -> point_set -> drawable -> shape_bezier -> curve_bezier
-  -> curve_line -> curve_spiral -> shape_raw -> shape_circle ->
-  shape_blob -> shape_ribbon -> shape_twist -> sketch -> draw -> convert
-  -> sketchpad-package). **Any new drawable subclass must be added to
-  `Collate` after `drawable.R`**, or `devtools::load_all()`/`R CMD check`
-  will fail with an "object 'drawable' not found" error.
+  -> curve_line -> curve_spiral -> curve_scribble -> shape_raw ->
+  shape_circle -> shape_blob -> shape_ribbon -> shape_twist -> sketch ->
+  draw -> convert -> sketchpad-package). **Any new drawable subclass must
+  be added to `Collate` after `drawable.R`**, or
+  `devtools::load_all()`/`R CMD check` will fail with an "object
+  'drawable' not found" error.
 
 ## Conventions
 

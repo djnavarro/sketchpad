@@ -713,3 +713,55 @@ passed (15 new) -- default values, valid/invalid `lineend`, valid/invalid
 `linemitre`, non-scalar rejection for both, and `curve_line()` accepting
 and rendering both without error at a thick `linewidth` with
 `linejoin = "mitre"`.
+
+## Adding `curve_scribble()`, promoting `scribble_lines()` to a public path generator
+
+The last item left in `.agents/PLAN.md`'s `curve_*()` family write-up:
+`curve_scribble()` draws a single random wandering line -- a finite sum
+of sine harmonics -- as a standalone open curve, reusing
+`fill_scribble()`'s internal `scribble_lines()` generator (`R/fill.R`)
+rather than duplicating its harmonic-construction logic. "Promoting" this
+helper meant giving it a second, public-facing consumer, not exporting
+`scribble_lines()` itself -- it stays `@noRd`, the same treatment already
+given to `shape_bezier.R`'s shared `bernstein()`/`bezier_curve_points()`/
+`validate_bezier_args()` helpers.
+
+`scribble_lines()` returns `(along, across)` coordinates in `[0, 1]`-ish
+form (`along` runs `0` to `1`; `across` wobbles around a random baseline
+near `0.5`), designed for `fill_scribble()`'s tile-repetition use case --
+periodicity at the two `along` ends is what lets tiles join seamlessly.
+That periodicity is irrelevant to a single standalone curve, but harmless
+to keep, so `curve_scribble()`'s `points` getter calls
+`scribble_lines(n_lines = 1, ...)` and rescales the one resulting line
+into an arbitrary `x`/`y` + `width`/`height` bounding box on the sketch's
+own coordinate plane, rather than tiling it inside a fill pattern.
+`direction` (`"horizontal"`/`"vertical"`) controls the `along`/`across`
+to `x`/`y` mapping, mirroring `fill_scribble()`'s own `direction`
+argument and its same rationale (see that function's "Known limitation"
+docs section -- unaffected by this change, since `curve_scribble()`
+doesn't attempt an arbitrary-angle version either).
+
+Naming diverged slightly from `fill_scribble()`'s own argument names:
+`resolution` (points sampled along the line) is called `n` here instead,
+matching every other `curve_*()`/`shape_*()` constructor's convention
+rather than `fill_scribble()`'s -- the constructor forwards it to
+`scribble_lines()`'s `resolution` parameter internally, so this is a
+public-API-only rename, not a change to the shared helper's own
+signature.
+
+Lives in its own file, `R/curve_scribble.R`, collated after
+`curve_spiral.R` (grouped with the rest of the `curve_*()` family) even
+though its logic is shared with `fill.R` -- it still depends on
+`drawable`, which loads after `fill.R` in `Collate`, so it can't live in
+`fill.R` itself the way `scribble_lines()` does.
+
+Visual check: a horizontal and a vertical `curve_scribble()`, in
+different bounding boxes side by side, both rendered as genuine
+wandering open curves (not tiled/repeating), confirming the rescaling
+and `direction` mapping both work as intended.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 370 tests
+passed (13 new, appended to `tests/testthat/test-curve.R`) -- geometry
+default, agreement with a direct `scribble_lines()` call for both
+directions, seed-reproducibility, argument validation, `draw()`
+rendering without error, and stroke-styling acceptance.

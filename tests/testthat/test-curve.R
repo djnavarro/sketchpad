@@ -134,3 +134,47 @@ test_that("curve_spiral() accepts stroke styling via style()", {
   expect_identical(cs@style@linewidth, 3)
   expect_identical(cs@style@linetype, "dashed")
 })
+
+test_that("curve_scribble() defaults to path geometry", {
+  expect_identical(curve_scribble()@geometry, "path")
+})
+
+test_that("curve_scribble() and scribble_lines() agree on a horizontal curve", {
+  cs <- curve_scribble(x = 0, y = 0, width = 2, height = 3, seed = 7L, n = 20L)
+  line <- scribble_lines(n_lines = 1L, n_harmonics = 3L, amplitude = 0.35, resolution = 20L, seed = 7L)[[1]]
+  expect_equal(cs@points@x, line$along * 2)
+  expect_equal(cs@points@y, line$across * 3)
+})
+
+test_that("curve_scribble() swaps along/across for direction = \"vertical\"", {
+  cs <- curve_scribble(width = 2, height = 3, direction = "vertical", seed = 3L, n = 15L)
+  line <- scribble_lines(n_lines = 1L, n_harmonics = 3L, amplitude = 0.35, resolution = 15L, seed = 3L)[[1]]
+  expect_equal(cs@points@x, line$across * 2)
+  expect_equal(cs@points@y, line$along * 3)
+})
+
+test_that("curve_scribble() is reproducible for a given seed", {
+  expect_identical(curve_scribble(seed = 5L)@points, curve_scribble(seed = 5L)@points)
+})
+
+test_that("curve_scribble() validates its arguments", {
+  expect_error(curve_scribble(width = 0))
+  expect_error(curve_scribble(height = -1))
+  expect_error(curve_scribble(direction = "diagonal"))
+  expect_error(curve_scribble(n_harmonics = 0L))
+  expect_error(curve_scribble(amplitude = -1))
+  expect_error(curve_scribble(n = 1L))
+})
+
+test_that("draw() renders a curve_scribble() without error", {
+  grDevices::pdf(nullfile())
+  withr::defer(grDevices::dev.off())
+  expect_no_error(draw(curve_scribble()))
+})
+
+test_that("curve_scribble() accepts stroke styling via style()", {
+  cs <- curve_scribble(color = "red", linewidth = 3, linetype = "dashed")
+  expect_identical(cs@style@color, "red")
+  expect_identical(cs@style@linewidth, 3)
+  expect_identical(cs@style@linetype, "dashed")
+})

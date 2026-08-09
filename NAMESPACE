@@ -2,6 +2,7 @@
 
 export(curve_bezier)
 export(curve_line)
+export(curve_scribble)
 export(curve_spiral)
 export(draw)
 export(drawable)
