@@ -54,3 +54,11 @@ matching \code{\link[grid:gpar]{grid::gpar()}}'s own default.}
 \code{style} is a container for the graphical properties passed to
 \code{\link[grid:gpar]{grid::gpar()}} when a \link{drawable} object is drawn.
 }
+\seealso{
+Other core structure:
+\code{\link[=draw]{draw()}},
+\code{\link[=drawable]{drawable()}},
+\code{\link[=point_set]{point_set()}},
+\code{\link[=sketch]{sketch()}}
+}
+\concept{core structure}

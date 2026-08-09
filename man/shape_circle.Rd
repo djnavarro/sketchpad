@@ -19,3 +19,12 @@ shape_circle(x = 0, y = 0, radius = 1, n = 100L, ...)
 \code{shape_circle} is a \link{drawable} defined by a centroid and a radius; its
 vertices are computed as evenly spaced points around the circumference.
 }
+\seealso{
+Other 2D shapes:
+\code{\link[=shape_bezier]{shape_bezier()}},
+\code{\link[=shape_blob]{shape_blob()}},
+\code{\link[=shape_raw]{shape_raw()}},
+\code{\link[=shape_ribbon]{shape_ribbon()}},
+\code{\link[=shape_twist]{shape_twist()}}
+}
+\concept{2D shapes}

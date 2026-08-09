@@ -13,6 +13,7 @@
 #' draw(s)
 #' }
 #'
+#' @family core structure
 #' @export
 sketch <- S7::new_class(
   name = "sketch",

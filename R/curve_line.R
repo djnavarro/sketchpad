@@ -15,6 +15,7 @@
 #'   same length, with at least two control points.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 1D curves
 #' @export
 curve_line <- S7::new_class(
   name = "curve_line",

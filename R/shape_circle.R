@@ -8,6 +8,7 @@
 #' @param n Number of points used to approximate the circle. Default `100L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 2D shapes
 #' @export
 shape_circle <- S7::new_class(
   name = "shape_circle",

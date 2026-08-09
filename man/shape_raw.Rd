@@ -19,3 +19,12 @@ coordinates directly, and \code{points} is computed trivially from them.
 It is most often produced by \code{\link[S7:convert]{convert()}}ing a more complex drawable
 (e.g. a \link{shape_blob} or \link{shape_twist}) down to its raw vertices.
 }
+\seealso{
+Other 2D shapes:
+\code{\link[=shape_bezier]{shape_bezier()}},
+\code{\link[=shape_blob]{shape_blob()}},
+\code{\link[=shape_circle]{shape_circle()}},
+\code{\link[=shape_ribbon]{shape_ribbon()}},
+\code{\link[=shape_twist]{shape_twist()}}
+}
+\concept{2D shapes}

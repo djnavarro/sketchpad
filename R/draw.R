@@ -8,6 +8,7 @@
 #' @param object A [drawable] or [sketch] object.
 #' @param ... Passed to methods, e.g. `xlim`/`ylim`.
 #'
+#' @family core structure
 #' @export
 draw <- S7::new_generic("draw", dispatch_args = "object")
 

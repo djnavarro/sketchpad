@@ -18,6 +18,7 @@
 #' @param y Numeric vector of y coordinates.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 0D points
 #' @export
 points_raw <- S7::new_class(
   name = "points_raw",

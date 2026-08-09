@@ -68,6 +68,7 @@ bezier_curve_points <- function(x, y, n) {
 #' @param n Number of points used to sample the curve. Default `100L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 2D shapes
 #' @export
 shape_bezier <- S7::new_class(
   name = "shape_bezier",

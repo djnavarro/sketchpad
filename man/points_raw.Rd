@@ -29,3 +29,4 @@ rather than a connected outline or path.
 geometry has no line to stroke and no interior to fill. Only \code{style@color}
 is used, as the marker colour.
 }
+\concept{0D points}

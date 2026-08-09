@@ -22,8 +22,11 @@ Imports:
     withr
 Suggests: 
     testthat (>= 3.0.0),
-    tibble
+    tibble,
+    waeponwifestre
 Config/testthat/edition: 3
+Remotes: 
+    djnavarro/waeponwifestre
 Collate: 'fill.R'
     'style.R'
     'point_set.R'

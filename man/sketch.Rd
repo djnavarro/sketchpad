@@ -22,3 +22,11 @@ draw(s)
 }
 
 }
+\seealso{
+Other core structure:
+\code{\link[=draw]{draw()}},
+\code{\link[=drawable]{drawable()}},
+\code{\link[=point_set]{point_set()}},
+\code{\link[=style]{style()}}
+}
+\concept{core structure}

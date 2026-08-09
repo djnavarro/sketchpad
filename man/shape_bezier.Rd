@@ -24,3 +24,12 @@ closed polygon, the curve is implicitly closed from its last control
 point back to its first -- for an open Bezier curve/path instead, see
 \code{\link[=curve_bezier]{curve_bezier()}}.
 }
+\seealso{
+Other 2D shapes:
+\code{\link[=shape_blob]{shape_blob()}},
+\code{\link[=shape_circle]{shape_circle()}},
+\code{\link[=shape_raw]{shape_raw()}},
+\code{\link[=shape_ribbon]{shape_ribbon()}},
+\code{\link[=shape_twist]{shape_twist()}}
+}
+\concept{2D shapes}

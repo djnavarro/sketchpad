@@ -43,3 +43,12 @@ Default \code{2L}.}
 Brownian bridge rather than a straight line, giving the polygon a
 wandering, twisted appearance.
 }
+\seealso{
+Other 2D shapes:
+\code{\link[=shape_bezier]{shape_bezier()}},
+\code{\link[=shape_blob]{shape_blob()}},
+\code{\link[=shape_circle]{shape_circle()}},
+\code{\link[=shape_raw]{shape_raw()}},
+\code{\link[=shape_ribbon]{shape_ribbon()}}
+}
+\concept{2D shapes}

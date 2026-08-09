@@ -19,6 +19,7 @@
 #' @param y Numeric vector of y coordinates.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 1D curves
 #' @export
 curve_raw <- S7::new_class(
   name = "curve_raw",

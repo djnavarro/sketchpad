@@ -40,3 +40,12 @@ Default \code{2L}.}
 between \verb{(x, y)} and \verb{(xend, yend)}, with a width that tapers at both
 ends and varies along its length according to simplex noise.
 }
+\seealso{
+Other 2D shapes:
+\code{\link[=shape_bezier]{shape_bezier()}},
+\code{\link[=shape_blob]{shape_blob()}},
+\code{\link[=shape_circle]{shape_circle()}},
+\code{\link[=shape_raw]{shape_raw()}},
+\code{\link[=shape_twist]{shape_twist()}}
+}
+\concept{2D shapes}

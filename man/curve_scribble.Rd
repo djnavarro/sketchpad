@@ -68,3 +68,11 @@ bottom-to-top instead.
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
 }
+\seealso{
+Other 1D curves:
+\code{\link[=curve_bezier]{curve_bezier()}},
+\code{\link[=curve_line]{curve_line()}},
+\code{\link[=curve_raw]{curve_raw()}},
+\code{\link[=curve_spiral]{curve_spiral()}}
+}
+\concept{1D curves}

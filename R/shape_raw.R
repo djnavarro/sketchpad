@@ -9,6 +9,7 @@
 #' @param y Numeric vector of y coordinates.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 2D shapes
 #' @export
 shape_raw <- S7::new_class(
   name = "shape_raw",

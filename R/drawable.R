@@ -21,6 +21,7 @@
 #'   each `shape_*()`/`curve_*()`/`points_raw()` constructor fixes one
 #'   value internally instead (see details).
 #'
+#' @family core structure
 #' @export
 drawable <- S7::new_class(
   name = "drawable",

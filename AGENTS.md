@@ -405,6 +405,15 @@ full debugging narrative):
   argument (`radius`, `width`, `range`, `frequency`) gets a `< 0` check;
   every positive-integer argument (`n`, `octaves`) gets a `< 1L` check.
   Keep new drawables consistent with this.
+- Every exported function's roxygen block carries an `@family` tag
+  matching the pkgdown reference category it belongs to (see
+  `_pkgdown.yml`), so its `.Rd` page's "See Also" section cross-links its
+  category siblings: `@family core structure` for `sketch`/`drawable`/
+  `draw`/`point_set`/`style`; `@family 2D shapes` for every `shape_*()`
+  constructor; `@family 1D curves` for every `curve_*()` constructor;
+  `@family 0D points` for `points_raw()`; `@family fill helpers` for
+  every `fill_*()` constructor. **Any new drawable or fill helper needs
+  the matching `@family` tag added alongside its `@export`.**
 
 ## Development workflow
 

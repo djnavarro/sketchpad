@@ -52,6 +52,7 @@ smooth_bridge <- function(n, scale = .1, smooth = 0, seed = 1L) {
 #' @param seed Integer seed for the noise field and path. Default `1L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 2D shapes
 #' @export
 shape_twist <- S7::new_class(
   name = "shape_twist",

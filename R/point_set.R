@@ -10,6 +10,7 @@
 #' @param x Numeric vector of x coordinates.
 #' @param y Numeric vector of y coordinates.
 #'
+#' @family core structure
 #' @export
 point_set <- S7::new_class(
   name = "point_set",

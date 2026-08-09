@@ -17,3 +17,11 @@ object to the current graphics device using \pkg{grid}. Methods accept
 optional \code{xlim}/\code{ylim} arguments giving axis limits; if omitted, limits
 are computed from the object's points.
 }
+\seealso{
+Other core structure:
+\code{\link[=drawable]{drawable()}},
+\code{\link[=point_set]{point_set()}},
+\code{\link[=sketch]{sketch()}},
+\code{\link[=style]{style()}}
+}
+\concept{core structure}

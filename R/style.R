@@ -35,6 +35,7 @@ fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern")
 #'   to avoid an arbitrarily long spike. Must be at least `1`. Default `10`,
 #'   matching [grid::gpar()]'s own default.
 #'
+#' @family core structure
 #' @export
 style <- S7::new_class(
   name = "style",

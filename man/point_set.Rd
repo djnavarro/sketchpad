@@ -19,3 +19,11 @@ exception, where the user supplies \code{x}/\code{y} directly. Named \code{point
 rather than \code{points} so this exported constructor doesn't mask
 \code{graphics::points()}.
 }
+\seealso{
+Other core structure:
+\code{\link[=draw]{draw()}},
+\code{\link[=drawable]{drawable()}},
+\code{\link[=sketch]{sketch()}},
+\code{\link[=style]{style()}}
+}
+\concept{core structure}

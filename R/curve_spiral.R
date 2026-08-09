@@ -20,6 +20,7 @@
 #' @param n Number of points used to approximate the spiral. Default `200L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 1D curves
 #' @export
 curve_spiral <- S7::new_class(
   name = "curve_spiral",

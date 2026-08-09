@@ -1,4 +1,41 @@
 url: https://sketchpad.djnavarro.net/
 template:
-  bootstrap: 5
+  package: waeponwifestre
+
+reference:
+- title: Core structure
+  desc: >
+    The classes and generics that define how a sketch is built and
+    rendered, independent of any specific drawable.
+  contents:
+  - sketch
+  - drawable
+  - draw
+  - point_set
+  - style
+
+- title: 2D shapes
+  desc: >
+    Closed, fillable `drawable`s (`geometry = "polygon"`).
+  contents:
+  - starts_with("shape_")
+
+- title: 1D curves
+  desc: >
+    Open, stroked `drawable`s (`geometry = "path"`).
+  contents:
+  - starts_with("curve_")
+
+- title: 0D points
+  desc: >
+    Unconnected marker `drawable`s (`geometry = "points"`).
+  contents:
+  - points_raw
+
+- title: Fills
+  desc: >
+    Textures and patterns for `style()`'s `fill` argument, used by 2D
+    shapes.
+  contents:
+  - starts_with("fill_")
 

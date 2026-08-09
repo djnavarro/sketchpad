@@ -19,6 +19,7 @@
 #' @param n Number of points used to sample the curve. Default `100L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @family 1D curves
 #' @export
 curve_bezier <- S7::new_class(
   name = "curve_bezier",

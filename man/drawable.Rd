@@ -31,3 +31,11 @@ e.g. \code{\link[=points_raw]{points_raw()}}), \code{"path"} (1D, an open \code{
 \code{"points"}/\code{"path"} geometries, since only a closed polygon has an
 interior to fill.
 }
+\seealso{
+Other core structure:
+\code{\link[=draw]{draw()}},
+\code{\link[=point_set]{point_set()}},
+\code{\link[=sketch]{sketch()}},
+\code{\link[=style]{style()}}
+}
+\concept{core structure}
