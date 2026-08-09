@@ -2,6 +2,8 @@
 
 ## All functions
 
+- [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)
+  : An open Bezier curve
 - [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) : Draw a
   drawable or sketch
 - [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md)
@@ -41,7 +43,7 @@
 - [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md)
   : A set of polygon vertices
 - [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
-  : A Bezier curve
+  : A closed Bezier curve
 - [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
   : An irregular, "blobby" circle
 - [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)

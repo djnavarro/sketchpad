@@ -1,4 +1,4 @@
-# A Bezier curve
+# A closed Bezier curve
 
 `shape_bezier` is a
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md) whose
@@ -6,9 +6,11 @@ outline follows a Bezier curve defined by an arbitrary number of control
 points (`x`, `y`). With two control points this is a straight line; with
 four, a cubic Bezier of the kind used to build ribbons and other flowing
 shapes. Since
-[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) always
-renders a `drawable`'s `points` as a closed polygon, the curve is
-implicitly closed from its last control point back to its first.
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) renders
+every `"polygon"`-geometry `drawable`'s `points` as a closed polygon,
+the curve is implicitly closed from its last control point back to its
+first – for an open Bezier curve/path instead, see
+[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md).
 
 ## Usage
 

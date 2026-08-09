@@ -5,9 +5,9 @@
 sketchpad is a lightweight, p5.js-inspired drawing system for generative
 art, built on [S7](https://rconsortium.github.io/S7/) classes and `grid`
 graphics. It bypasses ggplot2 entirely: a small set of `drawable` shapes
-(`shape_circle`, `shape_blob`, `shape_ribbon`, `shape_twist`,
-`shape_bezier`) expose a computed `points` property, are composed into a
-`sketch`, and rendered with
+and curves (`shape_circle`, `shape_blob`, `shape_ribbon`, `shape_twist`,
+`shape_bezier`, `curve_bezier`) expose a computed `points` property, are
+composed into a `sketch`, and rendered with
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md). It is the
 shared foundation extracted from the author’s personal generative-art
 sketchbook (`sketches` repo) and is intended to be depended on by the
@@ -84,13 +84,24 @@ how the API got here, see
   data frame, consumed internally by a separate `bezier_ribbon`
   drawable. Here `shape_bezier` itself has `parent = drawable`, so it’s
   directly usable with
-  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) – at the
-  cost of always rendering as a closed polygon (the curve’s last point
-  connects straight back to its first), since every `drawable`’s
-  `points` are drawn with
-  [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html).
-  There is no open/stroked-curve option. `bezier_ribbon` itself has not
-  been ported; see PLAN.md.
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) – always
+  rendering closed (`geometry = "polygon"`, the curve’s last point
+  connects straight back to its first) – for the same curve as an open
+  path instead, see `curve_bezier`. `bezier_ribbon` itself has not been
+  ported; see PLAN.md.
+- **`curve_bezier`** – the first `curve_*()`-prefixed drawable: an open
+  Bezier path, `geometry = "path"` fixed at construction (not exposed as
+  a caller-facing argument). Shares its geometry computation and
+  argument validation with `shape_bezier` via two internal helpers
+  factored into `R/shape_bezier.R` (`bezier_curve_points()`,
+  `validate_bezier_args()`), since the two constructors are otherwise
+  identical – `curve_bezier` just passes `drawable(geometry = "path")`
+  instead of bare
+  [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md).
+  `style@fill` is accepted (forwarded to
+  [`style()`](https://sketchpad.djnavarro.net/reference/style.md) like
+  any other drawable) but has no visible effect, per `drawable`’s
+  `geometry` docs.
 - **`sketch`** – a list of `drawable`s (`shapes` property). Built up
   with `sketch() + shape_circle() + shape_blob(...)`; the `+` method
   requires an S7 method registration, not an S3 `` `+.sketch` `` (see
@@ -117,8 +128,8 @@ how the API got here, see
   `method(convert, list(drawable, shape_raw))` “freezes” any drawable’s
   computed points into a plain `shape_raw`, preserving `style`.
 
-All constructor functions for concrete drawables share the `shape_*`
-prefix
+Every closed (`geometry = "polygon"`) drawable’s constructor shares the
+`shape_*` prefix
 ([`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
@@ -127,20 +138,26 @@ prefix
 and the trivial
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)),
 mirroring the `fill_*()` family below – this groups the “produces a
-drawable polygon” functions under one discoverable, greppable prefix
-distinct from the `fill_*()`,
+closed drawable polygon” functions under one discoverable, greppable
+prefix distinct from the `fill_*()`,
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md), and
-`convert()` families.
+`convert()` families. Open (`geometry = "path"`) drawables instead share
+a `curve_*` prefix – so far just
+[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)
+– kept visually distinct from `shape_*()` since the two families render
+fundamentally differently (closed polygon vs. open stroke), even where
+(as with `curve_bezier`/`shape_bezier`) the underlying geometry
+computation is shared.
 
 ### Rendering model
 
-Every `drawable` is drawn as a single
-[`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html) inside
-a [`grid::viewport()`](https://rdrr.io/r/grid/viewport.html) with
+Every `drawable` is drawn as a single grob (its type chosen by
+`geometry` – see `geometry_grob()` above) inside a
+[`grid::viewport()`](https://rdrr.io/r/grid/viewport.html) with
 equal-axis scaling (`width`/`height` set via `"snpc"` units so a 1:1
 aspect ratio is preserved regardless of the device’s own aspect ratio).
 `draw(sketch)` computes one shared viewport/axis-range across every
-shape’s points, then draws each shape’s polygon into it in list order –
+shape’s points, then draws each shape’s grob into it in list order –
 later shapes are drawn on top.
 
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) itself
@@ -386,11 +403,15 @@ full debugging narrative):
   to exist for its own property default.
 - `R/style.R`, `R/point_set.R`, `R/drawable.R` – foundation classes, in
   load order (each depends on the previous).
-- `R/shape_bezier.R`, `R/shape_raw.R`, `R/shape_circle.R`,
-  `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R` – the concrete
-  `drawable` subclasses, one file each. Every constructor function
-  shares the `shape_*` prefix (see “Class hierarchy” above), and each
-  file is named to match its constructor.
+- `R/shape_bezier.R`, `R/curve_bezier.R`, `R/shape_raw.R`,
+  `R/shape_circle.R`, `R/shape_blob.R`, `R/shape_ribbon.R`,
+  `R/shape_twist.R` – the concrete `drawable` subclasses, one file each.
+  Every closed constructor shares the `shape_*` prefix, every open one
+  the `curve_*` prefix (see “Class hierarchy” above), and each file is
+  named to match its constructor – except `curve_bezier.R`, kept
+  immediately after `shape_bezier.R` since it shares that file’s
+  `bernstein()`/`bezier_curve_points()`/`validate_bezier_args()`
+  internal helpers rather than duplicating them.
 - `R/sketch.R` – the `sketch` class and its `+` method.
 - `R/draw.R` – the `draw` generic and its three methods.
 - `R/convert.R` – the `convert(drawable, shape_raw)` method.
@@ -400,11 +421,12 @@ full debugging narrative):
   and the `globalVariables("properties")` workaround.
 - `DESCRIPTION`’s `Collate` field pins the load order above explicitly
   (fill -\> style -\> point_set -\> drawable -\> shape_bezier -\>
-  shape_raw -\> shape_circle -\> shape_blob -\> shape_ribbon -\>
-  shape_twist -\> sketch -\> draw -\> convert -\> sketchpad-package).
-  **Any new drawable subclass must be added to `Collate` after
-  `drawable.R`**, or `devtools::load_all()`/ `R CMD check` will fail
-  with an “object ‘drawable’ not found” error.
+  curve_bezier -\> shape_raw -\> shape_circle -\> shape_blob -\>
+  shape_ribbon -\> shape_twist -\> sketch -\> draw -\> convert -\>
+  sketchpad-package). **Any new drawable subclass must be added to
+  `Collate` after `drawable.R`**, or
+  `devtools::load_all()`/`R CMD check` will fail with an “object
+  ‘drawable’ not found” error.
 
 ## Conventions
 
