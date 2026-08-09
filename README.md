@@ -5,6 +5,7 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/djnavarro/sketchpad/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/djnavarro/sketchpad/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 sketchpad is a lightweight, [p5.js](https://p5js.org/)-inspired drawing
