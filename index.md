@@ -34,11 +34,6 @@ are arranged around a ring, one per colour:
 ``` r
 
 library(sketchpad)
-#> 
-#> Attaching package: 'sketchpad'
-#> The following object is masked from 'package:graphics':
-#> 
-#>     points
 
 values <- tibble::tibble(
   x = cos(seq(0, pi * 5 / 3, length.out = 6)),

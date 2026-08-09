@@ -36,8 +36,8 @@
   : Striped pattern fill
 - [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
   : Vignette fill
-- [`points()`](https://sketchpad.djnavarro.net/reference/points.md) :
-  Polygon vertices
+- [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md)
+  : A set of polygon vertices
 - [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
   : A Bezier curve
 - [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
