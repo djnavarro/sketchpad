@@ -19,7 +19,17 @@ style(color = "black", fill = "black", linewidth = 1)
 
 - fill:
 
-  Fill colour. Default `"black"`.
+  Fill colour or pattern. Either a plain colour string, or the output of
+  a `fill_*()` helper –
+  [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md),
+  [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md),
+  [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),
+  [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
+  [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md),
+  [`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md),
+  or
+  [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md).
+  Default `fill_solid("black")` (i.e. `"black"`).
 
 - linewidth:
 

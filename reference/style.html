@@ -52,7 +52,11 @@ grid::gpar() when a drawable object is drawn."></head><body>
 
 
 <dt id="arg-fill">fill<a class="anchor" aria-label="anchor" href="#arg-fill"></a></dt>
-<dd><p>Fill colour. Default <code>"black"</code>.</p></dd>
+<dd><p>Fill colour or pattern. Either a plain colour string, or the
+output of a <code>fill_*()</code> helper – <code><a href="fill_solid.html">fill_solid()</a></code>, <code><a href="fill_hatch.html">fill_hatch()</a></code>,
+<code><a href="fill_crosshatch.html">fill_crosshatch()</a></code>, <code><a href="fill_stipple.html">fill_stipple()</a></code>, <code><a href="fill_noise.html">fill_noise()</a></code>,
+<code><a href="fill_gradient.html">fill_gradient()</a></code>, or <code><a href="fill_vignette.html">fill_vignette()</a></code>. Default <code>fill_solid("black")</code>
+(i.e. <code>"black"</code>).</p></dd>
 
 
 <dt id="arg-linewidth">linewidth<a class="anchor" aria-label="anchor" href="#arg-linewidth"></a></dt>

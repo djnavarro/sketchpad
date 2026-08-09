@@ -22,7 +22,10 @@ how the API got here, see
 ### Class hierarchy
 
 - **`style`** – container for `color`/`fill`/`linewidth`, forwarded to
-  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html).
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html). `fill` accepts
+  either a plain colour string or the output of a `fill_*()` helper (see
+  “The `fill_*()` texture family” below); default is
+  `fill_solid("black")` (i.e. `"black"`).
 - **`points`** – a polygon’s vertices (`x`/`y` numeric vectors, equal
   length).
 - **`drawable`** – parent class of every shape. Declares two properties:
@@ -84,6 +87,104 @@ aspect ratio is preserved regardless of the device’s own aspect ratio).
 shape’s points, then draws each shape’s polygon into it in list order –
 later shapes are drawn on top.
 
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) itself
+needs no special-casing for pattern/gradient fills:
+`grid::gpar(fill = ...)` already accepts a colour string or a
+`"GridPattern"`-inheriting object interchangeably, so
+`object@style@fill` is passed straight through either way.
+
+### The `fill_*()` texture family
+
+`R/fill.R` holds fifteen `fill_*()` constructors for `style@fill`:
+[`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
+(a validated colour string, no
+[`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) involved),
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)/[`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)
+(diagonal hatching, sharing a tile-shape technique – see below),
+[`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)
+(a two-colour checkerboard),
+[`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md)
+(solid alternating bands via a self-repeating hard-stop
+[`grid::linearGradient()`](https://rdrr.io/r/grid/patterns.html), not
+tile repetition),
+[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)
+(scattered dots / arbitrary drawables / randomised-radius dots, all
+seeded via
+[`withr::with_seed()`](https://withr.r-lib.org/reference/with_seed.html)
+like [`blob()`](https://sketchpad.djnavarro.net/reference/blob.md)’s
+noise – see “Known rendering risk” in
+[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)’s
+docs),
+[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)
+(wandering lines built from random integer-frequency sine harmonics via
+the internal `scribble_lines()` helper – periodic by construction, so
+tiles with no seam; `direction` is fixed to `"horizontal"` or
+`"vertical"` only, not an arbitrary angle – see its “Known limitation”
+docs section),
+[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)
+(a rasterised `ambient` simplex/fractal field, sampled on a torus for
+seamless tiling),
+[`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md)/[`fill_flow()`](https://sketchpad.djnavarro.net/reference/fill_flow.md)
+(variants of
+[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)
+sharing its internal `torus_grid()`/`torus_noise()` helpers:
+[`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md)
+displaces sinusoidal bands by torus-periodic turbulence for a veined
+look;
+[`fill_flow()`](https://sketchpad.djnavarro.net/reference/fill_flow.md)
+domain-warps the final field’s own tile angles by a second,
+seed-decorrelated torus-periodic field for a swirlier, curl-noise-like
+look – both share
+[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)’s
+occasional faint tile-boundary rasterization seam, more visible here
+since [`sin()`](https://rdrr.io/r/base/Trig.html)/warping amplify small
+mismatches),
+[`fill_image()`](https://sketchpad.djnavarro.net/reference/fill_image.md)
+(a caller-supplied raster, letterboxed by default to preserve its own
+pixel aspect ratio),
+[`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md)
+(linear/radial via
+[`grid::linearGradient()`](https://rdrr.io/r/grid/patterns.html)/`radialGradient()`),
+and
+[`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
+(a colour faded via a
+[`grid::as.mask()`](https://rdrr.io/r/grid/as.mask.html) alpha mask –
+the only helper using masks). All but
+[`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
+return an object from
+[`grid::pattern()`](https://rdrr.io/r/grid/patterns.html), sharing the
+base S3 class `"GridPattern"`.
+
+The unifying design constraint across all of them:
+[`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) tiles are
+sized as a fraction of the *target polygon’s own bounding box*, not a
+fixed physical square, so every helper takes an `aspect` argument (the
+target’s bounding-box width/height ratio) to correct for this – computed
+via the internal `bbox_aspect()` helper. Two different corrections are
+needed depending on what’s drawn:
+
+- Directional content that must tile seamlessly
+  ([`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)/
+  [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md))
+  draws a plain corner-to-corner diagonal and controls the *rendered*
+  angle via the tile’s own `width`/`height` ratio (the internal
+  `hatch_tile_dims()` helper) – never via a raw direction vector baked
+  into the segment’s coordinates. `extend = "repeat"` only translates
+  tile copies by whole tile-widths/heights, so any slope other than
+  exactly 1 (corner-to-corner) leaves a visible mismatch at every tile
+  edge.
+- Content with no periodicity constraint
+  ([`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)’s
+  dots,
+  [`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md),
+  [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)’s
+  mask) instead makes the *tile itself* physically square
+  (`height = spacing * aspect`), so content drawn in plain `"npc"`
+  inside it needs no further correction.
+
+Shared argument validation lives in the internal `validate_fill_args()`
+(spacing/aspect, with an optional angle check via `angle = NULL`).
+
 ## Gotchas worth remembering
 
 A handful of non-obvious S7 behaviors that would bite a future edit if
@@ -123,6 +224,23 @@ full debugging narrative):
   references point at each other and none of their `.Rd` files exist
   yet; a second `document()` call resolves them all. Don’t chase this
   warning by rewording the docs.
+- **`@inheritParams` copies the *literal doc text* of the source
+  function, including any “Default `X`” wording – it does not check that
+  the borrowing function’s own default actually matches `X`.** A
+  pre-merge audit of the `fill_*()` family (all of which lean on
+  `@inheritParams fill_hatch()`/[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)/[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)
+  for `spacing`/`aspect`/`color`/`extend`) found several silently-wrong
+  inherited defaults this way –
+  e.g. [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)’s
+  real `spacing` default is `0.5`, but its docs said `0.1`
+  (fill_hatch()’s own default) until fixed. Whenever a new `fill_*()`
+  helper’s own default differs from the function it inherits params
+  from, give that parameter its own explicit `@param` overriding the
+  inherited text (as
+  [`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)/[`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md)/[`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)/
+  [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md)
+  already do for `spacing`) rather than relying on `@inheritParams` to
+  get the number right.
 - **`@export` on an individual `method(generic, class) <- function(...)`
   assignment generates its own `.Rd` page with a `\usage` section that
   won’t match hand-written `@param` docs** (e.g. a method’s `xlim`/
@@ -138,9 +256,50 @@ full debugging narrative):
 - **`sketch` was not available as the package name.** It’s an existing
   CRAN package (an R-to-JavaScript/p5.js transpiler) – installing both
   would collide. Named this package `sketchpad` instead.
+- **[`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) tiles
+  containing *multiple* shapes can render visibly distorted once the
+  tile actually repeats.** Found while building
+  [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md):
+  a single shape (one `circleGrob`, or a single tile spanning the whole
+  target via `spacing = 1`, so `extend = "repeat"` never actually
+  triggers) always renders correctly, but several separate shapes
+  (e.g. `n` scattered dots) inside a tile that’s genuinely repeated
+  (`spacing < 1`) can come out clipped into crescents or otherwise
+  non-circular – reproduced on this package’s development R build
+  (4.6.1) on both an interactive device and
+  [`ragg::agg_png()`](https://ragg.r-lib.org/reference/agg_png.html), in
+  a fresh R session (so it isn’t session degradation), across multiple
+  `n`/`radius` combinations with no clean rule for exactly when it
+  triggers. This looks like an upstream `grid`/Cairo bug with
+  multi-shape pattern tile content, not something fixable from this
+  package’s code – don’t spend more time chasing a root cause or a
+  parameter combination that “avoids” it without re-verifying on a
+  released (non-development) R version first. Documented on the affected
+  functions themselves
+  ([`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)’s
+  “Known rendering risk” section); no default was found that’s provably
+  safe, since
+  [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)’s
+  whole purpose requires genuine tile repetition.
+- **`grDevices::dev.capabilities()$patterns` is not a reliable signal
+  for whether a device supports pattern/gradient fills.** It returned
+  `NA` for [`cairo_pdf()`](https://rdrr.io/r/grDevices/cairo.html),
+  [`pdf()`](https://rdrr.io/r/grDevices/pdf.html), and
+  [`svg()`](https://rdrr.io/r/grDevices/cairo.html) alike when tested –
+  not just genuinely unsupported devices – and only reported real values
+  (`c("LinearGradient", "RadialGradient", "TilingPattern")`) on
+  Positron’s own live plotting device. A
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)-time
+  warning built on this was implemented and then reverted for exactly
+  this reason (see HISTORY.md); don’t re-attempt a capability check on
+  this API without first finding a more reliable signal.
 
 ## Structure
 
+- `R/fill.R` – the `fill_*()` texture family, loaded first: no
+  compile-time dependency on any other class, but `style.R` needs
+  [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
+  to exist for its own property default.
 - `R/style.R`, `R/points.R`, `R/drawable.R` – foundation classes, in
   load order (each depends on the previous).
 - `R/bezier.R`, `R/shape.R`, `R/circle.R`, `R/blob.R`, `R/ribbon.R`,
@@ -153,12 +312,11 @@ full debugging narrative):
   [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html),
   and the `globalVariables("properties")` workaround.
 - `DESCRIPTION`’s `Collate` field pins the load order above explicitly
-  (style -\> points -\> drawable -\> bezier -\> shape -\> circle -\>
-  blob -\> ribbon -\> twist -\> sketch -\> draw -\> convert -\>
-  sketchpad-package). **Any new drawable subclass must be added to
-  `Collate` after `drawable.R`**, or
-  `devtools::load_all()`/`R CMD check` will fail with an “object
-  ‘drawable’ not found” error.
+  (fill -\> style -\> points -\> drawable -\> bezier -\> shape -\>
+  circle -\> blob -\> ribbon -\> twist -\> sketch -\> draw -\> convert
+  -\> sketchpad-package). **Any new drawable subclass must be added to
+  `Collate` after `drawable.R`**, or `devtools::load_all()`/
+  `R CMD check` will fail with an “object ‘drawable’ not found” error.
 
 ## Conventions
 
