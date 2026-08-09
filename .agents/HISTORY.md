@@ -521,3 +521,56 @@ constructor directly. `devtools::document()` needed **three** passes
 link" warning persists past the usual second pass. `R CMD check`
 confirmed 0 errors/warnings/notes after the rename, and all 277
 existing tests passed unchanged.
+
+## Adding a `geometry` property to `drawable`, in preparation for open curves
+
+The first concrete step of the open-curve design (see the "Decided"
+entry that lived in `PLAN.md`): `drawable` gained a `geometry` property
+(`S7::new_property(S7::class_character, default = "polygon")`),
+validated by a new `drawable` `validator` clause requiring `geometry` be
+a length-1 string in `c("polygon", "path", "points")`. The three values
+follow a dimensional reading -- `"points"` (0D), `"path"` (1D),
+`"polygon"` (2D) -- deliberately settled on over an initial `closed`
+logical, since a boolean caps the design at two grob kinds and a third
+(multi-subpath/hole support) is already a known future candidate; see
+`PLAN.md`'s "Multiple sub-paths and holes per drawable" entry, kept
+explicitly separate since it needs a `points`-property data-shape change
+rather than a new `geometry` value.
+
+`draw()`'s `drawable` and `sketch` methods previously built a
+`grid::polygonGrob()` unconditionally; both now call a new internal
+`geometry_grob()` helper (`R/draw.R`) that switches on `geometry` to
+build `grid::polygonGrob()` (`"polygon"`), `grid::polylineGrob()`
+(`"path"`), or `grid::pointsGrob()` (`"points"`) -- `style@fill` is
+simply omitted from `gpar()` for the latter two, since only a closed
+polygon has an interior to fill. No existing `shape_*()` constructor
+exposes `geometry` yet -- reserved for the still-undesigned `curve_*()`
+family (see `PLAN.md`).
+
+**Gotcha hit while implementing:** `drawable`'s custom `constructor`
+(`function(...) S7::new_object(S7::S7_object(), style = style(...))`)
+does not automatically fill in a new property's `default` the way S7's
+own auto-generated constructor would -- passing `S7::S7_object()` (a
+bare object, not a `drawable` instance) as `new_object()`'s first
+argument means *only* explicitly-named properties get set, so `geometry`
+came back `NULL` and failed its class check on every single `shape_*()`
+call, not just new ones. Confirmed with a minimal reprex outside this
+package before concluding it's real S7 behavior, not a mistake specific
+to `drawable`. Fixed by adding `geometry = "polygon"` as an explicit
+default argument to `drawable`'s own constructor signature and passing
+it through to `new_object()` explicitly -- every concrete `shape_*()`
+subclass still calls bare `drawable()` internally, so this is invisible
+to them; a future `curve_*()` constructor would call `drawable(geometry
+= "path")` instead. **Any future property added to `drawable` needs the
+same treatment** (an explicit constructor argument/default, not just a
+`new_property(default = ...)` spec) as long as `drawable`'s constructor
+keeps bypassing the auto-generated one.
+
+Tests exercise `geometry` via `S7::prop<-` (which does trigger
+`validate()`, unlike calling `S7::new_object()` directly outside a
+constructor, which errors) since no public constructor exposes
+`geometry` to pass an invalid value through normal construction yet.
+`R CMD check` confirmed 0 errors/warnings/notes, and all 289 tests
+passed (10 new: default-geometry coverage across every `shape_*()`,
+validator rejection, and `draw()` exercising the `"path"`/`"points"`
+branches).

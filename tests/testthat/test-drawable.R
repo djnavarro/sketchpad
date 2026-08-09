@@ -1,3 +1,20 @@
+test_that("every shape_*() defaults to polygon geometry", {
+  expect_identical(shape_circle()@geometry, "polygon")
+  expect_identical(shape_blob(seed = 1L)@geometry, "polygon")
+  expect_identical(shape_ribbon()@geometry, "polygon")
+  expect_identical(shape_twist(seed = 1L)@geometry, "polygon")
+  expect_identical(shape_bezier(x = c(0, 1, 2), y = c(0, 1, 0))@geometry, "polygon")
+})
+
+test_that("geometry is validated as one of the three allowed values", {
+  # no shape_*() constructor exposes `geometry` yet (reserved for future
+  # curve_*()/point_*() constructors), so exercise the validator via
+  # S7::prop<-, which re-validates on assignment
+  cc <- shape_circle()
+  expect_error(S7::prop(cc, "geometry") <- "triangle", "geometry")
+  expect_error(S7::prop(cc, "geometry") <- c("path", "points"), "geometry")
+})
+
 test_that("circle points lie on the expected radius", {
   cc <- shape_circle(x = 0, y = 0, radius = 2, n = 50L)
   d <- sqrt(cc@points@x^2 + cc@points@y^2)

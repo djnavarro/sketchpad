@@ -4,15 +4,28 @@
 \alias{drawable}
 \title{Parent class for all drawable objects}
 \usage{
-drawable(...)
+drawable(..., geometry = "polygon")
 }
 \arguments{
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
+
+\item{geometry}{One of \code{"polygon"} (default), \code{"path"}, or \code{"points"}.
+Not currently exposed by any concrete \verb{shape_*()} constructor -- see
+details.}
 }
 \description{
 \code{drawable} enforces structure on its subclasses: every drawable must
-carry a \link{style} and expose a computed \code{points} property, of class
-\link{point_set}. It is not intended to be instantiated directly; use one of
-its subclasses (\link{shape_raw}, \link{shape_circle}, \link{shape_blob}, \link{shape_ribbon},
-\link{shape_twist}) instead.
+carry a \link{style}, a \code{geometry}, and expose a computed \code{points} property, of
+class \link{point_set}. It is not intended to be instantiated directly; use one
+of its subclasses (\link{shape_raw}, \link{shape_circle}, \link{shape_blob},
+\link{shape_ribbon}, \link{shape_twist}) instead.
+}
+\details{
+\code{geometry} tells \code{\link[=draw]{draw()}} which \link{grid} grob a drawable's \code{points} map to,
+following a dimensional reading: \code{"points"} (0D, \code{\link[grid:pointsGrob]{grid::pointsGrob()}}),
+\code{"path"} (1D, an open \code{\link[grid:polylineGrob]{grid::polylineGrob()}}), or \code{"polygon"} (2D, a
+closed \code{\link[grid:polygonGrob]{grid::polygonGrob()}} -- the default, and the only value any
+current \verb{shape_*()} constructor uses). \code{style@fill} is ignored for
+\code{"points"}/\code{"path"} geometries, since only a closed polygon has an
+interior to fill.
 }

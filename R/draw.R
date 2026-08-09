@@ -11,6 +11,54 @@
 #' @export
 draw <- S7::new_generic("draw", dispatch_args = "object")
 
+#' Build the grob for a drawable's geometry
+#'
+#' Internal helper shared by both `draw()` methods below: dispatches on a
+#' drawable's `geometry` property to build the [grid] grob appropriate to
+#' each of the three dimensional cases documented on [drawable]. `fill` is
+#' only meaningful for `"polygon"`, so it's omitted from `gpar()` for the
+#' other two geometries.
+#'
+#' @param points A [point_set].
+#' @param sty A [style].
+#' @param geometry One of `"polygon"`, `"path"`, or `"points"`.
+#' @param vp A [grid::viewport()].
+#' @noRd
+geometry_grob <- function(points, sty, geometry, vp) {
+  switch(
+    geometry,
+    polygon = grid::polygonGrob(
+      x = points@x,
+      y = points@y,
+      gp = grid::gpar(
+        col  = sty@color,
+        fill = sty@fill,
+        lwd  = sty@linewidth
+      ),
+      vp = vp,
+      default.units = "native"
+    ),
+    path = grid::polylineGrob(
+      x = points@x,
+      y = points@y,
+      gp = grid::gpar(
+        col = sty@color,
+        lwd = sty@linewidth
+      ),
+      vp = vp,
+      default.units = "native"
+    ),
+    points = grid::pointsGrob(
+      x = points@x,
+      y = points@y,
+      gp = grid::gpar(col = sty@color),
+      vp = vp,
+      default.units = "native"
+    ),
+    rlang::abort('geometry must be one of "polygon", "path", or "points"')
+  )
+}
+
 #' @export
 #' @noRd
 S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
@@ -27,18 +75,8 @@ S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
     height = grid::unit(min(1, y_width / x_width), "snpc"),
   )
 
-  # shapes are always polygon grobs
-  grob <- grid::polygonGrob(
-    x = object@points@x,
-    y = object@points@y,
-    gp = grid::gpar(
-      col = object@style@color,
-      fill = object@style@fill,
-      lwd = object@style@linewidth
-    ),
-    vp = vp,
-    default.units = "native"
-  )
+  # grob type depends on the drawable's geometry
+  grob <- geometry_grob(object@points, object@style, object@geometry, vp)
 
   # draw the grob
   grid::grid.newpage()
@@ -76,17 +114,7 @@ S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
   # draw the grobs
   grid::grid.newpage()
   for (s in object@shapes) {
-    grob <- grid::polygonGrob(
-      x = s@points@x,
-      y = s@points@y,
-      gp = grid::gpar(
-        col = s@style@color,
-        fill = s@style@fill,
-        lwd = s@style@linewidth
-      ),
-      vp = vp,
-      default.units = "native"
-    )
+    grob <- geometry_grob(s@points, s@style, s@geometry, vp)
     grid::grid.draw(grob)
   }
 }

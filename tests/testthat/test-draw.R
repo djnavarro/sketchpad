@@ -25,3 +25,21 @@ test_that("draw() renders a sketch mixing solid and pattern fills without error"
     shape_circle(x = 3, fill = fill_crosshatch())
   expect_no_error(draw(s))
 })
+
+test_that("draw() renders path and points geometries without error", {
+  local_null_device()
+  path_shape <- shape_circle()
+  S7::prop(path_shape, "geometry") <- "path"
+  points_shape <- shape_circle()
+  S7::prop(points_shape, "geometry") <- "points"
+  expect_no_error(draw(path_shape))
+  expect_no_error(draw(points_shape))
+})
+
+test_that("draw() rejects an invalid geometry at draw time", {
+  local_null_device()
+  # bypass the drawable validator to exercise geometry_grob()'s own guard
+  bad_shape <- shape_circle()
+  S7::prop(bad_shape, "geometry", check = FALSE) <- "triangle"
+  expect_error(draw(bad_shape), "geometry")
+})

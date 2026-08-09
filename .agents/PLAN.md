@@ -21,15 +21,27 @@ immediately after `shape_bezier.R` in `Collate`.
 constructor -- see `.agents/HISTORY.md`'s "Renaming drawable
 constructors to a shared `shape_*` prefix" entry.
 
-## Deferred: open/stroked curve support
+## Deferred: a `curve_*()` constructor family using `drawable`'s `geometry` property
 
-Every `drawable` currently renders as a closed `grid::polygonGrob()`.
-`shape_bezier` in particular would also be useful as an open, stroked path
-(`grid::polylineGrob()` or `grid::linesGrob()`) rather than always
-implicitly closing back to its first control point. No concrete need has
-forced a decision on the API shape yet (a `closed = TRUE/FALSE` property
-on `drawable`? a separate `curve`-like non-drawable class? a different
-`draw()` method dispatch?) -- deferred until a real sketch needs it.
+`drawable` now has a `geometry` property (`"polygon"`/`"path"`/`"points"`,
+default `"polygon"`) and `draw()` dispatches on it via an internal
+`geometry_grob()` helper -- see `.agents/HISTORY.md`'s "Adding a
+`geometry` property to `drawable`" entry for the settled design and a
+gotcha hit while implementing it. No constructor sets `geometry = "path"`
+or `"points"` yet.
+
+Still open: what a `curve_*()` family looks like concretely
+(`curve_bezier()`, `curve_line()`, `curve_spiral()`, `curve_scribble()`
+were floated -- `curve_bezier()` and `curve_scribble()` can likely reuse
+existing geometry/helpers almost unchanged, while `curve_line()`/
+`curve_spiral()` need new geometry), and whether stroke styling
+(`style`'s single `linewidth` vs. dash patterns/line caps/joins) needs to
+grow at the same time, since those matter more once a path is visibly
+open rather than just an edge of a filled shape. A `"points"`-geometry
+constructor (e.g. a scatter-of-markers primitive) hasn't been designed at
+all yet -- `geometry = "points"` was reserved on the dimensional reading
+`points`(0D)/`path`(1D)/`polygon`(2D), not because a concrete constructor
+need has come up.
 
 ## Deferred: arbitrary angle for `fill_scribble()`
 
@@ -99,15 +111,18 @@ Every `drawable` currently renders as exactly one `grid::polygonGrob()`
 per shape. `grid::polygonGrob()` supports multiple disjoint sub-paths via
 its `id`/`id.lengths` arguments (e.g. a ring with a hole, or several
 disconnected polygons sharing one `style`), which nothing in sketchpad
-currently uses.
+currently uses. Explicitly kept separate from the `geometry` property
+decided above -- this needs a data-shape change to `points` (a collection
+of sub-paths), not a new `geometry` value.
 
 ### Open/unstroked curve support
 
-(See also the existing "Deferred: open/stroked curve support" item
-above -- these overlap, kept separate since one is scoped narrowly to
-`shape_bezier` and this one is the more general open-vs-closed rendering
-question for any `drawable`.) Would also want line styling beyond the
-current single `linewidth`: dash patterns, line caps/joins.
+(Merged into the "Deferred: a `curve_*()` constructor family using
+`drawable`'s `geometry` property" item above -- see there and
+`.agents/HISTORY.md` for the settled `geometry`-property design. What's
+still open is the concrete `curve_*()` constructor family and whether
+line styling needs to grow beyond the current single `linewidth` -- dash
+patterns, line caps/joins.)
 
 ### Alpha/opacity in `style`
 
