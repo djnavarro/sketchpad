@@ -10,6 +10,14 @@ test_that("fill_solid() validates its argument", {
   expect_error(fill_solid(NA_character_), NA) # NA is a valid (transparent) colour
 })
 
+test_that("fill_none() returns a transparent (NA) colour", {
+  expect_identical(fill_none(), NA_character_)
+})
+
+test_that("fill_none() is usable as style()'s fill", {
+  expect_identical(style(fill = fill_none())@fill, NA_character_)
+})
+
 test_that("fill_hatch() returns a grid pattern object", {
   fill <- fill_hatch()
   expect_s3_class(fill, "GridPattern")

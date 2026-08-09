@@ -90,6 +90,7 @@ Other fill helpers:
 \code{\link[=fill_hatch]{fill_hatch()}},
 \code{\link[=fill_image]{fill_image()}},
 \code{\link[=fill_noise]{fill_noise()}},
+\code{\link[=fill_none]{fill_none()}},
 \code{\link[=fill_scatter]{fill_scatter()}},
 \code{\link[=fill_scribble]{fill_scribble()}},
 \code{\link[=fill_solid]{fill_solid()}},

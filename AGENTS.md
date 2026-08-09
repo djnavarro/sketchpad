@@ -96,8 +96,14 @@ is passed straight through either way.
 
 ### The `fill_*()` texture family
 
-`R/fill.R` holds fifteen `fill_*()` constructors for `style@fill`:
+`R/fill.R` holds sixteen `fill_*()` constructors for `style@fill`:
 `fill_solid()` (a validated colour string, no `grid::pattern()` involved),
+`fill_none()` (a thin `fill_solid(NA_character_)` wrapper -- `NA` is
+already a valid, transparent `grid::gpar()` colour, but the wrapper reads
+more clearly at a call site; note it still renders as a *closed* unfilled
+outline, since every `drawable` currently draws a closed
+`grid::polygonGrob()` -- see "Deferred: open/stroked curve support" in
+`.agents/PLAN.md`),
 `fill_hatch()`/`fill_crosshatch()` (diagonal hatching, sharing a
 tile-shape technique -- see below), `fill_checker()` (a two-colour
 checkerboard), `fill_stripe()` (solid alternating bands via a

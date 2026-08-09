@@ -22,6 +22,30 @@ fill_solid <- function(color = "black") {
   color
 }
 
+#' Unfilled (transparent) fill
+#'
+#' `fill_none()` leaves a [drawable]'s interior entirely unfilled, while
+#' still stroking its outline (per `style()`'s `color`/`linewidth`). It's a
+#' thin, self-documenting wrapper around `fill_solid(NA_character_)`: `NA` is
+#' already a valid colour to [grid::gpar()] (rendered as fully transparent),
+#' but spelling that out as `fill_none()` reads more clearly at a call site
+#' than a bare `NA_character_`, and groups discoverably with the rest of the
+#' `fill_*()` family.
+#'
+#' Since every [drawable] is currently rendered as a closed
+#' [grid::polygonGrob()] (see the "Deferred: open/stroked curve support"
+#' item in `.agents/PLAN.md`), `fill_none()` gives an unfilled *closed*
+#' outline -- the edge connecting the last point back to the first is still
+#' drawn. It does not, by itself, produce an open/unstroked curve.
+#'
+#' @return `NA_character_`.
+#'
+#' @family fill helpers
+#' @export
+fill_none <- function() {
+  NA_character_
+}
+
 #' Validate the shared arguments of a `fill_*()` helper
 #'
 #' Internal helper shared by every `fill_*()` pattern-fill constructor.

@@ -10,8 +10,8 @@ style(color = "black", fill = "black", linewidth = 1)
 \item{color}{Stroke colour. Default \code{"black"}.}
 
 \item{fill}{Fill colour or pattern. Either a plain colour string, or the
-output of a \verb{fill_*()} helper -- \code{\link[=fill_solid]{fill_solid()}}, \code{\link[=fill_hatch]{fill_hatch()}},
-\code{\link[=fill_crosshatch]{fill_crosshatch()}}, \code{\link[=fill_stipple]{fill_stipple()}}, \code{\link[=fill_noise]{fill_noise()}},
+output of a \verb{fill_*()} helper -- \code{\link[=fill_solid]{fill_solid()}}, \code{\link[=fill_none]{fill_none()}},
+\code{\link[=fill_hatch]{fill_hatch()}}, \code{\link[=fill_crosshatch]{fill_crosshatch()}}, \code{\link[=fill_stipple]{fill_stipple()}}, \code{\link[=fill_noise]{fill_noise()}},
 \code{\link[=fill_gradient]{fill_gradient()}}, or \code{\link[=fill_vignette]{fill_vignette()}}. Default \code{fill_solid("black")}
 (i.e. \code{"black"}).}
 
