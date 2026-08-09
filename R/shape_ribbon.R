@@ -29,7 +29,7 @@ shape_ribbon <- S7::new_class(
     octaves    = S7::class_integer,
     seed       = S7::class_integer,
     points = S7::new_property(
-      class = points,
+      class = point_set,
       getter = function(self) {
         x <- seq(self@x, self@xend, length.out = self@n)
         y <- seq(self@y, self@yend, length.out = self@n)
@@ -49,7 +49,7 @@ shape_ribbon <- S7::new_class(
         width <- displacement * taper * self@width
         dx <- self@xend - self@x
         dy <- self@yend - self@y
-        points(
+        point_set(
           x = c(x - width * dy, x[self@n:1L] + width[self@n:1L] * dy),
           y = c(y + width * dx, y[self@n:1L] - width[self@n:1L] * dx)
         )

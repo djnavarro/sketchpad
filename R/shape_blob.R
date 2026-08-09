@@ -29,7 +29,7 @@ shape_blob <- S7::new_class(
     octaves    = S7::class_integer,
     seed       = S7::class_integer,
     points = S7::new_property(
-      class = points,
+      class = point_set,
       getter = function(self) {
         angle <- seq(0, 2 * pi, length.out = self@n)
         pointwise_radius <- ambient::fracture(
@@ -42,7 +42,7 @@ shape_blob <- S7::new_class(
           octaves = self@octaves
         ) |>
           ambient::normalize(to = self@radius + c(-1, 1) * self@range)
-        points(
+        point_set(
           x = self@x + pointwise_radius * cos(angle),
           y = self@y + pointwise_radius * sin(angle)
         )

@@ -26,7 +26,7 @@ Suggests:
 Config/testthat/edition: 3
 Collate: 'fill.R'
     'style.R'
-    'points.R'
+    'point_set.R'
     'drawable.R'
     'shape_bezier.R'
     'shape_raw.R'

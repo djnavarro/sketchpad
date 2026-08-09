@@ -68,7 +68,7 @@ shape_twist <- S7::new_class(
     octaves    = S7::class_integer,
     seed       = S7::class_integer,
     path = S7::new_property(
-      class = points,
+      class = point_set,
       getter = function(self) {
         x_base <- seq(self@x, self@xend, length.out = self@n)
         y_base <- seq(self@y, self@yend, length.out = self@n)
@@ -84,14 +84,14 @@ shape_twist <- S7::new_class(
           scale = 0.1 * self@width,
           seed = self@seed + 1
         )
-        points(
+        point_set(
           x = x_base + x_disp,
           y = y_base + y_disp
         )
       }
     ),
     points = S7::new_property(
-      class = points,
+      class = point_set,
       getter = function(self) {
         x <- self@path@x
         y <- self@path@y
@@ -111,7 +111,7 @@ shape_twist <- S7::new_class(
         width <- displacement * taper * self@width
         dx <- self@xend - self@x
         dy <- self@yend - self@y
-        points(
+        point_set(
           x = c(x - width * dy, x[self@n:1L] + width[self@n:1L] * dy),
           y = c(y + width * dx, y[self@n:1L] - width[self@n:1L] * dx)
         )

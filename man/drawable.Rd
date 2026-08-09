@@ -11,8 +11,8 @@ drawable(...)
 }
 \description{
 \code{drawable} enforces structure on its subclasses: every drawable must
-carry a \link{style} and expose a computed \link{points} property. It is not
-intended to be instantiated directly; use one of its subclasses
-(\link{shape_raw}, \link{shape_circle}, \link{shape_blob}, \link{shape_ribbon},
+carry a \link{style} and expose a computed \code{points} property, of class
+\link{point_set}. It is not intended to be instantiated directly; use one of
+its subclasses (\link{shape_raw}, \link{shape_circle}, \link{shape_blob}, \link{shape_ribbon},
 \link{shape_twist}) instead.
 }

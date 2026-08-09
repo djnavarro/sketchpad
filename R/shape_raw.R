@@ -17,9 +17,9 @@ shape_raw <- S7::new_class(
     x = S7::class_numeric,
     y = S7::class_numeric,
     points = S7::new_property(
-      class = points,
+      class = point_set,
       getter = function(self) {
-        points(x = self@x, y = self@y)
+        point_set(x = self@x, y = self@y)
       }
     )
   ),

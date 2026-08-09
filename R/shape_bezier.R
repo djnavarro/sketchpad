@@ -43,10 +43,10 @@ shape_bezier <- S7::new_class(
     y = S7::class_numeric,
     n = S7::class_integer,
     points = S7::new_property(
-      class = points,
+      class = point_set,
       getter = function(self) {
         t <- seq(0, 1, length.out = self@n)
-        points(
+        point_set(
           x = bernstein(self@x, t),
           y = bernstein(self@y, t)
         )

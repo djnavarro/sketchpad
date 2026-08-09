@@ -485,3 +485,39 @@ resolve link" gotcha) before all cross-references between the renamed
 topics resolved cleanly, and `R CMD check` was re-run to confirm 0
 errors/warnings/notes. No deprecation shim was added for the old names,
 since the package has never been released.
+
+## Renaming the `points` class to `point_set`
+
+`points <- S7::new_class(name = "points", ...)` (`R/points.R`) was
+exported and masked `graphics::points()` on `library(sketchpad)` --
+a real problem worth fixing (any script calling `points()` after
+`library(sketchpad)` would hit this package's class constructor
+instead of the base function), not just a cosmetic naming choice.
+Renamed the class/constructor to `point_set` (`R/point_set.R`), after
+considering `vertices`, `coords`, and `xy` -- `point_set` was chosen as
+the most unambiguous option, prioritizing avoiding any further
+collision risk over brevity.
+
+Only the class generator itself needed renaming. Every `drawable`
+subclass's computed `points` *property* (`@points`) keeps its original
+name unchanged -- a property is accessed via `@`, not a top-level
+exported function, so it was never actually responsible for the
+masking, and renaming it too would have been a much larger, purely
+cosmetic breaking change for no benefit. Updated: every property's
+`class = points` -> `class = point_set` and every `points(x = ..., y =
+...)` constructor call -> `point_set(x = ..., y = ...)` across
+`drawable.R`/`shape_circle.R`/`shape_blob.R`/`shape_ribbon.R`/
+`shape_twist.R`/`shape_raw.R`/`shape_bezier.R`; `DESCRIPTION`'s
+`Collate` field (`'points.R'` -> `'point_set.R'`); roxygen `[points]`
+links that pointed at the class topic (in `drawable.R`/`convert.R`)
+reworded to reference the `points` property in prose (backticked, not
+linked) plus an explicit `[point_set]` link where the class itself is
+introduced. No test changes were needed -- `tests/testthat/` only ever
+accessed `@points` as a property, never called the `points()`
+constructor directly. `devtools::document()` needed **three** passes
+(not the usual two) before the cross-reference `drawable.R` ->
+`[point_set]` resolved cleanly; not fully explained, but re-running
+`document()` an extra time is a harmless fix if a "could not resolve
+link" warning persists past the usual second pass. `R CMD check`
+confirmed 0 errors/warnings/notes after the rename, and all 277
+existing tests passed unchanged.

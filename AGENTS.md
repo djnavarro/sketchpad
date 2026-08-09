@@ -24,8 +24,11 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `grid::gpar()`. `fill` accepts either a plain colour string or the
   output of a `fill_*()` helper (see "The `fill_*()` texture family"
   below); default is `fill_solid("black")` (i.e. `"black"`).
-- **`points`** -- a polygon's vertices (`x`/`y` numeric vectors, equal
-  length).
+- **`point_set`** -- a polygon's vertices (`x`/`y` numeric vectors, equal
+  length). Named `point_set` rather than `points` so the exported
+  constructor doesn't mask `graphics::points()`; every `drawable`'s
+  `points` *property* (see below) is still called `points`, since a
+  property isn't a top-level exported name and can't mask anything.
 - **`drawable`** -- parent class of every shape. Declares two properties:
   `style` (default `style()`) and a computed `points` property that
   subclasses override. Not meant to be instantiated directly.
@@ -210,6 +213,11 @@ full debugging narrative):
 - **`sketch` was not available as the package name.** It's an existing
   CRAN package (an R-to-JavaScript/p5.js transpiler) -- installing both
   would collide. Named this package `sketchpad` instead.
+- **`points` was not available as an exported class/constructor name.**
+  It would mask `graphics::points()` on `library(sketchpad)`. The class
+  is named `point_set` instead; the `points` *property* every `drawable`
+  exposes keeps its original name, since accessing it via `@points`
+  never shadows the base function.
 - **`grid::pattern()` tiles containing *multiple* shapes can render
   visibly distorted once the tile actually repeats.** Found while
   building `fill_stipple()`/`fill_scatter()`/`fill_halftone()`: a single
@@ -244,7 +252,7 @@ full debugging narrative):
 - `R/fill.R` -- the `fill_*()` texture family, loaded first: no
   compile-time dependency on any other class, but `style.R` needs
   `fill_solid()` to exist for its own property default.
-- `R/style.R`, `R/points.R`, `R/drawable.R` -- foundation classes, in
+- `R/style.R`, `R/point_set.R`, `R/drawable.R` -- foundation classes, in
   load order (each depends on the previous).
 - `R/shape_bezier.R`, `R/shape_raw.R`, `R/shape_circle.R`,
   `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R` -- the concrete
@@ -258,7 +266,7 @@ full debugging narrative):
   `.onLoad()` calling `S7::methods_register()`, and the
   `globalVariables("properties")` workaround.
 - `DESCRIPTION`'s `Collate` field pins the load order above explicitly
-  (fill -> style -> points -> drawable -> shape_bezier -> shape_raw ->
+  (fill -> style -> point_set -> drawable -> shape_bezier -> shape_raw ->
   shape_circle -> shape_blob -> shape_ribbon -> shape_twist -> sketch ->
   draw -> convert -> sketchpad-package). **Any new drawable subclass must
   be added to `Collate` after `drawable.R`**, or `devtools::load_all()`/

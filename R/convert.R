@@ -1,6 +1,6 @@
 #' Convert a drawable to a plain shape
 #'
-#' Extracts the computed [points] of any [drawable] object (e.g. a
+#' Extracts the computed `points` of any [drawable] object (e.g. a
 #' [shape_blob], [shape_ribbon], or [shape_twist]) and returns them as a
 #' plain [shape_raw], preserving the original [style]. Useful for
 #' "freezing" a noise-generated outline so it no longer recomputes on
