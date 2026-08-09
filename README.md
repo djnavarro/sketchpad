@@ -8,6 +8,8 @@
 [![R-CMD-check](https://github.com/djnavarro/sketchpad/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/djnavarro/sketchpad/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/djnavarro/sketchpad/graph/badge.svg)](https://app.codecov.io/gh/djnavarro/sketchpad)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 sketchpad is a lightweight, [p5.js](https://p5js.org/)-inspired drawing
