@@ -361,6 +361,137 @@ fill_stipple <- function(radius = 0.15,
   )
 }
 
+#' Scattered-shape pattern fill
+#'
+#' `fill_scatter()` generalizes [fill_stipple()]: instead of a fixed dot,
+#' it scatters copies of an arbitrary small [drawable] -- rendered with its
+#' own `style` (colour, fill, linewidth), which may itself be another
+#' `fill_*()` pattern -- at random positions inside each tile, using
+#' [withr::with_seed()] for reproducibility exactly as [fill_stipple()]
+#' does.
+#'
+#' `unit`'s own points are rescaled (preserving its own aspect ratio) to a
+#' bounding box of size `size` and re-centred at each scattered position;
+#' its absolute coordinates, position, and radius/width/etc. don't matter,
+#' only its shape.
+#'
+#' This needed two corrections neither [fill_stipple()]'s circles nor
+#' [fill_gradient()]'s/[fill_checker()]'s rectangles did:
+#'
+#' - Every other `fill_*()` helper's tile-squaring correction (`height =
+#'   spacing * aspect`, keeping the tile physically square) was, by
+#'   itself, enough to keep circular/rectangular content correctly
+#'   proportioned. Arbitrary polygon content does not get the same
+#'   treatment: empirically, a [grid::polygonGrob()] (or
+#'   [grid::pathGrob()]) used as pattern content renders as though it
+#'   inherits the *target's own, uncorrected* bounding-box distortion
+#'   directly, regardless of the tile-squaring correction applied around
+#'   it -- confirmed by testing a hand-built circular polygon side by side
+#'   with an equivalent [grid::circleGrob()] in the same corrected tile:
+#'   the circle stayed circular, the polygon became an ellipse. So
+#'   `fill_scatter()` applies a second, explicit correction directly to
+#'   `unit`'s own vertex x-coordinates (dividing by `aspect`) on top of
+#'   the usual tile-squaring.
+#' - Repeated (tiled) polygon content can render with visible clipping
+#'   artifacts on Cairo devices -- confirmed interactively: a single
+#'   stamp, comfortably inside its tile's margins, rendered as a clean
+#'   shape when the tile spans the whole target (`spacing = 1`, so
+#'   `extend = "repeat"` is present but never actually exercised within
+#'   the visible, clipped area) but as a "bitten" partial shape once
+#'   `spacing < 1` made the device actually tile multiple copies. This
+#'   matches [grid::pattern()]'s own documented warning that "on Cairo
+#'   devices, use of clipping in the pattern definition should be avoided
+#'   because it is very likely to result in distortion of the pattern
+#'   tile." Circles/rectangles/rasters didn't show this in the rest of
+#'   the family, but arbitrary polygon geometry did. `spacing` therefore
+#'   defaults to `1` here (one tile spans the whole shape, scattering all
+#'   `n` copies across it at once) rather than the smaller, densely-tiled
+#'   defaults used elsewhere; setting `spacing < 1` is still possible for
+#'   a repeating scattered motif, but may show this distortion.
+#'
+#' @param unit A small [drawable] to scatter copies of. Default
+#'   `circle(radius = 1)`.
+#' @param n Number of copies scattered per tile. Must be a positive
+#'   integer. Default `6L`.
+#' @param size `unit`'s rescaled size, as a `"npc"` fraction of the tile.
+#'   Must be a number strictly between `0` and `1`. Default `0.2`.
+#' @param seed Integer seed for the scatter positions. Default `1L`.
+#' @param spacing Tile size, as a fraction of the target's bounding box.
+#'   Must be a positive number. Default `1` (one tile spans the whole
+#'   shape, since `spacing < 1` risks the tiling distortion described
+#'   above).
+#' @param aspect Width-to-height ratio of the target polygon's bounding
+#'   box. Must be a positive number. Default `1` (a square bounding box).
+#' @param extend Passed to [grid::pattern()]. Default `"repeat"`.
+#'
+#' @return A pattern object as returned by [grid::pattern()], suitable for
+#'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @family fill helpers
+#' @export
+fill_scatter <- function(unit = circle(radius = 1),
+                          n = 6L,
+                          size = 0.2,
+                          spacing = 1,
+                          aspect = 1,
+                          seed = 1L,
+                          extend = "repeat") {
+  validate_fill_args(NULL, spacing, aspect)
+  if (!S7::S7_inherits(unit, drawable)) {
+    rlang::abort("unit must be a drawable")
+  }
+  if (!is.numeric(size) || length(size) != 1 || size <= 0 || size >= 1) {
+    rlang::abort("size must be a single number strictly between 0 and 1")
+  }
+  if (!is.numeric(n) || length(n) != 1 || n < 1 || n != round(n)) {
+    rlang::abort("n must be a single positive integer")
+  }
+  if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
+    rlang::abort("seed must be a single integer")
+  }
+
+  px <- unit@points@x
+  py <- unit@points@y
+  half_extent <- max(diff(range(px)), diff(range(py))) / 2
+  if (!is.finite(half_extent) || half_extent == 0) {
+    rlang::abort("unit must have nonzero, finite extent")
+  }
+  scale_factor <- (size / 2) / half_extent
+
+  # rescale unit's own points to fit a `size`-npc bounding box, preserving
+  # its own aspect ratio -- then apply the polygon-specific aspect
+  # correction described above, on top of (not instead of) the tile's own
+  # squaring below
+  norm_x <- (px - mean(range(px))) * scale_factor / aspect
+  norm_y <- (py - mean(range(py))) * scale_factor
+
+  # scattered centres kept at least `size/2` from the tile edge, so copies
+  # aren't clipped away when they fall near a boundary
+  margin <- size / 2
+  withr::with_seed(
+    seed = as.integer(seed),
+    code = {
+      cx <- stats::runif(n, margin, 1 - margin)
+      cy <- stats::runif(n, margin, 1 - margin)
+    }
+  )
+
+  stamps <- purrr::map2(cx, cy, function(ccx, ccy) {
+    grid::polygonGrob(
+      x = norm_x + ccx, y = norm_y + ccy,
+      default.units = "npc",
+      gp = grid::gpar(
+        col = unit@style@color,
+        fill = unit@style@fill,
+        lwd = unit@style@linewidth
+      )
+    )
+  })
+  content <- grid::grobTree(do.call(grid::gList, stamps))
+
+  grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+}
+
 #' Simplex/fractal noise texture fill
 #'
 #' `fill_noise()` builds a [grid::pattern()] fill value from a rasterised

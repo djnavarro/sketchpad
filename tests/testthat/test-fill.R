@@ -146,6 +146,51 @@ test_that("fill_stipple() is reproducible for a given seed", {
   expect_false(identical(extract_x(fill_a), extract_x(fill_c)))
 })
 
+test_that("fill_scatter() returns a grid pattern object", {
+  expect_s3_class(fill_scatter(), "GridPattern")
+})
+
+test_that("fill_scatter() validates its arguments", {
+  expect_error(fill_scatter(spacing = 0), "spacing")
+  expect_error(fill_scatter(spacing = -1), "spacing")
+  expect_error(fill_scatter(aspect = 0), "aspect")
+  expect_error(fill_scatter(aspect = -1), "aspect")
+  expect_error(fill_scatter(unit = "circle"), "unit")
+  expect_error(fill_scatter(unit = 1), "unit")
+  expect_error(fill_scatter(size = 0), "size")
+  expect_error(fill_scatter(size = 1), "size")
+  expect_error(fill_scatter(size = -0.5), "size")
+  expect_error(fill_scatter(n = 0), "n")
+  expect_error(fill_scatter(n = 1.5), "n")
+  expect_error(fill_scatter(seed = 1.5), "seed")
+})
+
+test_that("fill_scatter() accepts an arbitrary drawable as the scattered unit", {
+  expect_s3_class(fill_scatter(unit = blob(radius = 1, seed = 7L)), "GridPattern")
+  expect_s3_class(fill_scatter(unit = bezier(x = c(0, 1, 0), y = c(0, 1, 2))), "GridPattern")
+})
+
+test_that("fill_scatter() accepts a unit whose own fill is another fill_*() pattern", {
+  nested_unit <- circle(radius = 1, fill = fill_hatch())
+  expect_s3_class(fill_scatter(unit = nested_unit), "GridPattern")
+})
+
+test_that("fill_scatter() works with a non-default aspect ratio", {
+  expect_s3_class(fill_scatter(aspect = 2.33), "GridPattern")
+})
+
+test_that("fill_scatter() is reproducible for a given seed", {
+  extract_x <- function(fill) {
+    children <- environment(fill$f)$grob$children
+    unname(purrr::map_dbl(children, \(g) mean(as.numeric(g$x))))
+  }
+  fill_a <- fill_scatter(seed = 481L)
+  fill_b <- fill_scatter(seed = 481L)
+  fill_c <- fill_scatter(seed = 482L)
+  expect_identical(extract_x(fill_a), extract_x(fill_b))
+  expect_false(identical(extract_x(fill_a), extract_x(fill_c)))
+})
+
 test_that("fill_noise() returns a grid pattern object", {
   fill <- fill_noise()
   expect_s3_class(fill, "GridPattern")
