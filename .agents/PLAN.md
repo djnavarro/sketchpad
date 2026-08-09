@@ -25,6 +25,18 @@ forced a decision on the API shape yet (a `closed = TRUE/FALSE` property
 on `drawable`? a separate `curve`-like non-drawable class? a different
 `draw()` method dispatch?) -- deferred until a real sketch needs it.
 
+## Deferred: arbitrary angle for `fill_scribble()`
+
+`fill_scribble()` only supports `direction = "horizontal"` or
+`"vertical"` -- see its "Known limitation" docs section and
+`.agents/HISTORY.md`'s write-up for why `fill_hatch()`'s tile-reshaping
+angle trick doesn't generalize to wandering-line content. A genuinely
+rotated wandering line would need the tile built as a rotated/sheared
+parallelogram with edge-matching worked out for a curve rather than a
+segment; no such technique exists in this package yet, and none was
+prototyped successfully. Revisit if a real sketch needs an arbitrary
+angle.
+
 ## Deferred: migrate `sketches` repo's `example_*.R` scripts to depend on the package
 
 The four `example_*.R` scripts in the `sketches` repo were *adapted* into
@@ -78,12 +90,6 @@ current single `linewidth`: dash patterns, line caps/joins.
 `style` currently exposes only `color`/`fill`/`linewidth` -- no
 transparency control, a fairly basic omission for layered generative
 work where overlapping semi-transparent shapes are a common effect.
-
-### Gradient fills
-
-`grid` supports gradient fills (`grid::linearGradient()`/
-`radialGradient()` as of R 4.2); `style`'s `fill` is currently a plain
-color string only.
 
 ### Transform helpers
 
