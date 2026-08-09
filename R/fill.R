@@ -1,3 +1,27 @@
+#' Solid colour fill
+#'
+#' `fill_solid()` is the trivial member of the `fill_*()` family: a plain
+#' colour needs no [grid::pattern()] machinery, since [grid::gpar()]'s `fill`
+#' argument already accepts a colour string directly. It exists so that a
+#' plain colour can be requested with the same `fill_*()` naming as the
+#' pattern-based helpers (grouping them together in autocomplete), and so
+#' `style()`'s `fill` property has one uniform family of constructors to
+#' accept -- including for its own default -- once it's extended to take
+#' `fill_*()` outputs alongside a bare colour string.
+#'
+#' @param color Fill colour. Default `"black"`.
+#'
+#' @return `color`, unchanged (a single string), after validating it.
+#'
+#' @family fill helpers
+#' @export
+fill_solid <- function(color = "black") {
+  if (!is.character(color) || length(color) != 1) {
+    rlang::abort("color must be a single string")
+  }
+  color
+}
+
 #' Validate the shared arguments of a `fill_*()` helper
 #'
 #' Internal helper shared by every `fill_*()` pattern-fill constructor.
@@ -74,6 +98,7 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @family fill helpers
 #' @export
 fill_hatch <- function(angle = 45,
                         spacing = 0.1,
@@ -149,6 +174,7 @@ fill_hatch <- function(angle = 45,
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @family fill helpers
 #' @export
 fill_crosshatch <- function(angle = 45,
                              spacing = 0.1,

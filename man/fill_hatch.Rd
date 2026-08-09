@@ -61,3 +61,9 @@ desired angle is instead achieved entirely by choosing the tile's
 a special case, since a straight (non-diagonal) line tiles seamlessly at
 any tile aspect ratio.
 }
+\seealso{
+Other fill helpers:
+\code{\link[=fill_crosshatch]{fill_crosshatch()}},
+\code{\link[=fill_solid]{fill_solid()}}
+}
+\concept{fill helpers}

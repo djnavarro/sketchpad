@@ -1,3 +1,15 @@
+test_that("fill_solid() returns its color argument unchanged", {
+  expect_identical(fill_solid(), "black")
+  expect_identical(fill_solid("red"), "red")
+  expect_identical(fill_solid("#112233"), "#112233")
+})
+
+test_that("fill_solid() validates its argument", {
+  expect_error(fill_solid(1), "color")
+  expect_error(fill_solid(c("red", "blue")), "color")
+  expect_error(fill_solid(NA_character_), NA) # NA is a valid (transparent) colour
+})
+
 test_that("fill_hatch() returns a grid pattern object", {
   fill <- fill_hatch()
   expect_s3_class(fill, "GridPattern")

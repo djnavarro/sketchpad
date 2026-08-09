@@ -55,3 +55,9 @@ At \code{angle} a multiple of 90 degrees, the two mirrored diagonals would
 coincide, so this case is handled separately by drawing a horizontal line
 and a vertical line instead (a simple grid).
 }
+\seealso{
+Other fill helpers:
+\code{\link[=fill_hatch]{fill_hatch()}},
+\code{\link[=fill_solid]{fill_solid()}}
+}
+\concept{fill helpers}
