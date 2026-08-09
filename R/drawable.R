@@ -4,20 +4,22 @@
 #' carry a [style], a `geometry`, and expose a computed `points` property, of
 #' class [point_set]. It is not intended to be instantiated directly; use one
 #' of its subclasses ([shape_raw], [shape_circle], [shape_blob],
-#' [shape_ribbon], [shape_twist]) instead.
+#' [shape_ribbon], [shape_twist], [curve_raw], [points_raw], ...) instead.
 #'
 #' `geometry` tells [draw()] which [grid] grob a drawable's `points` map to,
-#' following a dimensional reading: `"points"` (0D, [grid::pointsGrob()]),
-#' `"path"` (1D, an open [grid::polylineGrob()]), or `"polygon"` (2D, a
-#' closed [grid::polygonGrob()] -- the default, and the only value any
-#' current `shape_*()` constructor uses). `style@fill` is ignored for
+#' following a dimensional reading: `"points"` (0D, [grid::pointsGrob()],
+#' e.g. [points_raw()]), `"path"` (1D, an open [grid::polylineGrob()], e.g.
+#' [curve_line()]/[curve_raw()]), or `"polygon"` (2D, a closed
+#' [grid::polygonGrob()] -- the default, and the only value any
+#' `shape_*()` constructor uses). `style@fill` is ignored for
 #' `"points"`/`"path"` geometries, since only a closed polygon has an
 #' interior to fill.
 #'
 #' @param ... Arguments passed to [style()].
 #' @param geometry One of `"polygon"` (default), `"path"`, or `"points"`.
-#'   Not currently exposed by any concrete `shape_*()` constructor -- see
-#'   details.
+#'   Not exposed as a constructor argument by any concrete drawable --
+#'   each `shape_*()`/`curve_*()`/`points_raw()` constructor fixes one
+#'   value internally instead (see details).
 #'
 #' @export
 drawable <- S7::new_class(

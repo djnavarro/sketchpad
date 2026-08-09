@@ -42,12 +42,13 @@ bounding box instead of tiled) are all done -- see `.agents/HISTORY.md`.
 `curve_line()`'s sharp vertex angles and free endpoints gave both a
 demonstrated visible effect.
 
-Still open: a `"points"`-geometry constructor (e.g. a
-scatter-of-markers primitive) hasn't been designed at all yet --
-`geometry = "points"` was reserved on the dimensional reading
-`points`(0D)/`path`(1D)/`polygon`(2D), not because a concrete constructor
-need has come up. No further `curve_*()` constructor is currently
-planned.
+`curve_raw()`/`points_raw()` (see `.agents/HISTORY.md`) round out the
+family: `shape_raw`'s `"path"`/`"points"`-geometry analogs, giving all
+three `geometry` values a trivial "supply `x`/`y` directly" constructor.
+`points_raw()` is also the first concrete `geometry = "points"`
+constructor -- previously reserved on the dimensional reading with
+nothing exposing it. No further `curve_*()`/`points_*()` constructor is
+currently planned.
 
 ## Deferred: arbitrary angle for `fill_scribble()`
 
@@ -109,6 +110,21 @@ is currently radius-only, with no independent x/y radii), and `arc`/`wedge`
 (a partial circle/annulus), `star`. (A bare open `line` and a `spiral` were
 also on this list -- both are now covered by `curve_line()`/
 `curve_spiral()`; see `.agents/HISTORY.md`.)
+
+### `convert()` targets for `"path"`/`"points"`-geometry drawables
+
+`convert(drawable, shape_raw)` always "freezes" a drawable's points into
+a `"polygon"`-geometry `shape_raw`, regardless of the source drawable's
+own `geometry` -- converting a `curve_bezier()` or `curve_scribble()`
+this way silently changes it from an open stroke to a closed, filled
+outline. `curve_raw()`/`points_raw()` (see `.agents/HISTORY.md`) now
+exist as the natural `"path"`/`"points"`-geometry targets, but no
+`method(convert, list(drawable, curve_raw))` or
+`method(convert, list(drawable, points_raw))` has been added yet -- not
+picked up as part of adding the two new raw constructors, since it was
+out of scope for that piece of work. Revisit if a real sketch needs to
+freeze a `"path"`/`"points"`-geometry drawable without its geometry
+silently changing.
 
 ### Multiple sub-paths and holes per drawable
 

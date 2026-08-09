@@ -765,3 +765,64 @@ passed (13 new, appended to `tests/testthat/test-curve.R`) -- geometry
 default, agreement with a direct `scribble_lines()` call for both
 directions, seed-reproducibility, argument validation, `draw()`
 rendering without error, and stroke-styling acceptance.
+
+## Adding `curve_raw()` and `points_raw()`
+
+Rounded out `shape_raw()` into a three-member "raw" family, one per
+`geometry` value: `curve_raw()` is the `"path"`-geometry analog,
+`points_raw()` the `"points"`-geometry one. Both are close to a literal
+copy of `shape_raw()`'s own constructor/validator/points-getter (`x`/`y`
+supplied directly, no computation), differing only in which
+`drawable(geometry = ...)` they build from -- following the same
+"differ only in `geometry`" pattern already used for
+`shape_bezier()`/`curve_bezier()`, except here there's no shared
+computation worth factoring into a common helper (the getter is a
+one-liner), so each constructor just repeats it inline rather than
+introducing a shared internal for three near-identical one-line
+getters.
+
+**`curve_raw()` vs. `curve_line()`.** Deliberately kept distinct from
+`curve_line()` rather than merged into it: `curve_line()` requires at
+least two control points (a single-point "line" isn't meaningful) and is
+meant as a hand-written primitive; `curve_raw()` places no minimum on
+`length(x)` at all, matching `shape_raw()`'s own leniency, since its
+primary role -- like `shape_raw()`'s -- is as a `convert()` target for
+"freezing" an arbitrary drawable's computed points (any `"path"`-geometry
+drawable, in this case), where a 0- or 1-point result should still be
+constructible even if rarely useful in practice. No `convert()` method
+actually targets `curve_raw()`/`points_raw()` yet -- see the new
+`.agents/PLAN.md` entry, "`convert()` targets for
+`"path"`/`"points"`-geometry drawables".
+
+**`points_raw()` is the first concrete `geometry = "points"`
+constructor.** `geometry = "points"` had been reserved since the
+`geometry` property was first added (see that entry above), on the
+dimensional reading `"points"`(0D)/`"path"`(1D)/`"polygon"`(2D), but
+nothing had exposed it until now. Its docs are explicit that every
+line-related `style` property (`linewidth`/`linetype`/`linejoin`/
+`lineend`/`linemitre`) and `fill` are inert for this geometry, per
+`geometry_grob()`'s existing `"points"` branch (`R/draw.R`, unchanged by
+this work) -- only `style@color` has any visible effect, as the marker
+colour.
+
+Both fix their `geometry` at construction (not exposed as a caller-facing
+argument), matching every other concrete drawable. Neither needed new
+validator logic beyond `shape_raw()`'s own single check (`x`/`y` equal
+length) -- confirmed both accept zero-length and single-point `x`/`y`
+without error, unlike `curve_line()`'s stricter minimum.
+
+Placed in `DESCRIPTION`'s `Collate` immediately after `shape_raw.R`
+(mirroring `shape_bezier.R`/`curve_bezier.R`'s adjacency, since these
+three are directly-parallel "raw" constructors) rather than grouped with
+the rest of the `curve_*()` family earlier in the file.
+
+Visual check: a `curve_raw()` zig-zag and a `points_raw()` scatter of
+unconnected markers, side by side, both rendered as expected -- the path
+open and unfilled, the points as separate circles with no connecting
+line.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 388 tests
+passed (18 new, in a new `tests/testthat/test-raw.R`) -- geometry
+defaults, points computed directly from input, zero-/single-point
+construction, `x`/`y` length validation, `draw()` rendering without
+error, and stroke/marker-colour styling acceptance for both.

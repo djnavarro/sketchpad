@@ -7,9 +7,10 @@ test_that("every shape_*() defaults to polygon geometry", {
 })
 
 test_that("geometry is validated as one of the three allowed values", {
-  # no shape_*() constructor exposes `geometry` yet (reserved for future
-  # curve_*()/point_*() constructors), so exercise the validator via
-  # S7::prop<-, which re-validates on assignment
+  # no shape_*() constructor exposes `geometry` yet (every shape_*() is
+  # fixed to "polygon"; curve_*()/points_raw() fix "path"/"points"
+  # instead), so exercise the validator via S7::prop<-, which
+  # re-validates on assignment
   cc <- shape_circle()
   expect_error(S7::prop(cc, "geometry") <- "triangle", "geometry")
   expect_error(S7::prop(cc, "geometry") <- c("path", "points"), "geometry")

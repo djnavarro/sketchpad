@@ -53,6 +53,9 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   bypasses S7's auto-generated constructor -- see "Gotchas".
 - **`shape_raw`** -- the trivial drawable: `x`/`y` supplied directly as
   `points`. Usually produced by `convert()`, not constructed by hand.
+  `curve_raw`/`points_raw` are its `"path"`/`"points"`-geometry analogs
+  (see below) -- together the three form a "raw" family covering all
+  three `geometry` values with the same trivial constructor shape.
 - **`shape_circle`** -- centroid + radius + `n` (point count); `points`
   is `n` evenly-spaced points around the circumference.
 - **`shape_blob`** -- like `shape_circle`, but the radius is perturbed by
@@ -106,6 +109,20 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   instead of tiled inside a fill pattern. `direction` (`"horizontal"`/
   `"vertical"`) controls which axis `along`/`across` map to, mirroring
   `fill_scribble()`'s own `direction` argument.
+- **`curve_raw`** -- `shape_raw`'s `"path"`-geometry analog: `x`/`y`
+  supplied directly as `points`, connected by straight segments with no
+  smoothing/resampling/closing edge. Unlike `curve_line`, places no
+  minimum on `length(x)` (matching `shape_raw`'s own leniency), since its
+  primary role is as a `convert()` target for "freezing" any
+  `"path"`-geometry drawable (no such `convert()` method exists yet,
+  mirroring `shape_raw`'s).
+- **`points_raw`** -- `shape_raw`'s `"points"`-geometry analog, and the
+  first concrete constructor to use `geometry = "points"` (previously
+  reserved on the dimensional reading with no constructor exposing it).
+  `x`/`y` supplied directly as `points`, rendered as unconnected markers;
+  every line-related `style` property (`linewidth`/`linetype`/`linejoin`/
+  `lineend`/`linemitre`) and `fill` have no effect, per `drawable`'s
+  `geometry` docs -- only `style@color` is used, as the marker colour.
 - **`sketch`** -- a list of `drawable`s (`shapes` property). Built up
   with `sketch() + shape_circle() + shape_blob(...)`; the `+` method
   requires an S7 method registration, not an S3 `` `+.sketch` `` (see
