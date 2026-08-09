@@ -1,0 +1,76 @@
+#' An open spiral
+#'
+#' `curve_spiral` is a [drawable] whose path winds around a centroid
+#' `(x, y)`, sweeping through `turns` full revolutions while its radius
+#' interpolates linearly from `radius_start` to `radius_end`. With
+#' `radius_start = radius_end` this traces a circle repeated `turns` times
+#' (visually indistinguishable from a single circle, since the path
+#' retraces itself); the usual case has `radius_start != radius_end`, giving
+#' an Archimedean-style spiral that grows or shrinks outward.
+#'
+#' `style@fill` has no effect for `curve_spiral()` -- see [drawable]'s
+#' `geometry` documentation for why `"path"` geometries have no interior to
+#' fill. Passing `fill` via `...` is still accepted (it's simply ignored at
+#' draw time), since `style()` is shared across every `geometry`.
+#'
+#' @param x,y Centroid coordinates. Default `0`.
+#' @param radius_start,radius_end Radius at the start/end of the path. Must
+#'   be non-negative. Default `0`/`1`.
+#' @param turns Number of full revolutions. Must be positive. Default `3`.
+#' @param n Number of points used to approximate the spiral. Default `200L`.
+#' @param ... Arguments passed to [style()].
+#'
+#' @export
+curve_spiral <- S7::new_class(
+  name = "curve_spiral",
+  parent = drawable,
+  properties = list(
+    x            = S7::class_numeric,
+    y            = S7::class_numeric,
+    radius_start = S7::class_numeric,
+    radius_end   = S7::class_numeric,
+    turns        = S7::class_numeric,
+    n            = S7::class_integer,
+    points = S7::new_property(
+      class = point_set,
+      getter = function(self) {
+        angle <- seq(0, 2 * pi * self@turns, length.out = self@n)
+        radius <- seq(self@radius_start, self@radius_end, length.out = self@n)
+        point_set(
+          x = self@x + radius * cos(angle),
+          y = self@y + radius * sin(angle)
+        )
+      }
+    )
+  ),
+  validator = function(self) {
+    if (length(self@x) != 1) return("x must be length 1")
+    if (length(self@y) != 1) return("y must be length 1")
+    if (length(self@radius_start) != 1) return("radius_start must be length 1")
+    if (length(self@radius_end) != 1) return("radius_end must be length 1")
+    if (length(self@turns) != 1) return("turns must be length 1")
+    if (length(self@n) != 1) return("n must be length 1")
+    if (self@radius_start < 0) return("radius_start must be a non-negative number")
+    if (self@radius_end < 0) return("radius_end must be a non-negative number")
+    if (self@turns <= 0) return("turns must be a positive number")
+    if (self@n < 1L) return("n must be a positive integer")
+  },
+  constructor = function(x = 0,
+                         y = 0,
+                         radius_start = 0,
+                         radius_end = 1,
+                         turns = 3,
+                         n = 200L,
+                         ...) {
+    S7::new_object(
+      drawable(geometry = "path"),
+      x = x,
+      y = y,
+      radius_start = radius_start,
+      radius_end = radius_end,
+      turns = turns,
+      n = n,
+      style = style(...)
+    )
+  }
+)

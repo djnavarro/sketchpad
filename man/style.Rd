@@ -9,7 +9,9 @@ style(
   fill = "black",
   linewidth = 1,
   linetype = "solid",
-  linejoin = "round"
+  linejoin = "round",
+  lineend = "round",
+  linemitre = 10
 )
 }
 \arguments{
@@ -34,6 +36,19 @@ aren't independently re-validated here. Default \code{"solid"}.}
 \code{\link[grid:gpar]{grid::gpar()}}'s \code{linejoin}. One of \code{"round"}, \code{"mitre"}, or \code{"bevel"}.
 Most visible on closed shapes with few, sharp vertices, or on any
 drawable stroked with a thick \code{linewidth}. Default \code{"round"}.}
+
+\item{lineend}{Line end style at a path's free endpoints, forwarded to
+\code{\link[grid:gpar]{grid::gpar()}}'s \code{lineend}. One of \code{"round"}, \code{"butt"}, or \code{"square"}.
+Only visible on \code{"path"}-geometry drawables (e.g. \code{\link[=curve_line]{curve_line()}},
+\code{\link[=curve_bezier]{curve_bezier()}}) -- a \code{"polygon"}-geometry drawable has no free
+endpoint, since its outline closes back on itself. Most visible at a
+thick \code{linewidth}. Default \code{"round"}.}
+
+\item{linemitre}{Mitre limit, forwarded to \code{\link[grid:gpar]{grid::gpar()}}'s \code{linemitre}.
+Only takes effect when \code{linejoin = "mitre"}: at a vertex sharper than
+this limit allows, the mitred corner is truncated to a bevel instead,
+to avoid an arbitrarily long spike. Must be at least \code{1}. Default \code{10},
+matching \code{\link[grid:gpar]{grid::gpar()}}'s own default.}
 }
 \description{
 \code{style} is a container for the graphical properties passed to

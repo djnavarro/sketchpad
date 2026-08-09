@@ -30,18 +30,21 @@ argument validation via two internal helpers factored into
 `R/shape_bezier.R` (`bezier_curve_points()`, `validate_bezier_args()`),
 differing only in which `drawable(geometry = ...)` they construct from.
 
-Still open: `curve_line()` and `curve_spiral()` need genuinely new
-geometry (no `shape_*()` counterpart to share code with), and
-`curve_scribble()` would promote `fill_scribble()`'s internal
-`scribble_lines()` helper from private to a public path generator. Also
-still open: whether `lineend`/`linemitre` need to be added to `style()`
-once one of these produces a path with actual visible free ends or sharp
-corners at high `linewidth` (`curve_bezier()`'s curve doesn't have sharp
-corners, so it didn't force this decision). A `"points"`-geometry
-constructor (e.g. a scatter-of-markers primitive) hasn't been designed at
-all yet -- `geometry = "points"` was reserved on the dimensional reading
-`points`(0D)/`path`(1D)/`polygon`(2D), not because a concrete constructor
-need has come up.
+`curve_line()` (a straight open polyline through arbitrary control
+points, with no `n`/resampling since it uses its control points as
+vertices directly) and `curve_spiral()` (angle sweeps `turns`
+revolutions while radius interpolates linearly from `radius_start` to
+`radius_end`) are both done -- see `.agents/HISTORY.md`.
+
+Still open: `curve_scribble()` would promote `fill_scribble()`'s
+internal `scribble_lines()` helper from private to a public path
+generator. `lineend`/`linemitre` have since been added to `style()` --
+see `.agents/HISTORY.md` -- once `curve_line()`'s sharp vertex angles and
+free endpoints gave both a demonstrated visible effect. A
+`"points"`-geometry constructor (e.g. a scatter-of-markers primitive)
+hasn't been designed at all yet -- `geometry = "points"` was reserved on
+the dimensional reading `points`(0D)/`path`(1D)/`polygon`(2D), not
+because a concrete constructor need has come up.
 
 ## Deferred: arbitrary angle for `fill_scribble()`
 
@@ -99,11 +102,10 @@ to pick up, reject, or refine later -- none are scheduled.
 ### Additional primitive shapes
 
 `rectangle`/`square`, `polygon` (regular n-gon), `ellipse` (`shape_circle`
-is currently radius-only, with no independent x/y radii), `arc`/`wedge` (a
-partial circle/annulus), `star`, a bare `line` (an open segment, distinct
-from `shape_ribbon`'s width), and `spiral` -- several `series-*` repo names
-(e.g. `series-nautilus`) suggest spirals recur often enough across
-projects to be worth a shared primitive rather than a one-off.
+is currently radius-only, with no independent x/y radii), and `arc`/`wedge`
+(a partial circle/annulus), `star`. (A bare open `line` and a `spiral` were
+also on this list -- both are now covered by `curve_line()`/
+`curve_spiral()`; see `.agents/HISTORY.md`.)
 
 ### Multiple sub-paths and holes per drawable
 

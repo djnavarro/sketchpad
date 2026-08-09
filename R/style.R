@@ -23,6 +23,17 @@ fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern")
 #'   [grid::gpar()]'s `linejoin`. One of `"round"`, `"mitre"`, or `"bevel"`.
 #'   Most visible on closed shapes with few, sharp vertices, or on any
 #'   drawable stroked with a thick `linewidth`. Default `"round"`.
+#' @param lineend Line end style at a path's free endpoints, forwarded to
+#'   [grid::gpar()]'s `lineend`. One of `"round"`, `"butt"`, or `"square"`.
+#'   Only visible on `"path"`-geometry drawables (e.g. [curve_line()],
+#'   [curve_bezier()]) -- a `"polygon"`-geometry drawable has no free
+#'   endpoint, since its outline closes back on itself. Most visible at a
+#'   thick `linewidth`. Default `"round"`.
+#' @param linemitre Mitre limit, forwarded to [grid::gpar()]'s `linemitre`.
+#'   Only takes effect when `linejoin = "mitre"`: at a vertex sharper than
+#'   this limit allows, the mitred corner is truncated to a bevel instead,
+#'   to avoid an arbitrarily long spike. Must be at least `1`. Default `10`,
+#'   matching [grid::gpar()]'s own default.
 #'
 #' @export
 style <- S7::new_class(
@@ -35,7 +46,9 @@ style <- S7::new_class(
       S7::new_union(S7::class_character, S7::class_numeric),
       default = "solid"
     ),
-    linejoin  = S7::new_property(S7::class_character, default = "round")
+    linejoin  = S7::new_property(S7::class_character, default = "round"),
+    lineend   = S7::new_property(S7::class_character, default = "round"),
+    linemitre = S7::new_property(S7::class_numeric, default = 10)
   ),
   validator = function(self) {
     if (length(self@linetype) != 1) return("linetype must be a single value")
@@ -43,5 +56,11 @@ style <- S7::new_class(
     if (!self@linejoin %in% c("round", "mitre", "bevel")) {
       return('linejoin must be one of "round", "mitre", or "bevel"')
     }
+    if (length(self@lineend) != 1) return("lineend must be a single string")
+    if (!self@lineend %in% c("round", "butt", "square")) {
+      return('lineend must be one of "round", "butt", or "square"')
+    }
+    if (length(self@linemitre) != 1) return("linemitre must be a single number")
+    if (self@linemitre < 1) return("linemitre must be at least 1")
   }
 )

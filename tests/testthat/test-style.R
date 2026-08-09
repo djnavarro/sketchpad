@@ -45,3 +45,32 @@ test_that("style() rejects a non-scalar linetype or linejoin", {
   expect_error(style(linetype = c("solid", "dashed")), "linetype")
   expect_error(style(linejoin = c("round", "mitre")), "linejoin")
 })
+
+test_that("style()'s lineend/linemitre default to \"round\"/10", {
+  expect_identical(style()@lineend, "round")
+  expect_identical(style()@linemitre, 10)
+})
+
+test_that("style() accepts every valid lineend value", {
+  expect_identical(style(lineend = "round")@lineend, "round")
+  expect_identical(style(lineend = "butt")@lineend, "butt")
+  expect_identical(style(lineend = "square")@lineend, "square")
+})
+
+test_that("style() rejects an invalid lineend", {
+  expect_error(style(lineend = "curvy"), "lineend")
+})
+
+test_that("style() accepts a linemitre at or above 1", {
+  expect_identical(style(linemitre = 1)@linemitre, 1)
+  expect_identical(style(linemitre = 25)@linemitre, 25)
+})
+
+test_that("style() rejects a linemitre below 1", {
+  expect_error(style(linemitre = 0.5), "linemitre")
+})
+
+test_that("style() rejects a non-scalar lineend or linemitre", {
+  expect_error(style(lineend = c("round", "butt")), "lineend")
+  expect_error(style(linemitre = c(1, 2)), "linemitre")
+})

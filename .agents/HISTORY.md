@@ -624,3 +624,92 @@ with `drawable`'s existing "`style` is a superset of features not every
 passed (11 new, in a new `tests/testthat/test-curve.R`), including one
 asserting `curve_bezier()` and `shape_bezier()` compute byte-identical
 `points` for the same inputs.
+
+## Adding `curve_line()` and `curve_spiral()`
+
+The next two entries in the `curve_*()` family (see `.agents/PLAN.md`),
+each needing genuinely new geometry rather than sharing a `shape_*()`
+counterpart's computation the way `curve_bezier()` shares
+`shape_bezier()`'s.
+
+`curve_line()` is a straight open polyline through an arbitrary number
+of control points `(x, y)` (at least two), connected in order. Unlike
+every other drawable so far, its `points` getter does no
+computation/resampling at all -- it's just `point_set(x = self@x, y =
+self@y)` -- so there's no `n` argument, and the constructor is the
+shortest in the package. This is the "bare `line`" primitive named in
+`PLAN.md`'s "Additional primitive shapes" brainstorm list, generalized
+from a single segment (two points) to an arbitrary polyline, since
+supporting more than two points cost nothing extra and is strictly more
+useful (e.g. a zig-zag or path through several waypoints).
+
+`curve_spiral()` is a new parametric curve: angle sweeps `2 * pi *
+turns` radians (`turns` full revolutions) while radius interpolates
+linearly from `radius_start` to `radius_end` across the same `n`
+evenly-spaced parameter values, giving an Archimedean-style spiral that
+grows or shrinks outward. Structurally closest to `shape_circle()`
+(centroid + radius + `n`, `cos`/`sin` points), but needed its own file
+rather than sharing helpers with it, since the angle range and
+non-constant radius are both genuinely new. `radius_start`/`radius_end`
+independently non-negative (not just their difference), `turns` strictly
+positive (a zero-turn spiral would degenerate to a single point at
+`radius_start`), `n` a positive integer -- validated the same way every
+other numeric-argument drawable is.
+
+Both fix `geometry = "path"` at construction, matching `curve_bezier()`;
+neither exposes `geometry` as a constructor argument. `style@fill` is
+accepted via `...` for both (forwarded to `style()`) but has no visible
+effect, per `drawable`'s existing `geometry` documentation.
+
+Visual check: a `curve_line()` zig-zag through four points and a
+`curve_spiral()` with `radius_start` near zero and `turns = 4` both
+rendered as open, unfilled strokes as expected, confirming neither
+accidentally closes back to its start the way a `"polygon"`-geometry
+drawable would.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 339 tests
+passed (26 new, appended to `tests/testthat/test-curve.R`) -- geometry
+defaults, points computation (including an exact zero-radius start and
+angle-sweep check for `curve_spiral()`), argument validation, `draw()`
+rendering without error, and stroke-styling acceptance for both.
+
+## Adding `lineend`/`linemitre` to `style()`
+
+Revisited the `lineend`/`linemitre` deferral noted when `linetype`/
+`linejoin` were first added (see that entry above) and again when
+`curve_bezier()` landed, this time with `curve_line()` in hand:
+`curve_line()` is a straight polyline, so unlike `curve_bezier()`'s
+smoothed curve it can produce genuinely sharp interior vertices, and
+(like every `"path"`-geometry drawable) it has real free endpoints. A
+quick `grid` experiment confirmed both properties have a real, visible
+effect at these features: `lineend` (`"round"`/`"butt"`/`"square"`)
+visibly changes the cap shape at a path's free ends, and `linemitre`
+(paired with `linejoin = "mitre"`) determines whether a sharp interior
+vertex renders as a full mitred spike or gets truncated to a bevel once
+the corner is sharper than the limit allows -- both only visible at a
+sufficiently thick `linewidth`, the same threshold that already applied
+to `linejoin`. That crossed the bar the package used to justify
+`linetype`/`linejoin` in the first place (a demonstrated, concrete visual
+effect rather than API completeness for its own sake), so both were
+added.
+
+Implementation exactly mirrors `linejoin`: `lineend` is a validated
+string enum (`"round"`/`"butt"`/`"square"`, default `"round"`);
+`linemitre` is numeric, validated only for `>= 1` (matching
+`grid::gpar()`'s own requirement), default `10` (matching `grid::gpar()`'s
+own default) rather than independently re-validated beyond that, the
+same leniency already given to `linetype`. Both are forwarded in
+`geometry_grob()`'s `"polygon"` and `"path"` branches alongside
+`linejoin`/`linetype`, omitted from `"points"` (no line to cap or mitre)
+-- including them in the `"polygon"` branch is harmless even though a
+closed polygon has no exposed free endpoint and, in practice, no mitred
+corner sharp enough to hit the default limit; this matches `linejoin`'s
+own existing precedent of applying uniformly across both stroked
+geometries rather than special-casing which geometry each sub-property
+"really" affects.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 354 tests
+passed (15 new) -- default values, valid/invalid `lineend`, valid/invalid
+`linemitre`, non-scalar rejection for both, and `curve_line()` accepting
+and rendering both without error at a thick `linewidth` with
+`linejoin = "mitre"`.
