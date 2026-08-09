@@ -1,8 +1,11 @@
 #' Generate a smoothed Brownian bridge
 #'
 #' Internal helper used by [twist] to displace its path away from a
-#' straight line. Generates a Brownian bridge (via [e1071::rbridge()]),
-#' scales it, and optionally smooths it with repeated local averaging.
+#' straight line. Generates a Brownian bridge on `n` points over `[0, 1]`
+#' (a discretized Wiener process pinned to `0` at both ends, matching
+#' `e1071::rbridge()`'s construction but implemented directly to avoid
+#' the dependency), scales it, and optionally smooths it with repeated
+#' local averaging.
 #'
 #' @param n Number of points in the bridge.
 #' @param scale Multiplicative scale applied to the bridge.
@@ -14,7 +17,14 @@
 smooth_bridge <- function(n, scale = .1, smooth = 0, seed = 1L) {
   withr::with_seed(
     seed = seed,
-    code = {b <- c(0, e1071::rbridge(1, n - 1))}
+    code = {
+      # Discretized Wiener process on n - 1 steps over (0, 1], then
+      # subtract the line through the origin and its own endpoint to
+      # pin both ends to 0 (the definition of a Brownian bridge).
+      z <- cumsum(stats::rnorm(n - 1) / sqrt(n - 1))
+      t <- seq_len(n - 1) / (n - 1)
+      b <- c(0, z - t * z[n - 1])
+    }
   )
   b <- b * scale
   if (smooth > 0) {

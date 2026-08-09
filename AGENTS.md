@@ -40,8 +40,10 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   width modulated by simplex noise and a `sqrt` taper that goes to zero
   at both ends.
 - **`twist`** -- like `ribbon`, but the underlying path is a smoothed
-  Brownian bridge (`e1071::rbridge()` via the internal `smooth_bridge()`
-  helper) rather than a straight line.
+  Brownian bridge (built directly from `stats::rnorm()` via the internal
+  `smooth_bridge()` helper -- no longer a dependency on `e1071::rbridge()`,
+  which it reproduces bit-for-bit for the same seed) rather than a
+  straight line.
 - **`bezier`** -- outline follows a Bezier curve through an arbitrary
   number of control points (`x`/`y`), evaluated via the Bernstein
   polynomial basis (internal `bernstein()` helper, *not* De Casteljau's
