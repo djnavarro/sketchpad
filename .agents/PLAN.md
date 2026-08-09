@@ -43,6 +43,24 @@ segment; no such technique exists in this package yet, and none was
 prototyped successfully. Revisit if a real sketch needs an arbitrary
 angle.
 
+## Deferred: S7 class for `fill` objects
+
+All fifteen `fill_*()` helpers in `R/fill.R` currently return either a
+plain colour string (`fill_solid()`) or whatever `grid::pattern()`
+produces (`"GridPattern"`-classed S3 objects, everything else) --
+`style@fill` stores this directly, and `draw()` hands it straight to
+`grid::gpar(fill = ...)`, which already accepts either kind
+interchangeably with no branching needed. Considered wrapping these in a
+proper S7 `fill` class (e.g. `fill(pattern = <string or GridPattern>)`)
+to match the rest of the package's S7-based design and give a dispatch
+target for any future `fill_*()` that needs behavior beyond "hand this
+to `gpar()`" -- e.g. `draw()`-time recomputation against the target
+polygon, or device-capability warnings. Deferred: no current `fill_*()`
+needs this, so the wrapper would add an unwrap-at-every-call-site cost
+(`style()`'s validator, `draw()`) for no present behavioral gain. Revisit
+if a concrete `fill_*()` idea comes up that can't be expressed as a bare
+colour string or `GridPattern`.
+
 ## Deferred: migrate `sketches` repo's `example_*.R` scripts to depend on the package
 
 The four `example_*.R` scripts in the `sketches` repo were *adapted* into
