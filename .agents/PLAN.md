@@ -65,22 +65,6 @@ needs this, so the wrapper would add an unwrap-at-every-call-site cost
 if a concrete `fill_*()` idea comes up that can't be expressed as a bare
 colour string or `GridPattern`.
 
-## Deferred: migrate `sketches` repo's `example_*.R` scripts to depend on the package
-
-The four `example_*.R` scripts in the `sketches` repo were *adapted* into
-`README.Rmd`, but the original scripts in that repo still
-`source(here::here("sketches.R"))` rather than `library(sketchpad)`. Not
-touched, since the `sketches` repo may want to stay as a standalone
-sketchbook independent of the package's release cycle.
-
-## Deferred: decide what belongs in sketchpad vs. stays series-specific
-
-Series repos (e.g. `series-lissajous`) extend the core drawing system
-with series-specific classes. `shape_bezier` was pulled into the shared
-package; other series-specific shapes have not been reviewed for
-candidacy. No process yet for deciding "shared primitive" vs.
-"series-specific one-off."
-
 ## Candidate features (brainstormed, not yet prioritized)
 
 The items below came out of a deliberate brainstorming pass over the
