@@ -11,7 +11,9 @@ style(
   linetype = "solid",
   linejoin = "round",
   lineend = "round",
-  linemitre = 10
+  linemitre = 10,
+  color_alpha = 1,
+  fill_alpha = 1
 )
 }
 \arguments{
@@ -49,6 +51,31 @@ Only takes effect when \code{linejoin = "mitre"}: at a vertex sharper than
 this limit allows, the mitred corner is truncated to a bevel instead,
 to avoid an arbitrarily long spike. Must be at least \code{1}. Default \code{10},
 matching \code{\link[grid:gpar]{grid::gpar()}}'s own default.}
+
+\item{color_alpha}{Stroke opacity, applied to \code{color} independently of
+\code{fill_alpha}. Must be a number in \verb{[0, 1]}, where \code{0} is fully
+transparent and \code{1} (the default) is fully opaque. Applied by baking
+the value into \code{color} via \code{\link[grDevices:adjustcolor]{grDevices::adjustcolor()}} at draw time
+(see \code{\link[=draw]{draw()}}'s internal \code{apply_alpha()} helper), not via
+\code{\link[grid:gpar]{grid::gpar()}}'s own \code{alpha} argument -- \code{gpar()}'s \code{alpha} applies
+uniformly to both stroke and fill on the same grob, which would
+couple \code{color_alpha} and \code{fill_alpha} together. If \code{color} already
+has its own alpha channel (e.g. an \code{"#RRGGBBAA"} hex string),
+\code{color_alpha} multiplies through it rather than overriding it.}
+
+\item{fill_alpha}{Fill opacity, applied to \code{fill} independently of
+\code{color_alpha}, via the same \code{\link[grDevices:adjustcolor]{grDevices::adjustcolor()}} mechanism as
+\code{color_alpha}. Must be a number in \verb{[0, 1]}. Default \code{1}. Only has an
+effect when \code{fill} is a plain colour string (as from \code{\link[=fill_solid]{fill_solid()}}
+or \code{\link[=fill_none]{fill_none()}}) -- \strong{silently inert when \code{fill} is a pattern or
+gradient} (the output of any other \verb{fill_*()} helper), since
+\code{\link[grDevices:adjustcolor]{grDevices::adjustcolor()}} has no defined effect on a \code{GridPattern}
+object. This mirrors \code{fill} itself already having no effect for
+\code{"path"}/\code{"points"}-geometry drawables (see \link{drawable}'s \code{geometry}
+docs), and \code{lineend}/\code{linemitre} already being inert for some
+geometries -- geometry- or fill-type-conditional inertness, not an
+error, is this package's existing convention for style properties
+that don't universally apply.}
 }
 \description{
 \code{style} is a container for the graphical properties passed to

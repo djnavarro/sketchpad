@@ -51,3 +51,29 @@ test_that("draw() rejects an invalid geometry at draw time", {
   S7::prop(bad_shape, "geometry", check = FALSE) <- "triangle"
   expect_error(draw(bad_shape), "geometry")
 })
+
+test_that("apply_alpha() is a no-op at alpha = 1", {
+  expect_identical(apply_alpha("red", 1), "red")
+  expect_identical(apply_alpha(NA_character_, 1), NA_character_)
+})
+
+test_that("apply_alpha() bakes alpha into a colour string", {
+  rgba <- grDevices::col2rgb(apply_alpha("red", 0), alpha = TRUE)["alpha", ]
+  expect_equal(unname(rgba), 0)
+  rgba_full <- grDevices::col2rgb(apply_alpha("red", 1), alpha = TRUE)["alpha", ]
+  expect_equal(unname(rgba_full), 255)
+})
+
+test_that("apply_alpha() multiplies through an existing alpha channel", {
+  expect_identical(apply_alpha("#FF000080", 0.5), "#FF000040")
+})
+
+test_that("draw() renders color_alpha/fill_alpha on a solid fill without error", {
+  local_null_device()
+  expect_no_error(draw(shape_circle(color_alpha = 0.5, fill_alpha = 0.5)))
+})
+
+test_that("fill_alpha is silently inert on a pattern fill", {
+  local_null_device()
+  expect_no_error(draw(shape_circle(fill = fill_hatch(), fill_alpha = 0.3)))
+})

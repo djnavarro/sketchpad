@@ -12,17 +12,46 @@
 #' @export
 draw <- S7::new_generic("draw", dispatch_args = "object")
 
+#' Bake a style alpha into a plain colour string
+#'
+#' Internal helper shared by every branch of `geometry_grob()`. Applies
+#' `alpha` to `color` via [grDevices::adjustcolor()], rather than via
+#' [grid::gpar()]'s own `alpha` argument -- `gpar()`'s `alpha` would apply
+#' uniformly to both `col` and `fill` on the same grob, coupling
+#' `style@color_alpha` and `style@fill_alpha` together, which is exactly
+#' what baking each into its own colour string avoids. A no-op (returns
+#' `color` unchanged) when `alpha == 1`, so the common case skips
+#' `adjustcolor()` entirely. `adjustcolor()` multiplies through any alpha
+#' channel already present in `color` (e.g. an `"#RRGGBBAA"` hex string)
+#' rather than overriding it, and returns a fully-transparent colour for
+#' `NA` input without erroring.
+#'
+#' @param color A single colour string (may be `NA`).
+#' @param alpha A single number in `[0, 1]`.
+#' @return A single colour string.
+#' @noRd
+apply_alpha <- function(color, alpha) {
+  if (alpha == 1) return(color)
+  grDevices::adjustcolor(color, alpha.f = alpha)
+}
+
 #' Build the grob for a drawable's geometry
 #'
 #' Internal helper shared by both `draw()` methods below: dispatches on a
 #' drawable's `geometry` property to build the [grid] grob appropriate to
-#' each of the three dimensional cases documented on [drawable]. `fill` is
-#' only meaningful for `"polygon"`, so it's omitted from `gpar()` for the
-#' other two geometries. `linetype`/`linejoin`/`lineend`/`linemitre` are
-#' forwarded for both stroked geometries (`"polygon"`, `"path"`) but not
-#' `"points"`, which has no line to dash, join, cap, or mitre --
-#' `lineend`/`linemitre` are simply inert for `"polygon"`, which has no
-#' free endpoint and only a mitred (rather than bevelled) join to truncate.
+#' each of the three dimensional cases documented on [drawable]. `fill`
+#' (and thus `fill_alpha`) is only meaningful for `"polygon"`, so both are
+#' omitted from `gpar()` for the other two geometries.
+#' `linetype`/`linejoin`/`lineend`/`linemitre` are forwarded for both
+#' stroked geometries (`"polygon"`, `"path"`) but not `"points"`, which
+#' has no line to dash, join, cap, or mitre -- `lineend`/`linemitre` are
+#' simply inert for `"polygon"`, which has no free endpoint and only a
+#' mitred (rather than bevelled) join to truncate. `color_alpha` is
+#' forwarded for every geometry, via `apply_alpha()`; `fill_alpha` is
+#' forwarded the same way but only when `fill` is a plain colour string --
+#' it's silently inert when `fill` is a `GridPattern`, since
+#' `apply_alpha()`/`adjustcolor()` has no defined effect on one (see
+#' [style()]'s `fill_alpha` docs).
 #'
 #' @param points A [point_set].
 #' @param sty A [style].
@@ -30,14 +59,19 @@ draw <- S7::new_generic("draw", dispatch_args = "object")
 #' @param vp A [grid::viewport()].
 #' @noRd
 geometry_grob <- function(points, sty, geometry, vp) {
+  fill <- if (is.character(sty@fill)) {
+    apply_alpha(sty@fill, sty@fill_alpha)
+  } else {
+    sty@fill
+  }
   switch(
     geometry,
     polygon = grid::polygonGrob(
       x = points@x,
       y = points@y,
       gp = grid::gpar(
-        col       = sty@color,
-        fill      = sty@fill,
+        col       = apply_alpha(sty@color, sty@color_alpha),
+        fill      = fill,
         lwd       = sty@linewidth,
         lty       = sty@linetype,
         linejoin  = sty@linejoin,
@@ -51,7 +85,7 @@ geometry_grob <- function(points, sty, geometry, vp) {
       x = points@x,
       y = points@y,
       gp = grid::gpar(
-        col       = sty@color,
+        col       = apply_alpha(sty@color, sty@color_alpha),
         lwd       = sty@linewidth,
         lty       = sty@linetype,
         linejoin  = sty@linejoin,
@@ -64,7 +98,7 @@ geometry_grob <- function(points, sty, geometry, vp) {
     points = grid::pointsGrob(
       x = points@x,
       y = points@y,
-      gp = grid::gpar(col = sty@color),
+      gp = grid::gpar(col = apply_alpha(sty@color, sty@color_alpha)),
       vp = vp,
       default.units = "native"
     ),

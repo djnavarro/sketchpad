@@ -130,12 +130,6 @@ still open is the concrete `curve_*()` constructor family and whether
 line styling needs to grow beyond the current single `linewidth` -- dash
 patterns, line caps/joins.)
 
-### Alpha/opacity in `style`
-
-`style` currently exposes only `color`/`fill`/`linewidth` -- no
-transparency control, a fairly basic omission for layered generative
-work where overlapping semi-transparent shapes are a common effect.
-
 ### Transform helpers
 
 Translate/rotate/scale/reflect a single `drawable` or an entire `sketch`

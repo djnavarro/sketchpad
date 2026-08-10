@@ -34,22 +34,47 @@ fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern")
 #'   this limit allows, the mitred corner is truncated to a bevel instead,
 #'   to avoid an arbitrarily long spike. Must be at least `1`. Default `10`,
 #'   matching [grid::gpar()]'s own default.
+#' @param color_alpha Stroke opacity, applied to `color` independently of
+#'   `fill_alpha`. Must be a number in `[0, 1]`, where `0` is fully
+#'   transparent and `1` (the default) is fully opaque. Applied by baking
+#'   the value into `color` via [grDevices::adjustcolor()] at draw time
+#'   (see [draw()]'s internal `apply_alpha()` helper), not via
+#'   [grid::gpar()]'s own `alpha` argument -- `gpar()`'s `alpha` applies
+#'   uniformly to both stroke and fill on the same grob, which would
+#'   couple `color_alpha` and `fill_alpha` together. If `color` already
+#'   has its own alpha channel (e.g. an `"#RRGGBBAA"` hex string),
+#'   `color_alpha` multiplies through it rather than overriding it.
+#' @param fill_alpha Fill opacity, applied to `fill` independently of
+#'   `color_alpha`, via the same [grDevices::adjustcolor()] mechanism as
+#'   `color_alpha`. Must be a number in `[0, 1]`. Default `1`. Only has an
+#'   effect when `fill` is a plain colour string (as from [fill_solid()]
+#'   or [fill_none()]) -- **silently inert when `fill` is a pattern or
+#'   gradient** (the output of any other `fill_*()` helper), since
+#'   [grDevices::adjustcolor()] has no defined effect on a `GridPattern`
+#'   object. This mirrors `fill` itself already having no effect for
+#'   `"path"`/`"points"`-geometry drawables (see [drawable]'s `geometry`
+#'   docs), and `lineend`/`linemitre` already being inert for some
+#'   geometries -- geometry- or fill-type-conditional inertness, not an
+#'   error, is this package's existing convention for style properties
+#'   that don't universally apply.
 #'
 #' @family core structure
 #' @export
 style <- S7::new_class(
   name = "style",
   properties = list(
-    color     = S7::new_property(S7::class_character, default = "black"),
-    fill      = S7::new_property(fill_class, default = fill_solid("black")),
-    linewidth = S7::new_property(S7::class_numeric, default = 1),
-    linetype  = S7::new_property(
+    color       = S7::new_property(S7::class_character, default = "black"),
+    fill        = S7::new_property(fill_class, default = fill_solid("black")),
+    linewidth   = S7::new_property(S7::class_numeric, default = 1),
+    linetype    = S7::new_property(
       S7::new_union(S7::class_character, S7::class_numeric),
       default = "solid"
     ),
-    linejoin  = S7::new_property(S7::class_character, default = "round"),
-    lineend   = S7::new_property(S7::class_character, default = "round"),
-    linemitre = S7::new_property(S7::class_numeric, default = 10)
+    linejoin    = S7::new_property(S7::class_character, default = "round"),
+    lineend     = S7::new_property(S7::class_character, default = "round"),
+    linemitre   = S7::new_property(S7::class_numeric, default = 10),
+    color_alpha = S7::new_property(S7::class_numeric, default = 1),
+    fill_alpha  = S7::new_property(S7::class_numeric, default = 1)
   ),
   validator = function(self) {
     if (length(self@linetype) != 1) return("linetype must be a single value")
@@ -63,5 +88,13 @@ style <- S7::new_class(
     }
     if (length(self@linemitre) != 1) return("linemitre must be a single number")
     if (self@linemitre < 1) return("linemitre must be at least 1")
+    if (length(self@color_alpha) != 1) return("color_alpha must be a single number")
+    if (self@color_alpha < 0 || self@color_alpha > 1) {
+      return("color_alpha must be between 0 and 1")
+    }
+    if (length(self@fill_alpha) != 1) return("fill_alpha must be a single number")
+    if (self@fill_alpha < 0 || self@fill_alpha > 1) {
+      return("fill_alpha must be between 0 and 1")
+    }
   }
 )

@@ -884,3 +884,75 @@ passed (10 new, in a new `tests/testthat/test-bezier-ribbon.R`) --
 backbone endpoints matching the supplied control points, a zero-width
 ribbon collapsing exactly onto its backbone (forward path then reversed
 path), and scalar-argument validation.
+
+## Adding `color_alpha`/`fill_alpha` opacity control to `style()`
+
+Added independent stroke/fill opacity to `style()`, closing the
+"Alpha/opacity in `style`" candidate-features item.
+
+**The key constraint driving the design: `grid::gpar()` can't decouple
+stroke opacity from fill opacity.** `gpar()` has a single `alpha`
+argument that applies uniformly to everything a grob draws -- passing it
+would couple `color_alpha` and `fill_alpha` together on the same
+`polygonGrob()`, defeating the point of having two independently-settable
+properties (mirroring the existing `color`/`fill` split). Instead, each
+alpha is baked directly into its own colour string via
+`grDevices::adjustcolor(color, alpha.f = ...)` before either reaches
+`gpar()`, via a new internal `apply_alpha()` helper in `R/draw.R`
+(a no-op at `alpha == 1`, so the common/default case skips
+`adjustcolor()` entirely). `gpar()`'s own `alpha` argument is never
+passed, staying at its implicit default of `1`, at every call site.
+
+**`adjustcolor()`'s behavior confirmed empirically before committing to
+this approach** (session console): it *multiplies* through any alpha
+channel already present in the input string (`adjustcolor("#FF000080",
+alpha.f = 0.5)` gives `"#FF000040"`, i.e. 0.5 x the existing ~0.502
+alpha, not a flat override) -- so a caller who already passed a
+translucent hex colour to `color`/`fill` composes correctly rather than
+being clobbered. It also returns a fully-transparent colour for `NA`
+input without erroring, so `fill = fill_none()` stays invisible
+regardless of `fill_alpha`. But it **errors** outright when given a
+`GridPattern` object (confirmed via `adjustcolor(fill_hatch(), alpha.f =
+0.5)`) -- there is no way to apply a scalar opacity to an arbitrary,
+already-built pattern/gradient grob this way.
+
+**`fill_alpha` is therefore silently inert whenever `style@fill` is a
+`GridPattern`** (i.e. built by any `fill_*()` helper except
+`fill_solid()`/`fill_none()`), guarded in `geometry_grob()` by
+`is.character(sty@fill)` before calling `apply_alpha()` on it at all.
+This was a deliberate choice to follow this package's existing
+precedent for style properties that don't universally apply (`fill`
+itself already has no effect for `"path"`/`"points"`-geometry
+drawables; `lineend`/`linemitre` are already inert for some geometries)
+-- documented in `fill_alpha`'s own `@param` text, with no warning or
+error, rather than rejecting the combination at `style()` construction
+time or warning at draw time. Both alternatives were considered and
+rejected: erecting a cross-property validation rule would be a new kind
+of coupling this package's `style` validator has never needed before
+(every existing check is local to one property), and a draw-time
+warning has no precedent among the package's several other
+geometry-conditional properties either.
+
+**Range chosen as `[0, 1]` closed**, not `fill_noise()`'s existing
+`(0, 1]` -- `0` is a legitimate "fully invisible" value at the `style`
+level (e.g. a fully transparent stroke while keeping a visible fill, or
+vice versa), unlike `fill_noise()`'s own `alpha` where `0` would be a
+pointless no-op fill.
+
+`color_alpha` is forwarded in all three `geometry_grob()` branches
+(`"polygon"`, `"path"`, `"points"`), matching `color` itself already
+applying everywhere; `fill_alpha` only matters for `"polygon"`, where
+`fill` itself is used.
+
+Visual check: two overlapping circles with independent `color_alpha`
+(one solid black outline, one faint outline) and matching `fill_alpha`
+blended visibly darker in the overlap region, as expected; a
+`fill_hatch()`-filled circle with `fill_alpha = 0.2` rendered with fully
+opaque hatch lines and no error, confirming the silent-inertness path.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 419 tests
+passed (23 new, across `tests/testthat/test-style.R` and
+`tests/testthat/test-draw.R`) -- defaults, full-range acceptance,
+out-of-range/non-scalar rejection, `apply_alpha()`'s no-op/alpha-baking/
+multiply-through behavior, and `draw()` not erroring on either a solid
+or pattern fill combined with the new properties.

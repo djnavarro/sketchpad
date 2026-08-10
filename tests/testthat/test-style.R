@@ -74,3 +74,29 @@ test_that("style() rejects a non-scalar lineend or linemitre", {
   expect_error(style(lineend = c("round", "butt")), "lineend")
   expect_error(style(linemitre = c(1, 2)), "linemitre")
 })
+
+test_that("style()'s color_alpha/fill_alpha default to 1", {
+  expect_identical(style()@color_alpha, 1)
+  expect_identical(style()@fill_alpha, 1)
+})
+
+test_that("style() accepts color_alpha/fill_alpha across [0, 1]", {
+  expect_identical(style(color_alpha = 0)@color_alpha, 0)
+  expect_identical(style(color_alpha = 0.5)@color_alpha, 0.5)
+  expect_identical(style(color_alpha = 1)@color_alpha, 1)
+  expect_identical(style(fill_alpha = 0)@fill_alpha, 0)
+  expect_identical(style(fill_alpha = 0.5)@fill_alpha, 0.5)
+  expect_identical(style(fill_alpha = 1)@fill_alpha, 1)
+})
+
+test_that("style() rejects out-of-range color_alpha/fill_alpha", {
+  expect_error(style(color_alpha = -0.1), "color_alpha")
+  expect_error(style(color_alpha = 1.1), "color_alpha")
+  expect_error(style(fill_alpha = -0.1), "fill_alpha")
+  expect_error(style(fill_alpha = 1.1), "fill_alpha")
+})
+
+test_that("style() rejects a non-scalar color_alpha or fill_alpha", {
+  expect_error(style(color_alpha = c(0, 1)), "color_alpha")
+  expect_error(style(fill_alpha = c(0, 1)), "fill_alpha")
+})
