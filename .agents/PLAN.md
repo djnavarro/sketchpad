@@ -6,21 +6,6 @@ not a changelog: once an item here is completed, its write-up should
 move to [.agents/HISTORY.md](HISTORY.md) and be removed from this file
 rather than marked "done" in place.
 
-## Deferred: port `bezier_ribbon` from series-lissajous
-
-`series-lissajous`'s `bezier_ribbon` combines a Bezier path with the same
-noise-perturbed perpendicular-offset logic `shape_ribbon`/`shape_twist`
-already use, giving a curved (rather than straight or Brownian-bridge)
-ribbon. Not ported yet -- `shape_bezier` (the plain curve) was the
-requested unit of work. Would slot in as `R/shape_bezier_ribbon.R`,
-immediately after `shape_bezier.R` in `Collate`.
-
-**Naming note:** when this is ported, name the constructor
-`shape_bezier_ribbon()` (not bare `bezier_ribbon()`), to match the
-`shape_*` prefix convention adopted for every drawable-producing
-constructor -- see `.agents/HISTORY.md`'s "Renaming drawable
-constructors to a shared `shape_*` prefix" entry.
-
 ## Deferred: rest of the `curve_*()` constructor family
 
 `curve_bezier()` (see `.agents/HISTORY.md`) is the first `curve_*()`

@@ -826,3 +826,61 @@ passed (18 new, in a new `tests/testthat/test-raw.R`) -- geometry
 defaults, points computed directly from input, zero-/single-point
 construction, `x`/`y` length validation, `draw()` rendering without
 error, and stroke/marker-colour styling acceptance for both.
+
+## Porting `bezier_ribbon` from series-lissajous as `shape_bezier_ribbon()`
+
+Ported `series-lissajous`'s `bezier_ribbon` -- a ribbon whose backbone is
+a cubic Bezier curve rather than a straight line ([shape_ribbon]) or
+Brownian bridge ([shape_twist]) -- as `shape_bezier_ribbon()`, per the
+naming note left in `.agents/PLAN.md` (matching the `shape_*` prefix
+convention rather than the source repo's bare `bezier_ribbon`).
+
+**Structure mirrors `shape_twist`, not `shape_ribbon`.** Like
+`shape_twist`, it exposes a computed `path` property (the raw backbone,
+here `bezier_curve_points()` through `(x, y)`, two control points, and
+`(xend, yend)`, reusing the helper factored out for
+`shape_bezier()`/`curve_bezier()` rather than duplicating Bernstein-basis
+evaluation) separately from `points` (the noise-perturbed, tapered
+outline built from that backbone) -- `shape_ribbon` has no equivalent
+split since its backbone is a trivial `seq()`, not worth its own
+property.
+
+**Control point naming.** The source repo used `xctr_1`/`yctr_1`/
+`xctr_2`/`yctr_2`; renamed to `x_ctrl1`/`y_ctrl1`/`x_ctrl2`/`y_ctrl2` to
+read more clearly at a call site and avoid the ambiguous abbreviation
+`ctr` (centre vs. control).
+
+**Dropped the source's unused `smooth` argument.** The original
+`bezier_ribbon` declared a `smooth` property/constructor argument
+(copied from `shape_twist`, where it drives `smooth_bridge()`'s
+averaging passes) but never referenced it anywhere in its own `bezier`
+or `points` getters -- a Bezier curve is deterministic, so there's no
+random path to smooth. Confirmed by inspection this was dead weight
+carried over from copy-pasting `shape_twist`'s scaffolding rather than
+intentional, so it was not ported.
+
+**Perpendicular-offset direction still uses the endpoint chord, not the
+local tangent.** Like `shape_ribbon`/`shape_twist` before it, the width
+offset at each point is perpendicular to the straight line from `(x, y)`
+to `(xend, yend)` (`dx`/`dy` computed once, not re-derived along the
+curve) rather than the Bezier curve's own local tangent direction. This
+matches the source repo's behavior exactly and keeps the outline
+self-consistent with its sibling shapes, but means a strongly-curved
+backbone's ribbon can look slightly asymmetric near sharp bends -- not
+treated as a bug to fix here, since it reproduces the ported behavior
+faithfully; revisit only if a real sketch's visual output demands a
+tangent-following offset.
+
+Placed in `DESCRIPTION`'s `Collate` immediately after `shape_bezier.R`
+(per the `.agents/PLAN.md` note), since it depends only on `drawable`
+and `shape_bezier.R`'s internal `bezier_curve_points()` helper, not on
+`curve_bezier.R`.
+
+Visual check: a curved, noise-tapered ribbon with visibly distinct
+endpoints and a smooth S-shaped backbone rendered as expected.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 398 tests
+passed (10 new, in a new `tests/testthat/test-bezier-ribbon.R`) --
+backbone endpoints matching the supplied control points, a zero-width
+ribbon collapsing exactly onto its backbone (forward path then reversed
+path), and scalar-argument validation.
