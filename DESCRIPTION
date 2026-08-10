@@ -4,9 +4,8 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Danielle", "Navarro", , "djnavarro@protonmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7648-6578"))
-Description: A lightweight, p5.js-inspired drawing system built on S7
-    classes and grid graphics, used as the shared foundation for the
-    author's generative art sketches.
+Description: A lightweight drawing system built on S7 classes and grid graphics 
+    that can be used for generative art. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
