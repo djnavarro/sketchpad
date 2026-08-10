@@ -1,7 +1,6 @@
 # sketchpad
 
-sketchpad is a lightweight, [p5.js](https://p5js.org/)-inspired drawing
-system for generative art, built on
+sketchpad is a lightweight drawing system for generative art, built on
 [S7](https://rconsortium.github.io/S7/) classes and `grid` graphics. It
 provides a small set of `drawable` shapes
 ([`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
