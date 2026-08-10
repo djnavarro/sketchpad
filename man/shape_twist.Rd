@@ -25,7 +25,8 @@ shape_twist(
 
 \item{width}{Maximum width. Must be non-negative. Default \code{0.2}.}
 
-\item{smooth}{Number of smoothing passes applied to the path. Default \code{3L}.}
+\item{smooth}{Number of smoothing passes applied to the path. Must be
+non-negative. Default \code{3L}.}
 
 \item{n}{Number of points used along the path. Default \code{100L}.}
 

@@ -992,14 +992,31 @@ reproducibility, and scalar-argument validation.
   or `seed` -- confirmed directly, then used as the base case for the
   outline-collapse check exactly as with `shape_ribbon`.
 
-**Noticed but not fixed:** `shape_twist`'s validator checks
-`x`/`y`/`xend`/`yend`/`width`/`n`/`frequency`/`octaves`/`seed`, but never
-validates `smooth` at all (no length-1 check, no non-negativity check,
-despite `smooth` counting down in a `for (i in 1:smooth)` loop that
-would behave oddly for a negative or non-integer value). Not addressed
-here, since fixing it was out of scope for a test-coverage pass -- flagged
-for a future fix rather than silently left undocumented.
+**Noticed while writing these tests, fixed separately (see next
+entry):** `shape_twist`'s validator didn't check `smooth` at all.
 
 `R CMD check` confirmed 0 errors/warnings/notes, and all 486 tests
 passed (67 new: 13 for `shape_circle`, 18 for `shape_blob`, 17 for
 `shape_ribbon`, 19 for `shape_twist`).
+
+## Fixing `shape_twist`'s missing `smooth` validation
+
+`shape_twist`'s validator checked
+`x`/`y`/`xend`/`yend`/`width`/`n`/`frequency`/`octaves`/`seed`, but never
+validated `smooth` at all -- no length-1 check, no non-negativity check,
+despite `smooth` counting down in a `for (i in 1:smooth)` loop
+(`smooth_bridge()`, `R/shape_twist.R`) that would behave oddly for a
+negative or non-integer value (`1:smooth` counts *down* from `1` for a
+negative `smooth`, running the smoothing loop body with descending,
+partly-negative indices rather than erroring or no-op'ing). Added the
+same two checks every other non-negative numeric argument in this
+package gets (`length(self@smooth) != 1`, `self@smooth < 0`), plus a
+`smooth = 0` acceptance test (confirming `0` -- i.e. no smoothing passes
+-- is explicitly valid, not just the boundary of a `< 0` rejection) and a
+non-scalar-`smooth` rejection test, both in `tests/testthat/test-twist.R`
+alongside the shape's other tests added just prior. `@param smooth`'s
+docs updated to state the non-negativity requirement, matching every
+other such parameter's docs in the package.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 489 tests
+passed (3 new).

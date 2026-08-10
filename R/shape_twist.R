@@ -44,7 +44,8 @@ smooth_bridge <- function(n, scale = .1, smooth = 0, seed = 1L) {
 #' @param x,y Start point. Default `0`.
 #' @param xend,yend End point. Default `1`.
 #' @param width Maximum width. Must be non-negative. Default `0.2`.
-#' @param smooth Number of smoothing passes applied to the path. Default `3L`.
+#' @param smooth Number of smoothing passes applied to the path. Must be
+#'   non-negative. Default `3L`.
 #' @param n Number of points used along the path. Default `100L`.
 #' @param frequency Noise frequency. Must be non-negative. Default `1`.
 #' @param octaves Number of noise octaves. Must be a positive integer.
@@ -151,11 +152,13 @@ shape_twist <- S7::new_class(
     if (length(self@xend) != 1) return("xend must be length 1")
     if (length(self@yend) != 1) return("yend must be length 1")
     if (length(self@width) != 1) return("width must be length 1")
+    if (length(self@smooth) != 1) return("smooth must be length 1")
     if (length(self@n) != 1) return("n must be length 1")
     if (length(self@frequency) != 1) return("frequency must be length 1")
     if (length(self@octaves) != 1) return("octaves must be length 1")
     if (length(self@seed) != 1) return("seed must be length 1")
     if (self@width < 0) return("width must be a non-negative number")
+    if (self@smooth < 0) return("smooth must be a non-negative number")
     if (self@frequency < 0) return("frequency must be a non-negative number")
     if (self@n < 1L) return("n must be a positive integer")
     if (self@octaves < 1L) return("octaves must be a positive integer")

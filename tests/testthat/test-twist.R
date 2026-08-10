@@ -36,6 +36,7 @@ test_that("shape_twist validates its scalar arguments", {
   expect_error(shape_twist(x = c(0, 1)))
   expect_error(shape_twist(xend = c(0, 1)))
   expect_error(shape_twist(width = c(0.1, 0.2)))
+  expect_error(shape_twist(smooth = c(1, 2)))
   expect_error(shape_twist(frequency = c(1, 2)))
   expect_error(shape_twist(octaves = c(1L, 2L)))
   expect_error(shape_twist(seed = c(1L, 2L)))
@@ -43,7 +44,12 @@ test_that("shape_twist validates its scalar arguments", {
 
 test_that("shape_twist rejects invalid non-negative/positive arguments", {
   expect_error(shape_twist(width = -1), "width")
+  expect_error(shape_twist(smooth = -1), "smooth")
   expect_error(shape_twist(frequency = -1), "frequency")
   expect_error(shape_twist(n = 0L), "n")
   expect_error(shape_twist(octaves = 0L), "octaves")
+})
+
+test_that("shape_twist accepts smooth = 0 (no smoothing passes)", {
+  expect_no_error(shape_twist(smooth = 0))
 })
