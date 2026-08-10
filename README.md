@@ -12,8 +12,7 @@ coverage](https://codecov.io/gh/djnavarro/sketchpad/graph/badge.svg)](https://ap
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-sketchpad is a lightweight, [p5.js](https://p5js.org/)-inspired drawing
-system for generative art, built on
+sketchpad is a lightweight drawing system for generative art, built on
 [S7](https://rconsortium.github.io/S7/) classes and `grid` graphics. It
 provides a small set of `drawable` shapes (`shape_circle()`,
 `shape_blob()`, `shape_ribbon()`, `shape_twist()`) that can be composed
