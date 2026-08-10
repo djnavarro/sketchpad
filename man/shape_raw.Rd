@@ -19,6 +19,10 @@ coordinates directly, and \code{points} is computed trivially from them.
 It is most often produced by \code{\link[S7:convert]{convert()}}ing a more complex drawable
 (e.g. a \link{shape_blob} or \link{shape_twist}) down to its raw vertices.
 }
+\examples{
+draw(shape_raw(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1)))
+
+}
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},

@@ -74,6 +74,10 @@ output} before relying on \code{fill_stipple()} (or \code{\link[=fill_scatter]{f
 use, especially on unfamiliar R/\code{grid}/graphics-device versions.
 }
 
+\examples{
+draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

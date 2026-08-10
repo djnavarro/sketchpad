@@ -51,6 +51,10 @@ curved rather than straight path. As with \link{shape_ribbon}, the ribbon's
 width tapers to zero at both ends and varies along its length
 according to simplex noise.
 }
+\examples{
+draw(shape_bezier_ribbon(x = 0, y = 0, xend = 1, yend = 0, width = 0.2))
+
+}
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},

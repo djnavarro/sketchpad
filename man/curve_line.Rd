@@ -25,6 +25,10 @@ resampled -- \code{points} is exactly \verb{(x, y)}, so there is no \code{n} arg
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
 }
+\examples{
+draw(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)))
+
+}
 \seealso{
 Other 1D curves:
 \code{\link[=curve_bezier]{curve_bezier()}},

@@ -8,6 +8,12 @@
 #' @param object A [drawable] or [sketch] object.
 #' @param ... Passed to methods, e.g. `xlim`/`ylim`.
 #'
+#' @examples
+#' draw(shape_circle(radius = 1))
+#'
+#' s <- sketch() + shape_circle(radius = 1) + shape_blob(x = 2, radius = 0.5)
+#' draw(s)
+#'
 #' @family core structure
 #' @export
 draw <- S7::new_generic("draw", dispatch_args = "object")

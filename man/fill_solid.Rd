@@ -22,6 +22,11 @@ pattern-based helpers (grouping them together in autocomplete), and so
 accept -- including for its own default -- once it's extended to take
 \verb{fill_*()} outputs alongside a bare colour string.
 }
+\examples{
+fill_solid("steelblue")
+draw(shape_circle(fill = fill_solid("tomato")))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

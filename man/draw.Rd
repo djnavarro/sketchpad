@@ -17,6 +17,13 @@ object to the current graphics device using \pkg{grid}. Methods accept
 optional \code{xlim}/\code{ylim} arguments giving axis limits; if omitted, limits
 are computed from the object's points.
 }
+\examples{
+draw(shape_circle(radius = 1))
+
+s <- sketch() + shape_circle(radius = 1) + shape_blob(x = 2, radius = 0.5)
+draw(s)
+
+}
 \seealso{
 Other core structure:
 \code{\link[=drawable]{drawable()}},

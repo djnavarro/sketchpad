@@ -47,6 +47,10 @@ width-to-height ratio as \code{aspect} to correct for this -- the same tile-
 squaring technique \code{\link[=fill_stipple]{fill_stipple()}} uses for its dots -- so the default
 \code{aspect = 1} is only exact for a square bounding box.
 }
+\examples{
+draw(shape_circle(fill = fill_checker(color1 = "black", color2 = "white")))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

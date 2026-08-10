@@ -81,6 +81,11 @@ that don't universally apply.}
 \code{style} is a container for the graphical properties passed to
 \code{\link[grid:gpar]{grid::gpar()}} when a \link{drawable} object is drawn.
 }
+\examples{
+style(color = "steelblue", fill = "lightblue", linewidth = 2)
+style(fill = fill_hatch(angle = 30))
+
+}
 \seealso{
 Other core structure:
 \code{\link[=draw]{draw()}},

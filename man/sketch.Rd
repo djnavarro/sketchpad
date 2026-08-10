@@ -16,10 +16,8 @@ using the \code{+} operator, e.g.
 \code{sketch() + shape_circle() + shape_circle(x = 2)}.
 }
 \examples{
-\dontrun{
 s <- sketch() + shape_circle(radius = 1) + shape_circle(x = 2, radius = 0.5)
 draw(s)
-}
 
 }
 \seealso{

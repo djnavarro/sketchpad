@@ -8,10 +8,8 @@
 #' @param shapes A list of [drawable]-classed objects. Default `list()`.
 #'
 #' @examples
-#' \dontrun{
 #' s <- sketch() + shape_circle(radius = 1) + shape_circle(x = 2, radius = 0.5)
 #' draw(s)
-#' }
 #'
 #' @family core structure
 #' @export

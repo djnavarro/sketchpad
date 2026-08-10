@@ -41,6 +41,9 @@
 #' @param seed Integer seed for the random harmonics. Default `1L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @examples
+#' draw(curve_scribble(width = 2, height = 0.5, seed = 5591L))
+#'
 #' @family 1D curves
 #' @export
 curve_scribble <- S7::new_class(

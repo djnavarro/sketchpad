@@ -101,6 +101,10 @@ no \code{angle} argument. Revisit if a real sketch needs an arbitrary
 angle.
 }
 
+\examples{
+draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

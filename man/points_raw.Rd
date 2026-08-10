@@ -29,4 +29,12 @@ rather than a connected outline or path.
 geometry has no line to stroke and no interior to fill. Only \code{style@color}
 is used, as the marker colour.
 }
+\examples{
+draw(points_raw(
+  x = seq(0, 1, length.out = 20),
+  y = sin(seq(0, 2 * pi, length.out = 20)) / 2 + 0.5,
+  color = "steelblue"
+))
+
+}
 \concept{0D points}

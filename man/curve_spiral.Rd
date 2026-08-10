@@ -41,6 +41,10 @@ an Archimedean-style spiral that grows or shrinks outward.
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
 }
+\examples{
+draw(curve_spiral(radius_start = 0, radius_end = 1, turns = 4))
+
+}
 \seealso{
 Other 1D curves:
 \code{\link[=curve_bezier]{curve_bezier()}},

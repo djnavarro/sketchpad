@@ -40,6 +40,10 @@ Default \code{2L}.}
 radius varies smoothly around the circumference according to
 Perlin/simplex noise generated with \pkg{ambient}.
 }
+\examples{
+draw(shape_blob(radius = 1, range = 0.3, seed = 4821L))
+
+}
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},

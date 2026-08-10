@@ -19,6 +19,9 @@
 #' @param seed Integer seed for the noise field. Default `1L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @examples
+#' draw(shape_bezier_ribbon(x = 0, y = 0, xend = 1, yend = 0, width = 0.2))
+#'
 #' @family 2D shapes
 #' @export
 shape_bezier_ribbon <- S7::new_class(

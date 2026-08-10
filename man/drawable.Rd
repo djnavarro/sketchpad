@@ -31,6 +31,11 @@ e.g. \code{\link[=points_raw]{points_raw()}}), \code{"path"} (1D, an open \code{
 \code{"points"}/\code{"path"} geometries, since only a closed polygon has an
 interior to fill.
 }
+\examples{
+circ <- shape_circle(radius = 1)
+S7::S7_inherits(circ, drawable)
+
+}
 \seealso{
 Other core structure:
 \code{\link[=draw]{draw()}},

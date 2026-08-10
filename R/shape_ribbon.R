@@ -14,6 +14,9 @@
 #' @param seed Integer seed for the noise field. Default `1L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @examples
+#' draw(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1, width = 0.3))
+#'
 #' @family 2D shapes
 #' @export
 shape_ribbon <- S7::new_class(

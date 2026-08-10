@@ -24,6 +24,10 @@ closed polygon, the curve is implicitly closed from its last control
 point back to its first -- for an open Bezier curve/path instead, see
 \code{\link[=curve_bezier]{curve_bezier()}}.
 }
+\examples{
+draw(shape_bezier(x = c(0, 0.5, 1, 0.5), y = c(0, 1, 0, -1)))
+
+}
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},

@@ -25,6 +25,10 @@ item in \code{.agents/PLAN.md}), \code{fill_none()} gives an unfilled \emph{clos
 outline -- the edge connecting the last point back to the first is still
 drawn. It does not, by itself, produce an open/unstroked curve.
 }
+\examples{
+draw(shape_circle(fill = fill_none(), linewidth = 2))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

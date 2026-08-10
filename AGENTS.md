@@ -93,8 +93,18 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `shape_bezier` itself has `parent = drawable`, so it's directly usable
   with `draw()` -- always rendering closed (`geometry = "polygon"`, the
   curve's last point connects straight back to its first) -- for the
-  same curve as an open path instead, see `curve_bezier`. `bezier_ribbon`
-  itself has not been ported; see PLAN.md.
+  same curve as an open path instead, see `curve_bezier`. The original's
+  separate `bezier_ribbon` drawable has also since been ported, as
+  `shape_bezier_ribbon` (see below).
+- **`shape_bezier_ribbon`** -- like `shape_ribbon`, but its backbone
+  follows a cubic Bezier curve -- through `(x, y)`, two control points
+  (`x_ctrl1`/`y_ctrl1`, `x_ctrl2`/`y_ctrl2`), and `(xend, yend)` -- rather
+  than a straight line, giving the ribbon a curved rather than straight
+  path. Reuses `shape_bezier`/`curve_bezier`'s internal
+  `bezier_curve_points()` helper (`R/shape_bezier.R`) to compute the
+  backbone rather than duplicating it; width still tapers to zero at
+  both ends and varies along the curve via simplex noise, exactly as in
+  `shape_ribbon`.
 - **`curve_bezier`** -- the first `curve_*()`-prefixed drawable: an open
   Bezier path, `geometry = "path"` fixed at construction (not exposed as
   a caller-facing argument). Shares its geometry computation and argument
@@ -366,23 +376,28 @@ full debugging narrative):
   `fill_solid()` to exist for its own property default.
 - `R/style.R`, `R/point_set.R`, `R/drawable.R` -- foundation classes, in
   load order (each depends on the previous).
-- `R/shape_bezier.R`, `R/curve_bezier.R`, `R/curve_line.R`,
-  `R/curve_spiral.R`, `R/curve_scribble.R`, `R/shape_raw.R`,
-  `R/shape_circle.R`, `R/shape_blob.R`, `R/shape_ribbon.R`,
-  `R/shape_twist.R` -- the concrete `drawable` subclasses, one file each.
-  Every closed constructor shares the `shape_*` prefix, every open one
-  the `curve_*` prefix (see "Class hierarchy" above), and each file is
-  named to match its constructor -- except `curve_bezier.R`, kept
-  immediately after `shape_bezier.R` since it shares that file's
-  `bernstein()`/`bezier_curve_points()`/`validate_bezier_args()` internal
-  helpers rather than duplicating them. `curve_line.R`/`curve_spiral.R`
-  need no such sharing (each is genuinely new geometry with no
-  `shape_*()` counterpart), so they're ordinary standalone constructor
-  files. `curve_scribble.R` shares `R/fill.R`'s internal
-  `scribble_lines()` helper (rather than duplicating it) but still needs
-  its own file, since it depends on `drawable` (defined after `fill.R`
-  in `Collate`) -- `fill.R` itself has no dependency on `drawable` and
-  loads first.
+- `R/shape_bezier.R`, `R/shape_bezier_ribbon.R`, `R/curve_bezier.R`,
+  `R/curve_line.R`, `R/curve_spiral.R`, `R/curve_scribble.R`,
+  `R/shape_raw.R`, `R/curve_raw.R`, `R/points_raw.R`, `R/shape_circle.R`,
+  `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R` -- the concrete
+  `drawable` subclasses, one file each. Every closed constructor shares
+  the `shape_*` prefix, every open one the `curve_*` prefix (see "Class
+  hierarchy" above), and each file is named to match its constructor --
+  except `curve_bezier.R`, kept immediately after `shape_bezier.R` (and
+  `shape_bezier_ribbon.R`, itself collated right after `shape_bezier.R`
+  since it depends on that file's `bezier_curve_points()`) since it
+  shares `shape_bezier.R`'s `bernstein()`/`bezier_curve_points()`/
+  `validate_bezier_args()` internal helpers rather than duplicating
+  them. `curve_line.R`/`curve_spiral.R` need no such sharing (each is
+  genuinely new geometry with no `shape_*()` counterpart), so they're
+  ordinary standalone constructor files. `curve_scribble.R` shares
+  `R/fill.R`'s internal `scribble_lines()` helper (rather than
+  duplicating it) but still needs its own file, since it depends on
+  `drawable` (defined after `fill.R` in `Collate`) -- `fill.R` itself
+  has no dependency on `drawable` and loads first. `curve_raw.R`/
+  `points_raw.R` are collated immediately after `shape_raw.R` (their
+  `"path"`/`"points"`-geometry analog), since the three form a parallel
+  "raw" family with the same trivial constructor shape.
 - `R/sketch.R` -- the `sketch` class and its `+` method.
 - `R/draw.R` -- the `draw` generic and its three methods.
 - `R/convert.R` -- the `convert(drawable, shape_raw)` method.

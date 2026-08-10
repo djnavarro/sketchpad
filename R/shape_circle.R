@@ -8,6 +8,10 @@
 #' @param n Number of points used to approximate the circle. Default `100L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @examples
+#' draw(shape_circle(radius = 1))
+#' draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6L, color = "darkred"))
+#'
 #' @family 2D shapes
 #' @export
 shape_circle <- S7::new_class(

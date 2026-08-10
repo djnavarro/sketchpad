@@ -80,6 +80,10 @@ details) can be more noticeable here: \code{sin()} turns a small mismatch in
 the turbulence field into a visibly sharper edge in a band than the
 same mismatch would produce in a plain opacity fade.
 }
+\examples{
+draw(shape_circle(fill = fill_marble(stripes = 4L, seed = 1274L)))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

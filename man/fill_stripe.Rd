@@ -63,6 +63,10 @@ corrected) tile spanning the whole target shape, exactly as
 \code{\link[=fill_gradient]{fill_gradient()}} does by default -- not to create repetition, which the
 gradient already provides.
 }
+\examples{
+draw(shape_circle(fill = fill_stripe(angle = 30)))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

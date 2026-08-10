@@ -13,6 +13,10 @@
 #'
 #' @return `color`, unchanged (a single string), after validating it.
 #'
+#' @examples
+#' fill_solid("steelblue")
+#' draw(shape_circle(fill = fill_solid("tomato")))
+#'
 #' @family fill helpers
 #' @export
 fill_solid <- function(color = "black") {
@@ -39,6 +43,9 @@ fill_solid <- function(color = "black") {
 #' drawn. It does not, by itself, produce an open/unstroked curve.
 #'
 #' @return `NA_character_`.
+#'
+#' @examples
+#' draw(shape_circle(fill = fill_none(), linewidth = 2))
 #'
 #' @family fill helpers
 #' @export
@@ -124,6 +131,9 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @examples
+#' draw(shape_circle(fill = fill_hatch(angle = 30, spacing = 0.15)))
+#'
 #' @family fill helpers
 #' @export
 fill_hatch <- function(color = "black",
@@ -202,6 +212,9 @@ fill_hatch <- function(color = "black",
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @examples
+#' draw(shape_circle(fill = fill_crosshatch(angle = 30)))
 #'
 #' @family fill helpers
 #' @export
@@ -285,6 +298,9 @@ fill_crosshatch <- function(color = "black",
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @examples
+#' draw(shape_circle(fill = fill_checker(color1 = "black", color2 = "white")))
+#'
 #' @family fill helpers
 #' @export
 fill_checker <- function(color1 = "black",
@@ -364,6 +380,9 @@ fill_checker <- function(color1 = "black",
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @examples
+#' draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
 #'
 #' @family fill helpers
 #' @export
@@ -486,6 +505,11 @@ fill_stipple <- function(color = "black",
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @examples
+#' draw(shape_circle(
+#'   fill = fill_scatter(unit = shape_circle(radius = 1), n = 8L, size = 0.15)
+#' ))
+#'
 #' @family fill helpers
 #' @export
 fill_scatter <- function(unit = shape_circle(radius = 1),
@@ -581,6 +605,9 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @examples
+#' draw(shape_circle(fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)))
 #'
 #' @family fill helpers
 #' @export
@@ -741,6 +768,9 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @examples
+#' draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
 #'
 #' @family fill helpers
 #' @export
@@ -914,6 +944,9 @@ torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @examples
+#' draw(shape_circle(fill = fill_noise(seed = 8843L)))
+#'
 #' @family fill helpers
 #' @export
 fill_noise <- function(color = "black",
@@ -1008,6 +1041,9 @@ fill_noise <- function(color = "black",
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @examples
+#' draw(shape_circle(fill = fill_marble(stripes = 4L, seed = 1274L)))
 #'
 #' @family fill helpers
 #' @export
@@ -1120,6 +1156,9 @@ fill_marble <- function(color1 = "white",
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @examples
+#' draw(shape_circle(fill = fill_flow(warp = 3, seed = 9350L)))
 #'
 #' @family fill helpers
 #' @export
@@ -1240,6 +1279,10 @@ fill_flow <- function(color = "black",
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @examples
+#' img <- matrix(c("red", "white", "white", "blue"), nrow = 2)
+#' draw(shape_circle(fill = fill_image(img, preserve_aspect = FALSE)))
+#'
 #' @family fill helpers
 #' @export
 fill_image <- function(image,
@@ -1346,6 +1389,10 @@ fill_image <- function(image,
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @examples
+#' draw(shape_circle(fill = fill_gradient(c("white", "steelblue"))))
+#' draw(shape_circle(fill = fill_gradient(c("yellow", "red"), type = "radial")))
+#'
 #' @family fill helpers
 #' @export
 fill_gradient <- function(colors = c("white", "black"),
@@ -1438,6 +1485,9 @@ fill_gradient <- function(colors = c("white", "black"),
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
 #'
+#' @examples
+#' draw(shape_circle(fill = fill_vignette(color = "black")))
+#'
 #' @family fill helpers
 #' @export
 fill_vignette <- function(color = "black",
@@ -1520,6 +1570,9 @@ fill_vignette <- function(color = "black",
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
 #'   use as the `fill` argument to [grid::gpar()].
+#'
+#' @examples
+#' draw(shape_circle(fill = fill_stripe(angle = 30)))
 #'
 #' @family fill helpers
 #' @export

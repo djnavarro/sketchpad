@@ -79,6 +79,10 @@ with higher \code{resolution}), not a flaw in the noise field itself, and is
 far subtler than the tile-edge mismatch \code{\link[=fill_hatch]{fill_hatch()}} has to actively
 avoid.
 }
+\examples{
+draw(shape_circle(fill = fill_noise(seed = 8843L)))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

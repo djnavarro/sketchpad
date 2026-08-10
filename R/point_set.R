@@ -10,6 +10,9 @@
 #' @param x Numeric vector of x coordinates.
 #' @param y Numeric vector of y coordinates.
 #'
+#' @examples
+#' point_set(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))
+#'
 #' @family core structure
 #' @export
 point_set <- S7::new_class(

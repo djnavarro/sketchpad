@@ -59,6 +59,10 @@ here; true \code{\link[grid:as.mask]{grid::as.mask()}} luminance masks were foun
 all in this nested tile context (silently ignored, regardless of
 explicitness), so \code{fill_vignette()} only offers the alpha variant.
 }
+\examples{
+draw(shape_circle(fill = fill_vignette(color = "black")))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

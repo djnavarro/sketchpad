@@ -19,6 +19,10 @@ exception, where the user supplies \code{x}/\code{y} directly. Named \code{point
 rather than \code{points} so this exported constructor doesn't mask
 \code{graphics::points()}.
 }
+\examples{
+point_set(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))
+
+}
 \seealso{
 Other core structure:
 \code{\link[=draw]{draw()}},

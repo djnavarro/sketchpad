@@ -44,6 +44,10 @@ Default \code{2L}.}
 Brownian bridge rather than a straight line, giving the polygon a
 wandering, twisted appearance.
 }
+\examples{
+draw(shape_twist(x = 0, y = 0, xend = 1, yend = 0, width = 0.2, seed = 7734L))
+
+}
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},

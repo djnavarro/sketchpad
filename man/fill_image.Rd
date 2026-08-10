@@ -67,6 +67,11 @@ to fit, leaving the tile's remaining margin transparent. Set
 \code{preserve_aspect = FALSE} to stretch the image to fill the tile exactly
 instead, matching \code{\link[=fill_noise]{fill_noise()}}'s own (always-stretched) behaviour.
 }
+\examples{
+img <- matrix(c("red", "white", "white", "blue"), nrow = 2)
+draw(shape_circle(fill = fill_image(img, preserve_aspect = FALSE)))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

@@ -94,6 +94,12 @@ default, was never observed to have the problem; only real
 repetition, \code{spacing < 1}, was.)
 }
 }
+\examples{
+draw(shape_circle(
+  fill = fill_scatter(unit = shape_circle(radius = 1), n = 8L, size = 0.15)
+))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

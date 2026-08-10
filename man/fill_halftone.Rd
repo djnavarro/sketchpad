@@ -61,6 +61,10 @@ bounding box. Dot centres are kept at least \code{max(radius)} from each
 tile edge, so even the largest possible dot isn't clipped away near a
 boundary.
 }
+\examples{
+draw(shape_circle(fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

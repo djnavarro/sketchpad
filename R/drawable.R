@@ -21,6 +21,10 @@
 #'   each `shape_*()`/`curve_*()`/`points_raw()` constructor fixes one
 #'   value internally instead (see details).
 #'
+#' @examples
+#' circ <- shape_circle(radius = 1)
+#' S7::S7_inherits(circ, drawable)
+#'
 #' @family core structure
 #' @export
 drawable <- S7::new_class(

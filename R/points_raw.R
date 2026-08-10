@@ -18,6 +18,13 @@
 #' @param y Numeric vector of y coordinates.
 #' @param ... Arguments passed to [style()].
 #'
+#' @examples
+#' draw(points_raw(
+#'   x = seq(0, 1, length.out = 20),
+#'   y = sin(seq(0, 2 * pi, length.out = 20)) / 2 + 0.5,
+#'   color = "steelblue"
+#' ))
+#'
 #' @family 0D points
 #' @export
 points_raw <- S7::new_class(

@@ -68,6 +68,10 @@ bottom-to-top instead.
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
 }
+\examples{
+draw(curve_scribble(width = 2, height = 0.5, seed = 5591L))
+
+}
 \seealso{
 Other 1D curves:
 \code{\link[=curve_bezier]{curve_bezier()}},

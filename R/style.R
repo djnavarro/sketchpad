@@ -58,6 +58,10 @@ fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern")
 #'   error, is this package's existing convention for style properties
 #'   that don't universally apply.
 #'
+#' @examples
+#' style(color = "steelblue", fill = "lightblue", linewidth = 2)
+#' style(fill = fill_hatch(angle = 30))
+#'
 #' @family core structure
 #' @export
 style <- S7::new_class(

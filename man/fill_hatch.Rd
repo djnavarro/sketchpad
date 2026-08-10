@@ -61,6 +61,10 @@ desired angle is instead achieved entirely by choosing the tile's
 a special case, since a straight (non-diagonal) line tiles seamlessly at
 any tile aspect ratio.
 }
+\examples{
+draw(shape_circle(fill = fill_hatch(angle = 30, spacing = 0.15)))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

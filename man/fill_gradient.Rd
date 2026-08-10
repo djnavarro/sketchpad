@@ -68,6 +68,11 @@ giving a single smooth gradient across the whole shape -- the overshoot
 is invisibly clipped away by the target's own outline. Set \code{spacing < 1}
 for a repeating pattern of small gradient motifs instead.
 }
+\examples{
+draw(shape_circle(fill = fill_gradient(c("white", "steelblue"))))
+draw(shape_circle(fill = fill_gradient(c("yellow", "red"), type = "radial")))
+
+}
 \seealso{
 Other fill helpers:
 \code{\link[=fill_checker]{fill_checker()}},

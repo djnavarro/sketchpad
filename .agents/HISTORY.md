@@ -1065,3 +1065,55 @@ passed (13 new, in `tests/testthat/test-drawable.R` alongside the
 existing `shape_raw` convert test) -- correct target class/geometry for
 each, points/style preserved exactly, and conversion working regardless
 of `from`'s own starting geometry.
+
+## Adding runnable `@examples` across the `drawable`/`fill_*()` family
+
+Closed the `.agents/PLAN.md` "Runnable `@examples`" item: every exported
+function that gets its own `.Rd` page (every `drawable` subclass, the
+core structure classes/generics, and all sixteen `fill_*()` helpers --
+34 exports in total) previously had either no `@examples` block at all
+or, in `sketch()`'s single existing case, one wrapped in `\dontrun{}`.
+Added one runnable example per export instead.
+
+**Chose genuinely runnable examples over `\dontrun{}`, including for
+the pre-existing `sketch()` example.** `\dontrun{}` was the only
+established precedent in the package, presumably out of caution around
+`draw()` opening a graphics device, but that caution turned out to be
+unfounded: `R CMD check`'s example-running already provides a device
+(a recording one, not an interactive window), so calls to
+`grid::grid.newpage()`/`grid::grid.draw()` inside `draw()` run cleanly
+with no window ever appearing. Verified every new example actually
+executes with `devtools::run_examples(run_dontrun = TRUE, run_donttest
+= TRUE)` against the freshly `devtools::document()`-ed package, not
+just visual inspection of the roxygen source.
+
+**Every example that needs a seed uses an explicit `L`-suffixed
+integer** (e.g. `seed = 4821L`), not a bare double -- every `seed`
+property across the package is typed `S7::class_integer`, so
+`shape_blob(seed = 4821)` (no `L`) fails construction with `@seed must
+be <integer>, not <double>`, caught by actually running the drafted
+examples before committing them rather than assuming the bare-number
+form would coerce.
+
+**Kept each example minimal and self-contained** -- one or two calls
+per function, usually `draw(shape_*(...))`/`draw(shape_circle(fill =
+fill_*(...)))`, rather than a full multi-shape sketch for every single
+helper (that broader composition is already what `sketch()`'s own
+example and `README.Rmd` demonstrate). `fill_image()`'s example builds
+a trivial 2x2 in-memory colour matrix rather than reading a real image
+file, since the function itself deliberately has no image-file I/O
+dependency (see its own docs) and an example shouldn't introduce one
+either. `fill_stipple()`'s and `fill_halftone()`'s examples exercise
+the documented "Known rendering risk with multiple dots" code path
+(multi-circle pattern tiles) on purpose, since avoiding it would leave
+exactly the functions with a known caveat undocumented by example; both
+ran without erroring in this session, consistent with the existing
+docs framing the risk as a rendering-fidelity concern, not a hard
+failure.
+
+`devtools::document()` (run twice, per the established "could not
+resolve link" gotcha -- unneeded here since no new cross-references
+were introduced, but run anyway for safety) regenerated all 34 affected
+`.Rd` files with no warnings, and `devtools::run_examples()` confirmed
+every one of the resulting 35 example blocks (34 new plus `sketch()`'s
+updated one) executes end to end with no errors.

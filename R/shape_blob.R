@@ -15,6 +15,9 @@
 #' @param seed Integer seed for the noise field. Default `1L`.
 #' @param ... Arguments passed to [style()].
 #'
+#' @examples
+#' draw(shape_blob(radius = 1, range = 0.3, seed = 4821L))
+#'
 #' @family 2D shapes
 #' @export
 shape_blob <- S7::new_class(

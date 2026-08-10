@@ -19,6 +19,11 @@ shape_circle(x = 0, y = 0, radius = 1, n = 100L, ...)
 \code{shape_circle} is a \link{drawable} defined by a centroid and a radius; its
 vertices are computed as evenly spaced points around the circumference.
 }
+\examples{
+draw(shape_circle(radius = 1))
+draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6L, color = "darkred"))
+
+}
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},

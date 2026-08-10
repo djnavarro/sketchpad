@@ -40,6 +40,10 @@ Default \code{2L}.}
 between \verb{(x, y)} and \verb{(xend, yend)}, with a width that tapers at both
 ends and varies along its length according to simplex noise.
 }
+\examples{
+draw(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1, width = 0.3))
+
+}
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
