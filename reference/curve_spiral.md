@@ -65,3 +65,10 @@ Other 1D curves:
 [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
 [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
 [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md)
+
+## Examples
+
+``` r
+draw(curve_spiral(radius_start = 0, radius_end = 1, turns = 4))
+
+```

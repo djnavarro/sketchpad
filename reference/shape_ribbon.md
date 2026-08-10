@@ -67,3 +67,10 @@ Other 2D shapes:
 [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+
+## Examples
+
+``` r
+draw(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1, width = 0.3))
+
+```

@@ -39,3 +39,12 @@ Other 2D shapes:
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+
+## Examples
+
+``` r
+draw(shape_circle(radius = 1))
+
+draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6L, color = "darkred"))
+
+```

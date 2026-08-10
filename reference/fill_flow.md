@@ -147,3 +147,10 @@ Other fill helpers:
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md),
 [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
+
+## Examples
+
+``` r
+draw(shape_circle(fill = fill_flow(warp = 3, seed = 9350L)))
+
+```

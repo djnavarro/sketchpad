@@ -123,3 +123,10 @@ Other fill helpers:
 [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md),
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md),
 [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
+
+## Examples
+
+``` r
+draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
+
+```

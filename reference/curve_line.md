@@ -44,3 +44,10 @@ Other 1D curves:
 [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
 [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md),
 [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md)
+
+## Examples
+
+``` r
+draw(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)))
+
+```

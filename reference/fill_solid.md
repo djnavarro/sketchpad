@@ -46,3 +46,12 @@ Other fill helpers:
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md),
 [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
+
+## Examples
+
+``` r
+fill_solid("steelblue")
+#> [1] "steelblue"
+draw(shape_circle(fill = fill_solid("tomato")))
+
+```

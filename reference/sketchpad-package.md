@@ -1,8 +1,7 @@
 # sketchpad: A Minimal Drawing System For Generative Art
 
-A lightweight, p5.js-inspired drawing system built on S7 classes and
-grid graphics, used as the shared foundation for the author's generative
-art sketches.
+A lightweight drawing system built on S7 classes and grid graphics that
+can be used for generative art.
 
 ## See also
 

@@ -40,3 +40,10 @@ Other 2D shapes:
 [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+
+## Examples
+
+``` r
+draw(shape_raw(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1)))
+
+```

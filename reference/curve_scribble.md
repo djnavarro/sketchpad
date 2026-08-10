@@ -99,3 +99,10 @@ Other 1D curves:
 [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
 [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
 [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md)
+
+## Examples
+
+``` r
+draw(curve_scribble(width = 2, height = 0.5, seed = 5591L))
+
+```

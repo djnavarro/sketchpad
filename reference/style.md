@@ -133,3 +133,44 @@ Other core structure:
 [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
 [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md)
+
+## Examples
+
+``` r
+style(color = "steelblue", fill = "lightblue", linewidth = 2)
+#> <sketchpad::style>
+#>  @ color      : chr "steelblue"
+#>  @ fill       : chr "lightblue"
+#>  @ linewidth  : num 2
+#>  @ linetype   : chr "solid"
+#>  @ linejoin   : chr "round"
+#>  @ lineend    : chr "round"
+#>  @ linemitre  : num 10
+#>  @ color_alpha: num 1
+#>  @ fill_alpha : num 1
+style(fill = fill_hatch(angle = 30))
+#> <sketchpad::style>
+#>  @ color      : chr "black"
+#>  @ fill       :List of 9
+#>  .. $ f     :function ()  
+#>  .. $ x     : 'simpleUnit' num 0.5npc
+#>  ..  ..- attr(*, "unit")= int 0
+#>  .. $ y     : 'simpleUnit' num 0.5npc
+#>  ..  ..- attr(*, "unit")= int 0
+#>  .. $ width : 'simpleUnit' num 0.0866npc
+#>  ..  ..- attr(*, "unit")= int 0
+#>  .. $ height: 'simpleUnit' num 0.05npc
+#>  ..  ..- attr(*, "unit")= int 0
+#>  .. $ hjust : num 0.5
+#>  .. $ vjust : num 0.5
+#>  .. $ extend: chr "repeat"
+#>  .. $ group : logi TRUE
+#>  .. - attr(*, "class")= chr [1:2] "GridTilingPattern" "GridPattern"
+#>  @ linewidth  : num 1
+#>  @ linetype   : chr "solid"
+#>  @ linejoin   : chr "round"
+#>  @ lineend    : chr "round"
+#>  @ linemitre  : num 10
+#>  @ color_alpha: num 1
+#>  @ fill_alpha : num 1
+```

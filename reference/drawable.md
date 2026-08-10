@@ -58,3 +58,11 @@ Other core structure:
 [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md)
+
+## Examples
+
+``` r
+circ <- shape_circle(radius = 1)
+S7::S7_inherits(circ, drawable)
+#> [1] TRUE
+```

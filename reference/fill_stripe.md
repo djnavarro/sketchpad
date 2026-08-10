@@ -103,3 +103,10 @@ Other fill helpers:
 [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md),
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
 [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
+
+## Examples
+
+``` r
+draw(shape_circle(fill = fill_stripe(angle = 30)))
+
+```

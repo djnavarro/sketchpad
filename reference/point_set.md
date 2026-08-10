@@ -33,3 +33,12 @@ Other core structure:
 [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md)
+
+## Examples
+
+``` r
+point_set(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))
+#> <sketchpad::point_set>
+#>  @ x: num [1:4] 0 1 1 0
+#>  @ y: num [1:4] 0 0 1 1
+```

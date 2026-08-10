@@ -82,3 +82,10 @@ Other 2D shapes:
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+
+## Examples
+
+``` r
+draw(shape_bezier_ribbon(x = 0, y = 0, xend = 1, yend = 0, width = 0.2))
+
+```

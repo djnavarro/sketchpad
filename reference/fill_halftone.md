@@ -107,3 +107,10 @@ Other fill helpers:
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md),
 [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
+
+## Examples
+
+``` r
+draw(shape_circle(fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)))
+
+```

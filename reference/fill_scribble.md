@@ -151,3 +151,10 @@ Other fill helpers:
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md),
 [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
+
+## Examples
+
+``` r
+draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
+
+```

@@ -31,3 +31,14 @@ Other core structure:
 [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md)
+
+## Examples
+
+``` r
+draw(shape_circle(radius = 1))
+
+
+s <- sketch() + shape_circle(radius = 1) + shape_blob(x = 2, radius = 0.5)
+draw(s)
+
+```

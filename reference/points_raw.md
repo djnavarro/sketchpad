@@ -39,3 +39,14 @@ points_raw(x, y, ...)
 `geometry` documentation and `geometry_grob()`'s internal dispatch
 (`R/draw.R`) for why a `"points"` geometry has no line to stroke and no
 interior to fill. Only `style@color` is used, as the marker colour.
+
+## Examples
+
+``` r
+draw(points_raw(
+  x = seq(0, 1, length.out = 20),
+  y = sin(seq(0, 2 * pi, length.out = 20)) / 2 + 0.5,
+  color = "steelblue"
+))
+
+```

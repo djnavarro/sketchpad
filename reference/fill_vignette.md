@@ -100,3 +100,10 @@ Other fill helpers:
 [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md),
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md)
+
+## Examples
+
+``` r
+draw(shape_circle(fill = fill_vignette(color = "black")))
+
+```
