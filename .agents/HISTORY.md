@@ -956,3 +956,50 @@ passed (23 new, across `tests/testthat/test-style.R` and
 out-of-range/non-scalar rejection, `apply_alpha()`'s no-op/alpha-baking/
 multiply-through behavior, and `draw()` not erroring on either a solid
 or pattern fill combined with the new properties.
+
+## Adding dedicated tests for `shape_circle`/`shape_blob`/`shape_ribbon`/`shape_twist`
+
+These four `drawable` subclasses previously had no tests of their own
+(test coverage was concentrated on `shape_bezier` plus `sketch`-level
+concerns) -- added one file each
+(`tests/testthat/test-circle.R`/`test-blob.R`/`test-ribbon.R`/
+`test-twist.R`), following the pattern already established by
+`test-bezier.R`/`test-bezier-ribbon.R`: geometry correctness via a
+degenerate-parameter collapse (radius/width set to a value that makes
+the computed `points` reduce to something exactly checkable), seed
+reproducibility, and scalar-argument validation.
+
+**Degenerate cases used to pin down geometry, one per shape:**
+
+- `shape_circle`: `radius = 0` collapses every point onto the centroid;
+  separately, every point at a positive radius is confirmed to lie at
+  exactly that Euclidean distance from the centroid (not merely "looks
+  circular"), and the outline is confirmed to close exactly (first point
+  equals last, since `seq(0, 2 * pi, length.out = n)` includes both
+  endpoints).
+- `shape_blob`: `range = 0` collapses every point onto a circle at the
+  mean `radius` -- confirmed via the same Euclidean-distance check as
+  `shape_circle`, verifying `ambient::normalize()`'s degenerate
+  zero-width target range behaves as expected (maps every input to the
+  single target value, not `NaN`) rather than just asserting on
+  appearance.
+- `shape_ribbon`/`shape_twist`: `width = 0` collapses the outline onto
+  the forward-then-reversed backbone (mirroring the check already used
+  for `shape_bezier_ribbon`). For `shape_twist` specifically, `width`
+  also scales the Brownian-bridge *displacement itself*
+  (`smooth_bridge(..., scale = 0.1 * self@width, ...)`), so `width = 0`
+  collapses `path` to the exact straight line regardless of `smooth`
+  or `seed` -- confirmed directly, then used as the base case for the
+  outline-collapse check exactly as with `shape_ribbon`.
+
+**Noticed but not fixed:** `shape_twist`'s validator checks
+`x`/`y`/`xend`/`yend`/`width`/`n`/`frequency`/`octaves`/`seed`, but never
+validates `smooth` at all (no length-1 check, no non-negativity check,
+despite `smooth` counting down in a `for (i in 1:smooth)` loop that
+would behave oddly for a negative or non-integer value). Not addressed
+here, since fixing it was out of scope for a test-coverage pass -- flagged
+for a future fix rather than silently left undocumented.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 486 tests
+passed (67 new: 13 for `shape_circle`, 18 for `shape_blob`, 17 for
+`shape_ribbon`, 19 for `shape_twist`).

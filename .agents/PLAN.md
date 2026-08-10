@@ -182,14 +182,15 @@ CSV palettes. sketchpad could depend on or bundle from it rather than
 every series/example inlining its own palette vector (as all four
 `README.Rmd` examples currently do).
 
-### Broader test coverage and runnable examples
+### Runnable `@examples`
 
-Test coverage is currently concentrated on `shape_bezier` plus a few
-`sketch`-level tests (`+`, validation, `convert()`); `shape_circle`/
-`shape_blob`/`shape_ribbon`/`shape_twist` have no dedicated tests. Most
-`@examples` blocks are
-`\dontrun{}` or absent entirely; per-drawable runnable examples would
-both document and exercise the geometry.
+`shape_circle`/`shape_blob`/`shape_ribbon`/`shape_twist` now have
+dedicated tests (see `.agents/HISTORY.md`), alongside the rest of the
+`drawable` family. What's still open: most `@examples` blocks across the
+package are `\dontrun{}` or absent entirely; per-drawable runnable
+examples would both document and exercise the geometry directly from
+`.Rd` pages (`R CMD check`'s own example-running, not just
+`tests/testthat/`).
 
 ### Explicitly flagged as possibly out of scope
 
