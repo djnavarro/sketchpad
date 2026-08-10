@@ -15,7 +15,9 @@ style(
   linetype = "solid",
   linejoin = "round",
   lineend = "round",
-  linemitre = 10
+  linemitre = 10,
+  color_alpha = 1,
+  fill_alpha = 1
 )
 ```
 
@@ -85,6 +87,44 @@ style(
   avoid an arbitrarily long spike. Must be at least `1`. Default `10`,
   matching [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)'s own
   default.
+
+- color_alpha:
+
+  Stroke opacity, applied to `color` independently of `fill_alpha`. Must
+  be a number in `[0, 1]`, where `0` is fully transparent and `1` (the
+  default) is fully opaque. Applied by baking the value into `color` via
+  [`grDevices::adjustcolor()`](https://rdrr.io/r/grDevices/adjustcolor.html)
+  at draw time (see
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)'s
+  internal `apply_alpha()` helper), not via
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)'s own `alpha`
+  argument – `gpar()`'s `alpha` applies uniformly to both stroke and
+  fill on the same grob, which would couple `color_alpha` and
+  `fill_alpha` together. If `color` already has its own alpha channel
+  (e.g. an `"#RRGGBBAA"` hex string), `color_alpha` multiplies through
+  it rather than overriding it.
+
+- fill_alpha:
+
+  Fill opacity, applied to `fill` independently of `color_alpha`, via
+  the same
+  [`grDevices::adjustcolor()`](https://rdrr.io/r/grDevices/adjustcolor.html)
+  mechanism as `color_alpha`. Must be a number in `[0, 1]`. Default `1`.
+  Only has an effect when `fill` is a plain colour string (as from
+  [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
+  or
+  [`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md))
+  – **silently inert when `fill` is a pattern or gradient** (the output
+  of any other `fill_*()` helper), since
+  [`grDevices::adjustcolor()`](https://rdrr.io/r/grDevices/adjustcolor.html)
+  has no defined effect on a `GridPattern` object. This mirrors `fill`
+  itself already having no effect for `"path"`/`"points"`-geometry
+  drawables (see
+  [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)'s
+  `geometry` docs), and `lineend`/`linemitre` already being inert for
+  some geometries – geometry- or fill-type-conditional inertness, not an
+  error, is this package's existing convention for style properties that
+  don't universally apply.
 
 ## See also
 

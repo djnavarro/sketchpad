@@ -23,8 +23,8 @@ how the API got here, see
 ### Class hierarchy
 
 - **`style`** – container for `color`/`fill`/`linewidth`/`linetype`/
-  `linejoin`/`lineend`/`linemitre`, forwarded to
-  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html). `fill` accepts
+  `linejoin`/`lineend`/`linemitre`/`color_alpha`/`fill_alpha`, forwarded
+  to [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html). `fill` accepts
   either a plain colour string or the output of a `fill_*()` helper (see
   “The `fill_*()` texture family” below); default is
   `fill_solid("black")` (i.e. `"black"`). `linetype` (default `"solid"`,
@@ -32,13 +32,31 @@ how the API got here, see
   anything [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s `lty`
   does (named types, integer codes, or a custom hex dash string), left
   to `grid` at draw time. `linejoin` (default `"round"`) is validated as
-  one of `"round"`/`"mitre"`/ `"bevel"`; `lineend` (default `"round"`)
-  as one of `"round"`/`"butt"`/ `"square"`; `linemitre` (default `10`,
+  one of `"round"`/`"mitre"`/`"bevel"`; `lineend` (default `"round"`) as
+  one of `"round"`/`"butt"`/`"square"`; `linemitre` (default `10`,
   matching [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s own
   default) must be at least `1`. `lineend` only has a visible effect on
   `"path"`-geometry drawables (free endpoints); `linemitre` only takes
   effect when `linejoin = "mitre"`, truncating a corner sharper than the
-  limit allows into a bevel instead.
+  limit allows into a bevel instead. `color_alpha`/`fill_alpha` (both
+  default `1`) control stroke/fill opacity independently, each validated
+  to `[0, 1]`; rather than
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s own `alpha`
+  (which would couple both together on one grob), each is baked into its
+  respective colour string via
+  [`grDevices::adjustcolor()`](https://rdrr.io/r/grDevices/adjustcolor.html)
+  in [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)’s
+  internal `apply_alpha()` helper (`R/draw.R`) – a no-op at
+  `alpha == 1`, multiplying through any alpha already present in the
+  colour string otherwise. `fill_alpha` is silently inert whenever
+  `fill` is a `GridPattern` rather than a plain colour string
+  (i.e. built by any `fill_*()` helper except
+  [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)/[`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md)),
+  since [`adjustcolor()`](https://rdrr.io/r/grDevices/adjustcolor.html)
+  has no defined effect on one – matching this package’s existing
+  convention of silent, documented inertness for style properties that
+  don’t universally apply (e.g. `fill` itself already has no effect for
+  `"path"`/`"points"`-geometry drawables).
 - **`point_set`** – a polygon’s vertices (`x`/`y` numeric vectors, equal
   length). Named `point_set` rather than `points` so the exported
   constructor doesn’t mask
