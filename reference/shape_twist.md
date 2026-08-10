@@ -39,7 +39,8 @@ shape_twist(
 
 - smooth:
 
-  Number of smoothing passes applied to the path. Default `3L`.
+  Number of smoothing passes applied to the path. Must be non-negative.
+  Default `3L`.
 
 - n:
 
