@@ -22,6 +22,8 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
 
 - [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
   : A closed Bezier curve
+- [`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md)
+  : A ribbon following a Bezier curve
 - [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
   : An irregular, "blobby" circle
 - [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)

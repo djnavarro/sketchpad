@@ -1,19 +1,26 @@
-# A tapered ribbon between two points
+# A ribbon following a Bezier curve
 
-`shape_ribbon` is a
-[drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
-polygon that follows a straight line between `(x, y)` and
-`(xend, yend)`, with a width that tapers at both ends and varies along
-its length according to simplex noise.
+`shape_bezier_ribbon` is like
+[shape_ribbon](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
+but its backbone follows a cubic Bezier curve through `(x, y)`, two
+control points, and `(xend, yend)`, rather than a straight line – giving
+the ribbon a curved rather than straight path. As with
+[shape_ribbon](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
+the ribbon's width tapers to zero at both ends and varies along its
+length according to simplex noise.
 
 ## Usage
 
 ``` r
-shape_ribbon(
+shape_bezier_ribbon(
   x = 0,
   y = 0,
   xend = 1,
   yend = 1,
+  x_ctrl1 = 0.5,
+  y_ctrl1 = 0.5,
+  x_ctrl2 = 0,
+  y_ctrl2 = 0,
   width = 0.2,
   n = 100L,
   frequency = 1,
@@ -32,6 +39,14 @@ shape_ribbon(
 - xend, yend:
 
   End point. Default `1`.
+
+- x_ctrl1, y_ctrl1:
+
+  First Bezier control point. Default `0.5`.
+
+- x_ctrl2, y_ctrl2:
+
+  Second Bezier control point. Default `0`.
 
 - width:
 
@@ -62,8 +77,8 @@ shape_ribbon(
 
 Other 2D shapes:
 [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
-[`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md),
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
 [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)

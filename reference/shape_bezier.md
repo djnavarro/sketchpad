@@ -37,6 +37,7 @@ shape_bezier(x, y, n = 100L, ...)
 ## See also
 
 Other 2D shapes:
+[`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md),
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
 [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),

@@ -66,6 +66,7 @@ shape_twist(
 
 Other 2D shapes:
 [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
+[`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md),
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
 [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
