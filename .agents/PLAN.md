@@ -96,21 +96,6 @@ is currently radius-only, with no independent x/y radii), and `arc`/`wedge`
 also on this list -- both are now covered by `curve_line()`/
 `curve_spiral()`; see `.agents/HISTORY.md`.)
 
-### `convert()` targets for `"path"`/`"points"`-geometry drawables
-
-`convert(drawable, shape_raw)` always "freezes" a drawable's points into
-a `"polygon"`-geometry `shape_raw`, regardless of the source drawable's
-own `geometry` -- converting a `curve_bezier()` or `curve_scribble()`
-this way silently changes it from an open stroke to a closed, filled
-outline. `curve_raw()`/`points_raw()` (see `.agents/HISTORY.md`) now
-exist as the natural `"path"`/`"points"`-geometry targets, but no
-`method(convert, list(drawable, curve_raw))` or
-`method(convert, list(drawable, points_raw))` has been added yet -- not
-picked up as part of adding the two new raw constructors, since it was
-out of scope for that piece of work. Revisit if a real sketch needs to
-freeze a `"path"`/`"points"`-geometry drawable without its geometry
-silently changing.
-
 ### Multiple sub-paths and holes per drawable
 
 Every `drawable` currently renders as exactly one `grid::polygonGrob()`

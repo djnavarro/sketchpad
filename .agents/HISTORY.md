@@ -1020,3 +1020,48 @@ other such parameter's docs in the package.
 
 `R CMD check` confirmed 0 errors/warnings/notes, and all 489 tests
 passed (3 new).
+
+## Adding `convert()` targets for `curve_raw`/`points_raw`
+
+`method(convert, list(drawable, shape_raw))` always freezes a drawable's
+points into a `"polygon"`-geometry `shape_raw`, regardless of the source
+drawable's own `geometry` -- silently closing/filling an open
+`"path"`-geometry drawable (e.g. `curve_bezier()`/`curve_scribble()`) or
+flattening a `"points"`-geometry one into a filled outline. Added two
+more `convert()` methods, `method(convert, list(drawable, curve_raw))`
+and `method(convert, list(drawable, points_raw))`, so a drawable can be
+frozen into its `"path"`/`"points"`-geometry analog directly instead,
+closing out the `.agents/PLAN.md` item left open when `curve_raw()`/
+`points_raw()` were first added.
+
+Both are near-identical to the existing `shape_raw` method (extract
+`from@points`, build the target constructor from it, then copy over
+`from@style`) -- differing only in which raw constructor they call.
+Deliberately **not** merged into one shared internal helper: three
+near-identical five-line method bodies were judged clearer than a
+helper parameterized by which of three constructors to call, especially
+since S7's `method<-` assignment (not a plain function call) is the
+outer shape each one needs regardless.
+
+**Dispatch is on `from`'s class only, `to`'s value is unconstrained.**
+Like the existing `shape_raw` method, these don't require `from` to
+already have the target geometry -- converting a `"polygon"`-geometry
+`shape_circle()` to `curve_raw`/`points_raw()` works exactly the same
+way as converting an already-`"path"`-geometry `curve_bezier()`, since
+all three methods only ever read `from@points` (the *computed* outline,
+already flattened to plain coordinates regardless of source geometry)
+and never inspect `from@geometry` itself. This is intentional -- it's
+what lets any drawable be frozen into any of the three geometries on
+request, not just its own.
+
+Visual check: converting a `shape_blob()` to `curve_raw` and drawing it
+rendered the same wobbly outline as an open, unfilled stroke -- visibly
+missing the closing edge between its last and first points, confirming
+the geometry actually changed rather than just relabeling the same
+closed shape.
+
+`R CMD check` confirmed 0 errors/warnings/notes, and all 502 tests
+passed (13 new, in `tests/testthat/test-drawable.R` alongside the
+existing `shape_raw` convert test) -- correct target class/geometry for
+each, points/style preserved exactly, and conversion working regardless
+of `from`'s own starting geometry.
