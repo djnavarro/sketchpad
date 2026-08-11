@@ -43,7 +43,8 @@ Other 1D curves:
 [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md),
 [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
 [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md),
-[`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md)
+[`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md),
+[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
 
 ## Examples
 

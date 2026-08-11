@@ -14,11 +14,9 @@ shape_twist(
   xend = 1,
   yend = 1,
   width = 0.2,
-  smooth = 3L,
   n = 100L,
-  frequency = 1,
-  octaves = 2L,
-  seed = 1L,
+  path_distortion = noise_bridge(),
+  distortion = noise_field(),
   ...
 )
 ```
@@ -37,26 +35,23 @@ shape_twist(
 
   Maximum width. Must be non-negative. Default `0.2`.
 
-- smooth:
-
-  Number of smoothing passes applied to the path. Must be non-negative.
-  Default `3L`.
-
 - n:
 
   Number of points used along the path. Default `100L`.
 
-- frequency:
+- path_distortion:
 
-  Noise frequency. Must be non-negative. Default `1`.
+  A
+  [noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md)
+  controlling the path's Brownian bridge. Default
+  [`noise_bridge()`](https://sketchpad.djnavarro.net/reference/noise_bridge.md).
 
-- octaves:
+- distortion:
 
-  Number of noise octaves. Must be a positive integer. Default `2L`.
-
-- seed:
-
-  Integer seed for the noise field and path. Default `1L`.
+  A
+  [noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
+  controlling the width modulation. Default
+  [`noise_field()`](https://sketchpad.djnavarro.net/reference/noise_field.md).
 
 - ...:
 
@@ -76,6 +71,9 @@ Other 2D shapes:
 ## Examples
 
 ``` r
-draw(shape_twist(x = 0, y = 0, xend = 1, yend = 0, width = 0.2, seed = 7734L))
+draw(shape_twist(
+  x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
+  path_distortion = noise_bridge(seed = 7734L)
+))
 
 ```

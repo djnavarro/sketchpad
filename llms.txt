@@ -179,6 +179,8 @@ Open, stroked `drawable`s (`geometry = "path"`).
   : A wandering scribble curve
 - [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md)
   : An open spiral
+- [`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
+  : An open, wandering path following a random walk
 
 ## 0D points
 
@@ -186,6 +188,18 @@ Unconnected marker `drawable`s (`geometry = "points"`).
 
 - [`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
   : A scatter of points defined directly by their coordinates
+
+## Noise helpers
+
+Scalar noise fields used to distort a shape’s points, used by
+[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)/[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md).
+
+- [`noise_field()`](https://sketchpad.djnavarro.net/reference/noise_field.md)
+  : A sampled scalar noise field
+- [`noise_bridge()`](https://sketchpad.djnavarro.net/reference/noise_bridge.md)
+  : A smoothed Brownian bridge, as a path distortion
+- [`noise_sample()`](https://sketchpad.djnavarro.net/reference/noise_sample.md)
+  : Sample a noise object
 
 ## Fills
 

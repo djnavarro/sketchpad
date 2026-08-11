@@ -69,9 +69,7 @@ according to simplex noise.</p>
 <span>  y_ctrl2 <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100L</span>,</span>
-<span>  frequency <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  octaves <span class="op">=</span> <span class="fl">2L</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  distortion <span class="op">=</span> <span class="fu"><a href="noise_field.html">noise_field</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -104,17 +102,9 @@ according to simplex noise.</p>
 <dd><p>Number of points used along the path. Default <code>100L</code>.</p></dd>
 
 
-<dt id="arg-frequency">frequency<a class="anchor" aria-label="anchor" href="#arg-frequency"></a></dt>
-<dd><p>Noise frequency. Must be non-negative. Default <code>1</code>.</p></dd>
-
-
-<dt id="arg-octaves">octaves<a class="anchor" aria-label="anchor" href="#arg-octaves"></a></dt>
-<dd><p>Number of noise octaves. Must be a positive integer.
-Default <code>2L</code>.</p></dd>
-
-
-<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>Integer seed for the noise field. Default <code>1L</code>.</p></dd>
+<dt id="arg-distortion">distortion<a class="anchor" aria-label="anchor" href="#arg-distortion"></a></dt>
+<dd><p>A <a href="noise_field.html">noise_field</a> controlling the width modulation.
+Default <code><a href="noise_field.html">noise_field()</a></code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

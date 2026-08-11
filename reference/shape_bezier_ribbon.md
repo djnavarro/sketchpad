@@ -23,9 +23,7 @@ shape_bezier_ribbon(
   y_ctrl2 = 0,
   width = 0.2,
   n = 100L,
-  frequency = 1,
-  octaves = 2L,
-  seed = 1L,
+  distortion = noise_field(),
   ...
 )
 ```
@@ -56,17 +54,12 @@ shape_bezier_ribbon(
 
   Number of points used along the path. Default `100L`.
 
-- frequency:
+- distortion:
 
-  Noise frequency. Must be non-negative. Default `1`.
-
-- octaves:
-
-  Number of noise octaves. Must be a positive integer. Default `2L`.
-
-- seed:
-
-  Integer seed for the noise field. Default `1L`.
+  A
+  [noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
+  controlling the width modulation. Default
+  [`noise_field()`](https://sketchpad.djnavarro.net/reference/noise_field.md).
 
 - ...:
 
