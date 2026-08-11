@@ -15,7 +15,7 @@ test_that("draw() renders a fill_hatch()-filled drawable without error", {
 
 test_that("draw() renders a fill_gradient()-filled drawable without error", {
   local_null_device()
-  expect_no_error(draw(shape_blob(seed = 1L, fill = fill_gradient(type = "radial"))))
+  expect_no_error(draw(shape_blob(distortion = noise_field(seed = 1L), fill = fill_gradient(type = "radial"))))
 })
 
 test_that("draw() renders a sketch mixing solid and pattern fills without error", {

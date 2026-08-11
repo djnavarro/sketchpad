@@ -1117,3 +1117,138 @@ were introduced, but run anyway for safety) regenerated all 34 affected
 `.Rd` files with no warnings, and `devtools::run_examples()` confirmed
 every one of the resulting 35 example blocks (34 new plus `sketch()`'s
 updated one) executes end to end with no errors.
+
+## Factoring noise sampling into a `noise_field` class
+
+`shape_blob()`'s radius perturbation, `shape_ribbon()`/`shape_twist()`'s
+width modulation, and `shape_bezier_ribbon()`'s width modulation all
+independently called `ambient::fracture(noise = ambient::gen_simplex,
+fractal = ambient::fbm, ...) |> ambient::normalize(to = ...)` against
+their own `frequency`/`octaves`/`seed` properties -- the same ~10-line
+block copied four times, with the noise/fractal functions hardcoded
+rather than configurable. Prompted by a question about whether these
+four constructors could be reframed as "a simpler base shape with a
+distortion applied," which they structurally are for this one part of
+each of them.
+
+**What was built.** A standalone `noise_field` S7 class (`R/noise_field.R`,
+no `drawable` parent) bundling `noise`/`fractal` (functions, default
+`ambient::gen_simplex`/`ambient::fbm`) and `frequency`/`octaves`/`seed`,
+plus a `noise_sample(field, x, y, to)` S7 generic wrapping the
+fracture-then-normalize call. Each of the four constructors above now
+takes a `distortion = noise_field()` property instead of bare
+`frequency`/`octaves`/`seed` arguments, and calls `noise_sample()` in
+its `points` getter. `shape_twist()` is the one wrinkle: it keeps its
+own `seed` property, since that seed drives its Brownian-bridge *path*
+(`smooth_bridge()`, unrelated to `ambient`/`noise_field`) -- only its
+*width* modulation moved to `distortion`. Defaults were chosen so
+`noise_field()`'s own defaults exactly reproduce each constructor's old
+`frequency = 1`/`octaves = 2L`/`seed = 1L` defaults, so no shape's
+default appearance changed.
+
+**What was rejected: one `distortion` class covering everything.** The
+original framing considered a single "distortion" abstraction applied
+uniformly across `shape_*()`/`curve_*()`/`points_*()`. This doesn't hold
+up structurally: `noise_field` is a *scalar field sampled at arbitrary
+`(x, y)` positions*, but `shape_twist()`'s path perturbation is a
+*point-count-indexed vector generator* with no spatial position
+involved at all (a Brownian bridge, built from `stats::rnorm()`, not
+`ambient`). Forcing both into one class's interface would mean either an
+awkward union of unrelated argument shapes or a class that's really just
+"pick which noise implementation to use," so the two were kept separate:
+`noise_field` now exists; a parallel `noise_bridge` for the path case is
+deferred (see `.agents/PLAN.md`) until `shape_twist()`'s path generator
+gets a second real consumer (a future `curve_twist()`) to validate the
+interface against, rather than being designed from one call site.
+
+**Breaking change, deliberately not mitigated.** Every caller of
+`shape_blob(frequency = ..., octaves = ..., seed = ...)` (etc.) needed
+updating to `shape_blob(distortion = noise_field(seed = ...))` --
+including every test in `tests/testthat/` that constructed one of these
+four shapes with a non-default noise argument. This package has no
+external consumers yet (see its own intro in `AGENTS.md`); the explicit
+decision was to take the breaking change now, while the cost is limited
+to this repo's own tests, rather than design around backward
+compatibility for hypothetical future callers.
+
+## Adding `noise_bridge` for `shape_twist()`'s path
+
+Once `noise_field` had two real width-noise consumers beyond
+`shape_blob()` (`shape_ribbon()`/`shape_twist()`, plus
+`shape_bezier_ribbon()` shortly after), its interface was considered
+validated enough to build the second, previously-deferred noise class:
+`noise_bridge`, covering `shape_twist()`'s *path* -- the
+`smooth_bridge()`-generated Brownian bridge (`stats::rnorm()`-based, no
+`ambient` involvement) that displaces its backbone away from a straight
+line, as distinct from the `distortion` `noise_field` that already
+modulated its *width*.
+
+**What was built.** `R/noise_bridge.R`: a `noise_bridge` class
+(properties `smooth`/`seed`, no `ambient` dependency) plus a
+`noise_sample(field, n, scale)` method -- deliberately a different
+signature from `noise_field`'s `noise_sample(field, x, y, to)` method,
+since a Brownian bridge has no spatial position to sample at, just a
+point count. `smooth_bridge()` itself (previously a bare internal helper
+living in `R/shape_twist.R`) moved into `R/noise_bridge.R` alongside its
+new class wrapper, since it's now exclusively that class's
+implementation detail. `shape_twist()` gained a `path_distortion =
+noise_bridge()` property (replacing its old bare `smooth`/`seed`
+arguments) alongside its existing `distortion = noise_field()` property
+-- two independent distortion properties on one shape, one per noise
+class, which is exactly the outcome the original "one unified
+`distortion` class" idea was rejected in favor of.
+
+**The two-axis wrinkle.** `shape_twist()`'s path needs two independent
+displacement vectors (x and y), generated from the same `smooth`
+setting but different seeds (the original code called `smooth_bridge()`
+twice, with `seed` and `seed + 1`). Rather than growing `noise_bridge`'s
+own interface to return both axes at once (which would make it a
+two-purpose class, path-shaped rather than a generic "sample a
+distortion" one), `shape_twist()`'s `path` getter calls `noise_sample()`
+twice: once against `self@path_distortion` directly, once against a
+second `noise_bridge` built inline with the same `smooth` and
+`seed + 1L`. This keeps `noise_bridge`/`noise_sample()`'s contract
+identical to `noise_field`'s (one object, one sampled vector) at the
+cost of one inline object construction in the caller -- judged the
+better tradeoff than a bespoke two-output method only `shape_twist()`
+would ever use.
+
+**Verified visually and via tests**: `shape_twist()`'s rendered output
+is unchanged at the same seed/smooth defaults (`noise_bridge()`'s
+defaults reproduce the old `smooth = 3L`/`seed = 1L` exactly), new
+`tests/testthat/test-noise-bridge.R` covers `noise_bridge`/`noise_sample()`
+directly, and `devtools::check()` stayed clean (0 errors/warnings/notes)
+throughout.
+
+## Adding `curve_twist()`, `noise_bridge`'s second consumer
+
+With `noise_bridge` built for `shape_twist()`'s path, the natural next
+step (flagged when the class was first designed) was giving it a second
+consumer to validate the interface: `curve_twist()`, an open, unfilled
+wandering path with no ribbon width at all -- `shape_twist()`'s path
+alone, `geometry = "path"` instead of a closed ribbon polygon.
+
+**Sharing rather than duplicating.** `shape_twist()`'s `path` property
+getter (backbone + two independent seed-offset `noise_bridge` draws, one
+per axis) was factored out into an internal `twisted_path_points()`
+helper in `R/shape_twist.R`, used by both `shape_twist()`'s own `path`
+getter and `curve_twist()`'s `points` getter -- the same
+"factor a helper into the file it originated in, collate the new
+constructor immediately after it" pattern already established by
+`shape_bezier.R`/`curve_bezier.R`'s `bezier_curve_points()`. No changes
+were needed to `noise_bridge`/`noise_sample()` themselves to support
+the new consumer -- the interface (a point count `n` and a `scale` in,
+a displacement vector out) was already general enough.
+
+**Naming: `scale` instead of `width`.** `shape_twist()`'s `width`
+argument does double duty (scales the Brownian-bridge path displacement
+*and* the ribbon's taper), but `curve_twist()` has no ribbon, so
+carrying the name `width` over would be misleading. `curve_twist()`
+instead exposes the same underlying displacement-amplitude parameter as
+`scale`, passed straight through to `twisted_path_points()`'s own
+`width` formal (which keeps that name internally, since it's shared
+with `shape_twist()`'s actual width-scaled call site).
+
+Verified `curve_twist()`'s points are identical to `shape_twist()`'s own
+`path` property for matching arguments (a direct test of the shared
+helper), and `devtools::check()` stayed clean throughout.

@@ -11,9 +11,7 @@ shape_ribbon(
   yend = 1,
   width = 0.2,
   n = 100L,
-  frequency = 1,
-  octaves = 2L,
-  seed = 1L,
+  distortion = noise_field(),
   ...
 )
 }
@@ -26,12 +24,8 @@ shape_ribbon(
 
 \item{n}{Number of points used along the path. Default \code{100L}.}
 
-\item{frequency}{Noise frequency. Must be non-negative. Default \code{1}.}
-
-\item{octaves}{Number of noise octaves. Must be a positive integer.
-Default \code{2L}.}
-
-\item{seed}{Integer seed for the noise field. Default \code{1L}.}
+\item{distortion}{A \link{noise_field} controlling the width modulation.
+Default \code{noise_field()}.}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

@@ -10,11 +10,9 @@ shape_twist(
   xend = 1,
   yend = 1,
   width = 0.2,
-  smooth = 3L,
   n = 100L,
-  frequency = 1,
-  octaves = 2L,
-  seed = 1L,
+  path_distortion = noise_bridge(),
+  distortion = noise_field(),
   ...
 )
 }
@@ -25,17 +23,13 @@ shape_twist(
 
 \item{width}{Maximum width. Must be non-negative. Default \code{0.2}.}
 
-\item{smooth}{Number of smoothing passes applied to the path. Must be
-non-negative. Default \code{3L}.}
-
 \item{n}{Number of points used along the path. Default \code{100L}.}
 
-\item{frequency}{Noise frequency. Must be non-negative. Default \code{1}.}
+\item{path_distortion}{A \link{noise_bridge} controlling the path's
+Brownian bridge. Default \code{noise_bridge()}.}
 
-\item{octaves}{Number of noise octaves. Must be a positive integer.
-Default \code{2L}.}
-
-\item{seed}{Integer seed for the noise field and path. Default \code{1L}.}
+\item{distortion}{A \link{noise_field} controlling the width modulation.
+Default \code{noise_field()}.}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
@@ -45,7 +39,10 @@ Brownian bridge rather than a straight line, giving the polygon a
 wandering, twisted appearance.
 }
 \examples{
-draw(shape_twist(x = 0, y = 0, xend = 1, yend = 0, width = 0.2, seed = 7734L))
+draw(shape_twist(
+  x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
+  path_distortion = noise_bridge(seed = 7734L)
+))
 
 }
 \seealso{

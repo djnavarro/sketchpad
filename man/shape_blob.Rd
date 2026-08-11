@@ -10,9 +10,7 @@ shape_blob(
   radius = 1,
   range = 0.2,
   n = 100L,
-  frequency = 1,
-  octaves = 2L,
-  seed = 1L,
+  distortion = noise_field(),
   ...
 )
 }
@@ -26,12 +24,8 @@ Default \code{0.2}.}
 
 \item{n}{Number of points used to approximate the outline. Default \code{100L}.}
 
-\item{frequency}{Noise frequency. Must be non-negative. Default \code{1}.}
-
-\item{octaves}{Number of noise octaves. Must be a positive integer.
-Default \code{2L}.}
-
-\item{seed}{Integer seed for the noise field. Default \code{1L}.}
+\item{distortion}{A \link{noise_field} controlling the radius distortion.
+Default \code{noise_field()}.}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
@@ -41,7 +35,7 @@ radius varies smoothly around the circumference according to
 Perlin/simplex noise generated with \pkg{ambient}.
 }
 \examples{
-draw(shape_blob(radius = 1, range = 0.3, seed = 4821L))
+draw(shape_blob(radius = 1, range = 0.3, distortion = noise_field(seed = 4821L)))
 
 }
 \seealso{

@@ -191,7 +191,7 @@ test_that("fill_scatter() validates its arguments", {
 })
 
 test_that("fill_scatter() accepts an arbitrary drawable as the scattered unit", {
-  expect_s3_class(fill_scatter(unit = shape_blob(radius = 1, seed = 7L)), "GridPattern")
+  expect_s3_class(fill_scatter(unit = shape_blob(radius = 1, distortion = noise_field(seed = 7L))), "GridPattern")
   expect_s3_class(fill_scatter(unit = shape_bezier(x = c(0, 1, 0), y = c(0, 1, 2))), "GridPattern")
 })
 

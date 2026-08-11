@@ -1,38 +1,34 @@
-#' Generate a smoothed Brownian bridge
+#' Sample a Brownian-bridge-displaced path
 #'
-#' Internal helper used by [shape_twist] to displace its path away from a
-#' straight line. Generates a Brownian bridge on `n` points over `[0, 1]`
-#' (a discretized Wiener process pinned to `0` at both ends, matching
-#' `e1071::rbridge()`'s construction but implemented directly to avoid
-#' the dependency), scales it, and optionally smooths it with repeated
-#' local averaging.
+#' Internal helper shared by [shape_twist] and [curve_twist]: builds a
+#' straight backbone between `(x, y)` and `(xend, yend)`, then displaces
+#' it with two independent [noise_bridge] draws (one per axis, the
+#' second seed-offset from `path_distortion`'s own `seed` so the two
+#' axes wander independently).
 #'
-#' @param n Number of points in the bridge.
-#' @param scale Multiplicative scale applied to the bridge.
-#' @param smooth Number of smoothing passes (`0` = no smoothing).
-#' @param seed Integer seed.
-#'
-#' @return Numeric vector of length `n`.
+#' @param x,y Start point.
+#' @param xend,yend End point.
+#' @param n Number of points used along the path.
+#' @param width Scale factor for the displacement (`0.1 * width`, matching
+#'   [shape_twist()]'s own scaling of its Brownian bridge).
+#' @param path_distortion A [noise_bridge].
+#' @return A [point_set].
 #' @noRd
-smooth_bridge <- function(n, scale = .1, smooth = 0, seed = 1L) {
-  withr::with_seed(
-    seed = seed,
-    code = {
-      # Discretized Wiener process on n - 1 steps over (0, 1], then
-      # subtract the line through the origin and its own endpoint to
-      # pin both ends to 0 (the definition of a Brownian bridge).
-      z <- cumsum(stats::rnorm(n - 1) / sqrt(n - 1))
-      t <- seq_len(n - 1) / (n - 1)
-      b <- c(0, z - t * z[n - 1])
-    }
+twisted_path_points <- function(x, y, xend, yend, n, width, path_distortion) {
+  x_base <- seq(x, xend, length.out = n)
+  y_base <- seq(y, yend, length.out = n)
+  x_disp <- noise_sample(path_distortion, n = n, scale = 0.1 * width)
+  # y displacement reuses the same smooth/seed settings, offset by
+  # one seed so the two axes wander independently
+  y_disp <- noise_sample(
+    noise_bridge(smooth = path_distortion@smooth, seed = path_distortion@seed + 1L),
+    n = n,
+    scale = 0.1 * width
   )
-  b <- b * scale
-  if (smooth > 0) {
-    for (i in 1:smooth) {
-      b <- (b + c(b[-1], 0) / 2 + c(0, b[-n]) / 2) / 2
-    }
-  }
-  b
+  point_set(
+    x = x_base + x_disp,
+    y = y_base + y_disp
+  )
 }
 
 #' A twisted ribbon following a random path
@@ -44,17 +40,18 @@ smooth_bridge <- function(n, scale = .1, smooth = 0, seed = 1L) {
 #' @param x,y Start point. Default `0`.
 #' @param xend,yend End point. Default `1`.
 #' @param width Maximum width. Must be non-negative. Default `0.2`.
-#' @param smooth Number of smoothing passes applied to the path. Must be
-#'   non-negative. Default `3L`.
 #' @param n Number of points used along the path. Default `100L`.
-#' @param frequency Noise frequency. Must be non-negative. Default `1`.
-#' @param octaves Number of noise octaves. Must be a positive integer.
-#'   Default `2L`.
-#' @param seed Integer seed for the noise field and path. Default `1L`.
+#' @param path_distortion A [noise_bridge] controlling the path's
+#'   Brownian bridge. Default `noise_bridge()`.
+#' @param distortion A [noise_field] controlling the width modulation.
+#'   Default `noise_field()`.
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
-#' draw(shape_twist(x = 0, y = 0, xend = 1, yend = 0, width = 0.2, seed = 7734L))
+#' draw(shape_twist(
+#'   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
+#'   path_distortion = noise_bridge(seed = 7734L)
+#' ))
 #'
 #' @family 2D shapes
 #' @export
@@ -66,32 +63,16 @@ shape_twist <- S7::new_class(
     y          = S7::class_numeric,
     xend       = S7::class_numeric,
     yend       = S7::class_numeric,
-    width      = S7::class_numeric,
-    smooth     = S7::class_numeric,
-    n          = S7::class_integer,
-    frequency  = S7::class_numeric,
-    octaves    = S7::class_integer,
-    seed       = S7::class_integer,
+    width           = S7::class_numeric,
+    n               = S7::class_integer,
+    path_distortion = noise_bridge,
+    distortion      = noise_field,
     path = S7::new_property(
       class = point_set,
       getter = function(self) {
-        x_base <- seq(self@x, self@xend, length.out = self@n)
-        y_base <- seq(self@y, self@yend, length.out = self@n)
-        x_disp <- smooth_bridge(
-          n = self@n,
-          smooth = self@smooth,
-          scale = 0.1 * self@width,
-          seed = self@seed
-        )
-        y_disp <- smooth_bridge(
-          n = self@n,
-          smooth = self@smooth,
-          scale = 0.1 * self@width,
-          seed = self@seed + 1
-        )
-        point_set(
-          x = x_base + x_disp,
-          y = y_base + y_disp
+        twisted_path_points(
+          x = self@x, y = self@y, xend = self@xend, yend = self@yend,
+          n = self@n, width = self@width, path_distortion = self@path_distortion
         )
       }
     ),
@@ -100,16 +81,7 @@ shape_twist <- S7::new_class(
       getter = function(self) {
         x <- self@path@x
         y <- self@path@y
-        displacement <- ambient::fracture(
-          noise = ambient::gen_simplex,
-          fractal = ambient::fbm,
-          x = x,
-          y = y,
-          frequency = self@frequency,
-          seed = self@seed,
-          octaves = self@octaves
-        ) |>
-          ambient::normalize(to = c(0, 1))
+        displacement <- noise_sample(self@distortion, x = x, y = y, to = c(0, 1))
         taper <- sqrt(
           seq(0, 1, length.out = self@n) * seq(1, 0, length.out = self@n)
         )
@@ -128,11 +100,9 @@ shape_twist <- S7::new_class(
                          xend = 1,
                          yend = 1,
                          width = 0.2,
-                         smooth = 3L,
                          n = 100L,
-                         frequency = 1,
-                         octaves = 2L,
-                         seed = 1L,
+                         path_distortion = noise_bridge(),
+                         distortion = noise_field(),
                          ...) {
     S7::new_object(
       drawable(),
@@ -141,11 +111,9 @@ shape_twist <- S7::new_class(
       xend = xend,
       yend = yend,
       width = width,
-      smooth = smooth,
       n = n,
-      frequency = frequency,
-      octaves = octaves,
-      seed = seed,
+      path_distortion = path_distortion,
+      distortion = distortion,
       style = style(...)
     )
   },
@@ -155,16 +123,9 @@ shape_twist <- S7::new_class(
     if (length(self@xend) != 1) return("xend must be length 1")
     if (length(self@yend) != 1) return("yend must be length 1")
     if (length(self@width) != 1) return("width must be length 1")
-    if (length(self@smooth) != 1) return("smooth must be length 1")
     if (length(self@n) != 1) return("n must be length 1")
-    if (length(self@frequency) != 1) return("frequency must be length 1")
-    if (length(self@octaves) != 1) return("octaves must be length 1")
-    if (length(self@seed) != 1) return("seed must be length 1")
     if (self@width < 0) return("width must be a non-negative number")
-    if (self@smooth < 0) return("smooth must be a non-negative number")
-    if (self@frequency < 0) return("frequency must be a non-negative number")
     if (self@n < 1L) return("n must be a positive integer")
-    if (self@octaves < 1L) return("octaves must be a positive integer")
   }
 )
 

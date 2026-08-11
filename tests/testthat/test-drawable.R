@@ -1,8 +1,8 @@
 test_that("every shape_*() defaults to polygon geometry", {
   expect_identical(shape_circle()@geometry, "polygon")
-  expect_identical(shape_blob(seed = 1L)@geometry, "polygon")
+  expect_identical(shape_blob(distortion = noise_field(seed = 1L))@geometry, "polygon")
   expect_identical(shape_ribbon()@geometry, "polygon")
-  expect_identical(shape_twist(seed = 1L)@geometry, "polygon")
+  expect_identical(shape_twist(path_distortion = noise_bridge(seed = 1L))@geometry, "polygon")
   expect_identical(shape_bezier(x = c(0, 1, 2), y = c(0, 1, 0))@geometry, "polygon")
 })
 
@@ -32,14 +32,14 @@ test_that("+ appends a drawable to a sketch", {
 })
 
 test_that("convert freezes a drawable's points into a shape", {
-  b <- shape_blob(radius = 1, seed = 1L)
+  b <- shape_blob(radius = 1, distortion = noise_field(seed = 1L))
   s <- convert(b, shape_raw)
   expect_s3_class(s, "sketchpad::shape_raw")
   expect_equal(s@x, b@points@x)
 })
 
 test_that("convert freezes a drawable's points into a curve", {
-  b <- shape_blob(radius = 1, seed = 1L)
+  b <- shape_blob(radius = 1, distortion = noise_field(seed = 1L))
   cr <- convert(b, curve_raw)
   expect_s3_class(cr, "sketchpad::curve_raw")
   expect_identical(cr@geometry, "path")
@@ -48,7 +48,7 @@ test_that("convert freezes a drawable's points into a curve", {
 })
 
 test_that("convert freezes a drawable's points into a points scatter", {
-  b <- shape_blob(radius = 1, seed = 1L)
+  b <- shape_blob(radius = 1, distortion = noise_field(seed = 1L))
   pr <- convert(b, points_raw)
   expect_s3_class(pr, "sketchpad::points_raw")
   expect_identical(pr@geometry, "points")
@@ -57,7 +57,7 @@ test_that("convert freezes a drawable's points into a points scatter", {
 })
 
 test_that("convert to curve_raw/points_raw preserves the original style", {
-  b <- shape_blob(radius = 1, seed = 1L, color = "red", linewidth = 3)
+  b <- shape_blob(radius = 1, distortion = noise_field(seed = 1L), color = "red", linewidth = 3)
   cr <- convert(b, curve_raw)
   pr <- convert(b, points_raw)
   expect_identical(cr@style, b@style)

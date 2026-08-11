@@ -21,9 +21,9 @@ test_that("shape_ribbon's width varies once width > 0", {
 })
 
 test_that("shape_ribbon is reproducible for a given seed, and varies across seeds", {
-  r1 <- shape_ribbon(seed = 3L)
-  r2 <- shape_ribbon(seed = 3L)
-  r3 <- shape_ribbon(seed = 4L)
+  r1 <- shape_ribbon(distortion = noise_field(seed = 3L))
+  r2 <- shape_ribbon(distortion = noise_field(seed = 3L))
+  r3 <- shape_ribbon(distortion = noise_field(seed = 4L))
   expect_identical(r1@points, r2@points)
   expect_false(isTRUE(all.equal(r1@points@x, r3@points@x)))
 })
@@ -32,14 +32,9 @@ test_that("shape_ribbon validates its scalar arguments", {
   expect_error(shape_ribbon(x = c(0, 1)))
   expect_error(shape_ribbon(xend = c(0, 1)))
   expect_error(shape_ribbon(width = c(0.1, 0.2)))
-  expect_error(shape_ribbon(frequency = c(1, 2)))
-  expect_error(shape_ribbon(octaves = c(1L, 2L)))
-  expect_error(shape_ribbon(seed = c(1L, 2L)))
 })
 
 test_that("shape_ribbon rejects invalid non-negative/positive arguments", {
   expect_error(shape_ribbon(width = -1), "width")
-  expect_error(shape_ribbon(frequency = -1), "frequency")
   expect_error(shape_ribbon(n = 0L), "n")
-  expect_error(shape_ribbon(octaves = 0L), "octaves")
 })

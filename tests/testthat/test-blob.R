@@ -17,9 +17,9 @@ test_that("shape_blob's radius varies once range > 0", {
 })
 
 test_that("shape_blob is reproducible for a given seed, and varies across seeds", {
-  b1 <- shape_blob(seed = 5L)
-  b2 <- shape_blob(seed = 5L)
-  b3 <- shape_blob(seed = 6L)
+  b1 <- shape_blob(distortion = noise_field(seed = 5L))
+  b2 <- shape_blob(distortion = noise_field(seed = 5L))
+  b3 <- shape_blob(distortion = noise_field(seed = 6L))
   expect_identical(b1@points, b2@points)
   expect_false(isTRUE(all.equal(b1@points@x, b3@points@x)))
 })
@@ -28,15 +28,10 @@ test_that("shape_blob validates its scalar arguments", {
   expect_error(shape_blob(x = c(0, 1)))
   expect_error(shape_blob(radius = c(1, 2)))
   expect_error(shape_blob(range = c(0, 1)))
-  expect_error(shape_blob(frequency = c(1, 2)))
-  expect_error(shape_blob(octaves = c(1L, 2L)))
-  expect_error(shape_blob(seed = c(1L, 2L)))
 })
 
 test_that("shape_blob rejects invalid non-negative/positive arguments", {
   expect_error(shape_blob(radius = -1), "radius")
   expect_error(shape_blob(range = -1), "range")
-  expect_error(shape_blob(frequency = -1), "frequency")
-  expect_error(shape_blob(octaves = 0L), "octaves")
   expect_error(shape_blob(n = 0L), "n")
 })

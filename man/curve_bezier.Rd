@@ -39,6 +39,7 @@ Other 1D curves:
 \code{\link[=curve_line]{curve_line()}},
 \code{\link[=curve_raw]{curve_raw()}},
 \code{\link[=curve_scribble]{curve_scribble()}},
-\code{\link[=curve_spiral]{curve_spiral()}}
+\code{\link[=curve_spiral]{curve_spiral()}},
+\code{\link[=curve_twist]{curve_twist()}}
 }
 \concept{1D curves}

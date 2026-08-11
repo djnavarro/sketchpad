@@ -13,10 +13,8 @@
 #' @param x_ctrl2,y_ctrl2 Second Bezier control point. Default `0`.
 #' @param width Maximum width. Must be non-negative. Default `0.2`.
 #' @param n Number of points used along the path. Default `100L`.
-#' @param frequency Noise frequency. Must be non-negative. Default `1`.
-#' @param octaves Number of noise octaves. Must be a positive integer.
-#'   Default `2L`.
-#' @param seed Integer seed for the noise field. Default `1L`.
+#' @param distortion A [noise_field] controlling the width modulation.
+#'   Default `noise_field()`.
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -38,9 +36,7 @@ shape_bezier_ribbon <- S7::new_class(
     y_ctrl2   = S7::class_numeric,
     width     = S7::class_numeric,
     n         = S7::class_integer,
-    frequency = S7::class_numeric,
-    octaves   = S7::class_integer,
-    seed      = S7::class_integer,
+    distortion = noise_field,
     path = S7::new_property(
       class = point_set,
       getter = function(self) {
@@ -56,16 +52,7 @@ shape_bezier_ribbon <- S7::new_class(
       getter = function(self) {
         x <- self@path@x
         y <- self@path@y
-        displacement <- ambient::fracture(
-          noise = ambient::gen_simplex,
-          fractal = ambient::fbm,
-          x = x,
-          y = y,
-          frequency = self@frequency,
-          seed = self@seed,
-          octaves = self@octaves
-        ) |>
-          ambient::normalize(to = c(0, 1))
+        displacement <- noise_sample(self@distortion, x = x, y = y, to = c(0, 1))
         taper <- sqrt(
           seq(0, 1, length.out = self@n) * seq(1, 0, length.out = self@n)
         )
@@ -89,9 +76,7 @@ shape_bezier_ribbon <- S7::new_class(
                          y_ctrl2 = 0,
                          width = 0.2,
                          n = 100L,
-                         frequency = 1,
-                         octaves = 2L,
-                         seed = 1L,
+                         distortion = noise_field(),
                          ...) {
     S7::new_object(
       drawable(),
@@ -105,9 +90,7 @@ shape_bezier_ribbon <- S7::new_class(
       y_ctrl2 = y_ctrl2,
       width = width,
       n = n,
-      frequency = frequency,
-      octaves = octaves,
-      seed = seed,
+      distortion = distortion,
       style = style(...)
     )
   },
@@ -122,12 +105,7 @@ shape_bezier_ribbon <- S7::new_class(
     if (length(self@y_ctrl2) != 1) return("y_ctrl2 must be length 1")
     if (length(self@width) != 1) return("width must be length 1")
     if (length(self@n) != 1) return("n must be length 1")
-    if (length(self@frequency) != 1) return("frequency must be length 1")
-    if (length(self@octaves) != 1) return("octaves must be length 1")
-    if (length(self@seed) != 1) return("seed must be length 1")
     if (self@width < 0) return("width must be a non-negative number")
-    if (self@frequency < 0) return("frequency must be a non-negative number")
     if (self@n < 1L) return("n must be a positive integer")
-    if (self@octaves < 1L) return("octaves must be a positive integer")
   }
 )

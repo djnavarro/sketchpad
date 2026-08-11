@@ -27,6 +27,8 @@ Config/testthat/edition: 3
 Remotes: 
     djnavarro/waeponwifestre
 Collate: 'fill.R'
+    'noise_field.R'
+    'noise_bridge.R'
     'style.R'
     'point_set.R'
     'drawable.R'
@@ -43,6 +45,7 @@ Collate: 'fill.R'
     'shape_blob.R'
     'shape_ribbon.R'
     'shape_twist.R'
+    'curve_twist.R'
     'sketch.R'
     'draw.R'
     'convert.R'

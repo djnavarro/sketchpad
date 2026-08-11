@@ -32,6 +32,15 @@ reference:
   contents:
   - points_raw
 
+- title: Noise helpers
+  desc: >
+    Scalar noise fields used to distort a shape's points, used by
+    `shape_blob()`/`shape_ribbon()`/`shape_twist()`.
+  contents:
+  - noise_field
+  - noise_bridge
+  - noise_sample
+
 - title: Fills
   desc: >
     Textures and patterns for `style()`'s `fill` argument, used by 2D
