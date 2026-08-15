@@ -179,7 +179,9 @@ by every `drawable`’s `trans` property.
 Helpers that compose several drawables together for a particular visual
 effect, rather than constructing a single drawable.
 
-- [`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md) :
-  Layer jittered copies of a path drawable for a hand-drawn look
-- [`bristle_stroke()`](https://sketchpad.djnavarro.net/reference/bristle_stroke.md)
+- [`effect_bristle()`](https://sketchpad.djnavarro.net/reference/effect_bristle.md)
   : A fanned bristle/dry-brush effect along a path
+- [`effect_grain()`](https://sketchpad.djnavarro.net/reference/effect_grain.md)
+  : A paper-grain/textured-ink rendering of a drawable's own outline
+- [`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md)
+  : Layer jittered copies of a drawable for a hand-drawn look

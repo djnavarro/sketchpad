@@ -76,6 +76,7 @@ s[[1]]
 #>  @ geometry: chr "polygon"
 #>  @ trans   : <sketchpad::trans>
 #>  .. @ matrix: num [1:3, 1:3] 1 0 0 0 1 0 0 0 1
+#>  @ pathlike: logi FALSE
 #>  @ points  : <sketchpad::xy>
 #>  .. @ x: num [1:100] 1 0.998 0.992 0.982 0.968 ...
 #>  .. @ y: num [1:100] 0 0.0634 0.1266 0.1893 0.2511 ...
@@ -100,6 +101,7 @@ s[1]
 #>  ..  ..@ geometry: chr "polygon"
 #>  ..  ..@ trans   : <sketchpad::trans>
 #>  .. .. .. @ matrix: num [1:3, 1:3] 1 0 0 0 1 0 0 0 1
+#>  ..  ..@ pathlike: logi FALSE
 #>  ..  ..@ points  : <sketchpad::xy>
 #>  .. .. .. @ x: num [1:100] 1 0.998 0.992 0.982 0.968 ...
 #>  .. .. .. @ y: num [1:100] 0 0.0634 0.1266 0.1893 0.2511 ...

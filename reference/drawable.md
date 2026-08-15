@@ -17,7 +17,7 @@ intended to be instantiated directly; use one of its subclasses
 ## Usage
 
 ``` r
-drawable(..., geometry = "polygon", trans = trans_identity())
+drawable(..., geometry = "polygon", trans = trans_identity(), pathlike = FALSE)
 ```
 
 ## Arguments
@@ -39,6 +39,12 @@ drawable(..., geometry = "polygon", trans = trans_identity())
   A
   [trans](https://sketchpad.djnavarro.net/reference/trans.md)/[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)/[trans_chain](https://sketchpad.djnavarro.net/reference/trans_chain.md)
   object. See details.
+
+- pathlike:
+
+  A single `TRUE`/`FALSE` (default `FALSE`). Not exposed as a
+  constructor argument by any concrete drawable – each fixes its own
+  value internally, the same convention `geometry` follows. See details.
 
 ## Details
 
@@ -79,6 +85,43 @@ centroid/radius) are never mutated or flattened by a transform – only
 the final rendered coordinates are affected. Default
 [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
 (no transform).
+
+`pathlike` marks whether `x`/`y` (where present) hold a genuine,
+caller-ordered, perturbable control-point path – as opposed to `x`/`y`
+meaning something else entirely (e.g.
+[`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)'s
+centroid, or one fixed endpoint of
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)'s
+two-point segment). This is the distinction
+[`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md)/[`effect_bristle()`](https://sketchpad.djnavarro.net/reference/effect_bristle.md)
+need to decide whether jittering `x`/`y` produces a meaningful wobble;
+it's orthogonal to `geometry` – a `pathlike` drawable can have any
+`geometry` (a future `points_*()` constructor could reasonably be
+`pathlike` despite `geometry == "points"`). Currently `TRUE` for
+[`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
+[`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
+[`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
+[`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
+[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md),
+and
+[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md);
+`FALSE` (the default) for every other concrete drawable, including
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)/
+[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)/[`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md)
+– these do have a conceptual backbone, but it's exposed via
+`x`/`y`/`xend`/`yend` (or additional named control-point pairs), not a
+plain `x`/`y` vector. Whether a `pathlike` subclass actually has `x`/`y`
+properties is not enforced by `drawable`'s own validator – every
+subclass constructor first builds a scaffold `drawable()` instance
+(validated on its own, before any subclass property exists) and only
+merges in `x`/`y` afterward via
+[`S7::new_object()`](https://rconsortium.github.io/S7/reference/new_class.html),
+so a cross-property check here would fire on that scaffold and reject
+every `pathlike` subclass unconditionally (see "Gotchas"). Setting
+`pathlike = TRUE` on a subclass with no `x`/`y` is therefore an author
+error caught only when an effect tries to read `object@x`/`object@y`,
+not at construction time.
 
 ## See also
 
