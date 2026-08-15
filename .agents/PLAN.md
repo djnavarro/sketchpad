@@ -74,10 +74,11 @@ to pick up, reject, or refine later -- none are scheduled.
 
 ### Additional primitive shapes
 
-`rectangle`/`square`, `polygon` (regular n-gon), `ellipse` (`shape_circle`
-is currently radius-only, with no independent x/y radii), and `arc`/`wedge`
-(a partial circle/annulus), `star`. (A bare open `line` and a `spiral` were
-also on this list -- both are now covered by `curve_line()`/
+`polygon` (regular n-gon), `ellipse` (`shape_circle` is currently
+radius-only, with no independent x/y radii), and `arc`/`wedge` (a partial
+circle/annulus), `star`. (`rectangle`/`square` are now covered by
+`shape_rectangle()`/`shape_square()`; a bare open `line` and a `spiral`
+were also on this list -- both are now covered by `curve_line()`/
 `curve_spiral()`; see `.agents/HISTORY.md`.)
 
 ### Multiple sub-paths and holes per drawable
