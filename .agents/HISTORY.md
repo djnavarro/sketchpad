@@ -1394,3 +1394,26 @@ regenerated `man/figures/README-twists-1.png` came out byte-identical
 to the version already committed, confirming the fix reproduces the
 example's originally-intended output rather than just silencing the
 error.
+
+## List-like access on `sketch`
+
+Added `length()`, `` `[[` ``, and `` `[` `` methods for `sketch`, so its
+shapes can be counted/accessed without reaching into `@shapes` directly
+(`length(s)`, `s[[i]]`, `s[i]`). Confirmed via a small non-package reprex
+first that S7's `method()`/`methods_register()` machinery -- already
+relied on for `+` -- also covers these: `S7:::internal_generics()`
+explicitly lists `"["`/`"[["` alongside `.S3PrimitiveGenerics` (which
+includes `length`), so no new registration mechanism was needed beyond
+the existing `.onLoad()` call to `S7::methods_register()`.
+
+`x[[i]]` forwards straight to `x@shapes[[i]]`, returning the bare
+`drawable` at that position. `x[i]` forwards to `x@shapes[i]` but wraps
+the result back into a `sketch` (preserving `@canvas`) rather than
+returning a bare list, mirroring how `[[`/`[` already differ on a plain
+list -- `s[i]` stays something `draw()` can be called on directly, no
+different from `s[[i]]` being a single drawable ready for `draw()`
+itself. Documented on `sketch`'s own class docs (not on the individual
+`method()` assignments, which just carry `@export`/`@noRd`, per this
+package's usual convention for method-only `.Rd` pages). Added
+`tests/testthat/test-sketch.R` covering `length()`, `[[`, `[` with
+numeric and logical indices, and canvas preservation.

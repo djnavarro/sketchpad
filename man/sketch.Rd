@@ -19,12 +19,23 @@ with a single call to \code{\link[=draw]{draw()}}. Sketches can be built up incr
 using the \code{+} operator, e.g.
 \code{sketch() + shape_circle() + shape_circle(x = 2)}.
 }
+\details{
+A sketch also supports list-like access to its shapes: \code{length(s)}
+counts them, \code{s[[i]]} returns the single \link{drawable} at position \code{i},
+and \code{s[i]} returns a new sketch containing only the selected shapes
+(its \code{canvas} is preserved) -- mirroring how \code{[[}/\code{[} differ on a
+plain list.
+}
 \examples{
 s <- sketch() + shape_circle(radius = 1) + shape_circle(x = 2, radius = 0.5)
 draw(s)
 
 s2 <- sketch(canvas = canvas(background = "grey95")) + shape_circle(radius = 1)
 draw(s2)
+
+length(s)
+s[[1]]
+s[1]
 
 }
 \seealso{

@@ -128,11 +128,6 @@ override, distinct from `sketch` (which represents the whole canvas of
 independently-styled shapes). Would pair naturally with the transform
 helpers above -- e.g. rotate a `group` as a unit.
 
-### List-like access on `sketch`
-
-`length()`, `` `[[` ``, `` `[` `` methods for `sketch`, rather than
-reaching into `@shapes` directly.
-
 ### Save-to-file and multi-frame/animation export helpers
 
 No `save_png()`/`save_svg()`-style convenience -- currently the caller

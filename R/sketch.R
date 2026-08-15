@@ -5,6 +5,12 @@
 #' using the `+` operator, e.g.
 #' `sketch() + shape_circle() + shape_circle(x = 2)`.
 #'
+#' A sketch also supports list-like access to its shapes: `length(s)`
+#' counts them, `s[[i]]` returns the single [drawable] at position `i`,
+#' and `s[i]` returns a new sketch containing only the selected shapes
+#' (its `canvas` is preserved) -- mirroring how `[[`/`[` differ on a
+#' plain list.
+#'
 #' @param shapes A list of [drawable]-classed objects. Default `list()`.
 #' @param canvas A [canvas] object, giving the background/framing settings
 #'   [draw()] applies to the sketch as a whole. Default `canvas()` (no
@@ -16,6 +22,10 @@
 #'
 #' s2 <- sketch(canvas = canvas(background = "grey95")) + shape_circle(radius = 1)
 #' draw(s2)
+#'
+#' length(s)
+#' s[[1]]
+#' s[1]
 #'
 #' @family core structure
 #' @export
@@ -119,4 +129,19 @@ method(`+`, list(sketch, trans_warp)) <- function(e1, e2) compose_sketch_trans(e
 #' @export
 #' @noRd
 method(`+`, list(sketch, trans_chain)) <- function(e1, e2) compose_sketch_trans(e1, e2)
+
+#' @export
+#' @noRd
+method(length, sketch) <- function(x) length(x@shapes)
+
+#' @export
+#' @noRd
+method(`[[`, sketch) <- function(x, i) x@shapes[[i]]
+
+#' @export
+#' @noRd
+method(`[`, sketch) <- function(x, i) {
+  x@shapes <- x@shapes[i]
+  x
+}
 
