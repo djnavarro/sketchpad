@@ -560,6 +560,35 @@ use, so it never leaks into the caller's global random state -- unlike
 noise is a pure function of its own seed argument, not `stats::runif()`
 against the global generator.
 
+`textured_stroke` (`R/textured_stroke.R`) is the third `effects` family
+member, and the first that isn't a plain function returning a `sketch`
+of ordinary drawables. It builds the same tapered outline as
+`shape_stroke()` (an `outline` computed property sharing that file's
+`resample_by_length()`/`stroke_normals()` internal helpers) but renders
+it by compositing a rasterised paper-grain texture -- its `grain`
+[noise_field] sampled directly at every raster pixel's own world
+`(x, y)` position, a single non-repeating raster the size of the whole
+stroke rather than a `grid::pattern()` tile -- and masking that raster
+to the outline's exact polygon shape via `grid::as.mask()`, the same
+masking technique `fill_vignette()` uses for its own radial fade, but
+built from the stroke's own real silhouette rather than a synthetic
+circle. Grain renders as `color`'s opacity fading between `0` and
+`alpha` at the noise field's extremes (`fill_noise()`'s own convention),
+optionally revealing a solid `background` colour underneath instead of
+true transparency (`fill_vignette()`'s own `background` argument). Since
+its rendering isn't a single `points`-based grob expressible through
+`geometry_grob()`'s `"polygon"`/`"path"`/`"points"` switch,
+`textured_stroke` is not a `drawable` subclass at all -- it has its own
+`S7::method(draw, textured_stroke)` (`R/textured_stroke.R`, collated
+right after `draw.R` so the `draw` generic already exists to register
+against), built directly from `grid::rasterGrob()`/`grid::polygonGrob()`/
+`grid::as.mask()`/`grid::gTree()` rather than reusing `geometry_grob()`.
+Its masked viewport reuses the same `xscale`/`yscale`/`width`/`height`
+as the shared drawing viewport `draw()` already built for it (read back
+via `vp$xscale` etc., since `grid::viewport()` objects support
+list-style `$` access), so the mask's own "native" coordinates line up
+with the raster's exactly.
+
 ## Gotchas worth remembering
 
 A handful of non-obvious S7 behaviors that would bite a future edit if
@@ -787,7 +816,13 @@ full debugging narrative):
   `shape_stroke.R`'s internal `stroke_normals()`/`resample_by_length()`
   helpers); like `sketchy.R`, its exact `Collate` position doesn't
   actually matter, since it's an ordinary function, not an S7 class.
-- `R/draw.R` -- the `draw` generic and its three methods.
+- `R/draw.R` -- the `draw` generic and its three methods (`drawable`,
+  `sketch`, and the `class_any` catch-all).
+- `R/textured_stroke.R` -- the `textured_stroke` class and its own
+  `draw()` method (see "Compositional effects" above). Collated right
+  after `draw.R`, since registering its method needs the `draw` generic
+  to already exist; unlike `vectorize.R`/`sketchy.R`/`bristle_stroke.R`,
+  this file's `Collate` position *does* matter, for that reason.
 - `R/convert.R` -- the `convert(drawable, shape_raw)` method.
 - `R/sketchpad-package.R` -- package-level doc, `#' @import S7`, the
   `.onLoad()` calling `S7::methods_register()`, and the
@@ -799,11 +834,14 @@ full debugging narrative):
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
   curve_twist -> shape_stroke -> canvas -> sketch -> vectorize -> sketchy
-  -> bristle_stroke -> draw -> convert -> sketchpad-package). **Any new
-  drawable
+  -> bristle_stroke -> draw -> textured_stroke -> convert ->
+  sketchpad-package). **Any new drawable
   subclass must be added to
   `Collate` after `drawable.R`**, or `devtools::load_all()`/`R CMD check`
-  will fail with an "object 'drawable' not found" error.
+  will fail with an "object 'drawable' not found" error. Any new class
+  that registers its own method on an *existing* generic (as
+  `textured_stroke` does for `draw`) must instead be collated after that
+  generic's own defining file.
 
 ## Conventions
 

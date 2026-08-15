@@ -102,6 +102,7 @@ draw(bristle_stroke(
 }
 \seealso{
 Other effects:
-\code{\link[=sketchy]{sketchy()}}
+\code{\link[=sketchy]{sketchy()}},
+\code{\link[=textured_stroke]{textured_stroke()}}
 }
 \concept{effects}

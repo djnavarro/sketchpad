@@ -1714,3 +1714,74 @@ class, the single-bristle edge case, seed reproducibility, no RNG leakage,
 offsets, argument validation, and a `draw()` smoke test. Verified with a
 full test suite run (798/798 passing) and `devtools::check()` (0 errors/
 warnings/notes).
+
+## `textured_stroke()`: masking a raster grain texture to a stroke's own outline
+
+The last item from the original stylized-stroke brainstorm (see
+`.agents/PLAN.md`'s now-removed "Rasterized/textured stroke" entry):
+composite a raster texture, masked to a stroke's exact tapered outline,
+using the same `grid::as.mask()` technique `fill_vignette()` already
+uses for its own radial fade. Prototyped interactively in the console
+first (building the masked grob by hand, rendering it with
+`grid::grid.draw()` directly) before committing to any package code, the
+same path `bristle_stroke()` followed.
+
+**Why this needed a new class, not another `shape_stroke()` fill.**
+`shape_stroke(fill = fill_charcoal())` already gives a stroke a textured
+interior, and works well (see `fill_charcoal()`'s own docs) -- but that
+texture is a `grid::pattern()` tile, repeated across the shape and sized
+relative to its bounding box. A single long, winding stroke then shows
+the tile repeating along its length, which doesn't read as continuous
+paper grain. `textured_stroke()` instead samples its grain `noise_field`
+directly at each raster pixel's own world `(x, y)` position across the
+outline's bounding box -- one non-repeating raster the size of the whole
+stroke, with no tiling seam to manage at all, at the cost of not being
+expressible as a `style@fill` value: nothing in the existing
+`geometry_grob()`/`draw()` machinery builds a raster this way, or masks
+it to an arbitrary (non-tile) polygon. This is also why `textured_stroke`
+is not a `drawable` subclass -- its rendering isn't a single
+`points`-based grob dispatchable through `geometry_grob()`'s
+`"polygon"`/`"path"`/`"points"` switch, so it needed its own `draw()`
+method (`S7::method(draw, textured_stroke) <- ...`) built directly from
+`grid::rasterGrob()`/`grid::polygonGrob()`/`grid::as.mask()`/
+`grid::gTree()`, the "new grob-building logic inside `draw()`" the
+original plan item anticipated.
+
+**Shares geometry with `shape_stroke()`, not code.** The tapered outline
+arithmetic is identical to `shape_stroke()`'s own `points` getter, so
+`textured_stroke`'s `outline` computed property calls the same
+`resample_by_length()`/`stroke_normals()` internal helpers
+(`shape_stroke.R`) rather than duplicating them -- confirmed by a test
+asserting `textured_stroke()@outline` and the equivalent `shape_stroke()
+@points` are numerically identical for the same arguments.
+
+**Masking an arbitrary polygon, not a synthetic circle.** `fill_vignette()`
+builds its mask from a `circleGrob()` drawn purely to define the mask
+shape -- a shape with no other purpose. Here the mask grob *is* the
+stroke's own real outline (`grid::polygonGrob(x = outline@x, y =
+outline@y, ...)`), reusing points already computed for the raster's own
+extent. The masked viewport is built with the same `xscale`/`yscale`/
+`width`/`height` as the shared drawing viewport `draw()` already
+constructed (read back via `vp$xscale` etc., since `grid::viewport()`
+objects support list-style `$` access) rather than a second, separately
+computed one, so the mask's "native" coordinates line up with the
+raster's exactly.
+
+**Rendering options mirror `fill_noise()`/`fill_vignette()`'s own
+conventions on purpose**, rather than inventing new ones: grain renders
+as `color`'s opacity fading from `0` to `alpha` at the noise field's
+extremes ( `fill_noise()`'s own convention), and an optional
+`background` colour can be revealed underneath rather than true
+transparency (`fill_vignette()`'s own `background` argument) -- useful
+for a solid, mottled-ink look rather than a sparse, see-through grain.
+
+Implemented as `R/textured_stroke.R`, collated right after `draw.R`
+(needs the `draw` generic to already exist, to register its own method)
+and before `convert.R`; the third member of the `effects` pkgdown family.
+`tests/testthat/test-textured-stroke.R` covers outline equivalence with
+`shape_stroke()`, the taper-to-zero-width edge case, argument validation,
+and `draw()` smoke tests both with and without a `background` colour.
+Verified with a full test suite run (812/812 passing) and
+`devtools::check()`/`rcmdcheck::rcmdcheck(args = c("--no-manual",
+"--as-cran"))` (0 errors/warnings, one pre-existing CRAN-submission-only
+NOTE unrelated to this change).

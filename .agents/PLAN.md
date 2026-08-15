@@ -153,16 +153,11 @@ every series/example inlining its own palette vector (as all four
 
 The variable-width ribbon-from-path idea is now implemented as
 `shape_stroke()`, the layered/jittered multi-stroke idea as `sketchy()`,
-the bristle/dry-brush idea as `bristle_stroke()`, and the "textured fill
-reads as charcoal/marker grain" finding as `fill_charcoal()` -- see
-`.agents/HISTORY.md`. Still open, from the same original brainstorm:
-
-- **Rasterized/textured stroke** -- composite a raster texture (paper
-  grain, scanned ink) masked to the stroke's own outline, the same
-  masking technique `fill_vignette()` already uses. Heaviest option,
-  and the only one that would need new grob-building logic inside
-  `draw()` rather than reusing `geometry_grob()`'s existing
-  `"polygon"`/`"path"` branches. Not prototyped.
+the bristle/dry-brush idea as `bristle_stroke()`, the "textured fill
+reads as charcoal/marker grain" finding as `fill_charcoal()`, and the
+rasterized/textured stroke idea as `textured_stroke()` -- see
+`.agents/HISTORY.md`. No further item from the original brainstorm is
+currently open.
 
 `fill_scribble()` remains a poor fit for texturing a curved
 `shape_stroke()`'s interior (its fixed horizontal/vertical direction

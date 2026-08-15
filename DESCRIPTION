@@ -60,6 +60,7 @@ Collate: 'fill.R'
     'sketchy.R'
     'bristle_stroke.R'
     'draw.R'
+    'textured_stroke.R'
     'convert.R'
     'sketchpad-package.R'
 URL: https://sketchpad.djnavarro.net/
