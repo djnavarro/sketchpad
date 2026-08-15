@@ -112,6 +112,14 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   function (not its own S7 class) that calls `shape_rectangle(width =
   side, height = side, ...)`, mirroring `fill_none()`'s
   wrapper-around-a-sibling-constructor pattern.
+- **`shape_polygon`** -- centroid + radius + `n` (side/vertex count,
+  default `6L`, minimum `3`); `points` is `n` evenly-spaced vertices
+  around the circumference, giving a regular n-gon. Unlike
+  `shape_circle`/`shape_blob`, `points` does *not* repeat its first
+  vertex at the end -- a polygon's vertices are exact, not an
+  approximation of a curve, so there's no reason to carry the same
+  closing point `shape_circle`'s `seq(0, 2 * pi, ...)` formula
+  incidentally produces.
 - **`shape_blob`** -- like `shape_circle`, but the radius is perturbed by
   a [noise_field] (see below), giving an irregular outline. `range`
   controls the perturbation amplitude; the noise itself (frequency,
@@ -255,8 +263,8 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 
 Every closed (`geometry = "polygon"`) drawable's constructor shares the
 `shape_*` prefix (`shape_circle()`, `shape_rectangle()`/`shape_square()`,
-`shape_blob()`, `shape_ribbon()`, `shape_twist()`, `shape_bezier()`, and
-the trivial `shape_raw()`),
+`shape_polygon()`, `shape_blob()`, `shape_ribbon()`, `shape_twist()`,
+`shape_bezier()`, and the trivial `shape_raw()`),
 mirroring the `fill_*()` family below -- this groups the "produces a
 closed drawable polygon" functions under one discoverable, greppable
 prefix distinct from the `fill_*()`, `draw()`, and `convert()` families.
@@ -506,9 +514,9 @@ full debugging narrative):
 - `R/shape_bezier.R`, `R/shape_bezier_ribbon.R`, `R/curve_bezier.R`,
   `R/curve_line.R`, `R/curve_spiral.R`, `R/curve_scribble.R`,
   `R/shape_raw.R`, `R/curve_raw.R`, `R/points_raw.R`, `R/shape_circle.R`,
-  `R/shape_rectangle.R`, `R/shape_blob.R`, `R/shape_ribbon.R`,
-  `R/shape_twist.R`, `R/curve_twist.R` -- the concrete `drawable`
-  subclasses, one file each (`shape_rectangle.R` also holds the
+  `R/shape_rectangle.R`, `R/shape_polygon.R`, `R/shape_blob.R`,
+  `R/shape_ribbon.R`, `R/shape_twist.R`, `R/curve_twist.R` -- the concrete
+  `drawable` subclasses, one file each (`shape_rectangle.R` also holds the
   `shape_square()` wrapper function, rather than giving it its own file,
   since it's not a separate S7 class). Every closed constructor shares
   the `shape_*` prefix, every open one the `curve_*` prefix (see "Class
@@ -546,9 +554,10 @@ full debugging narrative):
   (fill -> noise_field -> noise_bridge -> style -> xy -> drawable
   -> shape_bezier -> shape_bezier_ribbon -> curve_bezier -> curve_line ->
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
-  -> shape_circle -> shape_rectangle -> shape_blob -> shape_ribbon ->
-  shape_twist -> curve_twist -> canvas -> sketch -> draw -> convert ->
-  sketchpad-package). **Any new drawable subclass must be added to
+  -> shape_circle -> shape_rectangle -> shape_polygon -> shape_blob ->
+  shape_ribbon -> shape_twist -> curve_twist -> canvas -> sketch -> draw
+  -> convert -> sketchpad-package). **Any new drawable subclass must be
+  added to
   `Collate` after `drawable.R`**, or `devtools::load_all()`/`R CMD check`
   will fail with an "object 'drawable' not found" error.
 
