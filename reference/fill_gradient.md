@@ -96,6 +96,7 @@ for a repeating pattern of small gradient motifs instead.
 ## See also
 
 Other fill helpers:
+[`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),
 [`fill_flow()`](https://sketchpad.djnavarro.net/reference/fill_flow.md),

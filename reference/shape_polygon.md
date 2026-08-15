@@ -72,6 +72,7 @@ Other 2D shapes:
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
 [`shape_rectangle()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md),
 [`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)
 

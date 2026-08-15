@@ -51,6 +51,9 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
 - [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   [`shape_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   : A tapered ribbon between two points
+- [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
+  [`shape_strokes()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
+  : A tapered, pressure-modulated stroke along an arbitrary path
 - [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
   [`shape_twists()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
   : A twisted ribbon following a random path
@@ -110,6 +113,8 @@ Textures and patterns for
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md)’s `fill`
 argument, used by 2D shapes.
 
+- [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md)
+  : Charcoal/marker-style noise texture fill
 - [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)
   : Checkerboard pattern fill
 - [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)
@@ -168,3 +173,13 @@ by every `drawable`’s `trans` property.
   : Translate points
 - [`trans_warp()`](https://sketchpad.djnavarro.net/reference/trans_warp.md)
   : A non-rigid, noise-based deformation
+
+## Effects
+
+Helpers that compose several drawables together for a particular visual
+effect, rather than constructing a single drawable.
+
+- [`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md) :
+  Layer jittered copies of a path drawable for a hand-drawn look
+- [`bristle_stroke()`](https://sketchpad.djnavarro.net/reference/bristle_stroke.md)
+  : A fanned bristle/dry-brush effect along a path

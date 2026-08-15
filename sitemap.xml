@@ -5,6 +5,7 @@
 <url><loc>https://sketchpad.djnavarro.net/LICENSE.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/authors.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/index.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/bristle_stroke.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/canvas.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/curve_arc.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/curve_bezier.html</loc></url>
@@ -15,6 +16,7 @@
 <url><loc>https://sketchpad.djnavarro.net/reference/curve_twist.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/draw.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/drawable.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/fill_charcoal.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/fill_checker.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/fill_crosshatch.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/fill_flow.html</loc></url>
@@ -45,10 +47,12 @@
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_raw.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_rectangle.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_ribbon.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/shape_stroke.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_twist.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_wedge.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/sketch.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/sketchpad-package.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/sketchy.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/style.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/trans.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/trans_affine.html</loc></url>

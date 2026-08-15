@@ -238,6 +238,32 @@ how the API got here, see
   rather than a straight line. Its separate `distortion` \[noise_field\]
   property modulates width, exactly as in `shape_ribbon` – two
   independent distortion properties, one per noise class.
+- **`shape_stroke`** – like `shape_ribbon`, but its backbone is an
+  arbitrary path through `(x, y)` control points, resampled to `n`
+  evenly arc-length-spaced points via the internal
+  `resample_by_length()` helper (`R/shape_stroke.R`) – redistributes
+  points along the existing straight segments, but does not curve-fit or
+  smooth corners, matching `curve_line`’s own no-smoothing convention (a
+  `shape_stroke` built from only a few widely-spaced control points
+  still renders with visibly angular corners; a smoothly curving stroke
+  needs a denser input path). Width still tapers to zero at both ends
+  and is modulated by a `distortion` \[noise_field\] (a “pressure”
+  curve), exactly as in `shape_ribbon`, but unlike
+  `shape_ribbon`/`shape_twist` – which offset by a single *unnormalized*
+  direction vector shared across every point, safe only because their
+  own backbone is straight or nearly so – `shape_stroke` computes a
+  genuine per-point unit normal via the internal `stroke_normals()`
+  helper (central differences, re-normalized at every point), since an
+  arbitrary path can bend enough that a shared offset direction would
+  visibly skew the outline. Its taper formula
+  (`sqrt(pmin(t, 1 - t) * 2)`) is also renormalized to peak at exactly
+  `1` at the path’s midpoint, unlike `shape_ribbon`/`shape_twist`’s
+  shared `sqrt(t * (1 - t))` formula (which peaks at `0.5`, an existing,
+  undocumented quirk of those two classes) – so `shape_stroke`’s `width`
+  argument is exactly the maximum rendered width. Intended as the
+  building block for ink/brush/pencil-style stroke rendering – see
+  `.agents/PLAN.md` for compositional techniques (layered jitter,
+  textured fill) that build on top of it without further class changes.
 - **`shape_bezier`** – outline follows a Bezier curve through an
   arbitrary number of control points (`x`/`y`), evaluated via the
   Bernstein polynomial basis (internal `bernstein()` helper, *not* De
@@ -404,6 +430,7 @@ Every closed (`geometry = "polygon"`) drawable’s constructor shares the
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md),
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
 [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
 and the trivial
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)),
@@ -505,7 +532,7 @@ needs no special-casing for pattern/gradient fills:
 
 ### The `fill_*()` texture family
 
-`R/fill.R` holds sixteen `fill_*()` constructors for `style@fill`:
+`R/fill.R` holds seventeen `fill_*()` constructors for `style@fill`:
 [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
 (a validated colour string, no
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) involved),
@@ -557,6 +584,16 @@ look – both share
 occasional faint tile-boundary rasterization seam, more visible here
 since [`sin()`](https://rdrr.io/r/base/Trig.html)/warping amplify small
 mismatches),
+[`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md)
+(a
+[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)
+preset – lighter base tone, finer/denser tiling, finer noise detail –
+tuned to read as hand-drawn charcoal/marker grain; found to fit a curved
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
+interior noticeably better than
+[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md),
+whose fixed horizontal/vertical direction doesn’t track a curved path’s
+own tangent),
 [`fill_image()`](https://sketchpad.djnavarro.net/reference/fill_image.md)
 (a caller-supplied raster, letterboxed by default to preserve its own
 pixel aspect ratio),
@@ -602,6 +639,62 @@ needed depending on what’s drawn:
 
 Shared argument validation lives in the internal `validate_fill_args()`
 (spacing/aspect, with an optional angle check via `angle = NULL`).
+
+### Compositional effects: `sketchy()`
+
+[`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md)
+(`R/sketchy.R`) is the first member of a new, non-class family: a plain
+function (no S7 class) that composes several drawables into a \[sketch\]
+for a visual effect no single drawable can express by itself. It builds
+`layers` independently-jittered copies of a path – each one a call to a
+caller-supplied drawable constructor `.f` (e.g.
+[`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md)/[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md))
+with `x`/`y` displaced by smooth, seed-offset simplex noise sampled
+along the path’s own normalized arc-length (not raw `x`/`y` position, so
+the jitter’s shape doesn’t depend on the path’s own scale) – collected
+into one `sketch`. Every other argument
+(`width`/`distortion`/`color`/`color_alpha`/…) is forwarded via `...` to
+every layer unchanged; only `x`/`y` vary across layers. This formalizes
+an ad hoc technique used, during
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
+own development, to add a wobbling pencil-edge look on top of a stroke
+or to make a plain
+[`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md)
+read as hand-drawn. Documented under its own new pkgdown reference
+section, “Effects” (`@family effects`), separate from the
+`shape_*`/`curve_*` geometry families and the `fill_*`/`trans_*`
+per-drawable helper families, since it operates one level up – composing
+whole drawables, not producing one.
+
+[`bristle_stroke()`](https://sketchpad.djnavarro.net/reference/bristle_stroke.md)
+(`R/bristle_stroke.R`) is the second `effects` family member: a plain
+function fanning `n_bristles` thin
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)s
+out perpendicular to a backbone path, reusing
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
+own internal `stroke_normals()` helper for the perpendicular direction
+and [`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md)
+itself (one `layers = 1L` call per bristle) for each bristle’s
+independent wobble – composing both existing `effects`/`shape_*`
+building blocks rather than duplicating their logic. Each bristle is
+also trimmed to a random sub-range of the backbone (`fray`) and given a
+randomly-scaled `width` (`width_jitter`), so bristles start/end raggedly
+and vary in thickness rather than fanning out as one clean, uniform
+sheaf;
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
+own taper-to-zero at both ends does double duty as each bristle’s tip
+fade, needing no extra work. Per-bristle randomization
+(`fray`/`width_jitter`) is scoped with
+[`withr::with_seed()`](https://withr.r-lib.org/reference/with_seed.html),
+the same reproducibility convention
+[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)
+already use, so it never leaks into the caller’s global random state –
+unlike
+[`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md)’s
+own jitter, which needs no such scoping since simplex noise is a pure
+function of its own seed argument, not
+[`stats::runif()`](https://rdrr.io/r/stats/Uniform.html) against the
+global generator.
 
 ## Gotchas worth remembering
 
@@ -798,8 +891,8 @@ full debugging narrative):
   `R/shape_circle.R`, `R/shape_rectangle.R`, `R/shape_polygon.R`,
   `R/shape_ellipse.R`, `R/shape_wedge.R`, `R/curve_arc.R`,
   `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R`,
-  `R/curve_twist.R` – the concrete `drawable` subclasses, one file each
-  (`shape_rectangle.R` also holds the
+  `R/curve_twist.R`, `R/shape_stroke.R` – the concrete `drawable`
+  subclasses, one file each (`shape_rectangle.R` also holds the
   [`shape_square()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)
   wrapper function, rather than giving it its own file, since it’s not a
   separate S7 class). Every closed constructor shares the `shape_*`
@@ -824,9 +917,11 @@ full debugging narrative):
   loads first. `curve_raw.R`/`points_raw.R` are collated immediately
   after `shape_raw.R` (their `"path"`/`"points"`-geometry analog), since
   the three form a parallel “raw” family with the same trivial
-  constructor shape.
+  constructor shape. `shape_stroke.R` needs no such sharing either –
+  it’s the last concrete `drawable` subclass, collated right after
+  `curve_twist.R`.
 - `R/canvas.R` – the `canvas` class, collated right after
-  `curve_twist.R` (last of the concrete `drawable` subclasses) since it
+  `shape_stroke.R` (last of the concrete `drawable` subclasses) since it
   has no dependency on `drawable` itself, only on `fill_class` (from
   `fill.R`); `sketch.R` needs `canvas` to exist for its own `canvas`
   property.
@@ -846,6 +941,25 @@ full debugging narrative):
   doesn’t actually matter – function bodies are evaluated lazily, only
   S7 class definitions need their dependencies already loaded at parse
   time.
+- `R/sketchy.R` – the
+  [`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md)
+  compositional effect (see “Compositional effects:
+  [`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md)”
+  above). Collated right after `vectorize.R`, since it also builds a
+  `sketch` from its results and calls
+  [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md)
+  directly; like `vectorize.R`, its exact `Collate` position doesn’t
+  actually matter, since it’s an ordinary function, not an S7 class.
+- `R/bristle_stroke.R` – the
+  [`bristle_stroke()`](https://sketchpad.djnavarro.net/reference/bristle_stroke.md)
+  compositional effect (see “Compositional effects:
+  [`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md)”
+  above). Collated right after `sketchy.R`, since it calls
+  [`sketchy()`](https://sketchpad.djnavarro.net/reference/sketchy.md)
+  directly (as well as `shape_stroke.R`’s internal
+  `stroke_normals()`/`resample_by_length()` helpers); like `sketchy.R`,
+  its exact `Collate` position doesn’t actually matter, since it’s an
+  ordinary function, not an S7 class.
 - `R/draw.R` – the `draw` generic and its three methods.
 - `R/convert.R` – the `convert(drawable, shape_raw)` method.
 - `R/sketchpad-package.R` – package-level doc, `#' @import S7`, the
@@ -858,11 +972,12 @@ full debugging narrative):
   curve_line -\> curve_spiral -\> curve_scribble -\> shape_raw -\>
   curve_raw -\> points_raw -\> shape_circle -\> shape_rectangle -\>
   shape_polygon -\> shape_ellipse -\> shape_wedge -\> curve_arc -\>
-  shape_blob -\> shape_ribbon -\> shape_twist -\> curve_twist -\> canvas
-  -\> sketch -\> vectorize -\> draw -\> convert -\> sketchpad-package).
-  **Any new drawable subclass must be added to `Collate` after
-  `drawable.R`**, or `devtools::load_all()`/`R CMD check` will fail with
-  an “object ‘drawable’ not found” error.
+  shape_blob -\> shape_ribbon -\> shape_twist -\> curve_twist -\>
+  shape_stroke -\> canvas -\> sketch -\> vectorize -\> sketchy -\>
+  bristle_stroke -\> draw -\> convert -\> sketchpad-package). **Any new
+  drawable subclass must be added to `Collate` after `drawable.R`**, or
+  `devtools::load_all()`/`R CMD check` will fail with an “object
+  ‘drawable’ not found” error.
 
 ## Conventions
 
