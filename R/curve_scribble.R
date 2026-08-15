@@ -131,3 +131,41 @@ curve_scribble <- S7::new_class(
     )
   }
 )
+
+#' Multiple wandering scribble curves at once
+#'
+#' `curve_scribbles()` is a vectorized version of [curve_scribble()]:
+#' each argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). Varying `seed` per curve is usually what makes
+#' several scribbles look distinct from each other. The result is a
+#' [sketch] containing one `curve_scribble()` per recycled row, rather
+#' than a single drawable.
+#'
+#' @inheritParams curve_scribble
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(curve_scribbles(x = 1:3, width = 0.8, height = 0.5, seed = 1:3))
+#'
+#' @family 1D curves
+#' @export
+curve_scribbles <- function(x = 0,
+                             y = 0,
+                             width = 1,
+                             height = 1,
+                             direction = "horizontal",
+                             n_harmonics = 3L,
+                             amplitude = 0.35,
+                             n = 200L,
+                             seed = 1L,
+                             trans = trans_identity(),
+                             ...) {
+  vectorize_shapes(curve_scribble, c(
+    list(x = x, y = y, width = width, height = height, direction = direction,
+         n_harmonics = n_harmonics, amplitude = amplitude, n = n, seed = seed,
+         trans = trans),
+    list(...)
+  ))
+}

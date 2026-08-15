@@ -40,10 +40,17 @@ draw(curve_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0)))
 \seealso{
 Other 1D curves:
 \code{\link[=curve_arc]{curve_arc()}},
+\code{\link[=curve_arcs]{curve_arcs()}},
+\code{\link[=curve_beziers]{curve_beziers()}},
 \code{\link[=curve_line]{curve_line()}},
+\code{\link[=curve_lines]{curve_lines()}},
 \code{\link[=curve_raw]{curve_raw()}},
+\code{\link[=curve_raws]{curve_raws()}},
 \code{\link[=curve_scribble]{curve_scribble()}},
+\code{\link[=curve_scribbles]{curve_scribbles()}},
 \code{\link[=curve_spiral]{curve_spiral()}},
-\code{\link[=curve_twist]{curve_twist()}}
+\code{\link[=curve_spirals]{curve_spirals()}},
+\code{\link[=curve_twist]{curve_twist()}},
+\code{\link[=curve_twists]{curve_twists()}}
 }
 \concept{1D curves}

@@ -101,3 +101,38 @@ shape_bezier <- S7::new_class(
   }
 )
 
+#' Multiple closed Bezier curves at once
+#'
+#' `shape_beziers()` is a vectorized version of [shape_bezier()]. Since
+#' `x`/`y` are themselves numeric vectors of control points for a single
+#' curve, `shape_beziers()` takes them as a `list()` of numeric vectors
+#' instead -- one vector of control points per shape -- rather than a
+#' bare vector (which `shape_circles()`-style constructors use for a
+#' plain per-shape scalar). Every other argument may be a plain vector,
+#' recycled against `x`/`y` via `purrr::pmap()`'s own vctrs-based rules
+#' (any length-1 element is broadcast to the common length; mismatched
+#' lengths greater than 1 raise an error). The result is a [sketch]
+#' containing one `shape_bezier()` per list element/recycled row, rather
+#' than a single drawable.
+#'
+#' @inheritParams shape_bezier
+#' @param x,y A `list()` of numeric vectors of control point coordinates,
+#'   one vector per shape. Each vector must be the same length as its
+#'   `y`/`x` counterpart, with at least two control points.
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_beziers(
+#'   x = list(c(0, 0.5, 1, 0.5), c(2, 2.5, 3, 2.5)),
+#'   y = list(c(0, 1, 0, -1), c(0, 1, 0, -1))
+#' ))
+#'
+#' @family 2D shapes
+#' @export
+shape_beziers <- function(x, y, n = 100L, trans = trans_identity(), ...) {
+  vectorize_shapes(shape_bezier, c(
+    list(x = x, y = y, n = n, trans = trans),
+    list(...)
+  ))
+}
+

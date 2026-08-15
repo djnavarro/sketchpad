@@ -90,3 +90,28 @@ shape_wedge <- S7::new_class(
     )
   }
 )
+
+#' Multiple pie-slice wedges at once
+#'
+#' `shape_wedges()` is a vectorized version of [shape_wedge()]: each
+#' argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `shape_wedge()` per recycled row, rather than a single drawable.
+#'
+#' @inheritParams shape_wedge
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_wedges(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))
+#'
+#' @family 2D shapes
+#' @export
+shape_wedges <- function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L,
+                          trans = trans_identity(), ...) {
+  vectorize_shapes(shape_wedge, c(
+    list(x = x, y = y, radius = radius, start = start, end = end, n = n, trans = trans),
+    list(...)
+  ))
+}

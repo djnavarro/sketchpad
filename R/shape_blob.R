@@ -78,3 +78,38 @@ shape_blob <- S7::new_class(
   }
 )
 
+#' Multiple blobs at once
+#'
+#' `shape_blobs()` is a vectorized version of [shape_blob()]: each
+#' argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). A shared `distortion` [noise_field] is automatically
+#' recycled across every blob; pass a `list()` of several different
+#' `noise_field`s instead to vary it per blob. The result is a [sketch]
+#' containing one `shape_blob()` per recycled row, rather than a single
+#' drawable.
+#'
+#' @inheritParams shape_blob
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_blobs(x = 1:3, radius = c(0.5, 1, 1.5), range = 0.2))
+#'
+#' @family 2D shapes
+#' @export
+shape_blobs <- function(x = 0,
+                         y = 0,
+                         radius = 1,
+                         range = 0.2,
+                         n = 100L,
+                         distortion = noise_field(),
+                         trans = trans_identity(),
+                         ...) {
+  vectorize_shapes(shape_blob, c(
+    list(x = x, y = y, radius = radius, range = range, n = n,
+         distortion = distortion, trans = trans),
+    list(...)
+  ))
+}
+

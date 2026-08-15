@@ -51,3 +51,37 @@ curve_bezier <- S7::new_class(
     )
   }
 )
+
+#' Multiple open Bezier curves at once
+#'
+#' `curve_beziers()` is a vectorized version of [curve_bezier()]. Since
+#' `x`/`y` are themselves numeric vectors of control points for a single
+#' curve, `curve_beziers()` takes them as a `list()` of numeric vectors
+#' instead -- one vector of control points per curve. Every other
+#' argument may be a plain vector, recycled against `x`/`y` via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `curve_bezier()` per list element/recycled row, rather than a single
+#' drawable.
+#'
+#' @inheritParams curve_bezier
+#' @param x,y A `list()` of numeric vectors of control point coordinates,
+#'   one vector per curve. Each vector must be the same length as its
+#'   `y`/`x` counterpart, with at least two control points.
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(curve_beziers(
+#'   x = list(c(0, 0.5, 1), c(2, 2.5, 3)),
+#'   y = list(c(0, 1, 0), c(0, 1, 0))
+#' ))
+#'
+#' @family 1D curves
+#' @export
+curve_beziers <- function(x, y, n = 100L, trans = trans_identity(), ...) {
+  vectorize_shapes(curve_bezier, c(
+    list(x = x, y = y, n = n, trans = trans),
+    list(...)
+  ))
+}

@@ -136,13 +136,6 @@ original 50-seed export loop (in the `sketches` repo) had to. A thin
 wrapper generating a seed sequence plus a `gifski`-based animation export
 would mirror that same example's use case.
 
-### Vectorized constructors
-
-Building many shapes currently always goes through `purrr::pmap()` over
-a tibble of parameters (see every `README.Rmd` example). A plural
-constructor (e.g. `shape_circles(x = ..., y = ..., ...)`, vectorized over its
-arguments) could return a `sketch` directly instead.
-
 ### `print`/`format` methods
 
 `drawable` and `sketch` currently print as the default S7 object dump;

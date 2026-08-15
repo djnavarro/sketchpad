@@ -40,4 +40,8 @@ draw(points_raw(
 ))
 
 }
+\seealso{
+Other 0D points:
+\code{\link[=points_raws]{points_raws()}}
+}
 \concept{0D points}

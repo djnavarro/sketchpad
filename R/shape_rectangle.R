@@ -67,3 +67,39 @@ shape_rectangle <- S7::new_class(
 shape_square <- function(x = 0, y = 0, side = 1, trans = trans_identity(), ...) {
   shape_rectangle(x = x, y = y, width = side, height = side, trans = trans, ...)
 }
+
+#' Multiple rectangles/squares at once
+#'
+#' `shape_rectangles()`/`shape_squares()` are vectorized versions of
+#' [shape_rectangle()]/[shape_square()]: each argument may be a vector,
+#' recycled against the others via `purrr::pmap()`'s own vctrs-based
+#' rules (any length-1 element is broadcast to the common length;
+#' mismatched lengths greater than 1 raise an error). The result is a
+#' [sketch] containing one `shape_rectangle()`/`shape_square()` per
+#' recycled row, rather than a single drawable.
+#'
+#' @inheritParams shape_rectangle
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_rectangles(x = 1:3, width = c(0.5, 1, 1.5), height = 0.5))
+#' draw(shape_squares(x = 1:3, side = c(0.5, 1, 1.5)))
+#'
+#' @family 2D shapes
+#' @export
+shape_rectangles <- function(x = 0, y = 0, width = 1, height = 1, trans = trans_identity(), ...) {
+  vectorize_shapes(shape_rectangle, c(
+    list(x = x, y = y, width = width, height = height, trans = trans),
+    list(...)
+  ))
+}
+
+#' @rdname shape_rectangles
+#' @family 2D shapes
+#' @export
+shape_squares <- function(x = 0, y = 0, side = 1, trans = trans_identity(), ...) {
+  vectorize_shapes(shape_square, c(
+    list(x = x, y = y, side = side, trans = trans),
+    list(...)
+  ))
+}

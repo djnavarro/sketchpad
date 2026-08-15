@@ -91,3 +91,39 @@ curve_twist <- S7::new_class(
     if (self@n < 1L) return("n must be a positive integer")
   }
 )
+
+#' Multiple wandering twist paths at once
+#'
+#' `curve_twists()` is a vectorized version of [curve_twist()]: each
+#' argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). A shared `path_distortion` [noise_bridge] is
+#' automatically recycled across every path; pass a `list()` of several
+#' different `noise_bridge`s instead to vary it per path. The result is
+#' a [sketch] containing one `curve_twist()` per recycled row, rather
+#' than a single drawable.
+#'
+#' @inheritParams curve_twist
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(curve_twists(x = 1:3, y = 0, xend = 2:4, yend = 1))
+#'
+#' @family 1D curves
+#' @export
+curve_twists <- function(x = 0,
+                          y = 0,
+                          xend = 1,
+                          yend = 1,
+                          scale = 0.2,
+                          n = 100L,
+                          path_distortion = noise_bridge(),
+                          trans = trans_identity(),
+                          ...) {
+  vectorize_shapes(curve_twist, c(
+    list(x = x, y = y, xend = xend, yend = yend, scale = scale, n = n,
+         path_distortion = path_distortion, trans = trans),
+    list(...)
+  ))
+}

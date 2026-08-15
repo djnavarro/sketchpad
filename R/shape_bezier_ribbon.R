@@ -112,3 +112,45 @@ shape_bezier_ribbon <- S7::new_class(
     if (self@n < 1L) return("n must be a positive integer")
   }
 )
+
+#' Multiple Bezier ribbons at once
+#'
+#' `shape_bezier_ribbons()` is a vectorized version of
+#' [shape_bezier_ribbon()]: each argument may be a vector, recycled
+#' against the others via `purrr::pmap()`'s own vctrs-based rules (any
+#' length-1 element is broadcast to the common length; mismatched
+#' lengths greater than 1 raise an error). A shared `distortion`
+#' [noise_field] is automatically recycled across every ribbon; pass a
+#' `list()` of several different `noise_field`s instead to vary it per
+#' ribbon. The result is a [sketch] containing one
+#' `shape_bezier_ribbon()` per recycled row, rather than a single
+#' drawable.
+#'
+#' @inheritParams shape_bezier_ribbon
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_bezier_ribbons(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.2))
+#'
+#' @family 2D shapes
+#' @export
+shape_bezier_ribbons <- function(x = 0,
+                                  y = 0,
+                                  xend = 1,
+                                  yend = 1,
+                                  x_ctrl1 = 0.5,
+                                  y_ctrl1 = 0.5,
+                                  x_ctrl2 = 0,
+                                  y_ctrl2 = 0,
+                                  width = 0.2,
+                                  n = 100L,
+                                  distortion = noise_field(),
+                                  trans = trans_identity(),
+                                  ...) {
+  vectorize_shapes(shape_bezier_ribbon, c(
+    list(x = x, y = y, xend = xend, yend = yend,
+         x_ctrl1 = x_ctrl1, y_ctrl1 = y_ctrl1, x_ctrl2 = x_ctrl2, y_ctrl2 = y_ctrl2,
+         width = width, n = n, distortion = distortion, trans = trans),
+    list(...)
+  ))
+}

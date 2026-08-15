@@ -62,3 +62,28 @@ shape_ellipse <- S7::new_class(
     )
   }
 )
+
+#' Multiple ellipses at once
+#'
+#' `shape_ellipses()` is a vectorized version of [shape_ellipse()]: each
+#' argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `shape_ellipse()` per recycled row, rather than a single drawable.
+#'
+#' @inheritParams shape_ellipse
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_ellipses(x = 1:3, x_radius = c(0.5, 1, 1.5), y_radius = 0.5))
+#'
+#' @family 2D shapes
+#' @export
+shape_ellipses <- function(x = 0, y = 0, x_radius = 1, y_radius = 1, n = 100L,
+                            trans = trans_identity(), ...) {
+  vectorize_shapes(shape_ellipse, c(
+    list(x = x, y = y, x_radius = x_radius, y_radius = y_radius, n = n, trans = trans),
+    list(...)
+  ))
+}

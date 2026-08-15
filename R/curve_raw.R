@@ -53,3 +53,36 @@ curve_raw <- S7::new_class(
     )
   }
 )
+
+#' Multiple raw paths at once
+#'
+#' `curve_raws()` is a vectorized version of [curve_raw()]. Since `x`/`y`
+#' are themselves numeric vectors of vertex coordinates for a single
+#' path, `curve_raws()` takes them as a `list()` of numeric vectors
+#' instead -- one vector of vertices per path. Every other argument may
+#' be a plain vector, recycled against `x`/`y` via `purrr::pmap()`'s own
+#' vctrs-based rules (any length-1 element is broadcast to the common
+#' length; mismatched lengths greater than 1 raise an error). The result
+#' is a [sketch] containing one `curve_raw()` per list element/recycled
+#' row, rather than a single drawable.
+#'
+#' @inheritParams curve_raw
+#' @param x,y A `list()` of numeric vectors of vertex coordinates, one
+#'   vector per path. Each vector must be the same length as its `y`/`x`
+#'   counterpart.
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(curve_raws(
+#'   x = list(c(0, 1, 2), c(2, 3, 4)),
+#'   y = list(c(0, 1, 0), c(0, 1, 0))
+#' ))
+#'
+#' @family 1D curves
+#' @export
+curve_raws <- function(x, y, trans = trans_identity(), ...) {
+  vectorize_shapes(curve_raw, c(
+    list(x = x, y = y, trans = trans),
+    list(...)
+  ))
+}

@@ -55,3 +55,27 @@ shape_circle <- S7::new_class(
   }
 )
 
+#' Multiple circles at once
+#'
+#' `shape_circles()` is a vectorized version of [shape_circle()]: each
+#' argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `shape_circle()` per recycled row, rather than a single drawable.
+#'
+#' @inheritParams shape_circle
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_circles(x = 1:3, radius = c(0.5, 1, 1.5)))
+#'
+#' @family 2D shapes
+#' @export
+shape_circles <- function(x = 0, y = 0, radius = 1, n = 100L, trans = trans_identity(), ...) {
+  vectorize_shapes(shape_circle, c(
+    list(x = x, y = y, radius = radius, n = n, trans = trans),
+    list(...)
+  ))
+}
+

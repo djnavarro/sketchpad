@@ -82,3 +82,39 @@ shape_ribbon <- S7::new_class(
   }
 )
 
+#' Multiple ribbons at once
+#'
+#' `shape_ribbons()` is a vectorized version of [shape_ribbon()]: each
+#' argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). A shared `distortion` [noise_field] is automatically
+#' recycled across every ribbon; pass a `list()` of several different
+#' `noise_field`s instead to vary it per ribbon. The result is a
+#' [sketch] containing one `shape_ribbon()` per recycled row, rather
+#' than a single drawable.
+#'
+#' @inheritParams shape_ribbon
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_ribbons(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.3))
+#'
+#' @family 2D shapes
+#' @export
+shape_ribbons <- function(x = 0,
+                           y = 0,
+                           xend = 1,
+                           yend = 1,
+                           width = 0.2,
+                           n = 100L,
+                           distortion = noise_field(),
+                           trans = trans_identity(),
+                           ...) {
+  vectorize_shapes(shape_ribbon, c(
+    list(x = x, y = y, xend = xend, yend = yend, width = width, n = n,
+         distortion = distortion, trans = trans),
+    list(...)
+  ))
+}
+

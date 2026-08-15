@@ -1417,3 +1417,56 @@ itself. Documented on `sketch`'s own class docs (not on the individual
 package's usual convention for method-only `.Rd` pages). Added
 `tests/testthat/test-sketch.R` covering `length()`, `[[`, `[` with
 numeric and logical indices, and canvas preservation.
+
+## Vectorized (plural) constructors
+
+Added a plural `shape_*s()`/`curve_*s()`/`points_raws()` counterpart for
+every existing `shape_*()`/`curve_*()`/`points_raw()` constructor (e.g.
+`shape_circles()`, `shape_blobs()`, `curve_twists()`), replacing the
+`purrr::pmap(values, shape_circle) |> sketch()` idiom every `README.Rmd`
+example previously had to spell out by hand with a single call that
+returns a `sketch` directly.
+
+**Engine.** All twenty share one internal helper,
+`vectorize_shapes(.f, args)` (`R/vectorize.R`, collated right after
+`sketch.R`): it wraps any non-vector element of `args` (an S7 object,
+e.g. a single shared `trans`/`noise_field`/`noise_bridge`) in a
+length-1 `list()` -- `purrr::pmap()` errors on genuinely non-vector
+input, confirmed with a small reprex before writing this -- and then
+calls `purrr::pmap(args, .f)`, collecting the results into
+`sketch(shapes = ...)`. Every plural wrapper is otherwise a thin
+one-liner: same argument names/defaults as its singular counterpart,
+forwarding `list(<own args>)` plus `list(...)` (for style arguments
+like `color`/`fill`) into `vectorize_shapes()`.
+
+**Recycling comes for free from `purrr::pmap()`'s own vctrs rules** --
+no custom recycling logic was needed: a length-1 argument broadcasts
+against longer ones, and mismatched lengths greater than 1 raise a
+clear "Can't recycle" error. This also means a `list()` of several
+*different* S7 objects (rather than one shared scalar) passes straight
+through unchanged and varies correctly per shape, since an unclassed
+list already satisfies `is.vector()` -- confirmed both directions with
+tests (`shape_blobs(distortion = <single noise_field>)` sharing one
+object vs. `shape_blobs(distortion = list(<nf1>, <nf2>))` varying it).
+
+**Control-point arguments need a list-column, not a bare vector.** Six
+constructors (`shape_bezier`/`curve_bezier`, `curve_line`, `shape_raw`/
+`curve_raw`, `points_raw`) take `x`/`y` as numeric vectors of control
+points/vertices *for a single shape*, not one scalar per shape -- so
+their plural versions (`shape_beziers()`, etc.) require `x`/`y` as a
+`list()` of numeric vectors, one vector per shape, documented explicitly
+on each (overriding the inherited `@param x,y` text from the singular
+constructor, per this package's existing `@inheritParams`-override
+convention for anywhere the meaning/shape of an argument actually
+differs). This falls out of the same `vectorize_shapes()` engine with no
+special-casing, since a list of numeric vectors is exactly what
+`purrr::pmap()` expects to iterate one whole vector per row.
+
+Documented each plural constructor on its own `.Rd` page (own title,
+`@inheritParams` the singular constructor, `@family` matching the
+singular's own category) rather than merging into the singular's page,
+and added `tests/testthat/test-vectorize.R` covering recycling,
+mismatched-length errors, style-argument vectorization via `...`,
+shared-vs-varying S7-object arguments, list-column control points, the
+zero-length-input edge case, and that `draw()` renders the result.
+`devtools::check()` stayed clean (0 errors/warnings/notes) throughout.

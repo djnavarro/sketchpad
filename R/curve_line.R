@@ -46,3 +46,37 @@ curve_line <- S7::new_class(
     )
   }
 )
+
+#' Multiple open polylines at once
+#'
+#' `curve_lines()` is a vectorized version of [curve_line()]. Since
+#' `x`/`y` are themselves numeric vectors of control points for a single
+#' polyline, `curve_lines()` takes them as a `list()` of numeric vectors
+#' instead -- one vector of control points per polyline. Every other
+#' argument may be a plain vector, recycled against `x`/`y` via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `curve_line()` per list element/recycled row, rather than a single
+#' drawable.
+#'
+#' @inheritParams curve_line
+#' @param x,y A `list()` of numeric vectors of control point coordinates,
+#'   one vector per polyline. Each vector must be the same length as its
+#'   `y`/`x` counterpart, with at least two control points.
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(curve_lines(
+#'   x = list(c(0, 1, 1, 2), c(2, 3, 3, 4)),
+#'   y = list(c(0, 1, 0, 1), c(0, 1, 0, 1))
+#' ))
+#'
+#' @family 1D curves
+#' @export
+curve_lines <- function(x, y, trans = trans_identity(), ...) {
+  vectorize_shapes(curve_line, c(
+    list(x = x, y = y, trans = trans),
+    list(...)
+  ))
+}

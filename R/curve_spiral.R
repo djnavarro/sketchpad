@@ -81,3 +81,35 @@ curve_spiral <- S7::new_class(
     )
   }
 )
+
+#' Multiple open spirals at once
+#'
+#' `curve_spirals()` is a vectorized version of [curve_spiral()]: each
+#' argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `curve_spiral()` per recycled row, rather than a single drawable.
+#'
+#' @inheritParams curve_spiral
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(curve_spirals(x = c(0, 3, 6), turns = c(2, 3, 4)))
+#'
+#' @family 1D curves
+#' @export
+curve_spirals <- function(x = 0,
+                           y = 0,
+                           radius_start = 0,
+                           radius_end = 1,
+                           turns = 3,
+                           n = 200L,
+                           trans = trans_identity(),
+                           ...) {
+  vectorize_shapes(curve_spiral, c(
+    list(x = x, y = y, radius_start = radius_start, radius_end = radius_end,
+         turns = turns, n = n, trans = trans),
+    list(...)
+  ))
+}

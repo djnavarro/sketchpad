@@ -59,3 +59,27 @@ shape_polygon <- S7::new_class(
     )
   }
 )
+
+#' Multiple regular polygons at once
+#'
+#' `shape_polygons()` is a vectorized version of [shape_polygon()]: each
+#' argument may be a vector, recycled against the others via
+#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `shape_polygon()` per recycled row, rather than a single drawable.
+#'
+#' @inheritParams shape_polygon
+#' @return A [sketch].
+#'
+#' @examples
+#' draw(shape_polygons(x = 1:3, n = c(3L, 4L, 6L)))
+#'
+#' @family 2D shapes
+#' @export
+shape_polygons <- function(x = 0, y = 0, radius = 1, n = 6L, trans = trans_identity(), ...) {
+  vectorize_shapes(shape_polygon, c(
+    list(x = x, y = y, radius = radius, n = n, trans = trans),
+    list(...)
+  ))
+}

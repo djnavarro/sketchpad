@@ -46,13 +46,24 @@ draw(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1, width = 0.3))
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
+\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
+\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
+\code{\link[=shape_blobs]{shape_blobs()}},
 \code{\link[=shape_circle]{shape_circle()}},
+\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
+\code{\link[=shape_ellipses]{shape_ellipses()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
+\code{\link[=shape_polygons]{shape_polygons()}},
 \code{\link[=shape_raw]{shape_raw()}},
+\code{\link[=shape_raws]{shape_raws()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
+\code{\link[=shape_rectangles]{shape_rectangles()}},
+\code{\link[=shape_ribbons]{shape_ribbons()}},
 \code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_wedge]{shape_wedge()}}
+\code{\link[=shape_twists]{shape_twists()}},
+\code{\link[=shape_wedge]{shape_wedge()}},
+\code{\link[=shape_wedges]{shape_wedges()}}
 }
 \concept{2D shapes}
