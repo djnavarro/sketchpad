@@ -1,15 +1,15 @@
 #' Layer jittered copies of a drawable for a hand-drawn look
 #'
 #' No single [drawable] can express a hand-drawn ink/pencil look on its
-#' own -- what reads as "sketchy" is several independently wobbling
+#' own -- what reads as hand-drawn is several independently wobbling
 #' copies of the same nominal path layered on top of each other, not one
-#' perfectly smooth line. `sketchy()` builds a [sketch] of `layers` such
-#' copies: each is a copy of `object` (via [S7::set_props()]) with its
-#' `x`/`y` displaced by smooth, seed-offset simplex noise sampled along
-#' the path's own normalized arc-length -- the same ad hoc technique used,
-#' during development, to add a wobbling pencil edge on top of a
-#' [shape_stroke()]'s tapered outline, or to layer a plain [curve_line()]
-#' into a sketchier-looking line by itself.
+#' perfectly smooth line. `effect_tremor()` builds a [sketch] of `layers`
+#' such copies: each is a copy of `object` (via [S7::set_props()]) with
+#' its `x`/`y` displaced by smooth, seed-offset simplex noise sampled
+#' along the path's own normalized arc-length -- the same ad hoc
+#' technique used, during development, to add a wobbling pencil edge on
+#' top of a [shape_stroke()]'s tapered outline, or to layer a plain
+#' [curve_line()] into a shakier-looking line by itself.
 #'
 #' Noise is sampled at each control point's own position along arc-length
 #' (`0` to `1`), not at its raw `x`/`y` coordinates, so the jitter's shape
@@ -24,10 +24,10 @@
 #'
 #' Because each layer is built with [S7::set_props()] from `object`
 #' itself, every other property -- style, `width`/`distortion` for a
-#' [shape_stroke()], `trans`, ... -- carries over unchanged; `sketchy()`
-#' only varies `x`/`y` across layers. Vary `color_alpha` down and/or
-#' `layers` up (on `object` and via the `layers` argument, respectively)
-#' for a denser, more overlapping pencil/ink texture.
+#' [shape_stroke()], `trans`, ... -- carries over unchanged;
+#' `effect_tremor()` only varies `x`/`y` across layers. Vary `color_alpha`
+#' down and/or `layers` up (on `object` and via the `layers` argument,
+#' respectively) for a denser, more overlapping pencil/ink texture.
 #'
 #' @param object A pathlike [drawable] (`@pathlike == TRUE`, see
 #'   [drawable]'s docs), e.g. [curve_line()], [shape_stroke()],
@@ -45,10 +45,10 @@
 #' @return A [sketch] containing `layers` drawables.
 #'
 #' @examples
-#' draw(sketchy(
+#' draw(effect_tremor(
 #'   curve_line(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), color_alpha = 0.4)
 #' ))
-#' draw(sketchy(
+#' draw(effect_tremor(
 #'   shape_stroke(
 #'     x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
 #'     width = 0.3, fill_alpha = 0.5, color = NA_character_
@@ -58,12 +58,12 @@
 #'
 #' @family effects
 #' @export
-sketchy <- function(object,
-                     layers = 4L,
-                     jitter = 0.05,
-                     jitter_frequency = 0.5,
-                     seed = 1L) {
-  require_pathlike(object, "sketchy()")
+effect_tremor <- function(object,
+                          layers = 4L,
+                          jitter = 0.05,
+                          jitter_frequency = 0.5,
+                          seed = 1L) {
+  require_pathlike(object, "effect_tremor()")
   x <- object@x
   y <- object@y
   if (length(x) < 2) rlang::abort("at least two control points are required")

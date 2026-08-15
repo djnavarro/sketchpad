@@ -1907,3 +1907,41 @@ Plan mode before implementation (two separate planning passes, since the
 `pathlike` property came out of a follow-up design question after the
 first was already shipped). Verified with a full test suite run
 (825/825 passing) and `devtools::check()` (0 errors/warnings/notes).
+
+## Renaming the `effects` family to a shared `effect_` prefix
+
+`sketchy()`/`bristle_stroke()`/`textured_stroke` were named independently
+as each was designed (see the three entries above) and had drifted from
+every other family's naming convention (`shape_*()`, `curve_*()`,
+`fill_*()`, `trans_*()`): no shared prefix, and `sketchy` in particular
+named the hand-drawn *genre* rather than the visual *mechanism* (several
+independently-jittered copies of a path layered together, each wobbling
+independently). Renamed to `effect_tremor()`, `effect_bristle()`, and
+`effect_grain` respectively -- "tremor" for the trembling-line wobble
+(picked over "wobble"/"waver"/"scrawl", which were also considered),
+"bristle" unchanged (already named the mechanism well), and "grain"
+naming the specific paper-grain raster look rather than the more generic
+"textured", which risked reading as a synonym for the unrelated
+`fill_charcoal()`/`fill_noise()` tile textures.
+
+Mechanical consequences of the rename, beyond the identifiers
+themselves: `R/sketchy.R`/`R/bristle_stroke.R`/`R/textured_stroke.R`
+became `R/effect_tremor.R`/`R/effect_bristle.R`/`R/effect_grain.R` (`git
+mv`, to preserve file history), `DESCRIPTION`'s `Collate` field updated
+to match (same relative order -- `effect_grain.R` still needs `draw.R`'s
+generic to already exist), and the three `tests/testthat/test-*.R` files
+renamed to match. `_pkgdown.yml`'s "Effects" reference section, which had
+listed the three function names explicitly (the only family section not
+using a `starts_with()` selector, since there was no shared prefix to
+select on before now), was simplified to `starts_with("effect_")` --
+finally matching `shape_*()`/`curve_*()`/`fill_*()`/`trans_*()`'s own
+pkgdown selectors.
+
+Straight rename, no deprecation shim, consistent with this package's
+existing practice of breaking changes without a deprecation period while
+still pre-1.0. Earlier entries in this file (above) predate the rename
+and still refer to the old names -- an accurate record of what was
+actually built and called at the time, not retroactively updated; this
+entry is the bridge from old names to current ones. Current-state facts
+(what each function is called today) live in `AGENTS.md`, already
+updated throughout.

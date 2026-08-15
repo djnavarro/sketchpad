@@ -1,11 +1,11 @@
 #' A fanned bristle/dry-brush effect along a path
 #'
-#' `bristle_stroke()` builds a [sketch] of `n_bristles` copies of a
+#' `effect_bristle()` builds a [sketch] of `n_bristles` copies of a
 #' template drawable, fanned out perpendicular to its own backbone path --
-#' like [sketchy()], no single drawable can express this by itself, since
-#' a dry-brush look comes from several independently-frayed, independently
-#' wobbling strands laid side by side, not one stroke. Each bristle is a
-#' copy of `object` (via [S7::set_props()]) that:
+#' like [effect_tremor()], no single drawable can express this by itself,
+#' since a dry-brush look comes from several independently-frayed,
+#' independently wobbling strands laid side by side, not one stroke. Each
+#' bristle is a copy of `object` (via [S7::set_props()]) that:
 #'
 #' - is offset from the backbone by a fixed perpendicular distance (via
 #'   the same per-point unit normal [shape_stroke()] itself uses,
@@ -16,10 +16,10 @@
 #'   outer bristles show as it runs dry;
 #' - has its own randomly-scaled `width` (via `width_jitter`, applied to
 #'   `object@width`); and
-#' - is independently wobbled via [sketchy()] (`layers = 1L`, since the
-#'   fanning here already does the layering work `sketchy()` normally
-#'   provides -- one wobbling copy per bristle position, not several
-#'   wobbling copies of one path).
+#' - is independently wobbled via [effect_tremor()] (`layers = 1L`, since
+#'   the fanning here already does the layering work `effect_tremor()`
+#'   normally provides -- one wobbling copy per bristle position, not
+#'   several wobbling copies of one path).
 #'
 #' Every other property of `object` -- style, `distortion`, `trans`, ... --
 #' carries over to every bristle unchanged, since each is built with
@@ -48,9 +48,9 @@
 #' @param fray Maximum fraction of the backbone's own length randomly
 #'   trimmed from each bristle's start and end. Must be in `[0, 0.5)`.
 #'   Default `0.15`.
-#' @param jitter,jitter_frequency Passed to [sketchy()]'s own arguments
-#'   of the same name, controlling each bristle's independent wobble.
-#'   Defaults `0.015`/`1.2`.
+#' @param jitter,jitter_frequency Passed to [effect_tremor()]'s own
+#'   arguments of the same name, controlling each bristle's independent
+#'   wobble. Defaults `0.015`/`1.2`.
 #' @param n Number of points used along the backbone when fanning
 #'   bristles out (independent of any `n` property `object` itself has).
 #'   Must be at least `2`. Default `100L`.
@@ -60,7 +60,7 @@
 #'
 #' @examples
 #' t <- seq(0, 8, length.out = 200)
-#' draw(bristle_stroke(
+#' draw(effect_bristle(
 #'   shape_stroke(
 #'     x = t, y = sin(t) * 1.2, width = 0.06,
 #'     fill = "black", fill_alpha = 0.4, color = NA_character_
@@ -70,7 +70,7 @@
 #'
 #' @family effects
 #' @export
-bristle_stroke <- function(object,
+effect_bristle <- function(object,
                            n_bristles = 9L,
                            spread = 0.3,
                            width_jitter = 0.3,
@@ -79,8 +79,8 @@ bristle_stroke <- function(object,
                            jitter_frequency = 1.2,
                            n = 100L,
                            seed = 1L) {
-  require_pathlike(object, "bristle_stroke()")
-  require_props(object, "width", "bristle_stroke()")
+  require_pathlike(object, "effect_bristle()")
+  require_props(object, "width", "effect_bristle()")
   x <- object@x
   y <- object@y
   if (length(x) < 2) rlang::abort("at least two control points are required")
@@ -123,7 +123,7 @@ bristle_stroke <- function(object,
     if (has_n) overrides$n <- length(idx)
     bristle <- do.call(S7::set_props, c(list(object = object), overrides))
 
-    sketchy(
+    effect_tremor(
       bristle,
       layers = 1L, jitter = jitter, jitter_frequency = jitter_frequency,
       seed = bristle_seed

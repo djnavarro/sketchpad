@@ -61,7 +61,5 @@ reference:
     Helpers that compose several drawables together for a particular
     visual effect, rather than constructing a single drawable.
   contents:
-  - sketchy
-  - bristle_stroke
-  - textured_stroke
+  - starts_with("effect_")
 

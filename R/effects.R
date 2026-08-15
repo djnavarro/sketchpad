@@ -1,15 +1,16 @@
 #' Require that a drawable has particular properties
 #'
-#' Internal helper shared by [sketchy()]/[bristle_stroke()]: both take an
-#' `object` that must be a [drawable] exposing particular properties (e.g.
-#' `x`/`y` control points) for the effect to make sense. Gives a clear,
-#' effect-specific error rather than letting a missing property surface
-#' later as a raw `@` access or `S7::set_props()` failure.
+#' Internal helper shared by [effect_tremor()]/[effect_bristle()]: both
+#' take an `object` that must be a [drawable] exposing particular
+#' properties (e.g. `x`/`y` control points) for the effect to make sense.
+#' Gives a clear, effect-specific error rather than letting a missing
+#' property surface later as a raw `@` access or `S7::set_props()`
+#' failure.
 #'
 #' @param object The object to check.
 #' @param props A character vector of required property names.
 #' @param context A short string identifying the calling function, used
-#'   in the error message (e.g. `"sketchy()"`).
+#'   in the error message (e.g. `"effect_tremor()"`).
 #' @return `invisible(NULL)`, or aborts.
 #' @noRd
 require_props <- function(object, props, context) {
@@ -30,8 +31,8 @@ require_props <- function(object, props, context) {
 
 #' Require that a drawable is pathlike
 #'
-#' Internal helper shared by [sketchy()]/[bristle_stroke()]: both need an
-#' `object` whose `x`/`y` properties hold a genuine, perturbable,
+#' Internal helper shared by [effect_tremor()]/[effect_bristle()]: both
+#' need an `object` whose `x`/`y` properties hold a genuine, perturbable,
 #' caller-ordered control-point path -- [drawable]'s `pathlike` property
 #' (see its docs) -- rather than merely having properties *named* `x`/`y`
 #' with a different meaning (e.g. a shape's centroid, or one endpoint of
@@ -39,7 +40,7 @@ require_props <- function(object, props, context) {
 #'
 #' @param object The object to check.
 #' @param context A short string identifying the calling function, used
-#'   in the error message (e.g. `"sketchy()"`).
+#'   in the error message (e.g. `"effect_tremor()"`).
 #' @return `invisible(NULL)`, or aborts.
 #' @noRd
 require_pathlike <- function(object, context) {

@@ -31,7 +31,7 @@
 #' caller-ordered, perturbable control-point path -- as opposed to `x`/`y`
 #' meaning something else entirely (e.g. [shape_circle()]'s centroid, or
 #' one fixed endpoint of [shape_ribbon()]'s two-point segment). This is
-#' the distinction [sketchy()]/[bristle_stroke()] need to decide whether
+#' the distinction [effect_tremor()]/[effect_bristle()] need to decide whether
 #' jittering `x`/`y` produces a meaningful wobble; it's orthogonal to
 #' `geometry` -- a `pathlike` drawable can have any `geometry` (a future
 #' `points_*()` constructor could reasonably be `pathlike` despite

@@ -54,7 +54,7 @@ the final rendered coordinates are affected. Default \code{\link[=trans_identity
 caller-ordered, perturbable control-point path -- as opposed to \code{x}/\code{y}
 meaning something else entirely (e.g. \code{\link[=shape_circle]{shape_circle()}}'s centroid, or
 one fixed endpoint of \code{\link[=shape_ribbon]{shape_ribbon()}}'s two-point segment). This is
-the distinction \code{\link[=sketchy]{sketchy()}}/\code{\link[=bristle_stroke]{bristle_stroke()}} need to decide whether
+the distinction \code{\link[=effect_tremor]{effect_tremor()}}/\code{\link[=effect_bristle]{effect_bristle()}} need to decide whether
 jittering \code{x}/\code{y} produces a meaningful wobble; it's orthogonal to
 \code{geometry} -- a \code{pathlike} drawable can have any \code{geometry} (a future
 \verb{points_*()} constructor could reasonably be \code{pathlike} despite

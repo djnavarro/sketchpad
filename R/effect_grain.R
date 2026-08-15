@@ -1,9 +1,9 @@
 #' A paper-grain/textured-ink rendering of a drawable's own outline
 #'
-#' `textured_stroke` takes an existing polygon-geometry [drawable]
-#' (`object`, e.g. [shape_stroke()], [shape_blob()], [shape_ribbon()]) and
-#' renders its own outline (`object@points`) not with a [style()]`@fill`
-#' via the ordinary `draw()`/`geometry_grob()` path, but by compositing a
+#' `effect_grain` takes an existing polygon-geometry [drawable] (`object`,
+#' e.g. [shape_stroke()], [shape_blob()], [shape_ribbon()]) and renders
+#' its own outline (`object@points`) not with a [style()]`@fill` via the
+#' ordinary `draw()`/`geometry_grob()` path, but by compositing a
 #' rasterised paper-grain texture and masking it to the outline's exact
 #' polygon shape via [grid::as.mask()] -- the same masking technique
 #' [fill_vignette()] already uses for its own radial fade, but applied to
@@ -14,12 +14,12 @@
 #' [fill_charcoal()]/[fill_noise()] (already a good option for a shape's
 #' interior -- see [fill_charcoal()]'s docs): those tile a periodic
 #' texture that repeats across the shape via [grid::pattern()], sized
-#' relative to the target's own bounding box. `textured_stroke()` instead
+#' relative to the target's own bounding box. `effect_grain()` instead
 #' samples its grain [noise_field] once, directly, across `object`'s own
 #' world coordinates -- a single non-repeating raster the size of the
 #' whole shape, with no tiling seam to manage, at the cost of needing its
 #' own `draw()` method rather than reusing `geometry_grob()`'s existing
-#' `"polygon"`/`"path"`/`"points"` branches (`textured_stroke` is not a
+#' `"polygon"`/`"path"`/`"points"` branches (`effect_grain` is not a
 #' [drawable] subclass at all, since its rendering isn't expressible as a
 #' single `points`-based grob).
 #'
@@ -33,7 +33,7 @@
 #' @param object A polygon-geometry [drawable] (`@geometry == "polygon"`)
 #'   whose outline is textured -- e.g. [shape_stroke()], [shape_blob()],
 #'   [shape_ribbon()]. `object@points` is used directly; `object@style`
-#'   plays no role (textured_stroke draws its own grain raster instead).
+#'   plays no role (`effect_grain()` draws its own grain raster instead).
 #' @param grain A [noise_field] controlling the paper-grain texture,
 #'   sampled directly at each raster pixel's own world position (not
 #'   torus-periodic, unlike [fill_noise()]'s tiled field -- see Details).
@@ -49,23 +49,23 @@
 #' @param background Colour revealed as grain fades out, or `NA` for true
 #'   transparency (showing whatever is drawn behind). Default `NA`.
 #'
-#' @return A `textured_stroke` object.
+#' @return An `effect_grain` object.
 #'
 #' @examples
 #' t <- seq(0, 8, length.out = 150)
-#' draw(textured_stroke(
+#' draw(effect_grain(
 #'   shape_stroke(x = t, y = sin(t), width = 0.4),
 #'   color = "gray10", alpha = 0.9
 #' ))
-#' draw(textured_stroke(
+#' draw(effect_grain(
 #'   shape_stroke(x = t, y = sin(t), width = 0.4),
 #'   color = "gray5", alpha = 0.85, background = "gray30"
 #' ))
 #'
 #' @family effects
 #' @export
-textured_stroke <- S7::new_class(
-  name = "textured_stroke",
+effect_grain <- S7::new_class(
+  name = "effect_grain",
   properties = list(
     object     = drawable,
     grain      = noise_field,
@@ -109,22 +109,22 @@ textured_stroke <- S7::new_class(
   }
 )
 
-#' Build a `textured_stroke`'s masked raster grob
+#' Build an `effect_grain`'s masked raster grob
 #'
-#' Internal helper for `draw(textured_stroke)`. Samples `object@grain`
+#' Internal helper for `draw(effect_grain)`. Samples `object@grain`
 #' directly at every raster pixel's own world `(x, y)` position across the
 #' outline's bounding box (a single non-tiled sample -- see
-#' [textured_stroke()] details for why this differs from the `fill_*()`
+#' [effect_grain()] details for why this differs from the `fill_*()`
 #' family's torus-periodic tiling), then masks the resulting raster to
 #' `outline`'s exact polygon shape via [grid::as.mask()], mirroring
 #' [fill_vignette()]'s own mask-building technique.
 #'
-#' @param object A [textured_stroke] object.
+#' @param object An [effect_grain] object.
 #' @param outline `object@outline`, precomputed by the caller.
 #' @param vp The shared [grid::viewport()] `draw()` built for this object.
 #' @return A [grid::gTree()].
 #' @noRd
-textured_stroke_grob <- function(object, outline, vp) {
+effect_grain_grob <- function(object, outline, vp) {
   xlim <- range(outline@x)
   ylim <- range(outline@y)
   x_width <- xlim[2] - xlim[1]
@@ -177,7 +177,7 @@ textured_stroke_grob <- function(object, outline, vp) {
 
 #' @export
 #' @noRd
-S7::method(draw, textured_stroke) <- function(object, xlim = NULL, ylim = NULL, ...) {
+S7::method(draw, effect_grain) <- function(object, xlim = NULL, ylim = NULL, ...) {
   outline <- object@outline
 
   if (is.null(xlim)) xlim <- range(outline@x)
@@ -192,5 +192,5 @@ S7::method(draw, textured_stroke) <- function(object, xlim = NULL, ylim = NULL, 
   )
 
   grid::grid.newpage()
-  grid::grid.draw(textured_stroke_grob(object, outline, vp))
+  grid::grid.draw(effect_grain_grob(object, outline, vp))
 }
