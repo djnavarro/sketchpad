@@ -26,25 +26,48 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
   : A closed Bezier curve
 - [`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md)
   : A ribbon following a Bezier curve
+- [`shape_bezier_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbons.md)
+  : Multiple Bezier ribbons at once
+- [`shape_beziers()`](https://sketchpad.djnavarro.net/reference/shape_beziers.md)
+  : Multiple closed Bezier curves at once
 - [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
   : An irregular, "blobby" circle
+- [`shape_blobs()`](https://sketchpad.djnavarro.net/reference/shape_blobs.md)
+  : Multiple blobs at once
 - [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
   : A circle
+- [`shape_circles()`](https://sketchpad.djnavarro.net/reference/shape_circles.md)
+  : Multiple circles at once
 - [`shape_ellipse()`](https://sketchpad.djnavarro.net/reference/shape_ellipse.md)
   : An ellipse
+- [`shape_ellipses()`](https://sketchpad.djnavarro.net/reference/shape_ellipses.md)
+  : Multiple ellipses at once
 - [`shape_polygon()`](https://sketchpad.djnavarro.net/reference/shape_polygon.md)
   : A regular polygon
+- [`shape_polygons()`](https://sketchpad.djnavarro.net/reference/shape_polygons.md)
+  : Multiple regular polygons at once
 - [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)
   : A polygon defined directly by its vertices
+- [`shape_raws()`](https://sketchpad.djnavarro.net/reference/shape_raws.md)
+  : Multiple raw polygons at once
 - [`shape_rectangle()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)
   [`shape_square()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)
   : A rectangle
+- [`shape_rectangles()`](https://sketchpad.djnavarro.net/reference/shape_rectangles.md)
+  [`shape_squares()`](https://sketchpad.djnavarro.net/reference/shape_rectangles.md)
+  : Multiple rectangles/squares at once
 - [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   : A tapered ribbon between two points
+- [`shape_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_ribbons.md)
+  : Multiple ribbons at once
 - [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
   : A twisted ribbon following a random path
+- [`shape_twists()`](https://sketchpad.djnavarro.net/reference/shape_twists.md)
+  : Multiple twists at once
 - [`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)
   : A pie-slice wedge
+- [`shape_wedges()`](https://sketchpad.djnavarro.net/reference/shape_wedges.md)
+  : Multiple pie-slice wedges at once
 
 ## 1D curves
 
@@ -52,18 +75,32 @@ Open, stroked `drawable`s (`geometry = "path"`).
 
 - [`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md)
   : An open arc
+- [`curve_arcs()`](https://sketchpad.djnavarro.net/reference/curve_arcs.md)
+  : Multiple open arcs at once
 - [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)
   : An open Bezier curve
+- [`curve_beziers()`](https://sketchpad.djnavarro.net/reference/curve_beziers.md)
+  : Multiple open Bezier curves at once
 - [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md)
   : An open polyline
+- [`curve_lines()`](https://sketchpad.djnavarro.net/reference/curve_lines.md)
+  : Multiple open polylines at once
 - [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md)
   : An open path defined directly by its vertices
+- [`curve_raws()`](https://sketchpad.djnavarro.net/reference/curve_raws.md)
+  : Multiple raw paths at once
 - [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md)
   : A wandering scribble curve
+- [`curve_scribbles()`](https://sketchpad.djnavarro.net/reference/curve_scribbles.md)
+  : Multiple wandering scribble curves at once
 - [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md)
   : An open spiral
+- [`curve_spirals()`](https://sketchpad.djnavarro.net/reference/curve_spirals.md)
+  : Multiple open spirals at once
 - [`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
   : An open, wandering path following a random walk
+- [`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twists.md)
+  : Multiple wandering twist paths at once
 
 ## 0D points
 
@@ -71,6 +108,8 @@ Unconnected marker `drawable`s (`geometry = "points"`).
 
 - [`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
   : A scatter of points defined directly by their coordinates
+- [`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raws.md)
+  : Multiple point scatters at once
 
 ## Noise helpers
 
@@ -84,7 +123,7 @@ Scalar noise fields used to distort a shape’s points, used by
 - [`noise_sample()`](https://sketchpad.djnavarro.net/reference/noise_sample.md)
   : Sample a noise object
 
-## Fills
+## Fill helpers
 
 Textures and patterns for
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md)’s `fill`

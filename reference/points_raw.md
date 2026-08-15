@@ -47,6 +47,11 @@ points_raw(x, y, trans = trans_identity(), ...)
 (`R/draw.R`) for why a `"points"` geometry has no line to stroke and no
 interior to fill. Only `style@color` is used, as the marker colour.
 
+## See also
+
+Other 0D points:
+[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raws.md)
+
 ## Examples
 
 ``` r

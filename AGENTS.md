@@ -418,6 +418,43 @@ stroke), even where (as with `curve_bezier`/`shape_bezier`, or
 `curve_arc`/ `shape_wedge`) the underlying geometry computation is
 shared.
 
+Every
+`shape_*()`/`curve_*()`/[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
+constructor also has a plural, vectorized counterpart
+([`shape_circles()`](https://sketchpad.djnavarro.net/reference/shape_circles.md),
+[`shape_blobs()`](https://sketchpad.djnavarro.net/reference/shape_blobs.md),
+[`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twists.md),
+[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raws.md),
+…), returning a `sketch` directly instead of a single drawable. All of
+them share one internal engine, `vectorize_shapes(.f, args)`
+(`R/vectorize.R`): it wraps any non-vector element of `args` (e.g. a
+single shared `trans`/`noise_field`/ `noise_bridge`) in a length-1
+[`list()`](https://rdrr.io/r/base/list.html)
+([`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)
+errors on genuinely non-vector input), then calls
+`purrr::pmap(args, .f)` and collects the results into
+`sketch(shapes = ...)`. Recycling itself needs no custom logic – it
+comes directly from
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)’s own
+vctrs-based rules: a length-1 argument broadcasts against longer ones,
+mismatched lengths greater than 1 raise a clear error, and a
+[`list()`](https://rdrr.io/r/base/list.html) of several *different* S7
+objects (rather than one shared scalar) passes through unchanged and
+varies correctly per shape, since an unclassed list already satisfies
+[`is.vector()`](https://rdrr.io/r/base/vector.html). The six
+constructors whose `x`/`y` are themselves numeric vectors of control
+points/vertices for a single shape
+([`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)/[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md),
+[`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
+[`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)/[`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
+[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md))
+take `x`/`y` as a [`list()`](https://rdrr.io/r/base/list.html) of
+numeric vectors in their plural form instead – one vector per shape –
+documented explicitly on each, since this falls out of the same engine
+with no special-casing (a list of numeric vectors is exactly what
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)
+expects to iterate one whole vector per row).
+
 ### Rendering model
 
 Every `drawable` is drawn as a single grob (its type chosen by
@@ -762,10 +799,22 @@ full debugging narrative):
   has no dependency on `drawable` itself, only on `fill_class` (from
   `fill.R`); `sketch.R` needs `canvas` to exist for its own `canvas`
   property.
-- `R/sketch.R` – the `sketch` class and three `+` methods:
+- `R/sketch.R` – the `sketch` class, three `+` methods:
   `(sketch, drawable)` (accumulate shapes), `(drawable, trans)` and
   `(sketch, trans)` (compose a transform onto one drawable or every
-  shape in a sketch – see \[trans\] above).
+  shape in a sketch – see \[trans\] above) – and its
+  [`length()`](https://rdrr.io/r/base/length.html)/`` `[[` ``/`` `[` ``
+  methods for list-like access to `@shapes`.
+- `R/vectorize.R` – the internal `vectorize_shapes()` engine shared by
+  every plural
+  `shape_*s()`/`curve_*s()`/[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raws.md)
+  constructor (each defined alongside its singular counterpart, in that
+  constructor’s own file – see “Class hierarchy” above). Collated right
+  after `sketch.R`, since it builds a `sketch` from its results, though
+  as an ordinary function (not an S7 class) its exact `Collate` position
+  doesn’t actually matter – function bodies are evaluated lazily, only
+  S7 class definitions need their dependencies already loaded at parse
+  time.
 - `R/draw.R` – the `draw` generic and its three methods.
 - `R/convert.R` – the `convert(drawable, shape_raw)` method.
 - `R/sketchpad-package.R` – package-level doc, `#' @import S7`, the
@@ -779,10 +828,10 @@ full debugging narrative):
   curve_raw -\> points_raw -\> shape_circle -\> shape_rectangle -\>
   shape_polygon -\> shape_ellipse -\> shape_wedge -\> curve_arc -\>
   shape_blob -\> shape_ribbon -\> shape_twist -\> curve_twist -\> canvas
-  -\> sketch -\> draw -\> convert -\> sketchpad-package). **Any new
-  drawable subclass must be added to `Collate` after `drawable.R`**, or
-  `devtools::load_all()`/`R CMD check` will fail with an “object
-  ‘drawable’ not found” error.
+  -\> sketch -\> vectorize -\> draw -\> convert -\> sketchpad-package).
+  **Any new drawable subclass must be added to `Collate` after
+  `drawable.R`**, or `devtools::load_all()`/`R CMD check` will fail with
+  an “object ‘drawable’ not found” error.
 
 ## Conventions
 

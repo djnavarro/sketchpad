@@ -57,11 +57,18 @@ shared across every `geometry`.
 
 Other 1D curves:
 [`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md),
+[`curve_arcs()`](https://sketchpad.djnavarro.net/reference/curve_arcs.md),
 [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md),
+[`curve_beziers()`](https://sketchpad.djnavarro.net/reference/curve_beziers.md),
 [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
+[`curve_lines()`](https://sketchpad.djnavarro.net/reference/curve_lines.md),
+[`curve_raws()`](https://sketchpad.djnavarro.net/reference/curve_raws.md),
 [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md),
+[`curve_scribbles()`](https://sketchpad.djnavarro.net/reference/curve_scribbles.md),
 [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md),
-[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
+[`curve_spirals()`](https://sketchpad.djnavarro.net/reference/curve_spirals.md),
+[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md),
+[`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twists.md)
 
 ## Examples
 
