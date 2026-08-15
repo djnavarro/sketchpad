@@ -1521,3 +1521,73 @@ Verified with `pkgdown::build_reference()` (no warnings) and a full
 deleted the now-orphaned plural-only `.Rd` files (`shape_circles.Rd`,
 etc.) on the next `devtools::document()` run, with no manual cleanup
 needed.
+
+## `shape_stroke()`: a tapered stroke along an arbitrary path
+
+Explored, ahead of building any package code, several ways to give
+`curve_*()` drawables a hand-drawn (ink/pencil/brush) look that plain
+`grid::gpar()` line styling can't express. Prototyped in conversation
+(not committed) before settling on a design: a variable-width ribbon
+offset from an arbitrary path, generalizing `shape_ribbon()`'s
+offset-normal + `sqrt`-taper technique from a single straight segment to
+any point sequence, with a `noise_field` modulating width as a
+"pressure" curve. Confirmed by prototype that layering several
+independently-jittered copies of the resulting shape (or of a plain
+`curve_line()`) on top adds a convincing pencil/ink edge texture, and
+that texturing the ribbon's own interior with `fill_noise()` reads as
+charcoal/marker grain -- both left as compositional techniques for the
+caller rather than built into the class itself (see
+`.agents/PLAN.md`'s "Stylized stroke rendering" item for what's still
+open).
+
+**Why per-point normals, not a shared offset direction.** `shape_ribbon()`/
+`shape_twist()` both offset by a single, *unnormalized* direction vector
+(the straight backbone's own `(dy, dx)`) shared across every point --
+correct only because their own backbone is exactly straight, or
+displaced from straight by an amount small relative to its length. A
+`shape_stroke()` path can bend arbitrarily (that's the point of taking
+arbitrary control points), so reusing that same shortcut would visibly
+skew the outline anywhere the path curves -- confirmed by an early
+prototype attempt using the shared-direction shortcut on a sine-wave
+path, which came out visibly slanted at each bend. Fixed by computing a
+genuine unit normal at every point via central differences
+(`stroke_normals()`, `R/shape_stroke.R`), re-normalized per point rather
+than shared.
+
+**Why resampling, and why it doesn't smooth corners.** A stroke built
+from only a few widely-spaced control points needs denser points for its
+width taper/noise modulation to vary smoothly, so `shape_stroke()`
+resamples its control polyline to `n` evenly arc-length-spaced points
+(`resample_by_length()`, via `stats::approx()` after dropping duplicate
+arc-length ties to avoid its "collapsing to unique x values" warning)
+before computing normals/width. This only redistributes points along the
+existing straight segments -- it does not curve-fit or smooth sharp
+corners, matching `curve_line()`'s own no-smoothing convention (no
+spline fit, unlike `shape_bezier()`/`curve_bezier()`'s Bernstein-basis
+smoothing). A `shape_stroke()` given only a handful of control points
+therefore still renders with visibly angular corners; a smoothly curving
+stroke needs a denser input path (e.g. points already sampled from some
+smooth function), documented explicitly on the constructor after an
+initial test render with only 8-12 control points came out visibly
+zig-zagged rather than smooth.
+
+**Why the taper is renormalized to peak at `1`.** `shape_ribbon()`'s own
+`sqrt(t * (1 - t))` taper formula peaks at `0.5` (an existing,
+undocumented quirk -- its `width` argument is therefore not literally the
+maximum rendered width). `shape_stroke()` uses `sqrt(pmin(t, 1 - t) * 2)`
+instead, which peaks at exactly `1` at the path's midpoint, so its own
+`width` argument is exactly the maximum rendered width -- a deliberate,
+documented improvement over the existing siblings' behavior rather than
+copying their formula verbatim, without changing either existing class
+(no shared taper helper was factored out, since the two formulas are now
+genuinely different, not duplicated).
+
+Implemented as a full `shape_*` family member: `shape_stroke()` (singular)
+and `shape_strokes()` (plural, list-column `x`/`y` like `curve_line()`'s
+own plural), collated in `DESCRIPTION` right after `curve_twist.R`,
+documented together on one merged `.Rd` topic, `tests/testthat/test-stroke.R`
+covering point count, zero-width collapse-to-backbone, taper-to-zero at
+both ends, per-point (not global-chord) normal behavior on a bent path,
+seed reproducibility, argument validation, and `shape_strokes()`
+vectorization. Verified with a full `devtools::check()` (0 errors/
+warnings/notes).

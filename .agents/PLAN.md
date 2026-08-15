@@ -149,6 +149,41 @@ CSV palettes. sketchpad could depend on or bundle from it rather than
 every series/example inlining its own palette vector (as all four
 `README.Rmd` examples currently do).
 
+### Stylized stroke rendering: still open beyond `shape_stroke()`
+
+The variable-width ribbon-from-path idea is now implemented as
+`shape_stroke()` -- see `.agents/HISTORY.md`. Still open, from the same
+original brainstorm:
+
+- **Layered/jittered multi-stroke** -- draw the same path 2-4 times with
+  independently perturbed points (or small random `trans_translate()`
+  offsets) at partial `color_alpha`, and/or independently varied
+  `linewidth`/`width`. This needs no new drawable class at all -- it's a
+  compositional helper returning a `sketch` of several perturbed
+  `curve_*()`/`shape_stroke()` copies, layering into the classic
+  doubled/uneven look of pencil or pen. Prototyped ad hoc in conversation
+  (smooth `ambient::gen_simplex()` jitter per layer) and found
+  convincing; not yet promoted to a package helper.
+- **Bristle/dry-brush effect** -- several parallel sub-paths offset
+  perpendicular to the main path (a "comb" of thin, partially
+  transparent strokes, each with its own small-amplitude noise wobble),
+  approximating bristles fanning out. Also compositional, no new class
+  needed beyond `shape_stroke()`.
+- **Rasterized/textured stroke** -- composite a raster texture (paper
+  grain, scanned ink) masked to the stroke's own outline, the same
+  masking technique `fill_vignette()` already uses. Heaviest option,
+  and the only one that would need new grob-building logic inside
+  `draw()` rather than reusing `geometry_grob()`'s existing
+  `"polygon"`/`"path"` branches. Not prototyped.
+
+Textured fill on `shape_stroke()`'s own interior needs no further work --
+any existing `fill_*()` already applies; `fill_noise()`/`fill_marble()`
+read as convincing charcoal/marker grain in testing, while
+`fill_scribble()` fit poorly (its fixed horizontal/vertical direction
+doesn't track a curved path's own tangent -- the same underlying gap as
+the existing "Deferred: arbitrary angle for `fill_scribble()`" item
+above).
+
 ### Explicitly flagged as possibly out of scope
 
 Two ideas considered and tentatively set aside rather than silently
