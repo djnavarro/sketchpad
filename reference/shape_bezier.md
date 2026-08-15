@@ -71,7 +71,6 @@ For `shape_beziers()`, a
 ## See also
 
 Other 2D shapes:
-[`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md),
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
 [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [`shape_ellipse()`](https://sketchpad.djnavarro.net/reference/shape_ellipse.md),
@@ -79,6 +78,7 @@ Other 2D shapes:
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
 [`shape_rectangle()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
+[`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md),
 [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md),
 [`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)

@@ -108,7 +108,7 @@ and
 [`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md);
 `FALSE` (the default) for every other concrete drawable, including
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)/
-[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)/[`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md)
+[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
 – these do have a conceptual backbone, but it's exposed via
 `x`/`y`/`xend`/`yend` (or additional named control-point pairs), not a
 plain `x`/`y` vector. Whether a `pathlike` subclass actually has `x`/`y`

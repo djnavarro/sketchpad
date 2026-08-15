@@ -7,7 +7,11 @@ can be used for generative art.
 
 Useful links:
 
+- <https://github.com/djnavarro/sketchpad>
+
 - <https://sketchpad.djnavarro.net/>
+
+- Report bugs at <https://github.com/djnavarro/sketchpad/issues>
 
 ## Author
 

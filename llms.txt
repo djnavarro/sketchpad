@@ -69,9 +69,6 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
 - [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
   [`shape_beziers()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)
   : A closed Bezier curve
-- [`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md)
-  [`shape_bezier_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md)
-  : A ribbon following a Bezier curve
 - [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
   [`shape_blobs()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)
   : An irregular, "blobby" circle
@@ -95,6 +92,9 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
 - [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   [`shape_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   : A tapered ribbon between two points
+- [`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+  [`shape_ribbonpaths()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+  : A ribbon following an arbitrary curve
 - [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
   [`shape_strokes()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
   : A tapered, pressure-modulated stroke along an arbitrary path

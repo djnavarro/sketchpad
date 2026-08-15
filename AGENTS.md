@@ -33,7 +33,7 @@ how the API got here, see
   and rescales into `to` via
   [`ambient::normalize()`](https://ambient.data-imaginist.com/reference/modifications.html)
   – the one operation
-  [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)/[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)/[`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md)
+  [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)/[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
   all shared verbatim before this class existed (see
   `.agents/HISTORY.md`). Each of those constructors now takes a
   `distortion = noise_field()` property instead of bare `frequency`/
@@ -202,7 +202,7 @@ how the API got here, see
   [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)/[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)/[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
   – every other concrete drawable defaults to `FALSE`, including
   [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/
-  [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)/[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)/[`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md),
+  [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)/[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md),
   whose conceptual backbones are exposed via `x`/`y`/`xend`/`yend` (or
   additional named control-point pairs) rather than a plain `x`/`y`
   vector. Not meant to be instantiated directly. `drawable`’s own
@@ -300,6 +300,34 @@ how the API got here, see
   `.agents/PLAN.md` for compositional techniques (layered jitter,
   textured fill) that build on top of it without further class changes.
   `pathlike` (its `x`/`y` are the pre-resampling control points).
+- **[`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)**
+  – not its own S7 class; a plain function (`R/shape_ribbonpath.R`) that
+  builds a `shape_stroke` from an arbitrary `curve_*()` drawable’s own
+  computed `points` (i.e. any `drawable` with `geometry == "path"`,
+  validated by the internal `validate_ribbonpath_path()` helper):
+  `path@points@x`/`@y` are passed straight through as
+  [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
+  own `x`/`y`. This is the general “ribbon around an arbitrary curve”
+  replacement for the earlier `shape_bezier_ribbon()` (removed) – unlike
+  that class’s single shared offset direction (only accurate for a
+  nearly-straight backbone),
+  [`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+  inherits
+  [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
+  true per-point unit normals for free, so it renders correctly for any
+  backbone shape, including ones that loop or bend sharply
+  ([`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md),
+  [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md)),
+  not just a Bezier curve. Since the object it returns is literally a
+  `shape_stroke`, it’s already `pathlike` with no extra work, and
+  [`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md)/[`effect_bristle()`](https://sketchpad.djnavarro.net/reference/effect_bristle.md)
+  apply to it unchanged.
+  [`shape_ribbonpaths()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+  is its vectorized counterpart; since `path` is a single drawable
+  object per shape rather than a numeric vector, it needs no list-column
+  convention – a single shared `path` recycles automatically via
+  `vectorize_shapes()`’s existing rules, the same way a shared
+  `distortion` does.
 - **`shape_bezier`** – outline follows a Bezier curve through an
   arbitrary number of control points (`x`/`y`), evaluated via the
   Bernstein polynomial basis (internal `bernstein()` helper, *not* De
@@ -312,17 +340,12 @@ how the API got here, see
   rendering closed (`geometry = "polygon"`, the curve’s last point
   connects straight back to its first) – for the same curve as an open
   path instead, see `curve_bezier`. The original’s separate
-  `bezier_ribbon` drawable has also since been ported, as
-  `shape_bezier_ribbon` (see below). `pathlike`.
-- **`shape_bezier_ribbon`** – like `shape_ribbon`, but its backbone
-  follows a cubic Bezier curve – through `(x, y)`, two control points
-  (`x_ctrl1`/`y_ctrl1`, `x_ctrl2`/`y_ctrl2`), and `(xend, yend)` –
-  rather than a straight line, giving the ribbon a curved rather than
-  straight path. Reuses `shape_bezier`/`curve_bezier`’s internal
-  `bezier_curve_points()` helper (`R/shape_bezier.R`) to compute the
-  backbone rather than duplicating it; width still tapers to zero at
-  both ends and varies along the curve via a `distortion`
-  \[noise_field\], exactly as in `shape_ribbon`.
+  `bezier_ribbon` drawable was ported as `shape_bezier_ribbon`, then
+  later removed in favor of the more general
+  [`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+  (see below) once
+  [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
+  existed to build it on top of. `pathlike`.
 - **`curve_bezier`** – the first `curve_*()`-prefixed drawable: an open
   Bezier path, `geometry = "path"` fixed at construction (not exposed as
   a caller-facing argument). Shares its geometry computation and
@@ -473,7 +496,10 @@ Every closed (`geometry = "polygon"`) drawable’s constructor shares the
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md),
 [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
 [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
-and the trivial
+[`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+(a plain function wrapping
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
+not its own class – see “Class hierarchy” above), and the trivial
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)),
 mirroring the `fill_*()` family below – this groups the “produces a
 closed drawable polygon” functions under one discoverable, greppable
@@ -1015,9 +1041,9 @@ full debugging narrative):
 - `R/noise_field.R` – the `noise_field` class and
   [`noise_sample()`](https://sketchpad.djnavarro.net/reference/noise_sample.md)
   generic, loaded right after `fill.R`: no compile-time dependency on
-  any other class, but `shape_blob.R`/`shape_ribbon.R`/`shape_twist.R`/
-  `shape_bezier_ribbon.R` need `noise_field` to exist for their own
-  `distortion` property default.
+  any other class, but `shape_blob.R`/`shape_ribbon.R`/`shape_twist.R`
+  need `noise_field` to exist for their own `distortion` property
+  default.
 - `R/noise_bridge.R` – the `noise_bridge` class and its
   [`noise_sample()`](https://sketchpad.djnavarro.net/reference/noise_sample.md)
   method, loaded right after `noise_field.R` (needs the generic to
@@ -1030,22 +1056,20 @@ full debugging narrative):
   `trans` property default.
 - `R/style.R`, `R/xy.R`, `R/drawable.R` – foundation classes, in load
   order (each depends on the previous).
-- `R/shape_bezier.R`, `R/shape_bezier_ribbon.R`, `R/curve_bezier.R`,
-  `R/curve_line.R`, `R/curve_spiral.R`, `R/curve_scribble.R`,
-  `R/shape_raw.R`, `R/curve_raw.R`, `R/points_raw.R`,
-  `R/shape_circle.R`, `R/shape_rectangle.R`, `R/shape_polygon.R`,
-  `R/shape_ellipse.R`, `R/shape_wedge.R`, `R/curve_arc.R`,
-  `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R`,
-  `R/curve_twist.R`, `R/shape_stroke.R` – the concrete `drawable`
-  subclasses, one file each (`shape_rectangle.R` also holds the
+- `R/shape_bezier.R`, `R/curve_bezier.R`, `R/curve_line.R`,
+  `R/curve_spiral.R`, `R/curve_scribble.R`, `R/shape_raw.R`,
+  `R/curve_raw.R`, `R/points_raw.R`, `R/shape_circle.R`,
+  `R/shape_rectangle.R`, `R/shape_polygon.R`, `R/shape_ellipse.R`,
+  `R/shape_wedge.R`, `R/curve_arc.R`, `R/shape_blob.R`,
+  `R/shape_ribbon.R`, `R/shape_twist.R`, `R/curve_twist.R`,
+  `R/shape_stroke.R` – the concrete `drawable` subclasses, one file each
+  (`shape_rectangle.R` also holds the
   [`shape_square()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)
   wrapper function, rather than giving it its own file, since it’s not a
   separate S7 class). Every closed constructor shares the `shape_*`
   prefix, every open one the `curve_*` prefix (see “Class hierarchy”
   above), and each file is named to match its constructor – except
-  `curve_bezier.R`, kept immediately after `shape_bezier.R` (and
-  `shape_bezier_ribbon.R`, itself collated right after `shape_bezier.R`
-  since it depends on that file’s `bezier_curve_points()`) since it
+  `curve_bezier.R`, kept immediately after `shape_bezier.R` since it
   shares `shape_bezier.R`’s
   `bernstein()`/`bezier_curve_points()`/`validate_bezier_args()`
   internal helpers rather than duplicating them, `curve_twist.R`, kept
@@ -1065,11 +1089,22 @@ full debugging narrative):
   constructor shape. `shape_stroke.R` needs no such sharing either –
   it’s the last concrete `drawable` subclass, collated right after
   `curve_twist.R`.
+- `R/shape_ribbonpath.R` –
+  [`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)/[`shape_ribbonpaths()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md),
+  plain functions (not S7 classes) that build a tapered, noise-modulated
+  ribbon by feeding an arbitrary `curve_*()` drawable’s own computed
+  `points` into
+  [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
+  (see “Class hierarchy” above). Collated right after `shape_stroke.R`,
+  since it calls
+  [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
+  directly – though as an ordinary function, its exact `Collate`
+  position doesn’t actually matter, the same way `vectorize.R`’s
+  doesn’t.
 - `R/canvas.R` – the `canvas` class, collated right after
-  `shape_stroke.R` (last of the concrete `drawable` subclasses) since it
-  has no dependency on `drawable` itself, only on `fill_class` (from
-  `fill.R`); `sketch.R` needs `canvas` to exist for its own `canvas`
-  property.
+  `R/shape_ribbonpath.R` since it has no dependency on `drawable`
+  itself, only on `fill_class` (from `fill.R`); `sketch.R` needs
+  `canvas` to exist for its own `canvas` property.
 - `R/sketch.R` – the `sketch` class, three `+` methods:
   `(sketch, drawable)` (accumulate shapes), `(drawable, trans)` and
   `(sketch, trans)` (compose a transform onto one drawable or every
@@ -1123,12 +1158,12 @@ full debugging narrative):
   and the `globalVariables("properties")` workaround.
 - `DESCRIPTION`’s `Collate` field pins the load order above explicitly
   (fill -\> noise_field -\> noise_bridge -\> trans -\> style -\> xy -\>
-  drawable -\> shape_bezier -\> shape_bezier_ribbon -\> curve_bezier -\>
-  curve_line -\> curve_spiral -\> curve_scribble -\> shape_raw -\>
-  curve_raw -\> points_raw -\> shape_circle -\> shape_rectangle -\>
-  shape_polygon -\> shape_ellipse -\> shape_wedge -\> curve_arc -\>
-  shape_blob -\> shape_ribbon -\> shape_twist -\> curve_twist -\>
-  shape_stroke -\> canvas -\> sketch -\> vectorize -\> effects -\>
+  drawable -\> shape_bezier -\> curve_bezier -\> curve_line -\>
+  curve_spiral -\> curve_scribble -\> shape_raw -\> curve_raw -\>
+  points_raw -\> shape_circle -\> shape_rectangle -\> shape_polygon -\>
+  shape_ellipse -\> shape_wedge -\> curve_arc -\> shape_blob -\>
+  shape_ribbon -\> shape_twist -\> curve_twist -\> shape_stroke -\>
+  shape_ribbonpath -\> canvas -\> sketch -\> vectorize -\> effects -\>
   effect_tremor -\> effect_bristle -\> draw -\> effect_grain -\> convert
   -\> sketchpad-package). **Any new drawable subclass must be added to
   `Collate` after `drawable.R`**, or
