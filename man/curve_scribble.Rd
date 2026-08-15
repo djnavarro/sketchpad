@@ -2,9 +2,24 @@
 % Please edit documentation in R/curve_scribble.R
 \name{curve_scribble}
 \alias{curve_scribble}
+\alias{curve_scribbles}
 \title{A wandering scribble curve}
 \usage{
 curve_scribble(
+  x = 0,
+  y = 0,
+  width = 1,
+  height = 1,
+  direction = "horizontal",
+  n_harmonics = 3L,
+  amplitude = 0.35,
+  n = 200L,
+  seed = 1L,
+  trans = trans_identity(),
+  ...
+)
+
+curve_scribbles(
   x = 0,
   y = 0,
   width = 1,
@@ -45,6 +60,11 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{curve_scribbles()}, a \link{sketch}.
+}
 \description{
 \code{curve_scribble} is a \link{drawable} whose path is a single random wandering
 line -- a random finite sum of sine harmonics -- built from the same
@@ -54,6 +74,15 @@ on the sketch's own coordinate plane rather than tiled inside a fill
 pattern. Where \code{fill_scribble()} scatters several such lines across a
 repeating tile as a texture, \code{curve_scribble()} draws exactly one as a
 standalone open curve.
+
+\code{curve_scribbles()} is a vectorized version of \code{\link[=curve_scribble]{curve_scribble()}}:
+each argument may be a vector, recycled against the others via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). Varying \code{seed} per curve is usually what makes
+several scribbles look distinct from each other. The result is a
+\link{sketch} containing one \code{curve_scribble()} per recycled row, rather
+than a single drawable.
 }
 \details{
 The underlying line is generated in \verb{(along, across)} form, \code{along}
@@ -75,21 +104,16 @@ draw time), since \code{style()} is shared across every \code{geometry}.
 \examples{
 draw(curve_scribble(width = 2, height = 0.5, seed = 5591L))
 
+draw(curve_scribbles(x = 1:3, width = 0.8, height = 0.5, seed = 1:3))
+
 }
 \seealso{
 Other 1D curves:
 \code{\link[=curve_arc]{curve_arc()}},
-\code{\link[=curve_arcs]{curve_arcs()}},
 \code{\link[=curve_bezier]{curve_bezier()}},
-\code{\link[=curve_beziers]{curve_beziers()}},
 \code{\link[=curve_line]{curve_line()}},
-\code{\link[=curve_lines]{curve_lines()}},
 \code{\link[=curve_raw]{curve_raw()}},
-\code{\link[=curve_raws]{curve_raws()}},
-\code{\link[=curve_scribbles]{curve_scribbles()}},
 \code{\link[=curve_spiral]{curve_spiral()}},
-\code{\link[=curve_spirals]{curve_spirals()}},
-\code{\link[=curve_twist]{curve_twist()}},
-\code{\link[=curve_twists]{curve_twists()}}
+\code{\link[=curve_twist]{curve_twist()}}
 }
 \concept{1D curves}

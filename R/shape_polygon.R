@@ -14,6 +14,7 @@
 #' @param trans A [trans] object applied to the shape's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(shape_polygon(radius = 1, n = 3L))
@@ -69,8 +70,8 @@ shape_polygon <- S7::new_class(
 #' raise an error). The result is a [sketch] containing one
 #' `shape_polygon()` per recycled row, rather than a single drawable.
 #'
-#' @inheritParams shape_polygon
-#' @return A [sketch].
+#' @rdname shape_polygon
+#' @return For `shape_polygons()`, a [sketch].
 #'
 #' @examples
 #' draw(shape_polygons(x = 1:3, n = c(3L, 4L, 6L)))

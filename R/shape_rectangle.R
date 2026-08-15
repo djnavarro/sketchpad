@@ -14,6 +14,7 @@
 #' @param trans A [trans] object applied to the shape's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(shape_rectangle(width = 2, height = 1))
@@ -78,8 +79,8 @@ shape_square <- function(x = 0, y = 0, side = 1, trans = trans_identity(), ...) 
 #' [sketch] containing one `shape_rectangle()`/`shape_square()` per
 #' recycled row, rather than a single drawable.
 #'
-#' @inheritParams shape_rectangle
-#' @return A [sketch].
+#' @rdname shape_rectangle
+#' @return For `shape_rectangles()`/`shape_squares()`, a [sketch].
 #'
 #' @examples
 #' draw(shape_rectangles(x = 1:3, width = c(0.5, 1, 1.5), height = 0.5))
@@ -94,7 +95,7 @@ shape_rectangles <- function(x = 0, y = 0, width = 1, height = 1, trans = trans_
   ))
 }
 
-#' @rdname shape_rectangles
+#' @rdname shape_rectangle
 #' @family 2D shapes
 #' @export
 shape_squares <- function(x = 0, y = 0, side = 1, trans = trans_identity(), ...) {

@@ -21,6 +21,7 @@
 #' @param trans A [trans] object applied to the curve's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(curve_spiral(radius_start = 0, radius_end = 1, turns = 4))
@@ -91,8 +92,8 @@ curve_spiral <- S7::new_class(
 #' raise an error). The result is a [sketch] containing one
 #' `curve_spiral()` per recycled row, rather than a single drawable.
 #'
-#' @inheritParams curve_spiral
-#' @return A [sketch].
+#' @rdname curve_spiral
+#' @return For `curve_spirals()`, a [sketch].
 #'
 #' @examples
 #' draw(curve_spirals(x = c(0, 3, 6), turns = c(2, 3, 4)))

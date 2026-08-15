@@ -14,11 +14,11 @@
 #' geometry has no line to stroke and no interior to fill. Only `style@color`
 #' is used, as the marker colour.
 #'
-#' @param x Numeric vector of x coordinates.
-#' @param y Numeric vector of y coordinates.
+#' @param x,y Numeric vectors of x/y coordinates.
 #' @param trans A [trans] object applied to the computed points. Default
 #'   [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(points_raw(
@@ -71,11 +71,11 @@ points_raw <- S7::new_class(
 #' containing one `points_raw()` per list element/recycled row, rather
 #' than a single drawable.
 #'
-#' @inheritParams points_raw
-#' @param x,y A `list()` of numeric vectors of point coordinates, one
-#'   vector per scatter. Each vector must be the same length as its
-#'   `y`/`x` counterpart.
-#' @return A [sketch].
+#' @rdname points_raw
+#' @param x,y For `points_raw()`, a numeric vector of x/y coordinates. For
+#'   `points_raws()`, a `list()` of such vectors instead -- one vector
+#'   per scatter.
+#' @return For `points_raws()`, a [sketch].
 #'
 #' @examples
 #' draw(points_raws(

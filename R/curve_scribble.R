@@ -42,6 +42,7 @@
 #' @param trans A [trans] object applied to the curve's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(curve_scribble(width = 2, height = 0.5, seed = 5591L))
@@ -143,8 +144,8 @@ curve_scribble <- S7::new_class(
 #' [sketch] containing one `curve_scribble()` per recycled row, rather
 #' than a single drawable.
 #'
-#' @inheritParams curve_scribble
-#' @return A [sketch].
+#' @rdname curve_scribble
+#' @return For `curve_scribbles()`, a [sketch].
 #'
 #' @examples
 #' draw(curve_scribbles(x = 1:3, width = 0.8, height = 0.5, seed = 1:3))

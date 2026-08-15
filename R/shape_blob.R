@@ -14,6 +14,7 @@
 #' @param trans A [trans] object applied to the shape's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(shape_blob(radius = 1, range = 0.3, distortion = noise_field(seed = 4821L)))
@@ -90,8 +91,8 @@ shape_blob <- S7::new_class(
 #' containing one `shape_blob()` per recycled row, rather than a single
 #' drawable.
 #'
-#' @inheritParams shape_blob
-#' @return A [sketch].
+#' @rdname shape_blob
+#' @return For `shape_blobs()`, a [sketch].
 #'
 #' @examples
 #' draw(shape_blobs(x = 1:3, radius = c(0.5, 1, 1.5), range = 0.2))

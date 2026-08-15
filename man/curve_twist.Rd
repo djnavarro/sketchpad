@@ -2,9 +2,22 @@
 % Please edit documentation in R/curve_twist.R
 \name{curve_twist}
 \alias{curve_twist}
+\alias{curve_twists}
 \title{An open, wandering path following a random walk}
 \usage{
 curve_twist(
+  x = 0,
+  y = 0,
+  xend = 1,
+  yend = 1,
+  scale = 0.2,
+  n = 100L,
+  path_distortion = noise_bridge(),
+  trans = trans_identity(),
+  ...
+)
+
+curve_twists(
   x = 0,
   y = 0,
   xend = 1,
@@ -35,6 +48,11 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{curve_twists()}, a \link{sketch}.
+}
 \description{
 \code{curve_twist} is \code{\link[=shape_twist]{shape_twist()}}'s path alone, with no ribbon width:
 an open \code{\link[=curve_line]{curve_line()}}-like polyline between \verb{(x, y)} and
@@ -47,6 +65,16 @@ rendered as an open \code{grid::polylineGrob()} (\code{geometry = "path"}).
 Shares its path computation with \code{shape_twist()} via the internal
 \code{twisted_path_points()} helper (\code{R/shape_twist.R}) rather than
 duplicating it.
+
+\code{curve_twists()} is a vectorized version of \code{\link[=curve_twist]{curve_twist()}}: each
+argument may be a vector, recycled against the others via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). A shared \code{path_distortion} \link{noise_bridge} is
+automatically recycled across every path; pass a \code{list()} of several
+different \code{noise_bridge}s instead to vary it per path. The result is
+a \link{sketch} containing one \code{curve_twist()} per recycled row, rather
+than a single drawable.
 }
 \details{
 \code{style@fill} has no effect for \code{curve_twist()} -- see \link{drawable}'s
@@ -61,21 +89,16 @@ draw(curve_twist(
   path_distortion = noise_bridge(seed = 7734L)
 ))
 
+draw(curve_twists(x = 1:3, y = 0, xend = 2:4, yend = 1))
+
 }
 \seealso{
 Other 1D curves:
 \code{\link[=curve_arc]{curve_arc()}},
-\code{\link[=curve_arcs]{curve_arcs()}},
 \code{\link[=curve_bezier]{curve_bezier()}},
-\code{\link[=curve_beziers]{curve_beziers()}},
 \code{\link[=curve_line]{curve_line()}},
-\code{\link[=curve_lines]{curve_lines()}},
 \code{\link[=curve_raw]{curve_raw()}},
-\code{\link[=curve_raws]{curve_raws()}},
 \code{\link[=curve_scribble]{curve_scribble()}},
-\code{\link[=curve_scribbles]{curve_scribbles()}},
-\code{\link[=curve_spiral]{curve_spiral()}},
-\code{\link[=curve_spirals]{curve_spirals()}},
-\code{\link[=curve_twists]{curve_twists()}}
+\code{\link[=curve_spiral]{curve_spiral()}}
 }
 \concept{1D curves}

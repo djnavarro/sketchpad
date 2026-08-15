@@ -2,9 +2,21 @@
 % Please edit documentation in R/shape_wedge.R
 \name{shape_wedge}
 \alias{shape_wedge}
+\alias{shape_wedges}
 \title{A pie-slice wedge}
 \usage{
 shape_wedge(
+  x = 0,
+  y = 0,
+  radius = 1,
+  start = 0,
+  end = pi/2,
+  n = 100L,
+  trans = trans_identity(),
+  ...
+)
+
+shape_wedges(
   x = 0,
   y = 0,
   radius = 1,
@@ -31,6 +43,11 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{shape_wedges()}, a \link{sketch}.
+}
 \description{
 \code{shape_wedge} is a \link{drawable} defined by a centroid, a radius, and a
 \code{start}/\code{end} angle (in radians): its outline is the centroid, followed by
@@ -38,34 +55,32 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 polygon closing then draws the final straight edge back from the arc's
 last point to the centroid, giving the familiar pie-slice/wedge shape.
 \code{\link[=curve_arc]{curve_arc()}} is the arc alone, with no centroid vertex or fill.
+
+\code{shape_wedges()} is a vectorized version of \code{\link[=shape_wedge]{shape_wedge()}}: each
+argument may be a vector, recycled against the others via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{shape_wedge()} per recycled row, rather than a single drawable.
 }
 \examples{
 draw(shape_wedge(start = 0, end = pi / 2))
 draw(shape_wedge(x = 1, y = 1, radius = 0.5, start = pi, end = 2 * pi, color = "darkred"))
+
+draw(shape_wedges(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))
 
 }
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
-\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
-\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
-\code{\link[=shape_blobs]{shape_blobs()}},
 \code{\link[=shape_circle]{shape_circle()}},
-\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
-\code{\link[=shape_ellipses]{shape_ellipses()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
-\code{\link[=shape_polygons]{shape_polygons()}},
 \code{\link[=shape_raw]{shape_raw()}},
-\code{\link[=shape_raws]{shape_raws()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
-\code{\link[=shape_rectangles]{shape_rectangles()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
-\code{\link[=shape_ribbons]{shape_ribbons()}},
-\code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_twists]{shape_twists()}},
-\code{\link[=shape_wedges]{shape_wedges()}}
+\code{\link[=shape_twist]{shape_twist()}}
 }
 \concept{2D shapes}

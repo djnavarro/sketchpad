@@ -2,13 +2,18 @@
 % Please edit documentation in R/shape_bezier.R
 \name{shape_bezier}
 \alias{shape_bezier}
+\alias{shape_beziers}
 \title{A closed Bezier curve}
 \usage{
 shape_bezier(x, y, n = 100L, trans = trans_identity(), ...)
+
+shape_beziers(x, y, n = 100L, trans = trans_identity(), ...)
 }
 \arguments{
-\item{x, y}{Numeric vectors of control point coordinates. Must be the
-same length, with at least two control points.}
+\item{x, y}{For \code{shape_bezier()}, numeric vectors of control point
+coordinates, the same length, with at least two control points. For
+\code{shape_beziers()}, a \code{list()} of such vectors instead -- one vector
+of control points per shape.}
 
 \item{n}{Number of points used to sample the curve. Default \code{100L}.}
 
@@ -16,6 +21,11 @@ same length, with at least two control points.}
 Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
+}
+\value{
+A \link{drawable}.
+
+For \code{shape_beziers()}, a \link{sketch}.
 }
 \description{
 \code{shape_bezier} is a \link{drawable} whose outline follows a Bezier curve
@@ -26,33 +36,39 @@ the kind used to build ribbons and other flowing shapes. Since
 closed polygon, the curve is implicitly closed from its last control
 point back to its first -- for an open Bezier curve/path instead, see
 \code{\link[=curve_bezier]{curve_bezier()}}.
+
+\code{shape_beziers()} is a vectorized version of \code{\link[=shape_bezier]{shape_bezier()}}. Since
+\code{x}/\code{y} are themselves numeric vectors of control points for a single
+curve, \code{shape_beziers()} takes them as a \code{list()} of numeric vectors
+instead -- one vector of control points per shape -- rather than a
+bare vector (which \code{shape_circles()}-style constructors use for a
+plain per-shape scalar). Every other argument may be a plain vector,
+recycled against \code{x}/\code{y} via \code{purrr::pmap()}'s own vctrs-based rules
+(any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error). The result is a \link{sketch}
+containing one \code{shape_bezier()} per list element/recycled row, rather
+than a single drawable.
 }
 \examples{
 draw(shape_bezier(x = c(0, 0.5, 1, 0.5), y = c(0, 1, 0, -1)))
+
+draw(shape_beziers(
+  x = list(c(0, 0.5, 1, 0.5), c(2, 2.5, 3, 2.5)),
+  y = list(c(0, 1, 0, -1), c(0, 1, 0, -1))
+))
 
 }
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
-\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
-\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
-\code{\link[=shape_blobs]{shape_blobs()}},
 \code{\link[=shape_circle]{shape_circle()}},
-\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
-\code{\link[=shape_ellipses]{shape_ellipses()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
-\code{\link[=shape_polygons]{shape_polygons()}},
 \code{\link[=shape_raw]{shape_raw()}},
-\code{\link[=shape_raws]{shape_raws()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
-\code{\link[=shape_rectangles]{shape_rectangles()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
-\code{\link[=shape_ribbons]{shape_ribbons()}},
 \code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_twists]{shape_twists()}},
-\code{\link[=shape_wedge]{shape_wedge()}},
-\code{\link[=shape_wedges]{shape_wedges()}}
+\code{\link[=shape_wedge]{shape_wedge()}}
 }
 \concept{2D shapes}

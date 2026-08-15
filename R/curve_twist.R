@@ -29,6 +29,7 @@
 #' @param trans A [trans] object applied to the curve's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(curve_twist(
@@ -104,8 +105,8 @@ curve_twist <- S7::new_class(
 #' a [sketch] containing one `curve_twist()` per recycled row, rather
 #' than a single drawable.
 #'
-#' @inheritParams curve_twist
-#' @return A [sketch].
+#' @rdname curve_twist
+#' @return For `curve_twists()`, a [sketch].
 #'
 #' @examples
 #' draw(curve_twists(x = 1:3, y = 0, xend = 2:4, yend = 1))

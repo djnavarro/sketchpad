@@ -3,6 +3,8 @@
 \name{shape_rectangle}
 \alias{shape_rectangle}
 \alias{shape_square}
+\alias{shape_rectangles}
+\alias{shape_squares}
 \title{A rectangle}
 \usage{
 shape_rectangle(
@@ -15,6 +17,17 @@ shape_rectangle(
 )
 
 shape_square(x = 0, y = 0, side = 1, trans = trans_identity(), ...)
+
+shape_rectangles(
+  x = 0,
+  y = 0,
+  width = 1,
+  height = 1,
+  trans = trans_identity(),
+  ...
+)
+
+shape_squares(x = 0, y = 0, side = 1, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{Centroid coordinates. Default \code{0}.}
@@ -30,40 +43,45 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 \item{side}{Side length, for \code{shape_square()}. Must be non-negative.
 Default \code{1}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{shape_rectangles()}/\code{shape_squares()}, a \link{sketch}.
+}
 \description{
 \code{shape_rectangle} is a \link{drawable} defined by a centroid and a width/height,
 rendered as an axis-aligned rectangle. \code{shape_square()} is a thin
 convenience wrapper around \code{shape_rectangle()} for the common case of
 \code{width == height}, taking a single \code{side} argument instead -- it returns a
 \code{shape_rectangle} object directly rather than being its own class.
+
+\code{shape_rectangles()}/\code{shape_squares()} are vectorized versions of
+\code{\link[=shape_rectangle]{shape_rectangle()}}/\code{\link[=shape_square]{shape_square()}}: each argument may be a vector,
+recycled against the others via \code{purrr::pmap()}'s own vctrs-based
+rules (any length-1 element is broadcast to the common length;
+mismatched lengths greater than 1 raise an error). The result is a
+\link{sketch} containing one \code{shape_rectangle()}/\code{shape_square()} per
+recycled row, rather than a single drawable.
 }
 \examples{
 draw(shape_rectangle(width = 2, height = 1))
 draw(shape_square(x = 1, y = 1, side = 0.5, color = "darkred"))
+
+draw(shape_rectangles(x = 1:3, width = c(0.5, 1, 1.5), height = 0.5))
+draw(shape_squares(x = 1:3, side = c(0.5, 1, 1.5)))
 
 }
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
-\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
-\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
-\code{\link[=shape_blobs]{shape_blobs()}},
 \code{\link[=shape_circle]{shape_circle()}},
-\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
-\code{\link[=shape_ellipses]{shape_ellipses()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
-\code{\link[=shape_polygons]{shape_polygons()}},
 \code{\link[=shape_raw]{shape_raw()}},
-\code{\link[=shape_raws]{shape_raws()}},
-\code{\link[=shape_rectangles]{shape_rectangles()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
-\code{\link[=shape_ribbons]{shape_ribbons()}},
 \code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_twists]{shape_twists()}},
-\code{\link[=shape_wedge]{shape_wedge()}},
-\code{\link[=shape_wedges]{shape_wedges()}}
+\code{\link[=shape_wedge]{shape_wedge()}}
 }
 \concept{2D shapes}

@@ -48,6 +48,7 @@ twisted_path_points <- function(x, y, xend, yend, n, width, path_distortion) {
 #' @param trans A [trans] object applied to the shape's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(shape_twist(
@@ -146,8 +147,8 @@ shape_twist <- S7::new_class(
 #' containing one `shape_twist()` per recycled row, rather than a single
 #' drawable.
 #'
-#' @inheritParams shape_twist
-#' @return A [sketch].
+#' @rdname shape_twist
+#' @return For `shape_twists()`, a [sketch].
 #'
 #' @examples
 #' draw(shape_twists(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.2))

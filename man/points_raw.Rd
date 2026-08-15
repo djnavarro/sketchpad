@@ -2,19 +2,27 @@
 % Please edit documentation in R/points_raw.R
 \name{points_raw}
 \alias{points_raw}
+\alias{points_raws}
 \title{A scatter of points defined directly by their coordinates}
 \usage{
 points_raw(x, y, trans = trans_identity(), ...)
+
+points_raws(x, y, trans = trans_identity(), ...)
 }
 \arguments{
-\item{x}{Numeric vector of x coordinates.}
-
-\item{y}{Numeric vector of y coordinates.}
+\item{x, y}{For \code{points_raw()}, a numeric vector of x/y coordinates. For
+\code{points_raws()}, a \code{list()} of such vectors instead -- one vector
+per scatter.}
 
 \item{trans}{A \link{trans} object applied to the computed points. Default
 \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
+}
+\value{
+A \link{drawable}.
+
+For \code{points_raws()}, a \link{sketch}.
 }
 \description{
 \code{points_raw} is \link{shape_raw}'s \code{"points"}-geometry analog, and the first
@@ -23,6 +31,18 @@ on the dimensional reading \code{"points"}(0D)/\code{"path"}(1D)/\code{"polygon"
 but with no constructor exposing it -- see \code{.agents/PLAN.md}). The user
 supplies \code{x}/\code{y} coordinates directly, rendered as unconnected markers
 rather than a connected outline or path.
+
+\code{points_raws()} is a vectorized version of \code{\link[=points_raw]{points_raw()}}. Since
+\code{x}/\code{y} are themselves numeric vectors of point coordinates for a
+single scatter, \code{points_raws()} takes them as a \code{list()} of numeric
+vectors instead -- one vector per scatter -- which is most useful for
+giving several distinct scatters different \code{style} arguments (e.g. a
+different \code{color} each). Every other argument may be a plain vector,
+recycled against \code{x}/\code{y} via \code{purrr::pmap()}'s own vctrs-based rules
+(any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error). The result is a \link{sketch}
+containing one \code{points_raw()} per list element/recycled row, rather
+than a single drawable.
 }
 \details{
 \code{style@fill} and every line-related \code{style} property (\code{linewidth},
@@ -39,9 +59,11 @@ draw(points_raw(
   color = "steelblue"
 ))
 
-}
-\seealso{
-Other 0D points:
-\code{\link[=points_raws]{points_raws()}}
+draw(points_raws(
+  x = list(seq(0, 1, length.out = 10), seq(0, 1, length.out = 10)),
+  y = list(rep(0.25, 10), rep(0.75, 10)),
+  color = c("steelblue", "darkred")
+))
+
 }
 \concept{0D points}

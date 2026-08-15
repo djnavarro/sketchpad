@@ -2,9 +2,22 @@
 % Please edit documentation in R/shape_ribbon.R
 \name{shape_ribbon}
 \alias{shape_ribbon}
+\alias{shape_ribbons}
 \title{A tapered ribbon between two points}
 \usage{
 shape_ribbon(
+  x = 0,
+  y = 0,
+  xend = 1,
+  yend = 1,
+  width = 0.2,
+  n = 100L,
+  distortion = noise_field(),
+  trans = trans_identity(),
+  ...
+)
+
+shape_ribbons(
   x = 0,
   y = 0,
   xend = 1,
@@ -33,37 +46,43 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{shape_ribbons()}, a \link{sketch}.
+}
 \description{
 \code{shape_ribbon} is a \link{drawable} polygon that follows a straight line
 between \verb{(x, y)} and \verb{(xend, yend)}, with a width that tapers at both
 ends and varies along its length according to simplex noise.
+
+\code{shape_ribbons()} is a vectorized version of \code{\link[=shape_ribbon]{shape_ribbon()}}: each
+argument may be a vector, recycled against the others via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). A shared \code{distortion} \link{noise_field} is automatically
+recycled across every ribbon; pass a \code{list()} of several different
+\code{noise_field}s instead to vary it per ribbon. The result is a
+\link{sketch} containing one \code{shape_ribbon()} per recycled row, rather
+than a single drawable.
 }
 \examples{
 draw(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1, width = 0.3))
+
+draw(shape_ribbons(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.3))
 
 }
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
-\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
-\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
-\code{\link[=shape_blobs]{shape_blobs()}},
 \code{\link[=shape_circle]{shape_circle()}},
-\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
-\code{\link[=shape_ellipses]{shape_ellipses()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
-\code{\link[=shape_polygons]{shape_polygons()}},
 \code{\link[=shape_raw]{shape_raw()}},
-\code{\link[=shape_raws]{shape_raws()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
-\code{\link[=shape_rectangles]{shape_rectangles()}},
-\code{\link[=shape_ribbons]{shape_ribbons()}},
 \code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_twists]{shape_twists()}},
-\code{\link[=shape_wedge]{shape_wedge()}},
-\code{\link[=shape_wedges]{shape_wedges()}}
+\code{\link[=shape_wedge]{shape_wedge()}}
 }
 \concept{2D shapes}

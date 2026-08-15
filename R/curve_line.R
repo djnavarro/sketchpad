@@ -16,6 +16,7 @@
 #' @param trans A [trans] object applied to the curve's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)))
@@ -60,11 +61,12 @@ curve_line <- S7::new_class(
 #' `curve_line()` per list element/recycled row, rather than a single
 #' drawable.
 #'
-#' @inheritParams curve_line
-#' @param x,y A `list()` of numeric vectors of control point coordinates,
-#'   one vector per polyline. Each vector must be the same length as its
-#'   `y`/`x` counterpart, with at least two control points.
-#' @return A [sketch].
+#' @rdname curve_line
+#' @param x,y For `curve_line()`, numeric vectors of control point
+#'   coordinates, the same length, with at least two control points. For
+#'   `curve_lines()`, a `list()` of such vectors instead -- one vector of
+#'   control points per polyline.
+#' @return For `curve_lines()`, a [sketch].
 #'
 #' @examples
 #' draw(curve_lines(

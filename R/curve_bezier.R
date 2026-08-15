@@ -20,6 +20,7 @@
 #' @param trans A [trans] object applied to the curve's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(curve_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0)))
@@ -65,11 +66,12 @@ curve_bezier <- S7::new_class(
 #' `curve_bezier()` per list element/recycled row, rather than a single
 #' drawable.
 #'
-#' @inheritParams curve_bezier
-#' @param x,y A `list()` of numeric vectors of control point coordinates,
-#'   one vector per curve. Each vector must be the same length as its
-#'   `y`/`x` counterpart, with at least two control points.
-#' @return A [sketch].
+#' @rdname curve_bezier
+#' @param x,y For `curve_bezier()`, numeric vectors of control point
+#'   coordinates, the same length, with at least two control points. For
+#'   `curve_beziers()`, a `list()` of such vectors instead -- one vector
+#'   of control points per curve.
+#' @return For `curve_beziers()`, a [sketch].
 #'
 #' @examples
 #' draw(curve_beziers(

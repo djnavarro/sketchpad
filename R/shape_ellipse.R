@@ -12,6 +12,7 @@
 #' @param trans A [trans] object applied to the shape's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(shape_ellipse(x_radius = 2, y_radius = 1))
@@ -72,8 +73,8 @@ shape_ellipse <- S7::new_class(
 #' raise an error). The result is a [sketch] containing one
 #' `shape_ellipse()` per recycled row, rather than a single drawable.
 #'
-#' @inheritParams shape_ellipse
-#' @return A [sketch].
+#' @rdname shape_ellipse
+#' @return For `shape_ellipses()`, a [sketch].
 #'
 #' @examples
 #' draw(shape_ellipses(x = 1:3, x_radius = c(0.5, 1, 1.5), y_radius = 0.5))

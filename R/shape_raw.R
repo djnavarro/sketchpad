@@ -5,11 +5,11 @@
 #' It is most often produced by [convert()]ing a more complex drawable
 #' (e.g. a [shape_blob] or [shape_twist]) down to its raw vertices.
 #'
-#' @param x Numeric vector of x coordinates.
-#' @param y Numeric vector of y coordinates.
+#' @param x,y Numeric vectors of x/y coordinates.
 #' @param trans A [trans] object applied to the shape's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(shape_raw(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1)))
@@ -56,11 +56,11 @@ shape_raw <- S7::new_class(
 #' is a [sketch] containing one `shape_raw()` per list element/recycled
 #' row, rather than a single drawable.
 #'
-#' @inheritParams shape_raw
-#' @param x,y A `list()` of numeric vectors of vertex coordinates, one
-#'   vector per shape. Each vector must be the same length as its `y`/`x`
-#'   counterpart.
-#' @return A [sketch].
+#' @rdname shape_raw
+#' @param x,y For `shape_raw()`, a numeric vector of x/y coordinates. For
+#'   `shape_raws()`, a `list()` of such vectors instead -- one vector of
+#'   vertices per shape.
+#' @return For `shape_raws()`, a [sketch].
 #'
 #' @examples
 #' draw(shape_raws(

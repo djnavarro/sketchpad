@@ -2,9 +2,26 @@
 % Please edit documentation in R/shape_bezier_ribbon.R
 \name{shape_bezier_ribbon}
 \alias{shape_bezier_ribbon}
+\alias{shape_bezier_ribbons}
 \title{A ribbon following a Bezier curve}
 \usage{
 shape_bezier_ribbon(
+  x = 0,
+  y = 0,
+  xend = 1,
+  yend = 1,
+  x_ctrl1 = 0.5,
+  y_ctrl1 = 0.5,
+  x_ctrl2 = 0,
+  y_ctrl2 = 0,
+  width = 0.2,
+  n = 100L,
+  distortion = noise_field(),
+  trans = trans_identity(),
+  ...
+)
+
+shape_bezier_ribbons(
   x = 0,
   y = 0,
   xend = 1,
@@ -41,6 +58,11 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{shape_bezier_ribbons()}, a \link{sketch}.
+}
 \description{
 \code{shape_bezier_ribbon} is like \link{shape_ribbon}, but its backbone follows a
 cubic Bezier curve through \verb{(x, y)}, two control points, and
@@ -48,33 +70,35 @@ cubic Bezier curve through \verb{(x, y)}, two control points, and
 curved rather than straight path. As with \link{shape_ribbon}, the ribbon's
 width tapers to zero at both ends and varies along its length
 according to simplex noise.
+
+\code{shape_bezier_ribbons()} is a vectorized version of
+\code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}}: each argument may be a vector, recycled
+against the others via \code{purrr::pmap()}'s own vctrs-based rules (any
+length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error). A shared \code{distortion}
+\link{noise_field} is automatically recycled across every ribbon; pass a
+\code{list()} of several different \code{noise_field}s instead to vary it per
+ribbon. The result is a \link{sketch} containing one
+\code{shape_bezier_ribbon()} per recycled row, rather than a single
+drawable.
 }
 \examples{
 draw(shape_bezier_ribbon(x = 0, y = 0, xend = 1, yend = 0, width = 0.2))
+
+draw(shape_bezier_ribbons(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.2))
 
 }
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
-\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
-\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
-\code{\link[=shape_blobs]{shape_blobs()}},
 \code{\link[=shape_circle]{shape_circle()}},
-\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
-\code{\link[=shape_ellipses]{shape_ellipses()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
-\code{\link[=shape_polygons]{shape_polygons()}},
 \code{\link[=shape_raw]{shape_raw()}},
-\code{\link[=shape_raws]{shape_raws()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
-\code{\link[=shape_rectangles]{shape_rectangles()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
-\code{\link[=shape_ribbons]{shape_ribbons()}},
 \code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_twists]{shape_twists()}},
-\code{\link[=shape_wedge]{shape_wedge()}},
-\code{\link[=shape_wedges]{shape_wedges()}}
+\code{\link[=shape_wedge]{shape_wedge()}}
 }
 \concept{2D shapes}

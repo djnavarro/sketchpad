@@ -2,9 +2,21 @@
 % Please edit documentation in R/curve_spiral.R
 \name{curve_spiral}
 \alias{curve_spiral}
+\alias{curve_spirals}
 \title{An open spiral}
 \usage{
 curve_spiral(
+  x = 0,
+  y = 0,
+  radius_start = 0,
+  radius_end = 1,
+  turns = 3,
+  n = 200L,
+  trans = trans_identity(),
+  ...
+)
+
+curve_spirals(
   x = 0,
   y = 0,
   radius_start = 0,
@@ -30,6 +42,11 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{curve_spirals()}, a \link{sketch}.
+}
 \description{
 \code{curve_spiral} is a \link{drawable} whose path winds around a centroid
 \verb{(x, y)}, sweeping through \code{turns} full revolutions while its radius
@@ -38,6 +55,13 @@ interpolates linearly from \code{radius_start} to \code{radius_end}. With
 (visually indistinguishable from a single circle, since the path
 retraces itself); the usual case has \code{radius_start != radius_end}, giving
 an Archimedean-style spiral that grows or shrinks outward.
+
+\code{curve_spirals()} is a vectorized version of \code{\link[=curve_spiral]{curve_spiral()}}: each
+argument may be a vector, recycled against the others via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{curve_spiral()} per recycled row, rather than a single drawable.
 }
 \details{
 \code{style@fill} has no effect for \code{curve_spiral()} -- see \link{drawable}'s
@@ -48,21 +72,16 @@ draw time), since \code{style()} is shared across every \code{geometry}.
 \examples{
 draw(curve_spiral(radius_start = 0, radius_end = 1, turns = 4))
 
+draw(curve_spirals(x = c(0, 3, 6), turns = c(2, 3, 4)))
+
 }
 \seealso{
 Other 1D curves:
 \code{\link[=curve_arc]{curve_arc()}},
-\code{\link[=curve_arcs]{curve_arcs()}},
 \code{\link[=curve_bezier]{curve_bezier()}},
-\code{\link[=curve_beziers]{curve_beziers()}},
 \code{\link[=curve_line]{curve_line()}},
-\code{\link[=curve_lines]{curve_lines()}},
 \code{\link[=curve_raw]{curve_raw()}},
-\code{\link[=curve_raws]{curve_raws()}},
 \code{\link[=curve_scribble]{curve_scribble()}},
-\code{\link[=curve_scribbles]{curve_scribbles()}},
-\code{\link[=curve_spirals]{curve_spirals()}},
-\code{\link[=curve_twist]{curve_twist()}},
-\code{\link[=curve_twists]{curve_twists()}}
+\code{\link[=curve_twist]{curve_twist()}}
 }
 \concept{1D curves}

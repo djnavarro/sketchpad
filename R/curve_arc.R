@@ -14,6 +14,7 @@
 #' draw time), since `style()` is shared across every `geometry`.
 #'
 #' @inheritParams shape_wedge
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(curve_arc(start = 0, end = 3 * pi / 2))
@@ -67,8 +68,8 @@ curve_arc <- S7::new_class(
 #' raise an error). The result is a [sketch] containing one
 #' `curve_arc()` per recycled row, rather than a single drawable.
 #'
-#' @inheritParams curve_arc
-#' @return A [sketch].
+#' @rdname curve_arc
+#' @return For `curve_arcs()`, a [sketch].
 #'
 #' @examples
 #' draw(curve_arcs(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))

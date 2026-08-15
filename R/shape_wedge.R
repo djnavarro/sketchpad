@@ -48,6 +48,7 @@ validate_arc_args <- function(x, y, radius, start, end, n) {
 #' @param trans A [trans] object applied to the shape's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(shape_wedge(start = 0, end = pi / 2))
@@ -100,8 +101,8 @@ shape_wedge <- S7::new_class(
 #' raise an error). The result is a [sketch] containing one
 #' `shape_wedge()` per recycled row, rather than a single drawable.
 #'
-#' @inheritParams shape_wedge
-#' @return A [sketch].
+#' @rdname shape_wedge
+#' @return For `shape_wedges()`, a [sketch].
 #'
 #' @examples
 #' draw(shape_wedges(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))

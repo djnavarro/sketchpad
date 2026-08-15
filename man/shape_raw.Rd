@@ -2,52 +2,64 @@
 % Please edit documentation in R/shape_raw.R
 \name{shape_raw}
 \alias{shape_raw}
+\alias{shape_raws}
 \title{A polygon defined directly by its vertices}
 \usage{
 shape_raw(x, y, trans = trans_identity(), ...)
+
+shape_raws(x, y, trans = trans_identity(), ...)
 }
 \arguments{
-\item{x}{Numeric vector of x coordinates.}
-
-\item{y}{Numeric vector of y coordinates.}
+\item{x, y}{For \code{shape_raw()}, a numeric vector of x/y coordinates. For
+\code{shape_raws()}, a \code{list()} of such vectors instead -- one vector of
+vertices per shape.}
 
 \item{trans}{A \link{trans} object applied to the shape's computed points.
 Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{shape_raws()}, a \link{sketch}.
+}
 \description{
 \code{shape_raw} is the simplest \link{drawable}: the user supplies \code{x} and \code{y}
 coordinates directly, and \code{points} is computed trivially from them.
 It is most often produced by \code{\link[S7:convert]{convert()}}ing a more complex drawable
 (e.g. a \link{shape_blob} or \link{shape_twist}) down to its raw vertices.
+
+\code{shape_raws()} is a vectorized version of \code{\link[=shape_raw]{shape_raw()}}. Since \code{x}/\code{y}
+are themselves numeric vectors of vertex coordinates for a single
+polygon, \code{shape_raws()} takes them as a \code{list()} of numeric vectors
+instead -- one vector of vertices per shape. Every other argument may
+be a plain vector, recycled against \code{x}/\code{y} via \code{purrr::pmap()}'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result
+is a \link{sketch} containing one \code{shape_raw()} per list element/recycled
+row, rather than a single drawable.
 }
 \examples{
 draw(shape_raw(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1)))
+
+draw(shape_raws(
+  x = list(c(0, 1, 1, 0), c(2, 3, 3, 2)),
+  y = list(c(0, 0, 1, 1), c(0, 0, 1, 1))
+))
 
 }
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
-\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
-\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
-\code{\link[=shape_blobs]{shape_blobs()}},
 \code{\link[=shape_circle]{shape_circle()}},
-\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
-\code{\link[=shape_ellipses]{shape_ellipses()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
-\code{\link[=shape_polygons]{shape_polygons()}},
-\code{\link[=shape_raws]{shape_raws()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
-\code{\link[=shape_rectangles]{shape_rectangles()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
-\code{\link[=shape_ribbons]{shape_ribbons()}},
 \code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_twists]{shape_twists()}},
-\code{\link[=shape_wedge]{shape_wedge()}},
-\code{\link[=shape_wedges]{shape_wedges()}}
+\code{\link[=shape_wedge]{shape_wedge()}}
 }
 \concept{2D shapes}

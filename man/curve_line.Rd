@@ -2,18 +2,28 @@
 % Please edit documentation in R/curve_line.R
 \name{curve_line}
 \alias{curve_line}
+\alias{curve_lines}
 \title{An open polyline}
 \usage{
 curve_line(x, y, trans = trans_identity(), ...)
+
+curve_lines(x, y, trans = trans_identity(), ...)
 }
 \arguments{
-\item{x, y}{Numeric vectors of control point coordinates. Must be the
-same length, with at least two control points.}
+\item{x, y}{For \code{curve_line()}, numeric vectors of control point
+coordinates, the same length, with at least two control points. For
+\code{curve_lines()}, a \code{list()} of such vectors instead -- one vector of
+control points per polyline.}
 
 \item{trans}{A \link{trans} object applied to the curve's computed points.
 Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
+}
+\value{
+A \link{drawable}.
+
+For \code{curve_lines()}, a \link{sketch}.
 }
 \description{
 \code{curve_line} is a \link{drawable} whose path connects an arbitrary number of
@@ -21,6 +31,17 @@ control points \verb{(x, y)} with straight segments, in order. With two control
 points this is a single line segment; with more, an open polyline. Unlike
 \code{\link[=curve_bezier]{curve_bezier()}}/\code{\link[=shape_bezier]{shape_bezier()}}, the control points are not smoothed or
 resampled -- \code{points} is exactly \verb{(x, y)}, so there is no \code{n} argument.
+
+\code{curve_lines()} is a vectorized version of \code{\link[=curve_line]{curve_line()}}. Since
+\code{x}/\code{y} are themselves numeric vectors of control points for a single
+polyline, \code{curve_lines()} takes them as a \code{list()} of numeric vectors
+instead -- one vector of control points per polyline. Every other
+argument may be a plain vector, recycled against \code{x}/\code{y} via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{curve_line()} per list element/recycled row, rather than a single
+drawable.
 }
 \details{
 \code{style@fill} has no effect for \code{curve_line()} -- see \link{drawable}'s
@@ -31,21 +52,19 @@ draw time), since \code{style()} is shared across every \code{geometry}.
 \examples{
 draw(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)))
 
+draw(curve_lines(
+  x = list(c(0, 1, 1, 2), c(2, 3, 3, 4)),
+  y = list(c(0, 1, 0, 1), c(0, 1, 0, 1))
+))
+
 }
 \seealso{
 Other 1D curves:
 \code{\link[=curve_arc]{curve_arc()}},
-\code{\link[=curve_arcs]{curve_arcs()}},
 \code{\link[=curve_bezier]{curve_bezier()}},
-\code{\link[=curve_beziers]{curve_beziers()}},
-\code{\link[=curve_lines]{curve_lines()}},
 \code{\link[=curve_raw]{curve_raw()}},
-\code{\link[=curve_raws]{curve_raws()}},
 \code{\link[=curve_scribble]{curve_scribble()}},
-\code{\link[=curve_scribbles]{curve_scribbles()}},
 \code{\link[=curve_spiral]{curve_spiral()}},
-\code{\link[=curve_spirals]{curve_spirals()}},
-\code{\link[=curve_twist]{curve_twist()}},
-\code{\link[=curve_twists]{curve_twists()}}
+\code{\link[=curve_twist]{curve_twist()}}
 }
 \concept{1D curves}

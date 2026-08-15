@@ -2,9 +2,19 @@
 % Please edit documentation in R/shape_circle.R
 \name{shape_circle}
 \alias{shape_circle}
+\alias{shape_circles}
 \title{A circle}
 \usage{
 shape_circle(x = 0, y = 0, radius = 1, n = 100L, trans = trans_identity(), ...)
+
+shape_circles(
+  x = 0,
+  y = 0,
+  radius = 1,
+  n = 100L,
+  trans = trans_identity(),
+  ...
+)
 }
 \arguments{
 \item{x, y}{Centroid coordinates. Default \code{0}.}
@@ -18,37 +28,40 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{shape_circles()}, a \link{sketch}.
+}
 \description{
 \code{shape_circle} is a \link{drawable} defined by a centroid and a radius; its
 vertices are computed as evenly spaced points around the circumference.
+
+\code{shape_circles()} is a vectorized version of \code{\link[=shape_circle]{shape_circle()}}: each
+argument may be a vector, recycled against the others via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{shape_circle()} per recycled row, rather than a single drawable.
 }
 \examples{
 draw(shape_circle(radius = 1))
 draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6L, color = "darkred"))
+
+draw(shape_circles(x = 1:3, radius = c(0.5, 1, 1.5)))
 
 }
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
-\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
-\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
-\code{\link[=shape_blobs]{shape_blobs()}},
-\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
-\code{\link[=shape_ellipses]{shape_ellipses()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
-\code{\link[=shape_polygons]{shape_polygons()}},
 \code{\link[=shape_raw]{shape_raw()}},
-\code{\link[=shape_raws]{shape_raws()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
-\code{\link[=shape_rectangles]{shape_rectangles()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
-\code{\link[=shape_ribbons]{shape_ribbons()}},
 \code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_twists]{shape_twists()}},
-\code{\link[=shape_wedge]{shape_wedge()}},
-\code{\link[=shape_wedges]{shape_wedges()}}
+\code{\link[=shape_wedge]{shape_wedge()}}
 }
 \concept{2D shapes}

@@ -2,9 +2,12 @@
 % Please edit documentation in R/shape_polygon.R
 \name{shape_polygon}
 \alias{shape_polygon}
+\alias{shape_polygons}
 \title{A regular polygon}
 \usage{
 shape_polygon(x = 0, y = 0, radius = 1, n = 6L, trans = trans_identity(), ...)
+
+shape_polygons(x = 0, y = 0, radius = 1, n = 6L, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{Centroid coordinates. Default \code{0}.}
@@ -18,6 +21,11 @@ Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }
+\value{
+A \link{drawable}.
+
+For \code{shape_polygons()}, a \link{sketch}.
+}
 \description{
 \code{shape_polygon} is a \link{drawable} defined by a centroid and a radius; its
 vertices are \code{n} evenly spaced points around the circumference, giving a
@@ -26,34 +34,32 @@ regular n-gon (e.g. \code{n = 3} a triangle, \code{n = 6} a hexagon). Unlike
 at the end -- there are exactly \code{n} distinct vertices, since
 \code{grid::polygonGrob()} closes the path itself and a polygon has no
 approximation error to hide.
+
+\code{shape_polygons()} is a vectorized version of \code{\link[=shape_polygon]{shape_polygon()}}: each
+argument may be a vector, recycled against the others via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{shape_polygon()} per recycled row, rather than a single drawable.
 }
 \examples{
 draw(shape_polygon(radius = 1, n = 3L))
 draw(shape_polygon(x = 1, y = 1, radius = 0.5, n = 8L, color = "darkred"))
+
+draw(shape_polygons(x = 1:3, n = c(3L, 4L, 6L)))
 
 }
 \seealso{
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
-\code{\link[=shape_bezier_ribbons]{shape_bezier_ribbons()}},
-\code{\link[=shape_beziers]{shape_beziers()}},
 \code{\link[=shape_blob]{shape_blob()}},
-\code{\link[=shape_blobs]{shape_blobs()}},
 \code{\link[=shape_circle]{shape_circle()}},
-\code{\link[=shape_circles]{shape_circles()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
-\code{\link[=shape_ellipses]{shape_ellipses()}},
-\code{\link[=shape_polygons]{shape_polygons()}},
 \code{\link[=shape_raw]{shape_raw()}},
-\code{\link[=shape_raws]{shape_raws()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
-\code{\link[=shape_rectangles]{shape_rectangles()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
-\code{\link[=shape_ribbons]{shape_ribbons()}},
 \code{\link[=shape_twist]{shape_twist()}},
-\code{\link[=shape_twists]{shape_twists()}},
-\code{\link[=shape_wedge]{shape_wedge()}},
-\code{\link[=shape_wedges]{shape_wedges()}}
+\code{\link[=shape_wedge]{shape_wedge()}}
 }
 \concept{2D shapes}

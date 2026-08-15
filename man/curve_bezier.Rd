@@ -2,13 +2,18 @@
 % Please edit documentation in R/curve_bezier.R
 \name{curve_bezier}
 \alias{curve_bezier}
+\alias{curve_beziers}
 \title{An open Bezier curve}
 \usage{
 curve_bezier(x, y, n = 100L, trans = trans_identity(), ...)
+
+curve_beziers(x, y, n = 100L, trans = trans_identity(), ...)
 }
 \arguments{
-\item{x, y}{Numeric vectors of control point coordinates. Must be the
-same length, with at least two control points.}
+\item{x, y}{For \code{curve_bezier()}, numeric vectors of control point
+coordinates, the same length, with at least two control points. For
+\code{curve_beziers()}, a \code{list()} of such vectors instead -- one vector
+of control points per curve.}
 
 \item{n}{Number of points used to sample the curve. Default \code{100L}.}
 
@@ -16,6 +21,11 @@ same length, with at least two control points.}
 Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
+}
+\value{
+A \link{drawable}.
+
+For \code{curve_beziers()}, a \link{sketch}.
 }
 \description{
 \code{curve_bezier} is a \link{drawable} whose path follows a Bezier curve defined
@@ -26,6 +36,17 @@ always closes back to its first control point (a consequence of every
 \code{grid::polygonGrob()}), \code{curve_bezier()} sets \code{geometry = "path"} and is
 rendered as an open \code{grid::polylineGrob()} instead, stopping at its last
 control point rather than looping back.
+
+\code{curve_beziers()} is a vectorized version of \code{\link[=curve_bezier]{curve_bezier()}}. Since
+\code{x}/\code{y} are themselves numeric vectors of control points for a single
+curve, \code{curve_beziers()} takes them as a \code{list()} of numeric vectors
+instead -- one vector of control points per curve. Every other
+argument may be a plain vector, recycled against \code{x}/\code{y} via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{curve_bezier()} per list element/recycled row, rather than a single
+drawable.
 }
 \details{
 \code{style@fill} has no effect for \code{curve_bezier()} -- see \link{drawable}'s
@@ -36,21 +57,19 @@ draw time), since \code{style()} is shared across every \code{geometry}.
 \examples{
 draw(curve_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0)))
 
+draw(curve_beziers(
+  x = list(c(0, 0.5, 1), c(2, 2.5, 3)),
+  y = list(c(0, 1, 0), c(0, 1, 0))
+))
+
 }
 \seealso{
 Other 1D curves:
 \code{\link[=curve_arc]{curve_arc()}},
-\code{\link[=curve_arcs]{curve_arcs()}},
-\code{\link[=curve_beziers]{curve_beziers()}},
 \code{\link[=curve_line]{curve_line()}},
-\code{\link[=curve_lines]{curve_lines()}},
 \code{\link[=curve_raw]{curve_raw()}},
-\code{\link[=curve_raws]{curve_raws()}},
 \code{\link[=curve_scribble]{curve_scribble()}},
-\code{\link[=curve_scribbles]{curve_scribbles()}},
 \code{\link[=curve_spiral]{curve_spiral()}},
-\code{\link[=curve_spirals]{curve_spirals()}},
-\code{\link[=curve_twist]{curve_twist()}},
-\code{\link[=curve_twists]{curve_twists()}}
+\code{\link[=curve_twist]{curve_twist()}}
 }
 \concept{1D curves}

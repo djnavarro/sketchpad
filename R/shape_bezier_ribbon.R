@@ -18,6 +18,7 @@
 #' @param trans A [trans] object applied to the shape's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(shape_bezier_ribbon(x = 0, y = 0, xend = 1, yend = 0, width = 0.2))
@@ -126,8 +127,8 @@ shape_bezier_ribbon <- S7::new_class(
 #' `shape_bezier_ribbon()` per recycled row, rather than a single
 #' drawable.
 #'
-#' @inheritParams shape_bezier_ribbon
-#' @return A [sketch].
+#' @rdname shape_bezier_ribbon
+#' @return For `shape_bezier_ribbons()`, a [sketch].
 #'
 #' @examples
 #' draw(shape_bezier_ribbons(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.2))

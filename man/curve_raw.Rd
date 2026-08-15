@@ -2,19 +2,27 @@
 % Please edit documentation in R/curve_raw.R
 \name{curve_raw}
 \alias{curve_raw}
+\alias{curve_raws}
 \title{An open path defined directly by its vertices}
 \usage{
 curve_raw(x, y, trans = trans_identity(), ...)
+
+curve_raws(x, y, trans = trans_identity(), ...)
 }
 \arguments{
-\item{x}{Numeric vector of x coordinates.}
-
-\item{y}{Numeric vector of y coordinates.}
+\item{x, y}{For \code{curve_raw()}, a numeric vector of x/y coordinates. For
+\code{curve_raws()}, a \code{list()} of such vectors instead -- one vector of
+vertices per path.}
 
 \item{trans}{A \link{trans} object applied to the curve's computed points.
 Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
+}
+\value{
+A \link{drawable}.
+
+For \code{curve_raws()}, a \link{sketch}.
 }
 \description{
 \code{curve_raw} is \link{shape_raw}'s \code{"path"}-geometry analog: the user supplies
@@ -26,6 +34,16 @@ on \code{length(x)}, matching \link{shape_raw}'s own leniency -- it exists
 primarily as a \code{convert()} target for "freezing" any \code{"path"}-geometry
 drawable's computed points, the same role \link{shape_raw} plays for
 \code{"polygon"}-geometry drawables.
+
+\code{curve_raws()} is a vectorized version of \code{\link[=curve_raw]{curve_raw()}}. Since \code{x}/\code{y}
+are themselves numeric vectors of vertex coordinates for a single
+path, \code{curve_raws()} takes them as a \code{list()} of numeric vectors
+instead -- one vector of vertices per path. Every other argument may
+be a plain vector, recycled against \code{x}/\code{y} via \code{purrr::pmap()}'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result
+is a \link{sketch} containing one \code{curve_raw()} per list element/recycled
+row, rather than a single drawable.
 }
 \details{
 \code{style@fill} has no effect for \code{curve_raw()} -- see \link{drawable}'s
@@ -36,21 +54,19 @@ draw time), since \code{style()} is shared across every \code{geometry}.
 \examples{
 draw(curve_raw(x = c(0, 1, 2), y = c(0, 1, 0)))
 
+draw(curve_raws(
+  x = list(c(0, 1, 2), c(2, 3, 4)),
+  y = list(c(0, 1, 0), c(0, 1, 0))
+))
+
 }
 \seealso{
 Other 1D curves:
 \code{\link[=curve_arc]{curve_arc()}},
-\code{\link[=curve_arcs]{curve_arcs()}},
 \code{\link[=curve_bezier]{curve_bezier()}},
-\code{\link[=curve_beziers]{curve_beziers()}},
 \code{\link[=curve_line]{curve_line()}},
-\code{\link[=curve_lines]{curve_lines()}},
-\code{\link[=curve_raws]{curve_raws()}},
 \code{\link[=curve_scribble]{curve_scribble()}},
-\code{\link[=curve_scribbles]{curve_scribbles()}},
 \code{\link[=curve_spiral]{curve_spiral()}},
-\code{\link[=curve_spirals]{curve_spirals()}},
-\code{\link[=curve_twist]{curve_twist()}},
-\code{\link[=curve_twists]{curve_twists()}}
+\code{\link[=curve_twist]{curve_twist()}}
 }
 \concept{1D curves}

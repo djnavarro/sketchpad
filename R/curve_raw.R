@@ -15,11 +15,11 @@
 #' fill. Passing `fill` via `...` is still accepted (it's simply ignored at
 #' draw time), since `style()` is shared across every `geometry`.
 #'
-#' @param x Numeric vector of x coordinates.
-#' @param y Numeric vector of y coordinates.
+#' @param x,y Numeric vectors of x/y coordinates.
 #' @param trans A [trans] object applied to the curve's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
+#' @return A [drawable].
 #'
 #' @examples
 #' draw(curve_raw(x = c(0, 1, 2), y = c(0, 1, 0)))
@@ -66,11 +66,11 @@ curve_raw <- S7::new_class(
 #' is a [sketch] containing one `curve_raw()` per list element/recycled
 #' row, rather than a single drawable.
 #'
-#' @inheritParams curve_raw
-#' @param x,y A `list()` of numeric vectors of vertex coordinates, one
-#'   vector per path. Each vector must be the same length as its `y`/`x`
-#'   counterpart.
-#' @return A [sketch].
+#' @rdname curve_raw
+#' @param x,y For `curve_raw()`, a numeric vector of x/y coordinates. For
+#'   `curve_raws()`, a `list()` of such vectors instead -- one vector of
+#'   vertices per path.
+#' @return For `curve_raws()`, a [sketch].
 #'
 #' @examples
 #' draw(curve_raws(
