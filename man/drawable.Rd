@@ -62,7 +62,7 @@ jittering \code{x}/\code{y} produces a meaningful wobble; it's orthogonal to
 \code{\link[=curve_raw]{curve_raw()}}, \code{\link[=curve_line]{curve_line()}}, \code{\link[=shape_stroke]{shape_stroke()}}, \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=curve_bezier]{curve_bezier()}}, and \code{\link[=points_raw]{points_raw()}}; \code{FALSE} (the default) for every
 other concrete drawable, including \code{\link[=shape_ribbon]{shape_ribbon()}}/\code{\link[=shape_twist]{shape_twist()}}/
-\code{\link[=curve_twist]{curve_twist()}}/\code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}} -- these do have a conceptual
+\code{\link[=curve_twist]{curve_twist()}} -- these do have a conceptual
 backbone, but it's exposed via \code{x}/\code{y}/\code{xend}/\code{yend} (or additional
 named control-point pairs), not a plain \code{x}/\code{y} vector. Whether a
 \code{pathlike} subclass actually has \code{x}/\code{y} properties is not enforced by

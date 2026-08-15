@@ -11,7 +11,9 @@ A lightweight drawing system built on S7 classes and grid graphics that can be u
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://github.com/djnavarro/sketchpad}
   \item \url{https://sketchpad.djnavarro.net/}
+  \item Report bugs at \url{https://github.com/djnavarro/sketchpad/issues}
 }
 
 }

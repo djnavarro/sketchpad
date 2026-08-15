@@ -60,7 +60,6 @@ draw(shape_beziers(
 }
 \seealso{
 Other 2D shapes:
-\code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
 \code{\link[=shape_blob]{shape_blob()}},
 \code{\link[=shape_circle]{shape_circle()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
@@ -68,6 +67,7 @@ Other 2D shapes:
 \code{\link[=shape_raw]{shape_raw()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
+\code{\link[=shape_ribbonpath]{shape_ribbonpath()}},
 \code{\link[=shape_stroke]{shape_stroke()}},
 \code{\link[=shape_twist]{shape_twist()}},
 \code{\link[=shape_wedge]{shape_wedge()}}

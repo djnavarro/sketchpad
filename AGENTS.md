@@ -29,7 +29,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `seed`. `noise_sample(field, x, y, to)` is the S7 generic that
   evaluates a `noise_field` at a set of positions and rescales into
   `to` via `ambient::normalize()` -- the one operation
-  `shape_blob()`/`shape_ribbon()`/`shape_twist()`/`shape_bezier_ribbon()`
+  `shape_blob()`/`shape_ribbon()`/`shape_twist()`
   all shared verbatim before this class existed (see
   `.agents/HISTORY.md`). Each of those constructors now takes a
   `distortion = noise_field()` property instead of bare `frequency`/
@@ -180,7 +180,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `shape_raw()`/`curve_raw()`/`curve_line()`/`shape_stroke()`/
   `shape_bezier()`/`curve_bezier()`/`points_raw()` -- every other
   concrete drawable defaults to `FALSE`, including `shape_ribbon()`/
-  `shape_twist()`/`curve_twist()`/`shape_bezier_ribbon()`, whose
+  `shape_twist()`/`curve_twist()`, whose
   conceptual backbones are exposed via `x`/`y`/`xend`/`yend` (or
   additional named control-point pairs) rather than a plain `x`/`y`
   vector. Not meant to be instantiated directly. `drawable`'s own
@@ -272,6 +272,26 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `.agents/PLAN.md` for compositional techniques (layered jitter,
   textured fill) that build on top of it without further class changes.
   `pathlike` (its `x`/`y` are the pre-resampling control points).
+- **`shape_ribbonpath()`** -- not its own S7 class; a plain function
+  (`R/shape_ribbonpath.R`) that builds a `shape_stroke` from an arbitrary
+  `curve_*()` drawable's own computed `points` (i.e. any `drawable` with
+  `geometry == "path"`, validated by the internal
+  `validate_ribbonpath_path()` helper): `path@points@x`/`@y` are passed
+  straight through as `shape_stroke()`'s own `x`/`y`. This is the
+  general "ribbon around an arbitrary curve" replacement for the earlier
+  `shape_bezier_ribbon()` (removed) -- unlike that class's single shared
+  offset direction (only accurate for a nearly-straight backbone),
+  `shape_ribbonpath()` inherits `shape_stroke()`'s true per-point unit
+  normals for free, so it renders correctly for any backbone shape,
+  including ones that loop or bend sharply (`curve_twist()`,
+  `curve_spiral()`), not just a Bezier curve. Since the object it returns
+  is literally a `shape_stroke`, it's already `pathlike` with no extra
+  work, and `effect_tremor()`/`effect_bristle()` apply to it unchanged.
+  `shape_ribbonpaths()` is its vectorized counterpart; since `path` is a
+  single drawable object per shape rather than a numeric vector, it needs
+  no list-column convention -- a single shared `path` recycles
+  automatically via `vectorize_shapes()`'s existing rules, the same way a
+  shared `distortion` does.
 - **`shape_bezier`** -- outline follows a Bezier curve through an
   arbitrary number of control points (`x`/`y`), evaluated via the
   Bernstein polynomial basis (internal `bernstein()` helper, *not* De
@@ -282,17 +302,10 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   with `draw()` -- always rendering closed (`geometry = "polygon"`, the
   curve's last point connects straight back to its first) -- for the
   same curve as an open path instead, see `curve_bezier`. The original's
-  separate `bezier_ribbon` drawable has also since been ported, as
-  `shape_bezier_ribbon` (see below). `pathlike`.
-- **`shape_bezier_ribbon`** -- like `shape_ribbon`, but its backbone
-  follows a cubic Bezier curve -- through `(x, y)`, two control points
-  (`x_ctrl1`/`y_ctrl1`, `x_ctrl2`/`y_ctrl2`), and `(xend, yend)` -- rather
-  than a straight line, giving the ribbon a curved rather than straight
-  path. Reuses `shape_bezier`/`curve_bezier`'s internal
-  `bezier_curve_points()` helper (`R/shape_bezier.R`) to compute the
-  backbone rather than duplicating it; width still tapers to zero at
-  both ends and varies along the curve via a `distortion` [noise_field],
-  exactly as in `shape_ribbon`.
+  separate `bezier_ribbon` drawable was ported as `shape_bezier_ribbon`,
+  then later removed in favor of the more general `shape_ribbonpath()`
+  (see below) once `shape_stroke()` existed to build it on top of.
+  `pathlike`.
 - **`curve_bezier`** -- the first `curve_*()`-prefixed drawable: an open
   Bezier path, `geometry = "path"` fixed at construction (not exposed as
   a caller-facing argument). Shares its geometry computation and argument
@@ -411,7 +424,9 @@ Every closed (`geometry = "polygon"`) drawable's constructor shares the
 `shape_*` prefix (`shape_circle()`, `shape_rectangle()`/`shape_square()`,
 `shape_polygon()`, `shape_ellipse()`, `shape_wedge()`, `shape_blob()`,
 `shape_ribbon()`, `shape_twist()`, `shape_stroke()`, `shape_bezier()`,
-and the trivial `shape_raw()`), mirroring the `fill_*()` family below -- this groups the
+`shape_ribbonpath()` (a plain function wrapping `shape_stroke()`, not its
+own class -- see "Class hierarchy" above), and the trivial `shape_raw()`),
+mirroring the `fill_*()` family below -- this groups the
 "produces a closed drawable polygon" functions under one discoverable,
 greppable prefix distinct from the `fill_*()`, `draw()`, and `convert()`
 families. Open (`geometry = "path"`) drawables instead share a `curve_*`
@@ -829,8 +844,8 @@ full debugging narrative):
   `fill_solid()` to exist for its own property default.
 - `R/noise_field.R` -- the `noise_field` class and `noise_sample()`
   generic, loaded right after `fill.R`: no compile-time dependency on any
-  other class, but `shape_blob.R`/`shape_ribbon.R`/`shape_twist.R`/
-  `shape_bezier_ribbon.R` need `noise_field` to exist for their own
+  other class, but `shape_blob.R`/`shape_ribbon.R`/`shape_twist.R`
+  need `noise_field` to exist for their own
   `distortion` property default.
 - `R/noise_bridge.R` -- the `noise_bridge` class and its `noise_sample()`
   method, loaded right after `noise_field.R` (needs the generic to
@@ -843,7 +858,7 @@ full debugging narrative):
   `trans` property default.
 - `R/style.R`, `R/xy.R`, `R/drawable.R` -- foundation classes, in
   load order (each depends on the previous).
-- `R/shape_bezier.R`, `R/shape_bezier_ribbon.R`, `R/curve_bezier.R`,
+- `R/shape_bezier.R`, `R/curve_bezier.R`,
   `R/curve_line.R`, `R/curve_spiral.R`, `R/curve_scribble.R`,
   `R/shape_raw.R`, `R/curve_raw.R`, `R/points_raw.R`, `R/shape_circle.R`,
   `R/shape_rectangle.R`, `R/shape_polygon.R`, `R/shape_ellipse.R`,
@@ -855,9 +870,7 @@ full debugging narrative):
   the `shape_*` prefix, every open one the `curve_*` prefix (see "Class
   hierarchy" above), and each file is named to match its constructor --
   except `curve_bezier.R`, kept
-  immediately after `shape_bezier.R` (and `shape_bezier_ribbon.R`, itself
-  collated right after `shape_bezier.R` since it depends on that file's
-  `bezier_curve_points()`) since it shares `shape_bezier.R`'s
+  immediately after `shape_bezier.R` since it shares `shape_bezier.R`'s
   `bernstein()`/`bezier_curve_points()`/`validate_bezier_args()` internal
   helpers rather than duplicating them, `curve_twist.R`, kept
   immediately after `shape_twist.R` for the same reason -- it shares that
@@ -875,8 +888,15 @@ full debugging narrative):
   three form a parallel "raw" family with the same trivial constructor
   shape. `shape_stroke.R` needs no such sharing either -- it's the last
   concrete `drawable` subclass, collated right after `curve_twist.R`.
+- `R/shape_ribbonpath.R` -- `shape_ribbonpath()`/`shape_ribbonpaths()`,
+  plain functions (not S7 classes) that build a tapered, noise-modulated
+  ribbon by feeding an arbitrary `curve_*()` drawable's own computed
+  `points` into `shape_stroke()` (see "Class hierarchy" above). Collated
+  right after `shape_stroke.R`, since it calls `shape_stroke()` directly
+  -- though as an ordinary function, its exact `Collate` position doesn't
+  actually matter, the same way `vectorize.R`'s doesn't.
 - `R/canvas.R` -- the `canvas` class, collated right after
-  `shape_stroke.R` (last of the concrete `drawable` subclasses) since it
+  `R/shape_ribbonpath.R` since it
   has no dependency on `drawable` itself, only on `fill_class` (from
   `fill.R`); `sketch.R` needs `canvas` to exist for its own `canvas`
   property.
@@ -925,11 +945,12 @@ full debugging narrative):
   `globalVariables("properties")` workaround.
 - `DESCRIPTION`'s `Collate` field pins the load order above explicitly
   (fill -> noise_field -> noise_bridge -> trans -> style -> xy -> drawable
-  -> shape_bezier -> shape_bezier_ribbon -> curve_bezier -> curve_line ->
+  -> shape_bezier -> curve_bezier -> curve_line ->
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
-  curve_twist -> shape_stroke -> canvas -> sketch -> vectorize -> effects
+  curve_twist -> shape_stroke -> shape_ribbonpath -> canvas -> sketch ->
+  vectorize -> effects
   -> effect_tremor -> effect_bristle -> draw -> effect_grain -> convert ->
   sketchpad-package). **Any new drawable
   subclass must be added to

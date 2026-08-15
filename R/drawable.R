@@ -39,7 +39,7 @@
 #' [curve_raw()], [curve_line()], [shape_stroke()], [shape_bezier()],
 #' [curve_bezier()], and [points_raw()]; `FALSE` (the default) for every
 #' other concrete drawable, including [shape_ribbon()]/[shape_twist()]/
-#' [curve_twist()]/[shape_bezier_ribbon()] -- these do have a conceptual
+#' [curve_twist()] -- these do have a conceptual
 #' backbone, but it's exposed via `x`/`y`/`xend`/`yend` (or additional
 #' named control-point pairs), not a plain `x`/`y` vector. Whether a
 #' `pathlike` subclass actually has `x`/`y` properties is not enforced by
