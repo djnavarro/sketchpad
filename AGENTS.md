@@ -385,6 +385,33 @@ of numeric vectors in their plural form instead -- one vector per shape
 engine with no special-casing (a list of numeric vectors is exactly what
 `purrr::pmap()` expects to iterate one whole vector per row).
 
+Every plural constructor documents under its singular counterpart's own
+`.Rd` topic (`?shape_circle` covers both `shape_circle()` and
+`shape_circles()`), the same `@rdname`-merging pattern
+`shape_square()` already used to share `shape_rectangle`'s topic before
+plural constructors existed -- `shape_rectangle`'s topic now merges all
+four of `shape_rectangle()`/`shape_square()`/`shape_rectangles()`/
+`shape_squares()`. A plural block drops `@inheritParams <singular>`
+(redundant, and erroring under `devtools::document()`, once its
+parameters are already documented in the same merged topic) and its own
+`@title` line is kept only for roxygen's parsing (a block needs some
+first paragraph) but never rendered, since only the first block sharing
+an `@rdname` contributes the topic's actual `\title{}`; `@description`,
+`@return`, and `@examples` text from every block sharing an `@rdname`
+concatenate instead. Every singular constructor carries an explicit
+`@return` (e.g. `A [drawable].`) so the merged Value section correctly
+attributes each function's own return type once the plural block adds
+its own override (e.g. `For \`shape_circles()\`, a [sketch].`). The six
+list-column constructors additionally need their singular's `@param
+x,y` tag phrased as the single combined key `x,y` (not separate `@param
+x`/`@param y` tags) so the plural block's dual-purpose override (`For
+shape_raw(), a numeric vector...; for shape_raws(), a list()...`)
+replaces it cleanly instead of leaving stale singular-only entries
+alongside it -- confirmed by inspecting the rendered `.Rd` `\arguments{}`
+section directly, since a key mismatch doesn't produce any warning at
+`document()` time. **Any new plural constructor should follow this same
+`@rdname`-merge pattern**, not get its own standalone topic.
+
 ### Rendering model
 
 Every `drawable` is drawn as a single grob (its type chosen by `geometry`

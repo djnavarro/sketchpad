@@ -1470,3 +1470,54 @@ mismatched-length errors, style-argument vectorization via `...`,
 shared-vs-varying S7-object arguments, list-column control points, the
 zero-length-input edge case, and that `draw()` renders the result.
 `devtools::check()` stayed clean (0 errors/warnings/notes) throughout.
+
+## Merging singular/plural constructor docs into shared Rd topics
+
+Reorganized the pkgdown reference so every plural `shape_*s()`/
+`curve_*s()`/`points_raws()` constructor documents on the same `.Rd`
+topic as its singular counterpart, rather than getting a separate page
+-- `?shape_circle` now covers both `shape_circle()` and
+`shape_circles()`, matching the pattern `shape_square()` already used to
+share `shape_rectangle`'s topic. `shape_rectangle`'s topic now merges
+all four of `shape_rectangle()`/`shape_square()`/`shape_rectangles()`/
+`shape_squares()`.
+
+**Mechanism**: roxygen2's own `@rdname` merging (confirmed with a small
+standalone reprex before touching the package) concatenates
+`@description`/`@return`/`@examples` text across every block sharing an
+`@rdname`, using only the *first* block's `@title`. This meant each
+plural block needed: `@inheritParams <singular>` removed (once merged,
+its parameters are already documented in the same topic, so
+`@inheritParams` finds "no parameters left to inherit" and errors at
+`document()` time -- confirmed with the reprex first); its own title
+line left in place structurally (roxygen still needs *some* first
+paragraph to parse a block) but understood to be discarded, not
+rendered; and an `@rdname <singular>` tag added.
+
+**Disambiguating return types.** Singular constructors previously had no
+`@return` tag at all (undocumented by convention). Merging required
+adding one (`@return A [drawable].`) so the plural block's own
+`@return` (reworded as an override, e.g. `For \`shape_circles()\`, a
+[sketch].`) attributes the right return type to the right function
+in the merged Value section, rather than the section reading as if
+`shape_circle()` itself also returns a sketch.
+
+**A key-matching gotcha for the six list-column constructors**
+(`shape_bezier()`/`curve_bezier()`, `curve_line()`, `shape_raw()`/
+`curve_raw()`, `points_raw()`): roxygen's "later block overrides
+earlier" merge behavior is keyed on the exact `@param` tag string. Three
+of these (`shape_raw`, `curve_raw`, `points_raw`) originally declared
+`@param x` and `@param y` as two *separate* single-name tags; the plural
+block's override used the combined key `@param x,y`, which doesn't match
+either separate key -- the rendered `\arguments{}` section ended up with
+three entries (`x`, `y`, and `x, y`) instead of one. No warning surfaced
+at `document()` time; caught only by reading the generated `.Rd` file's
+`\arguments{}` section directly. Fixed by rephrasing the three affected
+singular constructors' own tag to the same combined `@param x,y` key,
+so the plural override replaces it cleanly.
+
+Verified with `pkgdown::build_reference()` (no warnings) and a full
+`devtools::check()` (0 errors/warnings/notes); roxygen2 automatically
+deleted the now-orphaned plural-only `.Rd` files (`shape_circles.Rd`,
+etc.) on the next `devtools::document()` run, with no manual cleanup
+needed.
