@@ -14,18 +14,35 @@ always closes back to its first control point (a consequence of every
 [`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html)
 instead, stopping at its last control point rather than looping back.
 
+`curve_beziers()` is a vectorized version of `curve_bezier()`. Since
+`x`/`y` are themselves numeric vectors of control points for a single
+curve, `curve_beziers()` takes them as a
+[`list()`](https://rdrr.io/r/base/list.html) of numeric vectors instead
+– one vector of control points per curve. Every other argument may be a
+plain vector, recycled against `x`/`y` via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `curve_bezier()` per list element/recycled row, rather
+than a single drawable.
+
 ## Usage
 
 ``` r
 curve_bezier(x, y, n = 100L, trans = trans_identity(), ...)
+
+curve_beziers(x, y, n = 100L, trans = trans_identity(), ...)
 ```
 
 ## Arguments
 
 - x, y:
 
-  Numeric vectors of control point coordinates. Must be the same length,
-  with at least two control points.
+  For `curve_bezier()`, numeric vectors of control point coordinates,
+  the same length, with at least two control points. For
+  `curve_beziers()`, a [`list()`](https://rdrr.io/r/base/list.html) of
+  such vectors instead – one vector of control points per curve.
 
 - n:
 
@@ -43,6 +60,13 @@ curve_bezier(x, y, n = 100L, trans = trans_identity(), ...)
   Arguments passed to
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md).
 
+## Value
+
+A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
+
+For `curve_beziers()`, a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
 ## Details
 
 `style@fill` has no effect for `curve_bezier()` – see
@@ -57,22 +81,21 @@ shared across every `geometry`.
 
 Other 1D curves:
 [`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md),
-[`curve_arcs()`](https://sketchpad.djnavarro.net/reference/curve_arcs.md),
-[`curve_beziers()`](https://sketchpad.djnavarro.net/reference/curve_beziers.md),
 [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
-[`curve_lines()`](https://sketchpad.djnavarro.net/reference/curve_lines.md),
 [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
-[`curve_raws()`](https://sketchpad.djnavarro.net/reference/curve_raws.md),
 [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md),
-[`curve_scribbles()`](https://sketchpad.djnavarro.net/reference/curve_scribbles.md),
 [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md),
-[`curve_spirals()`](https://sketchpad.djnavarro.net/reference/curve_spirals.md),
-[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md),
-[`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twists.md)
+[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
 
 ## Examples
 
 ``` r
 draw(curve_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0)))
+
+
+draw(curve_beziers(
+  x = list(c(0, 0.5, 1), c(2, 2.5, 3)),
+  y = list(c(0, 1, 0), c(0, 1, 0))
+))
 
 ```

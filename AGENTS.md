@@ -421,10 +421,10 @@ shared.
 Every
 `shape_*()`/`curve_*()`/[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
 constructor also has a plural, vectorized counterpart
-([`shape_circles()`](https://sketchpad.djnavarro.net/reference/shape_circles.md),
-[`shape_blobs()`](https://sketchpad.djnavarro.net/reference/shape_blobs.md),
-[`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twists.md),
-[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raws.md),
+([`shape_circles()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
+[`shape_blobs()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
+[`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twist.md),
+[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raw.md),
 …), returning a `sketch` directly instead of a single drawable. All of
 them share one internal engine, `vectorize_shapes(.f, args)`
 (`R/vectorize.R`): it wraps any non-vector element of `args` (e.g. a
@@ -454,6 +454,37 @@ documented explicitly on each, since this falls out of the same engine
 with no special-casing (a list of numeric vectors is exactly what
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)
 expects to iterate one whole vector per row).
+
+Every plural constructor documents under its singular counterpart’s own
+`.Rd` topic
+([`?shape_circle`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
+covers both
+[`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
+and
+[`shape_circles()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)),
+the same `@rdname`-merging pattern
+[`shape_square()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)
+already used to share `shape_rectangle`’s topic before plural
+constructors existed – `shape_rectangle`’s topic now merges all four of
+[`shape_rectangle()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)/[`shape_square()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)/[`shape_rectangles()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)/
+[`shape_squares()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md).
+A plural block drops `@inheritParams <singular>` (redundant, and
+erroring under `devtools::document()`, once its parameters are already
+documented in the same merged topic) and its own `@title` line is kept
+only for roxygen’s parsing (a block needs some first paragraph) but
+never rendered, since only the first block sharing an `@rdname`
+contributes the topic’s actual `\title{}`; `@description`, `@return`,
+and `@examples` text from every block sharing an `@rdname` concatenate
+instead. Every singular constructor carries an explicit `@return`
+(e.g. `A [drawable].`) so the merged Value section correctly attributes
+each function’s own return type once the plural block adds its own
+override (e.g. `For \`shape_circles()\`, a
+\[sketch\].`). The six list-column constructors additionally need their singular's`@param
+x,y`tag phrased as the single combined key`x,y`(not separate`@param
+x`/`@param y`tags) so the plural block's dual-purpose override (`For
+shape_raw(), a numeric vector…; for shape_raws(), a
+list()…`) replaces it cleanly instead of leaving stale singular-only entries alongside it -- confirmed by inspecting the rendered`.Rd`section directly, since a key mismatch doesn't produce any warning at`document()`time. **Any new plural constructor should follow this same`@rdname\`-merge
+pattern\*\*, not get its own standalone topic.
 
 ### Rendering model
 
@@ -807,7 +838,7 @@ full debugging narrative):
   methods for list-like access to `@shapes`.
 - `R/vectorize.R` – the internal `vectorize_shapes()` engine shared by
   every plural
-  `shape_*s()`/`curve_*s()`/[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raws.md)
+  `shape_*s()`/`curve_*s()`/[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
   constructor (each defined alongside its singular counterpart, in that
   constructor’s own file – see “Class hierarchy” above). Collated right
   after `sketch.R`, since it builds a `sketch` from its results, though

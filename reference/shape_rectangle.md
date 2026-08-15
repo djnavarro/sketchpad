@@ -8,6 +8,16 @@ rectangle. `shape_square()` is a thin convenience wrapper around
 single `side` argument instead – it returns a `shape_rectangle` object
 directly rather than being its own class.
 
+`shape_rectangles()`/`shape_squares()` are vectorized versions of
+`shape_rectangle()`/`shape_square()`: each argument may be a vector,
+recycled against the others via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `shape_rectangle()`/`shape_square()` per recycled row,
+rather than a single drawable.
+
 ## Usage
 
 ``` r
@@ -21,6 +31,17 @@ shape_rectangle(
 )
 
 shape_square(x = 0, y = 0, side = 1, trans = trans_identity(), ...)
+
+shape_rectangles(
+  x = 0,
+  y = 0,
+  width = 1,
+  height = 1,
+  trans = trans_identity(),
+  ...
+)
+
+shape_squares(x = 0, y = 0, side = 1, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -49,30 +70,26 @@ shape_square(x = 0, y = 0, side = 1, trans = trans_identity(), ...)
 
   Side length, for `shape_square()`. Must be non-negative. Default `1`.
 
+## Value
+
+A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
+
+For `shape_rectangles()`/`shape_squares()`, a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
 ## See also
 
 Other 2D shapes:
 [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
 [`shape_bezier_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.md),
-[`shape_bezier_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_bezier_ribbons.md),
-[`shape_beziers()`](https://sketchpad.djnavarro.net/reference/shape_beziers.md),
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
-[`shape_blobs()`](https://sketchpad.djnavarro.net/reference/shape_blobs.md),
 [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
-[`shape_circles()`](https://sketchpad.djnavarro.net/reference/shape_circles.md),
 [`shape_ellipse()`](https://sketchpad.djnavarro.net/reference/shape_ellipse.md),
-[`shape_ellipses()`](https://sketchpad.djnavarro.net/reference/shape_ellipses.md),
 [`shape_polygon()`](https://sketchpad.djnavarro.net/reference/shape_polygon.md),
-[`shape_polygons()`](https://sketchpad.djnavarro.net/reference/shape_polygons.md),
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
-[`shape_raws()`](https://sketchpad.djnavarro.net/reference/shape_raws.md),
-[`shape_rectangles()`](https://sketchpad.djnavarro.net/reference/shape_rectangles.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
-[`shape_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_ribbons.md),
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md),
-[`shape_twists()`](https://sketchpad.djnavarro.net/reference/shape_twists.md),
-[`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md),
-[`shape_wedges()`](https://sketchpad.djnavarro.net/reference/shape_wedges.md)
+[`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)
 
 ## Examples
 
@@ -80,5 +97,10 @@ Other 2D shapes:
 draw(shape_rectangle(width = 2, height = 1))
 
 draw(shape_square(x = 1, y = 1, side = 0.5, color = "darkred"))
+
+
+draw(shape_rectangles(x = 1:3, width = c(0.5, 1, 1.5), height = 0.5))
+
+draw(shape_squares(x = 1:3, side = c(0.5, 1, 1.5)))
 
 ```

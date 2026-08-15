@@ -6,14 +6,30 @@ texture a tile's interior, but scaled here into an arbitrary bounding box
 on the sketch's own coordinate plane rather than tiled inside a fill
 pattern. Where fill_scribble() scatters several such lines across a
 repeating tile as a texture, curve_scribble() draws exactly one as a
-standalone open curve."><meta property="og:description" content="curve_scribble is a drawable whose path is a single random wandering
+standalone open curve.
+curve_scribbles() is a vectorized version of curve_scribble():
+each argument may be a vector, recycled against the others via
+purrr::pmap()'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). Varying seed per curve is usually what makes
+several scribbles look distinct from each other. The result is a
+sketch containing one curve_scribble() per recycled row, rather
+than a single drawable."><meta property="og:description" content="curve_scribble is a drawable whose path is a single random wandering
 line – a random finite sum of sine harmonics – built from the same
 internal scribble_lines() generator that fill_scribble() uses to
 texture a tile's interior, but scaled here into an arbitrary bounding box
 on the sketch's own coordinate plane rather than tiled inside a fill
 pattern. Where fill_scribble() scatters several such lines across a
 repeating tile as a texture, curve_scribble() draws exactly one as a
-standalone open curve."></head><body>
+standalone open curve.
+curve_scribbles() is a vectorized version of curve_scribble():
+each argument may be a vector, recycled against the others via
+purrr::pmap()'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). Varying seed per curve is usually what makes
+several scribbles look distinct from each other. The result is a
+sketch containing one curve_scribble() per recycled row, rather
+than a single drawable."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -60,11 +76,33 @@ on the sketch's own coordinate plane rather than tiled inside a fill
 pattern. Where <code><a href="fill_scribble.html">fill_scribble()</a></code> scatters several such lines across a
 repeating tile as a texture, <code>curve_scribble()</code> draws exactly one as a
 standalone open curve.</p>
+<p><code>curve_scribbles()</code> is a vectorized version of <code>curve_scribble()</code>:
+each argument may be a vector, recycled against the others via
+<code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). Varying <code>seed</code> per curve is usually what makes
+several scribbles look distinct from each other. The result is a
+<a href="sketch.html">sketch</a> containing one <code>curve_scribble()</code> per recycled row, rather
+than a single drawable.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">curve_scribble</span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  y <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  width <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  height <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  direction <span class="op">=</span> <span class="st">"horizontal"</span>,</span>
+<span>  n_harmonics <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  amplitude <span class="op">=</span> <span class="fl">0.35</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">200L</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">curve_scribbles</span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  y <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -128,6 +166,11 @@ Default <code><a href="trans_identity.html">trans_identity()</a></code> (no tran
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A <a href="drawable.html">drawable</a>.</p>
+<p>For <code>curve_scribbles()</code>, a <a href="sketch.html">sketch</a>.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The underlying line is generated in <code>(along, across)</code> form, <code>along</code>
 running from <code>0</code> to <code>1</code> and <code>across</code> wandering around a random baseline
@@ -148,24 +191,20 @@ draw time), since <code><a href="style.html">style()</a></code> is shared across
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other 1D curves:
 <code><a href="curve_arc.html">curve_arc()</a></code>,
-<code><a href="curve_arcs.html">curve_arcs()</a></code>,
 <code><a href="curve_bezier.html">curve_bezier()</a></code>,
-<code><a href="curve_beziers.html">curve_beziers()</a></code>,
 <code><a href="curve_line.html">curve_line()</a></code>,
-<code><a href="curve_lines.html">curve_lines()</a></code>,
 <code><a href="curve_raw.html">curve_raw()</a></code>,
-<code><a href="curve_raws.html">curve_raws()</a></code>,
-<code><a href="curve_scribbles.html">curve_scribbles()</a></code>,
 <code><a href="curve_spiral.html">curve_spiral()</a></code>,
-<code><a href="curve_spirals.html">curve_spirals()</a></code>,
-<code><a href="curve_twist.html">curve_twist()</a></code>,
-<code><a href="curve_twists.html">curve_twists()</a></code></p></div>
+<code><a href="curve_twist.html">curve_twist()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu">curve_scribble</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">2</span>, height <span class="op">=</span> <span class="fl">0.5</span>, seed <span class="op">=</span> <span class="fl">5591L</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="curve_scribble-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu">curve_scribbles</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, width <span class="op">=</span> <span class="fl">0.8</span>, height <span class="op">=</span> <span class="fl">0.5</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="curve_scribble-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

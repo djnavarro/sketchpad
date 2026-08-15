@@ -9,7 +9,16 @@ has no width or fill at all – just the displaced backbone itself,
 rendered as an open grid::polylineGrob() (geometry = &quot;path&quot;).
 Shares its path computation with shape_twist() via the internal
 twisted_path_points() helper (R/shape_twist.R) rather than
-duplicating it."><meta property="og:description" content="curve_twist is shape_twist()'s path alone, with no ribbon width:
+duplicating it.
+curve_twists() is a vectorized version of curve_twist(): each
+argument may be a vector, recycled against the others via
+purrr::pmap()'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). A shared path_distortion noise_bridge is
+automatically recycled across every path; pass a list() of several
+different noise_bridges instead to vary it per path. The result is
+a sketch containing one curve_twist() per recycled row, rather
+than a single drawable."><meta property="og:description" content="curve_twist is shape_twist()'s path alone, with no ribbon width:
 an open curve_line()-like polyline between (x, y) and
 (xend, yend), displaced away from a straight line by a
 noise_bridge, giving a wandering, twisted appearance. Where
@@ -19,7 +28,16 @@ has no width or fill at all – just the displaced backbone itself,
 rendered as an open grid::polylineGrob() (geometry = &quot;path&quot;).
 Shares its path computation with shape_twist() via the internal
 twisted_path_points() helper (R/shape_twist.R) rather than
-duplicating it."></head><body>
+duplicating it.
+curve_twists() is a vectorized version of curve_twist(): each
+argument may be a vector, recycled against the others via
+purrr::pmap()'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). A shared path_distortion noise_bridge is
+automatically recycled across every path; pass a list() of several
+different noise_bridges instead to vary it per path. The result is
+a sketch containing one curve_twist() per recycled row, rather
+than a single drawable."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -69,11 +87,32 @@ rendered as an open <code><a href="https://rdrr.io/r/grid/grid.lines.html" class
 Shares its path computation with <code><a href="shape_twist.html">shape_twist()</a></code> via the internal
 <code>twisted_path_points()</code> helper (<code>R/shape_twist.R</code>) rather than
 duplicating it.</p>
+<p><code>curve_twists()</code> is a vectorized version of <code>curve_twist()</code>: each
+argument may be a vector, recycled against the others via
+<code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). A shared <code>path_distortion</code> <a href="noise_bridge.html">noise_bridge</a> is
+automatically recycled across every path; pass a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of several
+different <code>noise_bridge</code>s instead to vary it per path. The result is
+a <a href="sketch.html">sketch</a> containing one <code>curve_twist()</code> per recycled row, rather
+than a single drawable.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">curve_twist</span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  y <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  xend <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  yend <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  scale <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">100L</span>,</span>
+<span>  path_distortion <span class="op">=</span> <span class="fu"><a href="noise_bridge.html">noise_bridge</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">curve_twists</span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  y <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  xend <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -123,6 +162,11 @@ Default <code><a href="trans_identity.html">trans_identity()</a></code> (no tran
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A <a href="drawable.html">drawable</a>.</p>
+<p>For <code>curve_twists()</code>, a <a href="sketch.html">sketch</a>.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>style@fill</code> has no effect for <code>curve_twist()</code> – see <a href="drawable.html">drawable</a>'s
 <code>geometry</code> documentation for why <code>"path"</code> geometries have no interior
@@ -134,18 +178,11 @@ ignored at draw time), since <code><a href="style.html">style()</a></code> is sh
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other 1D curves:
 <code><a href="curve_arc.html">curve_arc()</a></code>,
-<code><a href="curve_arcs.html">curve_arcs()</a></code>,
 <code><a href="curve_bezier.html">curve_bezier()</a></code>,
-<code><a href="curve_beziers.html">curve_beziers()</a></code>,
 <code><a href="curve_line.html">curve_line()</a></code>,
-<code><a href="curve_lines.html">curve_lines()</a></code>,
 <code><a href="curve_raw.html">curve_raw()</a></code>,
-<code><a href="curve_raws.html">curve_raws()</a></code>,
 <code><a href="curve_scribble.html">curve_scribble()</a></code>,
-<code><a href="curve_scribbles.html">curve_scribbles()</a></code>,
-<code><a href="curve_spiral.html">curve_spiral()</a></code>,
-<code><a href="curve_spirals.html">curve_spirals()</a></code>,
-<code><a href="curve_twists.html">curve_twists()</a></code></p></div>
+<code><a href="curve_spiral.html">curve_spiral()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -155,6 +192,9 @@ ignored at draw time), since <code><a href="style.html">style()</a></code> is sh
 <span class="r-in"><span>  path_distortion <span class="op">=</span> <span class="fu"><a href="noise_bridge.html">noise_bridge</a></span><span class="op">(</span>seed <span class="op">=</span> <span class="fl">7734L</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="curve_twist-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu">curve_twists</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, y <span class="op">=</span> <span class="fl">0</span>, xend <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">4</span>, yend <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="curve_twist-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

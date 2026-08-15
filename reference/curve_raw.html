@@ -7,7 +7,16 @@ a single-point &quot;line&quot; isn't meaningful), curve_raw places no minimum
 on length(x), matching shape_raw's own leniency – it exists
 primarily as a convert() target for &quot;freezing&quot; any &quot;path&quot;-geometry
 drawable's computed points, the same role shape_raw plays for
-&quot;polygon&quot;-geometry drawables."><meta property="og:description" content="curve_raw is shape_raw's &quot;path&quot;-geometry analog: the user supplies
+&quot;polygon&quot;-geometry drawables.
+curve_raws() is a vectorized version of curve_raw(). Since x/y
+are themselves numeric vectors of vertex coordinates for a single
+path, curve_raws() takes them as a list() of numeric vectors
+instead – one vector of vertices per path. Every other argument may
+be a plain vector, recycled against x/y via purrr::pmap()'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result
+is a sketch containing one curve_raw() per list element/recycled
+row, rather than a single drawable."><meta property="og:description" content="curve_raw is shape_raw's &quot;path&quot;-geometry analog: the user supplies
 x/y coordinates directly, connected by straight segments in the
 order given, with no smoothing, resampling, or implicit closing edge.
 Unlike curve_line() (which requires at least two control points, since
@@ -15,7 +24,16 @@ a single-point &quot;line&quot; isn't meaningful), curve_raw places no minimum
 on length(x), matching shape_raw's own leniency – it exists
 primarily as a convert() target for &quot;freezing&quot; any &quot;path&quot;-geometry
 drawable's computed points, the same role shape_raw plays for
-&quot;polygon&quot;-geometry drawables."></head><body>
+&quot;polygon&quot;-geometry drawables.
+curve_raws() is a vectorized version of curve_raw(). Since x/y
+are themselves numeric vectors of vertex coordinates for a single
+path, curve_raws() takes them as a list() of numeric vectors
+instead – one vector of vertices per path. Every other argument may
+be a plain vector, recycled against x/y via purrr::pmap()'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result
+is a sketch containing one curve_raw() per list element/recycled
+row, rather than a single drawable."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -63,23 +81,32 @@ on <code>length(x)</code>, matching <a href="shape_raw.html">shape_raw</a>'s own
 primarily as a <code>convert()</code> target for "freezing" any <code>"path"</code>-geometry
 drawable's computed points, the same role <a href="shape_raw.html">shape_raw</a> plays for
 <code>"polygon"</code>-geometry drawables.</p>
+<p><code>curve_raws()</code> is a vectorized version of <code>curve_raw()</code>. Since <code>x</code>/<code>y</code>
+are themselves numeric vectors of vertex coordinates for a single
+path, <code>curve_raws()</code> takes them as a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of numeric vectors
+instead – one vector of vertices per path. Every other argument may
+be a plain vector, recycled against <code>x</code>/<code>y</code> via <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result
+is a <a href="sketch.html">sketch</a> containing one <code>curve_raw()</code> per list element/recycled
+row, rather than a single drawable.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">curve_raw</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">curve_raw</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">curve_raws</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Numeric vector of x coordinates.</p></dd>
-
-
-<dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
-<dd><p>Numeric vector of y coordinates.</p></dd>
+<dl><dt id="arg-x-y">x, y<a class="anchor" aria-label="anchor" href="#arg-x-y"></a></dt>
+<dd><p>For <code>curve_raw()</code>, a numeric vector of x/y coordinates. For
+<code>curve_raws()</code>, a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of such vectors instead – one vector of
+vertices per path.</p></dd>
 
 
 <dt id="arg-trans">trans<a class="anchor" aria-label="anchor" href="#arg-trans"></a></dt>
@@ -92,6 +119,11 @@ Default <code><a href="trans_identity.html">trans_identity()</a></code> (no tran
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A <a href="drawable.html">drawable</a>.</p>
+<p>For <code>curve_raws()</code>, a <a href="sketch.html">sketch</a>.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>style@fill</code> has no effect for <code>curve_raw()</code> – see <a href="drawable.html">drawable</a>'s
 <code>geometry</code> documentation for why <code>"path"</code> geometries have no interior to
@@ -102,24 +134,23 @@ draw time), since <code><a href="style.html">style()</a></code> is shared across
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other 1D curves:
 <code><a href="curve_arc.html">curve_arc()</a></code>,
-<code><a href="curve_arcs.html">curve_arcs()</a></code>,
 <code><a href="curve_bezier.html">curve_bezier()</a></code>,
-<code><a href="curve_beziers.html">curve_beziers()</a></code>,
 <code><a href="curve_line.html">curve_line()</a></code>,
-<code><a href="curve_lines.html">curve_lines()</a></code>,
-<code><a href="curve_raws.html">curve_raws()</a></code>,
 <code><a href="curve_scribble.html">curve_scribble()</a></code>,
-<code><a href="curve_scribbles.html">curve_scribbles()</a></code>,
 <code><a href="curve_spiral.html">curve_spiral()</a></code>,
-<code><a href="curve_spirals.html">curve_spirals()</a></code>,
-<code><a href="curve_twist.html">curve_twist()</a></code>,
-<code><a href="curve_twists.html">curve_twists()</a></code></p></div>
+<code><a href="curve_twist.html">curve_twist()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu">curve_raw</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="curve_raw-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu">curve_raws</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="curve_raw-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

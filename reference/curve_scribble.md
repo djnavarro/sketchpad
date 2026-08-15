@@ -13,10 +13,34 @@ inside a fill pattern. Where
 scatters several such lines across a repeating tile as a texture,
 `curve_scribble()` draws exactly one as a standalone open curve.
 
+`curve_scribbles()` is a vectorized version of `curve_scribble()`: each
+argument may be a vector, recycled against the others via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). Varying
+`seed` per curve is usually what makes several scribbles look distinct
+from each other. The result is a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
+one `curve_scribble()` per recycled row, rather than a single drawable.
+
 ## Usage
 
 ``` r
 curve_scribble(
+  x = 0,
+  y = 0,
+  width = 1,
+  height = 1,
+  direction = "horizontal",
+  n_harmonics = 3L,
+  amplitude = 0.35,
+  n = 200L,
+  seed = 1L,
+  trans = trans_identity(),
+  ...
+)
+
+curve_scribbles(
   x = 0,
   y = 0,
   width = 1,
@@ -79,6 +103,13 @@ curve_scribble(
   Arguments passed to
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md).
 
+## Value
+
+A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
+
+For `curve_scribbles()`, a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
 ## Details
 
 The underlying line is generated in `(along, across)` form, `along`
@@ -104,22 +135,18 @@ shared across every `geometry`.
 
 Other 1D curves:
 [`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md),
-[`curve_arcs()`](https://sketchpad.djnavarro.net/reference/curve_arcs.md),
 [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md),
-[`curve_beziers()`](https://sketchpad.djnavarro.net/reference/curve_beziers.md),
 [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
-[`curve_lines()`](https://sketchpad.djnavarro.net/reference/curve_lines.md),
 [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
-[`curve_raws()`](https://sketchpad.djnavarro.net/reference/curve_raws.md),
-[`curve_scribbles()`](https://sketchpad.djnavarro.net/reference/curve_scribbles.md),
 [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md),
-[`curve_spirals()`](https://sketchpad.djnavarro.net/reference/curve_spirals.md),
-[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md),
-[`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twists.md)
+[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
 
 ## Examples
 
 ``` r
 draw(curve_scribble(width = 2, height = 0.5, seed = 5591L))
+
+
+draw(curve_scribbles(x = 1:3, width = 0.8, height = 0.5, seed = 1:3))
 
 ```

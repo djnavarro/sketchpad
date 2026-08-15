@@ -9,21 +9,36 @@ exposing it – see `.agents/PLAN.md`). The user supplies `x`/`y`
 coordinates directly, rendered as unconnected markers rather than a
 connected outline or path.
 
+`points_raws()` is a vectorized version of `points_raw()`. Since `x`/`y`
+are themselves numeric vectors of point coordinates for a single
+scatter, `points_raws()` takes them as a
+[`list()`](https://rdrr.io/r/base/list.html) of numeric vectors instead
+– one vector per scatter – which is most useful for giving several
+distinct scatters different `style` arguments (e.g. a different `color`
+each). Every other argument may be a plain vector, recycled against
+`x`/`y` via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `points_raw()` per list element/recycled row, rather than
+a single drawable.
+
 ## Usage
 
 ``` r
 points_raw(x, y, trans = trans_identity(), ...)
+
+points_raws(x, y, trans = trans_identity(), ...)
 ```
 
 ## Arguments
 
-- x:
+- x, y:
 
-  Numeric vector of x coordinates.
-
-- y:
-
-  Numeric vector of y coordinates.
+  For `points_raw()`, a numeric vector of x/y coordinates. For
+  `points_raws()`, a [`list()`](https://rdrr.io/r/base/list.html) of
+  such vectors instead – one vector per scatter.
 
 - trans:
 
@@ -37,6 +52,13 @@ points_raw(x, y, trans = trans_identity(), ...)
   Arguments passed to
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md).
 
+## Value
+
+A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
+
+For `points_raws()`, a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
 ## Details
 
 `style@fill` and every line-related `style` property (`linewidth`,
@@ -47,11 +69,6 @@ points_raw(x, y, trans = trans_identity(), ...)
 (`R/draw.R`) for why a `"points"` geometry has no line to stroke and no
 interior to fill. Only `style@color` is used, as the marker colour.
 
-## See also
-
-Other 0D points:
-[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raws.md)
-
 ## Examples
 
 ``` r
@@ -59,6 +76,13 @@ draw(points_raw(
   x = seq(0, 1, length.out = 20),
   y = sin(seq(0, 2 * pi, length.out = 20)) / 2 + 0.5,
   color = "steelblue"
+))
+
+
+draw(points_raws(
+  x = list(seq(0, 1, length.out = 10), seq(0, 1, length.out = 10)),
+  y = list(rep(0.25, 10), rep(0.75, 10)),
+  color = c("steelblue", "darkred")
 ))
 
 ```

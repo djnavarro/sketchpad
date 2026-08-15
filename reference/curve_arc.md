@@ -12,10 +12,30 @@ via two internal helpers factored into `R/shape_wedge.R`
 `drawable(geometry = ...)` they construct from and the missing centroid
 vertex.
 
+`curve_arcs()` is a vectorized version of `curve_arc()`: each argument
+may be a vector, recycled against the others via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `curve_arc()` per recycled row, rather than a single
+drawable.
+
 ## Usage
 
 ``` r
 curve_arc(
+  x = 0,
+  y = 0,
+  radius = 1,
+  start = 0,
+  end = pi/2,
+  n = 100L,
+  trans = trans_identity(),
+  ...
+)
+
+curve_arcs(
   x = 0,
   y = 0,
   radius = 1,
@@ -58,6 +78,13 @@ curve_arc(
   Arguments passed to
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md).
 
+## Value
+
+A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
+
+For `curve_arcs()`, a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
 ## Details
 
 `style@fill` has no effect for `curve_arc()` – see
@@ -71,23 +98,19 @@ shared across every `geometry`.
 ## See also
 
 Other 1D curves:
-[`curve_arcs()`](https://sketchpad.djnavarro.net/reference/curve_arcs.md),
 [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md),
-[`curve_beziers()`](https://sketchpad.djnavarro.net/reference/curve_beziers.md),
 [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md),
-[`curve_lines()`](https://sketchpad.djnavarro.net/reference/curve_lines.md),
 [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
-[`curve_raws()`](https://sketchpad.djnavarro.net/reference/curve_raws.md),
 [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md),
-[`curve_scribbles()`](https://sketchpad.djnavarro.net/reference/curve_scribbles.md),
 [`curve_spiral()`](https://sketchpad.djnavarro.net/reference/curve_spiral.md),
-[`curve_spirals()`](https://sketchpad.djnavarro.net/reference/curve_spirals.md),
-[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md),
-[`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twists.md)
+[`curve_twist()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
 
 ## Examples
 
 ``` r
 draw(curve_arc(start = 0, end = 3 * pi / 2))
+
+
+draw(curve_arcs(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))
 
 ```
