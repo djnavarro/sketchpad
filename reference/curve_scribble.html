@@ -74,6 +74,7 @@ standalone open curve.</p>
 <span>  amplitude <span class="op">=</span> <span class="fl">0.35</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">200L</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -115,6 +116,11 @@ integer of at least <code>2L</code>. Default <code>200L</code>.</p></dd>
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Integer seed for the random harmonics. Default <code>1L</code>.</p></dd>
+
+
+<dt id="arg-trans">trans<a class="anchor" aria-label="anchor" href="#arg-trans"></a></dt>
+<dd><p>A <a href="trans.html">trans</a> object applied to the curve's computed points.
+Default <code><a href="trans_identity.html">trans_identity()</a></code> (no transform).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

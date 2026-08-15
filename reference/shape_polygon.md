@@ -14,7 +14,7 @@ the path itself and a polygon has no approximation error to hide.
 ## Usage
 
 ``` r
-shape_polygon(x = 0, y = 0, radius = 1, n = 6L, ...)
+shape_polygon(x = 0, y = 0, radius = 1, n = 6L, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -30,6 +30,13 @@ shape_polygon(x = 0, y = 0, radius = 1, n = 6L, ...)
 - n:
 
   Number of sides (vertices). Must be at least `3`. Default `6L`.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the shape's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

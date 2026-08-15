@@ -12,7 +12,7 @@ the control points are not smoothed or resampled – `points` is exactly
 ## Usage
 
 ``` r
-curve_line(x, y, ...)
+curve_line(x, y, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -21,6 +21,13 @@ curve_line(x, y, ...)
 
   Numeric vectors of control point coordinates. Must be the same length,
   with at least two control points.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the curve's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

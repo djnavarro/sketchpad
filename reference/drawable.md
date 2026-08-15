@@ -17,7 +17,7 @@ intended to be instantiated directly; use one of its subclasses
 ## Usage
 
 ``` r
-drawable(..., geometry = "polygon")
+drawable(..., geometry = "polygon", trans = trans_identity())
 ```
 
 ## Arguments
@@ -33,6 +33,12 @@ drawable(..., geometry = "polygon")
   a constructor argument by any concrete drawable – each
   `shape_*()`/`curve_*()`/[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
   constructor fixes one value internally instead (see details).
+
+- trans:
+
+  A
+  [trans](https://sketchpad.djnavarro.net/reference/trans.md)/[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)/[trans_chain](https://sketchpad.djnavarro.net/reference/trans_chain.md)
+  object. See details.
 
 ## Details
 
@@ -50,6 +56,29 @@ or `"polygon"` (2D, a closed
 default, and the only value any `shape_*()` constructor uses).
 `style@fill` is ignored for `"points"`/`"path"` geometries, since only a
 closed polygon has an interior to fill.
+
+`trans` is a [trans](https://sketchpad.djnavarro.net/reference/trans.md)
+(an affine map:
+[`trans_translate()`](https://sketchpad.djnavarro.net/reference/trans_translate.md),
+[`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md),
+[`trans_scale()`](https://sketchpad.djnavarro.net/reference/trans_scale.md),
+[`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md),
+[`trans_shear()`](https://sketchpad.djnavarro.net/reference/trans_shear.md),
+[`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md)),
+a [trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)
+(a non-rigid, noise-based deformation), or a
+[trans_chain](https://sketchpad.djnavarro.net/reference/trans_chain.md)
+combining several via `+`, applied to a drawable's computed `points` as
+the very last step – after any shape-specific geometry (and, for
+[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)/[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md),
+any noise-based distortion) has already been computed. This means a
+drawable's own defining parameters (e.g.
+[`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)'s
+centroid/radius) are never mutated or flattened by a transform – only
+the final rendered coordinates are affected. Default
+[`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+(no transform).
 
 ## See also
 

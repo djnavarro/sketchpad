@@ -18,7 +18,7 @@ plays for `"polygon"`-geometry drawables.
 ## Usage
 
 ``` r
-curve_raw(x, y, ...)
+curve_raw(x, y, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -30,6 +30,13 @@ curve_raw(x, y, ...)
 - y:
 
   Numeric vector of y coordinates.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the curve's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

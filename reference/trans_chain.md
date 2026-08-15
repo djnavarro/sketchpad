@@ -1,0 +1,51 @@
+# A sequence of composed transforms
+
+`trans_chain` is what `+` produces when combining transforms that can't
+collapse into a single
+[trans](https://sketchpad.djnavarro.net/reference/trans.md) matrix –
+e.g. a
+[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)
+with another
+[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md),
+or a
+[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)
+mixed with a
+[trans](https://sketchpad.djnavarro.net/reference/trans.md). It is not
+usually constructed directly; it holds an ordered list of `steps` (each
+a [trans](https://sketchpad.djnavarro.net/reference/trans.md) or
+[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)),
+applied in sequence – `steps[[1]]` first, `steps[[length(steps)]]` last
+– exactly like chained `+` calls on a
+[drawable](https://sketchpad.djnavarro.net/reference/drawable.md) would
+suggest. Two consecutive
+[trans](https://sketchpad.djnavarro.net/reference/trans.md) (affine)
+steps are *not* automatically collapsed into one matrix when they're
+already part of a chain (only a bare `trans + trans` collapses); this
+only costs a little efficiency, not correctness.
+
+## Usage
+
+``` r
+trans_chain(steps = list())
+```
+
+## Arguments
+
+- steps:
+
+  A list of
+  [trans](https://sketchpad.djnavarro.net/reference/trans.md)/[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)/`trans_chain`
+  objects.
+
+## See also
+
+Other transform helpers:
+[`trans()`](https://sketchpad.djnavarro.net/reference/trans.md),
+[`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md),
+[`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md),
+[`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md),
+[`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md),
+[`trans_scale()`](https://sketchpad.djnavarro.net/reference/trans_scale.md),
+[`trans_shear()`](https://sketchpad.djnavarro.net/reference/trans_shear.md),
+[`trans_translate()`](https://sketchpad.djnavarro.net/reference/trans_translate.md),
+[`trans_warp()`](https://sketchpad.djnavarro.net/reference/trans_warp.md)

@@ -15,7 +15,16 @@ vertex.
 ## Usage
 
 ``` r
-curve_arc(x = 0, y = 0, radius = 1, start = 0, end = pi/2, n = 100L, ...)
+curve_arc(
+  x = 0,
+  y = 0,
+  radius = 1,
+  start = 0,
+  end = pi/2,
+  n = 100L,
+  trans = trans_identity(),
+  ...
+)
 ```
 
 ## Arguments
@@ -36,6 +45,13 @@ curve_arc(x = 0, y = 0, radius = 1, start = 0, end = pi/2, n = 100L, ...)
 
   Number of points used to approximate the arc. Must be at least `2`.
   Default `100L`.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the shape's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

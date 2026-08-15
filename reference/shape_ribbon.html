@@ -57,6 +57,7 @@ ends and varies along its length according to simplex noise.</p>
 <span>  width <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">100L</span>,</span>
 <span>  distortion <span class="op">=</span> <span class="fu"><a href="noise_field.html">noise_field</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -84,6 +85,11 @@ ends and varies along its length according to simplex noise.</p>
 <dt id="arg-distortion">distortion<a class="anchor" aria-label="anchor" href="#arg-distortion"></a></dt>
 <dd><p>A <a href="noise_field.html">noise_field</a> controlling the width modulation.
 Default <code><a href="noise_field.html">noise_field()</a></code>.</p></dd>
+
+
+<dt id="arg-trans">trans<a class="anchor" aria-label="anchor" href="#arg-trans"></a></dt>
+<dd><p>A <a href="trans.html">trans</a> object applied to the shape's computed points.
+Default <code><a href="trans_identity.html">trans_identity()</a></code> (no transform).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

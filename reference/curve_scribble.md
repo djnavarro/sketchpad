@@ -26,6 +26,7 @@ curve_scribble(
   amplitude = 0.35,
   n = 200L,
   seed = 1L,
+  trans = trans_identity(),
   ...
 )
 ```
@@ -65,6 +66,13 @@ curve_scribble(
 - seed:
 
   Integer seed for the random harmonics. Default `1L`.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the curve's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

@@ -11,9 +11,16 @@ directly rather than being its own class.
 ## Usage
 
 ``` r
-shape_rectangle(x = 0, y = 0, width = 1, height = 1, ...)
+shape_rectangle(
+  x = 0,
+  y = 0,
+  width = 1,
+  height = 1,
+  trans = trans_identity(),
+  ...
+)
 
-shape_square(x = 0, y = 0, side = 1, ...)
+shape_square(x = 0, y = 0, side = 1, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -25,6 +32,13 @@ shape_square(x = 0, y = 0, side = 1, ...)
 - width, height:
 
   Rectangle dimensions. Must be non-negative. Default `1`.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the shape's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

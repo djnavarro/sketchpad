@@ -17,6 +17,7 @@ shape_twist(
   n = 100L,
   path_distortion = noise_bridge(),
   distortion = noise_field(),
+  trans = trans_identity(),
   ...
 )
 ```
@@ -52,6 +53,13 @@ shape_twist(
   [noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
   controlling the width modulation. Default
   [`noise_field()`](https://sketchpad.djnavarro.net/reference/noise_field.md).
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the shape's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

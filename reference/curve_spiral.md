@@ -20,6 +20,7 @@ curve_spiral(
   radius_end = 1,
   turns = 3,
   n = 200L,
+  trans = trans_identity(),
   ...
 )
 ```
@@ -42,6 +43,13 @@ curve_spiral(
 - n:
 
   Number of points used to approximate the spiral. Default `200L`.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the curve's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

@@ -58,6 +58,64 @@ how the API got here, see
   builds a second, seed-offset `noise_bridge` internally to get an
   independent y-displacement from the same `path_distortion` property’s
   `smooth` setting.
+- **`trans`** – not a `drawable`; wraps a 3x3 homogeneous-coordinates
+  affine transformation matrix (`R/trans.R`). Not usually constructed
+  directly –
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md),
+  [`trans_translate()`](https://sketchpad.djnavarro.net/reference/trans_translate.md),
+  [`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md),
+  [`trans_scale()`](https://sketchpad.djnavarro.net/reference/trans_scale.md),
+  [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md),
+  [`trans_shear()`](https://sketchpad.djnavarro.net/reference/trans_shear.md),
+  and the general escape hatch
+  [`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md)
+  (a caller-supplied matrix) all return one, mirroring the `fill_*()`
+  family’s “many constructors, one shared representation” shape.
+  [`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md)/[`trans_scale()`](https://sketchpad.djnavarro.net/reference/trans_scale.md)/[`trans_shear()`](https://sketchpad.djnavarro.net/reference/trans_shear.md)/
+  [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md)
+  each take an `about_x`/`about_y` pivot (default the origin), built via
+  the internal `mat_about()` helper
+  (`translate(about) %*% m %*% translate(-about)`).
+  [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md)
+  is parameterized as `x`/`y` logicals (which coordinate to flip) rather
+  than a `"horizontal"`/`"vertical"` axis string, since that terminology
+  is genuinely ambiguous; arbitrary-angle line reflection isn’t a
+  separate argument – it composes from
+  [`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md) +
+  [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md) +
+  [`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md)
+  instead.
+- **`trans_warp`** – also not a `drawable`; a non-rigid, noise-based
+  deformation that can’t be represented as a matrix (`R/trans.R`).
+  Displaces each point by simplex/fractal noise sampled at the point’s
+  own `(x, y)` position (domain warping): two independent `noise_field`s
+  (`distortion_x`/`distortion_y`, each rescaled to `[-1, 1]` and scaled
+  by `amount`), with `distortion_y` defaulting to `distortion_x`’s own
+  settings with its seed offset by `1` – the same seed-offset convention
+  `twisted_path_points()` (`R/shape_twist.R`) uses for its own two
+  independent axes. The class doubles as its own constructor (like
+  `noise_field`/`noise_bridge`, and unlike the `trans_*()` affine
+  family, which are separate wrapper functions sharing the single
+  `trans` class).
+- **`trans_chain`** – also not a `drawable`; an ordered list of `steps`
+  (each a `trans`/`trans_warp`/`trans_chain`), applied in sequence. This
+  is what `+` produces when composing two transforms that can’t collapse
+  into a single affine matrix – e.g. a `trans_warp` combined with
+  another `trans_warp` or with a `trans`. Not usually constructed
+  directly.
+- Every `trans`/`trans_warp`/`trans_chain` combination composes with
+  `+`, via the internal `combine_trans()` helper backing nine
+  `method(\`+\`,
+  list(…))`registrations (one per ordered pair of the three classes): two plain`trans`(affine) objects still collapse into a single`trans`via matrix multiplication (`t1 +
+  t2`means "apply`t1`'s effect first, then`t2`'s";`(t1 +
+  t2)@matrix`is`<t2@matrix> %*%
+  <t1@matrix>`, since points are homogeneous column vectors transformed as`matrix
+  %*%
+  point`-- documented and tested explicitly in`trans_translate()`'s docs, since composition order is an easy thing to get backwards); any combination involving a`trans_warp`/`trans_chain`instead builds/extends a`trans_chain`(via the internal`trans_steps()`helper, which flattens an existing chain's own`steps`rather than nesting chains). Every`drawable`carries a`trans`property (default`trans_identity()`, typed as the internal`trans_any`union of all three classes -- the same`S7::new_union()`-as-property-class pattern`<style@fill>`'s`fill_class`already uses), applied via the internal`apply_trans()`S7 generic (dispatching on the transform's own class alone, the same single-dispatch-argument pattern`noise_sample()`uses for`field`) as the very last step inside each subclass's own`points`getter -- *after* any shape-specific geometry or noise-based distortion has already been computed, so a drawable's own defining parameters (e.g.`shape_circle`'s centroid/radius) are never mutated or flattened by a transform, only the final rendered coordinates.`convert()`picks this up for free (no changes needed there), since it already reads`<from@points>`. As a fluent alternative to passing`trans
+  = `at construction time,`method(\`+\`, list(drawable,
+  ))`(`R/sketch.R`, one registration per concrete class, sharing the internal`compose_drawable_trans()`helper) returns a copy of a drawable with`@trans`composed, and the analogous`method(\`+\`,
+  list(sketch,
+  ))`/`compose_sketch_trans()`maps the same composition over every shape in a`sketch`at once. Arbitrary-function warps (rather than noise-driven ones) remain out of scope -- see`.agents/PLAN.md\`.
 - **`style`** – container for `color`/`fill`/`linewidth`/`linetype`/
   `linejoin`/`lineend`/`linemitre`/`color_alpha`/`fill_alpha`, forwarded
   to [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html). `fill` accepts
@@ -103,7 +161,7 @@ how the API got here, see
   `drawable`’s `points` *property* (see below) is still called `points`,
   since a property isn’t a top-level exported name and can’t mask
   anything.
-- **`drawable`** – parent class of every shape. Declares three
+- **`drawable`** – parent class of every shape. Declares four
   properties: `style` (default
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md)),
   `geometry` (a validated string, one of
@@ -111,12 +169,13 @@ how the API got here, see
   [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) which
   grob type to build, on a dimensional reading: `"points"` is 0D,
   `"path"` is 1D, `"polygon"` is 2D and the only value any current
-  `shape_*()` constructor uses), and a computed `points` property that
-  subclasses override. Not meant to be instantiated directly.
-  `drawable`’s own `constructor` sets `geometry`’s default explicitly
-  (as an argument default, not just a `new_property(default = ...)`
-  spec) because it bypasses S7’s auto-generated constructor – see
-  “Gotchas”.
+  `shape_*()` constructor uses), `trans` (a \[trans\], default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  – see above), and a computed `points` property that subclasses
+  override. Not meant to be instantiated directly. `drawable`’s own
+  `constructor` sets `geometry`’s and `trans`’s defaults explicitly (as
+  argument defaults, not just `new_property(default = ...)` specs)
+  because it bypasses S7’s auto-generated constructor – see “Gotchas”.
 - **`shape_raw`** – the trivial drawable: `x`/`y` supplied directly as
   `points`. Usually produced by `convert()`, not constructed by hand.
   `curve_raw`/`points_raw` are its `"path"`/`"points"`-geometry analogs
@@ -293,6 +352,11 @@ how the API got here, see
   auto-generated one) purely so `canvas`’s default can be a pre-built
   [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md)
   object rather than an embedded property default – see “Gotchas”.
+  `R/sketch.R` also holds two more `+` methods, overloading the same
+  operator for a different purpose: `method(\`+\`, list(drawable,
+  trans))`composes a [trans] onto a single drawable's own`@trans`, and`method(\`+\`,
+  list(sketch, trans))\` maps that same composition over every shape in
+  a sketch at once – see \[trans\] above.
 - **[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)** – S7
   generic, `dispatch_args = "object"`. Methods for `drawable` (single
   shape) and `sketch` (renders every shape into one shared, equal-aspect
@@ -654,6 +718,10 @@ full debugging narrative):
   already exist, but not the `noise_field` class itself).
   `shape_twist.R` needs `noise_bridge` to exist for its own
   `path_distortion` property default.
+- `R/trans.R` – the `trans` class and the `trans_*()` transform family,
+  loaded right after `noise_bridge.R`: no compile-time dependency on any
+  other class, but `drawable.R` needs `trans` to exist for its own
+  `trans` property default.
 - `R/style.R`, `R/xy.R`, `R/drawable.R` – foundation classes, in load
   order (each depends on the previous).
 - `R/shape_bezier.R`, `R/shape_bezier_ribbon.R`, `R/curve_bezier.R`,
@@ -694,7 +762,10 @@ full debugging narrative):
   has no dependency on `drawable` itself, only on `fill_class` (from
   `fill.R`); `sketch.R` needs `canvas` to exist for its own `canvas`
   property.
-- `R/sketch.R` – the `sketch` class and its `+` method.
+- `R/sketch.R` – the `sketch` class and three `+` methods:
+  `(sketch, drawable)` (accumulate shapes), `(drawable, trans)` and
+  `(sketch, trans)` (compose a transform onto one drawable or every
+  shape in a sketch – see \[trans\] above).
 - `R/draw.R` – the `draw` generic and its three methods.
 - `R/convert.R` – the `convert(drawable, shape_raw)` method.
 - `R/sketchpad-package.R` – package-level doc, `#' @import S7`, the
@@ -702,8 +773,8 @@ full debugging narrative):
   [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html),
   and the `globalVariables("properties")` workaround.
 - `DESCRIPTION`’s `Collate` field pins the load order above explicitly
-  (fill -\> noise_field -\> noise_bridge -\> style -\> xy -\> drawable
-  -\> shape_bezier -\> shape_bezier_ribbon -\> curve_bezier -\>
+  (fill -\> noise_field -\> noise_bridge -\> trans -\> style -\> xy -\>
+  drawable -\> shape_bezier -\> shape_bezier_ribbon -\> curve_bezier -\>
   curve_line -\> curve_spiral -\> curve_scribble -\> shape_raw -\>
   curve_raw -\> points_raw -\> shape_circle -\> shape_rectangle -\>
   shape_polygon -\> shape_ellipse -\> shape_wedge -\> curve_arc -\>
@@ -725,9 +796,12 @@ full debugging narrative):
   anywhere in `R/`.
 - Use the base R pipe (`|>`), not the magrittr pipe.
 - Every concrete drawable follows the same constructor shape:
-  `constructor = function(<own args>, ...) S7::new_object(drawable(), <own args>, style = style(...))`,
+  `constructor = function(<own args>, trans = trans_identity(), ...) S7::new_object(drawable(trans = trans), <own args>, style = style(...))`,
   so arbitrary style arguments (`color`, `fill`, `linewidth`) are always
-  accepted via `...` without each subclass needing to declare them.
+  accepted via `...` without each subclass needing to declare them,
+  while `trans` (which can’t ride along in `...`, since that’s reserved
+  for [`style()`](https://sketchpad.djnavarro.net/reference/style.md))
+  is threaded through explicitly by every subclass.
 - A computed geometry property (`points`, and `bezier`/`path` on
   `shape_twist`) is a `new_property()` with only a `getter` – geometry
   is always derived, never stored and mutated in place.
@@ -746,9 +820,10 @@ full debugging narrative):
   [`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md);
   `@family fill helpers` for every `fill_*()` constructor;
   `@family noise helpers` for `noise_field`/
-  `noise_bridge`/`noise_sample`. **Any new drawable, fill helper, or
-  noise helper needs the matching `@family` tag added alongside its
-  `@export`.**
+  `noise_bridge`/`noise_sample`; `@family transform helpers` for
+  `trans`/ every `trans_*()` constructor. **Any new drawable, fill
+  helper, noise helper, or transform helper needs the matching `@family`
+  tag added alongside its `@export`.**
 
 ## Development workflow
 

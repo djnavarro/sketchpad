@@ -31,6 +31,7 @@ curve_twist(
   scale = 0.2,
   n = 100L,
   path_distortion = noise_bridge(),
+  trans = trans_identity(),
   ...
 )
 ```
@@ -62,6 +63,13 @@ curve_twist(
   [noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md)
   controlling the path's Brownian bridge. Default
   [`noise_bridge()`](https://sketchpad.djnavarro.net/reference/noise_bridge.md).
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the curve's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

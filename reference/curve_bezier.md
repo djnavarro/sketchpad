@@ -17,7 +17,7 @@ instead, stopping at its last control point rather than looping back.
 ## Usage
 
 ``` r
-curve_bezier(x, y, n = 100L, ...)
+curve_bezier(x, y, n = 100L, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -30,6 +30,13 @@ curve_bezier(x, y, n = 100L, ...)
 - n:
 
   Number of points used to sample the curve. Default `100L`.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the curve's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

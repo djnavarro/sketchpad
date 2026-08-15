@@ -8,7 +8,7 @@ spaced points around the circumference.
 ## Usage
 
 ``` r
-shape_circle(x = 0, y = 0, radius = 1, n = 100L, ...)
+shape_circle(x = 0, y = 0, radius = 1, n = 100L, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -24,6 +24,13 @@ shape_circle(x = 0, y = 0, radius = 1, n = 100L, ...)
 - n:
 
   Number of points used to approximate the circle. Default `100L`.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the shape's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

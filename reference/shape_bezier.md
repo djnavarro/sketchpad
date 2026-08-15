@@ -15,7 +15,7 @@ first – for an open Bezier curve/path instead, see
 ## Usage
 
 ``` r
-shape_bezier(x, y, n = 100L, ...)
+shape_bezier(x, y, n = 100L, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -28,6 +28,13 @@ shape_bezier(x, y, n = 100L, ...)
 - n:
 
   Number of points used to sample the curve. Default `100L`.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the shape's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

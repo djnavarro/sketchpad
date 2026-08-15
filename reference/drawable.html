@@ -55,7 +55,7 @@ of its subclasses (<a href="shape_raw.html">shape_raw</a>, <a href="shape_circle
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drawable</span><span class="op">(</span><span class="va">...</span>, geometry <span class="op">=</span> <span class="st">"polygon"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drawable</span><span class="op">(</span><span class="va">...</span>, geometry <span class="op">=</span> <span class="st">"polygon"</span>, trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -72,6 +72,10 @@ Not exposed as a constructor argument by any concrete drawable –
 each <code>shape_*()</code>/<code>curve_*()</code>/<code><a href="points_raw.html">points_raw()</a></code> constructor fixes one
 value internally instead (see details).</p></dd>
 
+
+<dt id="arg-trans">trans<a class="anchor" aria-label="anchor" href="#arg-trans"></a></dt>
+<dd><p>A <a href="trans.html">trans</a>/<a href="trans_warp.html">trans_warp</a>/<a href="trans_chain.html">trans_chain</a> object. See details.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -83,6 +87,17 @@ e.g. <code><a href="points_raw.html">points_raw()</a></code>), <code>"path"</cod
 <code>shape_*()</code> constructor uses). <code>style@fill</code> is ignored for
 <code>"points"</code>/<code>"path"</code> geometries, since only a closed polygon has an
 interior to fill.</p>
+<p><code>trans</code> is a <a href="trans.html">trans</a> (an affine map: <code><a href="trans_translate.html">trans_translate()</a></code>,
+<code><a href="trans_rotate.html">trans_rotate()</a></code>, <code><a href="trans_scale.html">trans_scale()</a></code>, <code><a href="trans_reflect.html">trans_reflect()</a></code>, <code><a href="trans_shear.html">trans_shear()</a></code>,
+<code><a href="trans_affine.html">trans_affine()</a></code>), a <a href="trans_warp.html">trans_warp</a> (a non-rigid, noise-based
+deformation), or a <a href="trans_chain.html">trans_chain</a> combining several via <code>+</code>, applied to
+a drawable's computed <code>points</code> as the very last step – after any
+shape-specific geometry (and, for <code><a href="shape_blob.html">shape_blob()</a></code>/<code><a href="shape_ribbon.html">shape_ribbon()</a></code>/
+<code><a href="shape_twist.html">shape_twist()</a></code>, any noise-based distortion) has already been computed.
+This means a drawable's own defining parameters (e.g. <code><a href="shape_circle.html">shape_circle()</a></code>'s
+centroid/radius) are never mutated or flattened by a transform – only
+the final rendered coordinates are affected. Default <code><a href="trans_identity.html">trans_identity()</a></code>
+(no transform).</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

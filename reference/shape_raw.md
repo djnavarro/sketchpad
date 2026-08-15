@@ -13,7 +13,7 @@ down to its raw vertices.
 ## Usage
 
 ``` r
-shape_raw(x, y, ...)
+shape_raw(x, y, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -25,6 +25,13 @@ shape_raw(x, y, ...)
 - y:
 
   Numeric vector of y coordinates.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the shape's computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

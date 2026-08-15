@@ -12,7 +12,7 @@ connected outline or path.
 ## Usage
 
 ``` r
-points_raw(x, y, ...)
+points_raw(x, y, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -24,6 +24,13 @@ points_raw(x, y, ...)
 - y:
 
   Numeric vector of y coordinates.
+
+- trans:
+
+  A [trans](https://sketchpad.djnavarro.net/reference/trans.md) object
+  applied to the computed points. Default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
+  (no transform).
 
 - ...:
 

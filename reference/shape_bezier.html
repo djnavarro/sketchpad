@@ -64,7 +64,7 @@ point back to its first – for an open Bezier curve/path instead, see
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">shape_bezier</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, n <span class="op">=</span> <span class="fl">100L</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">shape_bezier</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, n <span class="op">=</span> <span class="fl">100L</span>, trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -78,6 +78,11 @@ same length, with at least two control points.</p></dd>
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
 <dd><p>Number of points used to sample the curve. Default <code>100L</code>.</p></dd>
+
+
+<dt id="arg-trans">trans<a class="anchor" aria-label="anchor" href="#arg-trans"></a></dt>
+<dd><p>A <a href="trans.html">trans</a> object applied to the shape's computed points.
+Default <code><a href="trans_identity.html">trans_identity()</a></code> (no transform).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

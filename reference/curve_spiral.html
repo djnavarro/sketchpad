@@ -68,6 +68,7 @@ an Archimedean-style spiral that grows or shrinks outward.</p>
 <span>  radius_end <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  turns <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">200L</span>,</span>
+<span>  trans <span class="op">=</span> <span class="fu"><a href="trans_identity.html">trans_identity</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -91,6 +92,11 @@ be non-negative. Default <code>0</code>/<code>1</code>.</p></dd>
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
 <dd><p>Number of points used to approximate the spiral. Default <code>200L</code>.</p></dd>
+
+
+<dt id="arg-trans">trans<a class="anchor" aria-label="anchor" href="#arg-trans"></a></dt>
+<dd><p>A <a href="trans.html">trans</a> object applied to the curve's computed points.
+Default <code><a href="trans_identity.html">trans_identity()</a></code> (no transform).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
