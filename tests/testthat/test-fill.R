@@ -359,6 +359,27 @@ test_that("fill_noise() is reproducible for a given seed", {
   expect_false(identical(extract_raster(fill_a), extract_raster(fill_c)))
 })
 
+test_that("fill_charcoal() returns a grid pattern object", {
+  expect_s3_class(fill_charcoal(), "GridPattern")
+})
+
+test_that("fill_charcoal() validates its arguments (forwarded to fill_noise())", {
+  expect_error(fill_charcoal(spacing = 0), "spacing")
+  expect_error(fill_charcoal(color = 1), "color")
+  expect_error(fill_charcoal(frequency = -1), "frequency")
+  expect_error(fill_charcoal(octaves = 1.5), "octaves")
+})
+
+test_that("fill_charcoal() differs from fill_noise() only in its defaults", {
+  extract_raster <- function(fill) environment(fill$f)$grob$raster
+  charcoal_default <- fill_charcoal(seed = 481L, resolution = 8L)
+  noise_matching_args <- fill_noise(
+    color = "gray15", spacing = 0.25, frequency = 4, octaves = 3L,
+    seed = 481L, resolution = 8L
+  )
+  expect_identical(extract_raster(charcoal_default), extract_raster(noise_matching_args))
+})
+
 test_that("fill_marble() returns a grid pattern object", {
   expect_s3_class(fill_marble(), "GridPattern")
 })

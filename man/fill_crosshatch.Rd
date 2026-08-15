@@ -61,6 +61,7 @@ draw(shape_circle(fill = fill_crosshatch(angle = 30)))
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_flow]{fill_flow()}},
 \code{\link[=fill_gradient]{fill_gradient()}},

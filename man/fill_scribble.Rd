@@ -107,6 +107,7 @@ draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_flow]{fill_flow()}},

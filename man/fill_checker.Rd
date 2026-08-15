@@ -53,6 +53,7 @@ draw(shape_circle(fill = fill_checker(color1 = "black", color2 = "white")))
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_flow]{fill_flow()}},
 \code{\link[=fill_gradient]{fill_gradient()}},
