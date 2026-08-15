@@ -18,6 +18,7 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/djnavarro/sketchpad/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch"><li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
@@ -33,7 +34,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>AGENTS.md</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/djnavarro/sketchpad/blob/main/AGENTS.md" class="external-link"><code>AGENTS.md</code></a></small>
     </div>
 
 <div id="agentsmd" class="section level1">
@@ -166,7 +167,7 @@
 <li>
 <strong><code>sketch</code> was not available as the package name.</strong> It’s an existing CRAN package (an R-to-JavaScript/p5.js transpiler) – installing both would collide. Named this package <code>sketchpad</code> instead.</li>
 <li>
-<strong><code>points</code> was not available as an exported class/constructor name.</strong> It would mask <code><a href="https://rdrr.io/r/graphics/points.html" class="external-link">graphics::points()</a></code> on <code><a href="https://sketchpad.djnavarro.net/">library(sketchpad)</a></code>. The class is named <code>xy</code> instead; the <code>points</code> <em>property</em> every <code>drawable</code> exposes keeps its original name, since accessing it via <code>@points</code> never shadows the base function.</li>
+<strong><code>points</code> was not available as an exported class/constructor name.</strong> It would mask <code><a href="https://rdrr.io/r/graphics/points.html" class="external-link">graphics::points()</a></code> on <code><a href="https://github.com/djnavarro/sketchpad" class="external-link">library(sketchpad)</a></code>. The class is named <code>xy</code> instead; the <code>points</code> <em>property</em> every <code>drawable</code> exposes keeps its original name, since accessing it via <code>@points</code> never shadows the base function.</li>
 <li>
 <strong><code><a href="https://rdrr.io/r/grid/patterns.html" class="external-link">grid::pattern()</a></code> tiles containing <em>multiple</em> shapes can render visibly distorted once the tile actually repeats.</strong> Found while building <code><a href="reference/fill_stipple.html">fill_stipple()</a></code>/<code><a href="reference/fill_scatter.html">fill_scatter()</a></code>/<code><a href="reference/fill_halftone.html">fill_halftone()</a></code>: a single shape (one <code>circleGrob</code>, or a single tile spanning the whole target via <code>spacing = 1</code>, so <code>extend = "repeat"</code> never actually triggers) always renders correctly, but several separate shapes (e.g. <code>n</code> scattered dots) inside a tile that’s genuinely repeated (<code>spacing &lt; 1</code>) can come out clipped into crescents or otherwise non-circular – reproduced on this package’s development R build (4.6.1) on both an interactive device and <code><a href="https://ragg.r-lib.org/reference/agg_png.html" class="external-link">ragg::agg_png()</a></code>, in a fresh R session (so it isn’t session degradation), across multiple <code>n</code>/<code>radius</code> combinations with no clean rule for exactly when it triggers. This looks like an upstream <code>grid</code>/Cairo bug with multi-shape pattern tile content, not something fixable from this package’s code – don’t spend more time chasing a root cause or a parameter combination that “avoids” it without re-verifying on a released (non-development) R version first. Documented on the affected functions themselves (<code><a href="reference/fill_stipple.html">fill_stipple()</a></code>’s “Known rendering risk” section); no default was found that’s provably safe, since <code><a href="reference/fill_stipple.html">fill_stipple()</a></code>’s whole purpose requires genuine tile repetition.</li>
 <li>

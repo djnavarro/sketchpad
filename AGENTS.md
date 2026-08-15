@@ -928,10 +928,10 @@ full debugging narrative):
 - **`points` was not available as an exported class/constructor name.**
   It would mask
   [`graphics::points()`](https://rdrr.io/r/graphics/points.html) on
-  [`library(sketchpad)`](https://sketchpad.djnavarro.net/). The class is
-  named `xy` instead; the `points` *property* every `drawable` exposes
-  keeps its original name, since accessing it via `@points` never
-  shadows the base function.
+  [`library(sketchpad)`](https://github.com/djnavarro/sketchpad). The
+  class is named `xy` instead; the `points` *property* every `drawable`
+  exposes keeps its original name, since accessing it via `@points`
+  never shadows the base function.
 - **[`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) tiles
   containing *multiple* shapes can render visibly distorted once the
   tile actually repeats.** Found while building
