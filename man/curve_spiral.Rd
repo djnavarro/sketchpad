@@ -47,6 +47,7 @@ draw(curve_spiral(radius_start = 0, radius_end = 1, turns = 4))
 }
 \seealso{
 Other 1D curves:
+\code{\link[=curve_arc]{curve_arc()}},
 \code{\link[=curve_bezier]{curve_bezier()}},
 \code{\link[=curve_line]{curve_line()}},
 \code{\link[=curve_raw]{curve_raw()}},

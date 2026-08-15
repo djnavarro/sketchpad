@@ -125,6 +125,19 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `shape_circle` is the special case where both are equal (not
   implemented in terms of `shape_ellipse`, though, since it predates it
   and the two constructors are simple enough not to share code).
+- **`shape_wedge`** -- centroid + radius + `start`/`end` angle (radians) +
+  `n`; `points` is the centroid followed by `n` points along the circular
+  arc from `start` to `end` -- `grid::polygonGrob()`'s own closing edge
+  then draws the final straight side back from the arc's last point to
+  the centroid, giving the familiar pie-slice shape. Shares its arc
+  computation and argument validation with `curve_arc` via two internal
+  helpers factored into `R/shape_wedge.R` (`arc_points()`,
+  `validate_arc_args()`).
+- **`curve_arc`** -- `shape_wedge`'s arc alone, with no centroid vertex:
+  an open path of `n` points swept from `start` to `end`. Reuses
+  `shape_wedge`'s `arc_points()`/`validate_arc_args()` helpers rather than
+  duplicating them, mirroring `curve_bezier`/`shape_bezier`'s own
+  sharing.
 - **`shape_blob`** -- like `shape_circle`, but the radius is perturbed by
   a [noise_field] (see below), giving an irregular outline. `range`
   controls the perturbation amplitude; the noise itself (frequency,
@@ -268,16 +281,16 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 
 Every closed (`geometry = "polygon"`) drawable's constructor shares the
 `shape_*` prefix (`shape_circle()`, `shape_rectangle()`/`shape_square()`,
-`shape_polygon()`, `shape_ellipse()`, `shape_blob()`, `shape_ribbon()`,
-`shape_twist()`, `shape_bezier()`, and the trivial `shape_raw()`),
-mirroring the `fill_*()` family below -- this groups the "produces a
-closed drawable polygon" functions under one discoverable, greppable
-prefix distinct from the `fill_*()`, `draw()`, and `convert()` families.
-Open (`geometry = "path"`) drawables instead share a `curve_*` prefix --
-so far just `curve_bezier()` -- kept visually distinct from `shape_*()`
-since the two families render fundamentally differently (closed polygon
-vs. open stroke), even where (as with `curve_bezier`/`shape_bezier`) the
-underlying geometry computation is shared.
+`shape_polygon()`, `shape_ellipse()`, `shape_wedge()`, `shape_blob()`,
+`shape_ribbon()`, `shape_twist()`, `shape_bezier()`, and the trivial
+`shape_raw()`), mirroring the `fill_*()` family below -- this groups the
+"produces a closed drawable polygon" functions under one discoverable,
+greppable prefix distinct from the `fill_*()`, `draw()`, and `convert()`
+families. Open (`geometry = "path"`) drawables instead share a `curve_*`
+prefix, kept visually distinct from `shape_*()` since the two families
+render fundamentally differently (closed polygon vs. open stroke), even
+where (as with `curve_bezier`/`shape_bezier`, or `curve_arc`/
+`shape_wedge`) the underlying geometry computation is shared.
 
 ### Rendering model
 
@@ -520,9 +533,9 @@ full debugging narrative):
   `R/curve_line.R`, `R/curve_spiral.R`, `R/curve_scribble.R`,
   `R/shape_raw.R`, `R/curve_raw.R`, `R/points_raw.R`, `R/shape_circle.R`,
   `R/shape_rectangle.R`, `R/shape_polygon.R`, `R/shape_ellipse.R`,
-  `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R`,
-  `R/curve_twist.R` -- the concrete `drawable` subclasses, one file each
-  (`shape_rectangle.R` also holds the
+  `R/shape_wedge.R`, `R/curve_arc.R`, `R/shape_blob.R`, `R/shape_ribbon.R`,
+  `R/shape_twist.R`, `R/curve_twist.R` -- the concrete `drawable`
+  subclasses, one file each (`shape_rectangle.R` also holds the
   `shape_square()` wrapper function, rather than giving it its own file,
   since it's not a separate S7 class). Every closed constructor shares
   the `shape_*` prefix, every open one the `curve_*` prefix (see "Class
@@ -532,12 +545,14 @@ full debugging narrative):
   collated right after `shape_bezier.R` since it depends on that file's
   `bezier_curve_points()`) since it shares `shape_bezier.R`'s
   `bernstein()`/`bezier_curve_points()`/`validate_bezier_args()` internal
-  helpers rather than duplicating them, and `curve_twist.R`, kept
+  helpers rather than duplicating them, `curve_twist.R`, kept
   immediately after `shape_twist.R` for the same reason -- it shares that
-  file's `twisted_path_points()` helper. `curve_line.R`/`curve_spiral.R`
-  need no such sharing (each is genuinely new geometry with no
-  `shape_*()` counterpart), so they're ordinary standalone constructor
-  files. `curve_scribble.R` shares `R/fill.R`'s internal
+  file's `twisted_path_points()` helper, and `curve_arc.R`, kept
+  immediately after `shape_wedge.R` since it shares that file's
+  `arc_points()`/`validate_arc_args()` helpers. `curve_line.R`/
+  `curve_spiral.R` need no such sharing (each is genuinely new geometry
+  with no `shape_*()` counterpart), so they're ordinary standalone
+  constructor files. `curve_scribble.R` shares `R/fill.R`'s internal
   `scribble_lines()` helper (rather than duplicating it) but still needs
   its own file, since it depends on `drawable` (defined after `fill.R` in
   `Collate`) -- `fill.R` itself has no dependency on `drawable` and loads
@@ -561,8 +576,9 @@ full debugging narrative):
   -> shape_bezier -> shape_bezier_ribbon -> curve_bezier -> curve_line ->
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
-  shape_blob -> shape_ribbon -> shape_twist -> curve_twist -> canvas ->
-  sketch -> draw -> convert -> sketchpad-package). **Any new drawable
+  shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
+  curve_twist -> canvas -> sketch -> draw -> convert ->
+  sketchpad-package). **Any new drawable
   subclass must be added to
   `Collate` after `drawable.R`**, or `devtools::load_all()`/`R CMD check`
   will fail with an "object 'drawable' not found" error.

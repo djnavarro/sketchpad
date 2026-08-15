@@ -36,6 +36,7 @@ draw(curve_raw(x = c(0, 1, 2), y = c(0, 1, 0)))
 }
 \seealso{
 Other 1D curves:
+\code{\link[=curve_arc]{curve_arc()}},
 \code{\link[=curve_bezier]{curve_bezier()}},
 \code{\link[=curve_line]{curve_line()}},
 \code{\link[=curve_scribble]{curve_scribble()}},
