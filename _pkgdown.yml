@@ -56,3 +56,10 @@ reference:
   contents:
   - starts_with("trans")
 
+- title: Effects
+  desc: >
+    Helpers that compose several drawables together for a particular
+    visual effect, rather than constructing a single drawable.
+  contents:
+  - sketchy
+

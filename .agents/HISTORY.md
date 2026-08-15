@@ -1591,3 +1591,71 @@ both ends, per-point (not global-chord) normal behavior on a bent path,
 seed reproducibility, argument validation, and `shape_strokes()`
 vectorization. Verified with a full `devtools::check()` (0 errors/
 warnings/notes).
+
+## `sketchy()` and `fill_charcoal()`: formalizing the layered-jitter and texture-preset prototypes
+
+Two ad hoc techniques used while designing `shape_stroke()` (layering
+independently-jittered path copies for a pencil/ink look, and texturing
+a stroke's interior with `fill_noise()` for a charcoal/marker look) were
+promoted from one-off console prototypes into real, tested, documented
+package functions.
+
+**`sketchy()`** (`R/sketchy.R`) generalizes the layered-jitter prototype:
+rather than a new drawable class or a `shape_stroke()`-specific helper,
+it's a plain function taking a drawable constructor `.f` (e.g.
+`curve_line()` or `shape_stroke()`) plus `x`/`y`, building `layers`
+independently-perturbed calls to `.f` and collecting them into a
+`sketch`. Two design decisions worth recording:
+
+- **Noise sampled along normalized arc-length, not raw `(x, y)`.** The
+  original ad hoc prototype sampled `ambient::gen_simplex()` at the
+  curve's own domain parameter (e.g. `t` in `sin(t)`), which only exists
+  because that example happened to be a function plot. A general-purpose
+  version has no such parameter available, so `sketchy()` computes one:
+  cumulative arc-length, normalized to `[0, 1]`. This keeps the jitter's
+  qualitative shape independent of the input path's own scale -- a path
+  spanning `[0, 100]` and one spanning `[0, 1]` with the same point count
+  get comparably-shaped wobble, rather than the frequency parameter
+  needing rescaling by hand for each new path.
+- **No new drawable class, no new prefix family.** Considered naming
+  this something in the `shape_*`/`curve_*` vein, but rejected: it
+  doesn't produce a single `drawable` (a `sketch` of several isn't
+  representable as one polygon/path/points geometry), and confusion with
+  the already-existing `shape_strokes()` (unrelated: vectorizes over
+  several *independent* strokes' own arguments, not jittered copies of
+  *one* logical stroke) seemed likely with any name sharing that prefix.
+  Landed on a new, minimal top-level family instead: `sketchy()` is the
+  first member of a new pkgdown reference section, "Effects"
+  (`@family effects`), for functions that compose whole drawables rather
+  than constructing one.
+
+**`fill_charcoal()`** (`R/fill.R`, collated as an ordinary function
+addition, no `Collate` change needed) is a thin `fill_noise()` preset --
+same field, same rendering, just different defaults (lighter `"gray15"`
+base colour, finer `spacing = 0.25`, finer `frequency = 4`, one more
+`octaves = 3L`) -- capturing the parameter combination found, while
+testing `shape_stroke()`'s own texture options, to read convincingly as
+charcoal/marker grain. Implemented and documented following
+`fill_none()`'s "thin wrapper over a sibling constructor, self-documenting
+name" pattern rather than duplicating `fill_noise()`'s own validation.
+
+**A repeated gotcha, caught by `R CMD check` rather than avoided in
+advance**: `fill_charcoal()`'s own roxygen example used `color = NA`
+(a logical `NA`) instead of `NA_character_`, the same
+`style()`-validator mismatch documented elsewhere in this file for
+interactive `draw()` calls -- but this time inside a runnable example,
+which `R CMD check`'s `--run-examples` step actually executes, so it
+surfaced as a real check ERROR rather than a console error the developer
+could just retype. Fixed by using `NA_character_` in the example, same
+as everywhere else `color = NA` is wanted. Worth remembering: this
+mistake is easy to make even after hitting it before, precisely because
+it *looks* correct and only fails at the `style()` validator boundary.
+
+Verified with a full test suite run (`tests/testthat/test-sketchy.R`
+covering layer count, per-layer class, jitter-vs-unperturbed and
+zero-jitter-collapses-to-backbone behavior, independent per-layer
+wobble, seed reproducibility, `...` forwarding, `shape_stroke()`
+compatibility, argument validation, and a `draw()` smoke test; three new
+tests appended to `tests/testthat/test-fill.R` for `fill_charcoal()`)
+and a full `devtools::check()` (0 errors/warnings/notes, after fixing
+the example bug above).

@@ -454,7 +454,7 @@ is passed straight through either way.
 
 ### The `fill_*()` texture family
 
-`R/fill.R` holds sixteen `fill_*()` constructors for `style@fill`:
+`R/fill.R` holds seventeen `fill_*()` constructors for `style@fill`:
 `fill_solid()` (a validated colour string, no `grid::pattern()` involved),
 `fill_none()` (a thin `fill_solid(NA_character_)` wrapper -- `NA` is
 already a valid, transparent `grid::gpar()` colour, but the wrapper reads
@@ -483,7 +483,12 @@ sinusoidal bands by torus-periodic turbulence for a veined look;
 seed-decorrelated torus-periodic field for a swirlier, curl-noise-like
 look -- both share `fill_noise()`'s occasional faint tile-boundary
 rasterization seam, more visible here since `sin()`/warping amplify small
-mismatches), `fill_image()` (a caller-supplied raster, letterboxed by
+mismatches), `fill_charcoal()` (a `fill_noise()` preset -- lighter base
+tone, finer/denser tiling, finer noise detail -- tuned to read as
+hand-drawn charcoal/marker grain; found to fit a curved `shape_stroke()`
+interior noticeably better than `fill_scribble()`, whose fixed
+horizontal/vertical direction doesn't track a curved path's own tangent),
+`fill_image()` (a caller-supplied raster, letterboxed by
 default to preserve its own pixel aspect ratio), `fill_gradient()`
 (linear/radial via `grid::linearGradient()`/`radialGradient()`), and
 `fill_vignette()` (a colour faded via a `grid::as.mask()` alpha mask --
@@ -512,6 +517,28 @@ corrections are needed depending on what's drawn:
 
 Shared argument validation lives in the internal `validate_fill_args()`
 (spacing/aspect, with an optional angle check via `angle = NULL`).
+
+### Compositional effects: `sketchy()`
+
+`sketchy()` (`R/sketchy.R`) is the first member of a new, non-class
+family: a plain function (no S7 class) that composes several drawables
+into a [sketch] for a visual effect no single drawable can express by
+itself. It builds `layers` independently-jittered copies of a path --
+each one a call to a caller-supplied drawable constructor `.f` (e.g.
+`curve_line()`/`shape_stroke()`) with `x`/`y` displaced by smooth,
+seed-offset simplex noise sampled along the path's own normalized
+arc-length (not raw `x`/`y` position, so the jitter's shape doesn't
+depend on the path's own scale) -- collected into one `sketch`. Every
+other argument (`width`/`distortion`/`color`/`color_alpha`/...) is
+forwarded via `...` to every layer unchanged; only `x`/`y` vary across
+layers. This formalizes an ad hoc technique used, during
+`shape_stroke()`'s own development, to add a wobbling pencil-edge look
+on top of a stroke or to make a plain `curve_line()` read as
+hand-drawn. Documented under its own new pkgdown reference section,
+"Effects" (`@family effects`), separate from the `shape_*`/`curve_*`
+geometry families and the `fill_*`/`trans_*` per-drawable helper
+families, since it operates one level up -- composing whole drawables,
+not producing one.
 
 ## Gotchas worth remembering
 
@@ -729,6 +756,11 @@ full debugging narrative):
   doesn't actually matter -- function bodies are evaluated lazily, only
   S7 class definitions need their dependencies already loaded at parse
   time.
+- `R/sketchy.R` -- the `sketchy()` compositional effect (see "Compositional
+  effects: `sketchy()`" above). Collated right after `vectorize.R`, since
+  it also builds a `sketch` from its results and calls `sketch()`
+  directly; like `vectorize.R`, its exact `Collate` position doesn't
+  actually matter, since it's an ordinary function, not an S7 class.
 - `R/draw.R` -- the `draw` generic and its three methods.
 - `R/convert.R` -- the `convert(drawable, shape_raw)` method.
 - `R/sketchpad-package.R` -- package-level doc, `#' @import S7`, the
@@ -740,8 +772,8 @@ full debugging narrative):
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
-  curve_twist -> shape_stroke -> canvas -> sketch -> vectorize -> draw ->
-  convert -> sketchpad-package). **Any new drawable
+  curve_twist -> shape_stroke -> canvas -> sketch -> vectorize -> sketchy
+  -> draw -> convert -> sketchpad-package). **Any new drawable
   subclass must be added to
   `Collate` after `drawable.R`**, or `devtools::load_all()`/`R CMD check`
   will fail with an "object 'drawable' not found" error.
