@@ -31,7 +31,7 @@ reference:
   desc: >
     Unconnected marker `drawable`s (`geometry = "points"`).
   contents:
-  - points_raw
+  - starts_with("points_raw")
 
 - title: Noise helpers
   desc: >
@@ -42,7 +42,7 @@ reference:
   - noise_bridge
   - noise_sample
 
-- title: Fills
+- title: Fill helpers
   desc: >
     Textures and patterns for `style()`'s `fill` argument, used by 2D
     shapes.
