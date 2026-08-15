@@ -30,17 +30,28 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
   : An irregular, "blobby" circle
 - [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
   : A circle
+- [`shape_ellipse()`](https://sketchpad.djnavarro.net/reference/shape_ellipse.md)
+  : An ellipse
+- [`shape_polygon()`](https://sketchpad.djnavarro.net/reference/shape_polygon.md)
+  : A regular polygon
 - [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)
   : A polygon defined directly by its vertices
+- [`shape_rectangle()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)
+  [`shape_square()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)
+  : A rectangle
 - [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   : A tapered ribbon between two points
 - [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
   : A twisted ribbon following a random path
+- [`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)
+  : A pie-slice wedge
 
 ## 1D curves
 
 Open, stroked `drawable`s (`geometry = "path"`).
 
+- [`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md)
+  : An open arc
 - [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)
   : An open Bezier curve
 - [`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md)

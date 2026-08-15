@@ -72,9 +72,13 @@ Other 2D shapes:
 [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
 [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
+[`shape_ellipse()`](https://sketchpad.djnavarro.net/reference/shape_ellipse.md),
+[`shape_polygon()`](https://sketchpad.djnavarro.net/reference/shape_polygon.md),
 [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md),
+[`shape_rectangle()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md),
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md),
-[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md),
+[`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)
 
 ## Examples
 

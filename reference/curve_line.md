@@ -40,6 +40,7 @@ shared across every `geometry`.
 ## See also
 
 Other 1D curves:
+[`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md),
 [`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md),
 [`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md),
 [`curve_scribble()`](https://sketchpad.djnavarro.net/reference/curve_scribble.md),

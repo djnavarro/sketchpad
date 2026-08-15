@@ -6,6 +6,7 @@
 <url><loc>https://sketchpad.djnavarro.net/authors.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/index.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/canvas.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/curve_arc.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/curve_bezier.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/curve_line.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/curve_raw.html</loc></url>
@@ -39,9 +40,13 @@
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_blob.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_circle.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/shape_ellipse.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/shape_polygon.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_raw.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/shape_rectangle.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_ribbon.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_twist.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/shape_wedge.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/sketch.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/sketchpad-package.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/style.html</loc></url>
