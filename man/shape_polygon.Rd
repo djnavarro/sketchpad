@@ -35,6 +35,7 @@ Other 2D shapes:
 \code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}},
 \code{\link[=shape_blob]{shape_blob()}},
 \code{\link[=shape_circle]{shape_circle()}},
+\code{\link[=shape_ellipse]{shape_ellipse()}},
 \code{\link[=shape_raw]{shape_raw()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
