@@ -4,10 +4,14 @@
 \alias{sketch}
 \title{A collection of drawable objects}
 \usage{
-sketch(shapes = list())
+sketch(shapes = list(), canvas = sketchpad::canvas())
 }
 \arguments{
 \item{shapes}{A list of \link{drawable}-classed objects. Default \code{list()}.}
+
+\item{canvas}{A \link{canvas} object, giving the background/framing settings
+\code{\link[=draw]{draw()}} applies to the sketch as a whole. Default \code{canvas()} (no
+background, axis limits computed from \code{shapes}).}
 }
 \description{
 \code{sketch} is a list of \link{drawable} objects that can be rendered together
@@ -19,9 +23,13 @@ using the \code{+} operator, e.g.
 s <- sketch() + shape_circle(radius = 1) + shape_circle(x = 2, radius = 0.5)
 draw(s)
 
+s2 <- sketch(canvas = canvas(background = "grey95")) + shape_circle(radius = 1)
+draw(s2)
+
 }
 \seealso{
 Other core structure:
+\code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
 \code{\link[=drawable]{drawable()}},
 \code{\link[=point_set]{point_set()}},

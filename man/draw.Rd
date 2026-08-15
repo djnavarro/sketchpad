@@ -26,6 +26,7 @@ draw(s)
 }
 \seealso{
 Other core structure:
+\code{\link[=canvas]{canvas()}},
 \code{\link[=drawable]{drawable()}},
 \code{\link[=point_set]{point_set()}},
 \code{\link[=sketch]{sketch()}},

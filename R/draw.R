@@ -140,7 +140,11 @@ S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
 #' @noRd
 S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
 
-  # set default axis limits
+  # axis limits: an explicit draw() argument wins, then the sketch's own
+  # canvas, then the shapes' own point ranges (canvas's xlim/ylim default to
+  # NULL, so this falls through to the pre-canvas() default behavior)
+  if (is.null(xlim)) xlim <- object@canvas@xlim
+  if (is.null(ylim)) ylim <- object@canvas@ylim
   if (is.null(xlim)) {
     xlim <- c(
       min(purrr::map_dbl(object@shapes, \(s) min(s@points@x))),
@@ -154,18 +158,24 @@ S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
     )
   }
 
-  # plotting area is a single viewport with equal-axis scaling
+  # plotting area is a single viewport with equal-axis scaling; clip only
+  # takes effect when canvas@clip is TRUE (see canvas()'s docs)
   x_width <- xlim[2] - xlim[1]
   y_width <- ylim[2] - ylim[1]
   vp <- grid::viewport(
     xscale = xlim,
     yscale = ylim,
     width  = grid::unit(min(1, x_width / y_width), "snpc"),
-    height = grid::unit(min(1, y_width / x_width), "snpc")
+    height = grid::unit(min(1, y_width / x_width), "snpc"),
+    clip   = if (object@canvas@clip) "on" else "off"
   )
 
-  # draw the grobs
+  # draw the page, canvas background, then every shape's grob on top
   grid::grid.newpage()
+  bg <- object@canvas@background
+  if (!(is.character(bg) && length(bg) == 1 && is.na(bg))) {
+    grid::grid.draw(grid::rectGrob(gp = grid::gpar(fill = bg, col = NA), vp = vp))
+  }
   for (s in object@shapes) {
     grob <- geometry_grob(s@points, s@style, s@geometry, vp)
     grid::grid.draw(grob)

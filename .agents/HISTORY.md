@@ -1252,3 +1252,96 @@ with `shape_twist()`'s actual width-scaled call site).
 Verified `curve_twist()`'s points are identical to `shape_twist()`'s own
 `path` property for matching arguments (a direct test of the shared
 helper), and `devtools::check()` stayed clean throughout.
+
+## Adding a `canvas` class for sketch-level background/framing
+
+Picked up the "Canvas/background concept" item from `.agents/PLAN.md`:
+`draw()` had no way to paint a background behind a sketch's shapes, or to
+give a sketch its own remembered `xlim`/`ylim` frame -- every `draw()`
+call recomputed axis limits from whatever shapes were present unless the
+caller passed `xlim`/`ylim` by hand each time.
+
+**A `canvas` value class, not `sketch()`-constructor arguments.** Settled
+the open design question (should `sketch()` itself do canvas/background
+setup, or should a separate concept own it?) in favor of a small `canvas`
+class -- `background` (any `style@fill`-style value: plain colour or
+`fill_*()` output), `xlim`/`ylim` (each `NULL` or length-2 numeric), and
+`clip` (logical) -- stored as `sketch`'s own `canvas` property, default
+`canvas()`. This mirrors `style`'s relationship to `drawable` rather than
+folding flat properties onto `sketch`: `sketch()` stays pure data with no
+device-level side effects at construction time (still composable via `+`
+across multiple lines/calls, still re-drawable to multiple devices), and
+all rendering — including painting the background — happens only inside
+`draw()`, exactly as it already did for every other style property.
+`draw(drawable)` (the single-shape method) is unaffected; canvas is a
+sketch-level concept only.
+
+**Clipping is opt-in, not automatic.** `xlim`/`ylim` alone only fix the
+viewport's coordinate scale, matching `draw()`'s pre-existing `xlim`/
+`ylim` argument behavior exactly -- content outside that range still
+renders in full by default. Deliberately did not make `canvas`'s
+`xlim`/`ylim` clip by default: shapes built from a `noise_field`/
+`noise_bridge` (`shape_blob()`, `shape_twist()`, ...) can have somewhat
+unpredictable extents, and silently cropping part of one away is a worse
+failure mode than a visibly overflowing shape, which is an obvious cue to
+fix the sketch's own parameters. A separate `clip` logical (`FALSE` by
+default, mapped onto `grid::viewport()`'s own `clip = "on"`/`"off"`, never
+`"inherit"`) opts into hard clipping -- most useful once `background` is
+also set to something other than `fill_none()`, since otherwise an
+overflowing shape visibly bleeds past an opaque background's own edge
+onto the bare page, undermining the point of having a background at all.
+`clip` has no visible effect whenever `xlim`/`ylim` are both left `NULL`,
+since `draw()` then computes them from the sketch's own shapes, which by
+construction never exceed that range.
+
+**`draw(sketch)`'s xlim/ylim precedence.** An explicit `xlim`/`ylim`
+passed directly to `draw()` still takes precedence over `canvas`'s own
+stored values, which in turn take precedence over the auto-computed
+range from the sketch's shapes -- preserving every pre-`canvas()` call
+site unchanged while letting a sketch remember its own frame as the new
+middle tier.
+
+**Two S7 property-default gotchas hit while building this, both now
+worth remembering generally:**
+
+- **`new_property(class = class_numeric, default = NULL)` does not store
+  a literal `NULL`.** S7 treats a property spec's bare `default = NULL`
+  as "no default was given," not as the value `NULL` -- for `xlim`/
+  `ylim`, this silently substituted a zero-length `numeric()`/`integer()`
+  instead, which then failed `canvas`'s own "must be `NULL` or length 2"
+  validator every time (a `numeric(0)` is neither). Fixed by declaring
+  `xlim`/`ylim` as `S7::class_any` instead of `S7::class_numeric` --
+  `class_any` has no zero-length substitution behavior, so `default =
+  NULL` is stored as a genuine `NULL` -- and moving the type check
+  (`is.numeric(...)`) into the validator itself alongside the existing
+  length check, since the property class no longer enforces it.
+- **A constructor argument cannot share a name with the S7 class/
+  constructor function used in its own default expression.** `sketch`'s
+  new `canvas` argument, defaulting to bare `canvas()`, failed at call
+  time with `"promise already under evaluation: recursive default
+  argument reference"` -- the argument's own name shadows the `canvas`
+  class within the constructor's evaluation frame, so the unqualified
+  call resolves to the argument's own unforced promise instead of the
+  class constructor. Confirmed with a minimal non-package reprex that
+  this is ordinary R lazy-evaluation behavior, not S7-specific. Fixed by
+  self-namespace-qualifying the default as `sketchpad::canvas()`, which
+  resolves via the namespace export table rather than local frame lookup
+  and so isn't shadowed -- an intentional, commented exception to this
+  package's usual "don't `::`-qualify your own package's exports"
+  practice, needed only because the argument and class happen to share a
+  name. This also surfaced a smaller, separate lesson: giving `sketch` a
+  custom `constructor` (rather than relying on S7's auto-generated one,
+  as it had before) was itself required once `canvas`'s default was a
+  pre-built object -- embedding an already-evaluated S7 object directly
+  as a property's `default` renders as an unparseable `<object>` literal
+  in the auto-generated constructor's roxygen `\usage` line (`R CMD
+  check`'s "Bad \usage lines" warning), the same reason every other
+  constructor with a non-trivial object default (`drawable`'s `style`,
+  `shape_blob`'s `distortion`) already used a custom `constructor` with
+  an explicit argument default instead of `new_property(default = ...)`.
+
+Added `tests/testthat/test-canvas.R` covering `canvas()`'s own defaults/
+validation, `sketch()`'s new `canvas` property, and `draw()`'s background
+painting, `xlim`/`ylim` precedence, and `clip` behavior (both on and off,
+against a shape sized to overflow a small canvas). `devtools::check()`
+stayed clean (0 errors/warnings/notes) throughout.

@@ -88,6 +88,7 @@ style(fill = fill_hatch(angle = 30))
 }
 \seealso{
 Other core structure:
+\code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
 \code{\link[=drawable]{drawable()}},
 \code{\link[=point_set]{point_set()}},

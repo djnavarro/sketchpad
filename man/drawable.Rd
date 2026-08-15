@@ -38,6 +38,7 @@ S7::S7_inherits(circ, drawable)
 }
 \seealso{
 Other core structure:
+\code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
 \code{\link[=point_set]{point_set()}},
 \code{\link[=sketch]{sketch()}},

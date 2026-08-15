@@ -25,6 +25,7 @@ point_set(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))
 }
 \seealso{
 Other core structure:
+\code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
 \code{\link[=drawable]{drawable()}},
 \code{\link[=sketch]{sketch()}},

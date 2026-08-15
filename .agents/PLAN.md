@@ -117,12 +117,6 @@ helpers above -- e.g. rotate a `group` as a unit.
 `length()`, `` `[[` ``, `` `[` `` methods for `sketch`, rather than
 reaching into `@shapes` directly.
 
-### Canvas/background concept
-
-`draw()` always starts from `grid::grid.newpage()` (the device's default
-background); there's no explicit `canvas()`/`background()` concept the
-way p5.js has one, despite that being the package's stated inspiration.
-
 ### Save-to-file and multi-frame/animation export helpers
 
 No `save_png()`/`save_svg()`-style convenience -- currently the caller

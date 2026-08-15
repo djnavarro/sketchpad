@@ -9,6 +9,7 @@ reference:
     rendered, independent of any specific drawable.
   contents:
   - sketch
+  - canvas
   - drawable
   - draw
   - point_set
