@@ -54,6 +54,7 @@ closed polygon has an interior to fill.
 ## See also
 
 Other core structure:
+[`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md),
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
 [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),

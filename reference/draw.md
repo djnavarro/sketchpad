@@ -27,6 +27,7 @@ draw(object, ...)
 ## See also
 
 Other core structure:
+[`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md),
 [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
 [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),

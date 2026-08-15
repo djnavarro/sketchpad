@@ -7,6 +7,8 @@ independent of any specific drawable.
 
 - [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md) : A
   collection of drawable objects
+- [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md) :
+  Canvas settings for a sketch
 - [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md)
   : Parent class for all drawable objects
 - [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) : Draw a

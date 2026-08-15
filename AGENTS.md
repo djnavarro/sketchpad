@@ -221,18 +221,56 @@ how the API got here, see
   (`linewidth`/`linetype`/`linejoin`/ `lineend`/`linemitre`) and `fill`
   have no effect, per `drawable`’s `geometry` docs – only `style@color`
   is used, as the marker colour.
-- **`sketch`** – a list of `drawable`s (`shapes` property). Built up
-  with `sketch() + shape_circle() + shape_blob(...)`; the `+` method
-  requires an S7 method registration, not an S3 `` `+.sketch` `` (see
-  “Gotchas”).
+- **`canvas`** – not a `drawable`; a small value class (parallel to
+  `style`, but for a `sketch` as a whole rather than one shape) bundling
+  `background` (a `style@fill`-style value: plain colour string or
+  `fill_*()` output, default
+  [`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md)),
+  `xlim`/`ylim` (each `NULL` or a length-2 numeric, default `NULL` –
+  computed from the sketch’s own shapes at draw time when left `NULL`),
+  and `clip` (logical, default `FALSE`). `xlim`/`ylim` only fix the
+  coordinate scale
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) maps
+  onto the page; they do not clip content by themselves, since a shape
+  built from a `noise_field`/`noise_bridge` distortion can have
+  unpredictable extents and silently cropping part of one away is a
+  worse failure mode than a visibly overflowing shape. `clip` opts into
+  hard clipping at `xlim`/`ylim` (mapped onto
+  [`grid::viewport()`](https://rdrr.io/r/grid/viewport.html)’s own
+  `clip = "on"`/`"off"`), most useful once `background` is also set,
+  since otherwise overflowing content bleeds past an opaque background’s
+  edge onto the bare page. `sketch` stores one as its own `canvas`
+  property, default
+  [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md).
+- **`sketch`** – a list of `drawable`s (`shapes` property) plus a
+  `canvas` (background/framing settings, default
+  [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md)).
+  Built up with `sketch() + shape_circle() + shape_blob(...)`; the `+`
+  method requires an S7 method registration, not an S3 `` `+.sketch` ``
+  (see “Gotchas”). Uses a custom `constructor` (rather than S7’s
+  auto-generated one) purely so `canvas`’s default can be a pre-built
+  [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md)
+  object rather than an embedded property default – see “Gotchas”.
 - **[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)** – S7
   generic, `dispatch_args = "object"`. Methods for `drawable` (single
   shape) and `sketch` (renders every shape into one shared, equal-aspect
   viewport); a catch-all method on `class_any` warns and returns
-  `invisible(NULL)` for anything else. `xlim`/`ylim` default to the
-  range of the object’s own points. Both methods build their grob via
-  the internal `geometry_grob()` helper (`R/draw.R`), which switches on
-  a drawable’s `geometry` property:
+  `invisible(NULL)` for anything else. `xlim`/`ylim` default to
+  `object@canvas@xlim`/`@ylim` (for the `sketch` method only), falling
+  back to the range of the object’s own points when both are `NULL`; an
+  explicit `xlim`/`ylim` argument to
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) itself
+  always takes precedence over `canvas`’s own stored values. The
+  `sketch` method also paints `object@canvas@background` as a
+  full-viewport
+  [`grid::rectGrob()`](https://rdrr.io/r/grid/grid.rect.html) before any
+  shape (skipped entirely when `background` is the default
+  [`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md)),
+  and sets the shared viewport’s `clip` from `object@canvas@clip`.
+  `draw(drawable)` (the single-shape method) has no `canvas` concept –
+  background/clip are sketch-level only. Both methods build their grob
+  via the internal `geometry_grob()` helper (`R/draw.R`), which switches
+  on a drawable’s `geometry` property:
   [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html) for
   `"polygon"`,
   [`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html) for
@@ -504,6 +542,42 @@ full debugging narrative):
   safe, since
   [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)’s
   whole purpose requires genuine tile repetition.
+- **`new_property(class = class_numeric, default = NULL)` does not store
+  a literal `NULL`.** S7 treats a bare `default = NULL` on a property
+  spec as “no default was given” rather than the value `NULL`, silently
+  substituting a zero-length vector of the property’s class instead
+  (e.g. `numeric(0)`/`integer(0)`) – `canvas`’s `xlim`/`ylim` hit this,
+  since a `numeric(0)` default then failed their own “must be `NULL` or
+  length 2” validator on every construction. Fixed by declaring the
+  property as
+  [`S7::class_any`](https://rconsortium.github.io/S7/reference/class_any.html)
+  instead of the narrower class (`class_any` has no zero-length
+  substitution behavior, so `default = NULL` is stored as a genuine
+  `NULL`), moving the type check itself into the validator. Any future
+  optional/nullable numeric (or other narrowly-classed) property needs
+  the same `class_any` treatment.
+- **A constructor argument cannot share a name with the S7 class/
+  constructor function used in its own default expression.** A default
+  like `function(canvas = canvas()) ...` fails at call time with
+  `"promise already under evaluation: recursive default argument reference"`
+  – the argument’s own name shadows the class within the constructor’s
+  evaluation frame, so the unqualified call resolves to the argument’s
+  own unforced promise rather than the class constructor (confirmed as
+  ordinary R lazy-evaluation behavior with a minimal non-package reprex,
+  not S7-specific). `sketch`’s `canvas` argument works around this by
+  self-namespace-qualifying its default as
+  [`sketchpad::canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md),
+  which resolves via the namespace export table rather than local frame
+  lookup – an intentional, commented exception to this package’s usual
+  “don’t `::`-qualify your own package’s exports” practice, needed only
+  when an argument and its default’s constructor happen to share a name.
+  Separately, `sketch` needed a custom `constructor` at all (rather than
+  S7’s auto-generated one, as it had before `canvas` existed) for the
+  same reason `drawable`’s `style` and `shape_blob`’s `distortion`
+  already have one: embedding an already-evaluated S7 object directly as
+  a property’s `default` renders as an unparseable `<object>` literal in
+  the auto-generated constructor’s roxygen `\usage` line, triggering
+  `R CMD check`’s “Bad lines” warning.
 - **`grDevices::dev.capabilities()$patterns` is not a reliable signal
   for whether a device supports pattern/gradient fills.** It returned
   `NA` for [`cairo_pdf()`](https://rdrr.io/r/grDevices/cairo.html),
@@ -564,6 +638,11 @@ full debugging narrative):
   `shape_raw.R` (their `"path"`/`"points"`-geometry analog), since the
   three form a parallel “raw” family with the same trivial constructor
   shape.
+- `R/canvas.R` – the `canvas` class, collated right after
+  `curve_twist.R` (last of the concrete `drawable` subclasses) since it
+  has no dependency on `drawable` itself, only on `fill_class` (from
+  `fill.R`); `sketch.R` needs `canvas` to exist for its own `canvas`
+  property.
 - `R/sketch.R` – the `sketch` class and its `+` method.
 - `R/draw.R` – the `draw` generic and its three methods.
 - `R/convert.R` – the `convert(drawable, shape_raw)` method.
@@ -576,9 +655,9 @@ full debugging narrative):
   drawable -\> shape_bezier -\> shape_bezier_ribbon -\> curve_bezier -\>
   curve_line -\> curve_spiral -\> curve_scribble -\> shape_raw -\>
   curve_raw -\> points_raw -\> shape_circle -\> shape_blob -\>
-  shape_ribbon -\> shape_twist -\> curve_twist -\> sketch -\> draw -\>
-  convert -\> sketchpad-package). **Any new drawable subclass must be
-  added to `Collate` after `drawable.R`**, or
+  shape_ribbon -\> shape_twist -\> curve_twist -\> canvas -\> sketch -\>
+  draw -\> convert -\> sketchpad-package). **Any new drawable subclass
+  must be added to `Collate` after `drawable.R`**, or
   `devtools::load_all()`/`R CMD check` will fail with an “object
   ‘drawable’ not found” error.
 

@@ -29,6 +29,7 @@ point_set(x = integer(0), y = integer(0))
 ## See also
 
 Other core structure:
+[`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md),
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
 [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
