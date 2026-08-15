@@ -117,7 +117,7 @@ values <- tibble::tibble(
   xend = x + 1,
   yend = y + rnorm(n_twists, sd = 1),
   width = runif(n_twists, min = .1, max = .3),
-  smooth = 6L,
+  path_distortion = list(noise_bridge(smooth = 6L)),
   n = 100L,
   fill = sample(palette, n_twists, replace = TRUE),
   color = fill

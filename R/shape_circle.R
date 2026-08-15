@@ -23,10 +23,10 @@ shape_circle <- S7::new_class(
     radius = S7::class_numeric,
     n      = S7::class_integer,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         angle <- seq(0, 2 * pi, length.out = self@n)
-        point_set(
+        xy(
           x = self@x + self@radius * cos(angle),
           y = self@y + self@radius * sin(angle)
         )

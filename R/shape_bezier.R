@@ -45,11 +45,11 @@ validate_bezier_args <- function(x, y, n) {
 #'
 #' @param x,y,n The arguments of the same name from the calling
 #'   constructor.
-#' @return A [point_set].
+#' @return A [xy].
 #' @noRd
 bezier_curve_points <- function(x, y, n) {
   t <- seq(0, 1, length.out = n)
-  point_set(x = bernstein(x, t), y = bernstein(y, t))
+  xy(x = bernstein(x, t), y = bernstein(y, t))
 }
 
 #' A closed Bezier curve
@@ -81,7 +81,7 @@ shape_bezier <- S7::new_class(
     y = S7::class_numeric,
     n = S7::class_integer,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) bezier_curve_points(self@x, self@y, self@n)
     )
   ),

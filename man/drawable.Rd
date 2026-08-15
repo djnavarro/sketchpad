@@ -17,7 +17,7 @@ value internally instead (see details).}
 \description{
 \code{drawable} enforces structure on its subclasses: every drawable must
 carry a \link{style}, a \code{geometry}, and expose a computed \code{points} property, of
-class \link{point_set}. It is not intended to be instantiated directly; use one
+class \link{xy}. It is not intended to be instantiated directly; use one
 of its subclasses (\link{shape_raw}, \link{shape_circle}, \link{shape_blob},
 \link{shape_ribbon}, \link{shape_twist}, \link{curve_raw}, \link{points_raw}, ...) instead.
 }
@@ -40,8 +40,8 @@ S7::S7_inherits(circ, drawable)
 Other core structure:
 \code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
-\code{\link[=point_set]{point_set()}},
 \code{\link[=sketch]{sketch()}},
-\code{\link[=style]{style()}}
+\code{\link[=style]{style()}},
+\code{\link[=xy]{xy()}}
 }
 \concept{core structure}

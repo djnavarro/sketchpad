@@ -59,7 +59,7 @@ apply_alpha <- function(color, alpha) {
 #' `apply_alpha()`/`adjustcolor()` has no defined effect on one (see
 #' [style()]'s `fill_alpha` docs).
 #'
-#' @param points A [point_set].
+#' @param points A [xy].
 #' @param sty A [style].
 #' @param geometry One of `"polygon"`, `"path"`, or `"points"`.
 #' @param vp A [grid::viewport()].

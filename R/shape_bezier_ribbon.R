@@ -38,7 +38,7 @@ shape_bezier_ribbon <- S7::new_class(
     n         = S7::class_integer,
     distortion = noise_field,
     path = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         bezier_curve_points(
           x = c(self@x, self@x_ctrl1, self@x_ctrl2, self@xend),
@@ -48,7 +48,7 @@ shape_bezier_ribbon <- S7::new_class(
       }
     ),
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         x <- self@path@x
         y <- self@path@y
@@ -59,7 +59,7 @@ shape_bezier_ribbon <- S7::new_class(
         width <- displacement * taper * self@width
         dx <- self@xend - self@x
         dy <- self@yend - self@y
-        point_set(
+        xy(
           x = c(x - width * dy, x[self@n:1L] + width[self@n:1L] * dy),
           y = c(y + width * dx, y[self@n:1L] - width[self@n:1L] * dx)
         )

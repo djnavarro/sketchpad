@@ -29,7 +29,7 @@ shape_blob <- S7::new_class(
     n          = S7::class_integer,
     distortion = noise_field,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         angle <- seq(0, 2 * pi, length.out = self@n)
         pointwise_radius <- noise_sample(
@@ -38,7 +38,7 @@ shape_blob <- S7::new_class(
           y = self@y + sin(angle) * self@radius,
           to = self@radius + c(-1, 1) * self@range
         )
-        point_set(
+        xy(
           x = self@x + pointwise_radius * cos(angle),
           y = self@y + pointwise_radius * sin(angle)
         )

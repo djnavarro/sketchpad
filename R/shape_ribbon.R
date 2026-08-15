@@ -29,7 +29,7 @@ shape_ribbon <- S7::new_class(
     n          = S7::class_integer,
     distortion = noise_field,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         x <- seq(self@x, self@xend, length.out = self@n)
         y <- seq(self@y, self@yend, length.out = self@n)
@@ -40,7 +40,7 @@ shape_ribbon <- S7::new_class(
         width <- displacement * taper * self@width
         dx <- self@xend - self@x
         dy <- self@yend - self@y
-        point_set(
+        xy(
           x = c(x - width * dy, x[self@n:1L] + width[self@n:1L] * dy),
           y = c(y + width * dx, y[self@n:1L] - width[self@n:1L] * dx)
         )

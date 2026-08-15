@@ -48,7 +48,7 @@ curve_twist <- S7::new_class(
     n               = S7::class_integer,
     path_distortion = noise_bridge,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         twisted_path_points(
           x = self@x, y = self@y, xend = self@xend, yend = self@yend,

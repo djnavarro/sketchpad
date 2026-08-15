@@ -12,7 +12,7 @@
 #' @param width Scale factor for the displacement (`0.1 * width`, matching
 #'   [shape_twist()]'s own scaling of its Brownian bridge).
 #' @param path_distortion A [noise_bridge].
-#' @return A [point_set].
+#' @return A [xy].
 #' @noRd
 twisted_path_points <- function(x, y, xend, yend, n, width, path_distortion) {
   x_base <- seq(x, xend, length.out = n)
@@ -25,7 +25,7 @@ twisted_path_points <- function(x, y, xend, yend, n, width, path_distortion) {
     n = n,
     scale = 0.1 * width
   )
-  point_set(
+  xy(
     x = x_base + x_disp,
     y = y_base + y_disp
   )
@@ -68,7 +68,7 @@ shape_twist <- S7::new_class(
     path_distortion = noise_bridge,
     distortion      = noise_field,
     path = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         twisted_path_points(
           x = self@x, y = self@y, xend = self@xend, yend = self@yend,
@@ -77,7 +77,7 @@ shape_twist <- S7::new_class(
       }
     ),
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         x <- self@path@x
         y <- self@path@y
@@ -88,7 +88,7 @@ shape_twist <- S7::new_class(
         width <- displacement * taper * self@width
         dx <- self@xend - self@x
         dy <- self@yend - self@y
-        point_set(
+        xy(
           x = c(x - width * dy, x[self@n:1L] + width[self@n:1L] * dy),
           y = c(y + width * dx, y[self@n:1L] - width[self@n:1L] * dx)
         )

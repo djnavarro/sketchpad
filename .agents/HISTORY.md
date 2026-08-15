@@ -522,6 +522,34 @@ link" warning persists past the usual second pass. `R CMD check`
 confirmed 0 errors/warnings/notes after the rename, and all 277
 existing tests passed unchanged.
 
+## Renaming `point_set` to `xy`, and dropping the polygon-vertex framing
+
+Revisited the earlier `point_set` name once more of the package existed
+and it became clear the class carries no inherent polygon/vertex
+meaning of its own -- it's just parallel `x`/`y` coordinate vectors, and
+several concrete drawables use it for a `"path"` or `"points"` geometry
+where "vertices of a polygon" doesn't even apply (`curve_line`,
+`curve_raw`, `points_raw`, ...). `point_set` was chosen the first time
+specifically to avoid collision risk over brevity (see above), but on
+reflection `xy` -- rejected back then only for being *too* terse --
+reads fine once the docs stop trying to justify a name via a
+now-inaccurate polygon description. Renamed `R/point_set.R` ->
+`R/xy.R`; every property/getter's `class = point_set` -> `class = xy`
+and every `point_set(x = ..., y = ...)` constructor call -> `xy(x =
+..., y = ...)` across all affected files (`drawable.R`, every
+`shape_*.R`/`curve_*.R`/`points_raw.R`); `DESCRIPTION`'s `Collate`
+field and `_pkgdown.yml`'s reference index updated to match. Reworded
+the class's own roxygen title/description (previously "A set of
+polygon vertices") to describe it as a generic collection of 2D
+locations, with no polygon-specific language; `drawable.R`'s own
+description already read generically ("expose a computed `points`
+property, of class `xy`") and needed no change. No test changes were
+needed, matching the earlier rename -- `tests/testthat/` never called
+the constructor directly. `devtools::document()` needed the usual two
+passes (not three, this time) for cross-reference links to `[xy]` to
+resolve; `devtools::test()` confirmed all 547 existing tests passed
+unchanged after the rename.
+
 ## Adding a `geometry` property to `drawable`, in preparation for open curves
 
 The first concrete step of the open-curve design (see the "Decided"
@@ -1345,3 +1373,24 @@ validation, `sketch()`'s new `canvas` property, and `draw()`'s background
 painting, `xlim`/`ylim` precedence, and `clip` behavior (both on and off,
 against a shape sized to overflow a small canvas). `devtools::check()`
 stayed clean (0 errors/warnings/notes) throughout.
+
+## Fixing a stale `shape_twist()` call in README.Rmd's "Twists" example
+
+`devtools::build_readme()` failed on the "Twists" chunk with `unused
+argument (smooth = 6)`: that chunk still called `shape_twist(..., smooth
+= 6L, ...)` via `purrr::pmap()`, left over from before `shape_twist()`
+was refactored to take a `path_distortion = noise_bridge(smooth = ...,
+seed = ...)` property instead of a bare `smooth` argument (see
+`noise_bridge`'s own introduction, above) -- that refactor updated every
+`R/*.R` call site but missed this README chunk. Fixed by replacing the
+`smooth = 6L` column with `path_distortion = list(noise_bridge(smooth =
+6L))`: a length-1 list column, which `tibble::tibble()` recycles to
+`n_twists` rows like any other length-1 column, giving every twist the
+same `noise_bridge` object (matching the original chunk's behavior,
+which also never varied a seed across rows -- only `smooth` was set, and
+every twist implicitly shared the same default seed). Verified the fixed
+chunk runs standalone before re-running `build_readme()`; the
+regenerated `man/figures/README-twists-1.png` came out byte-identical
+to the version already committed, confirming the fix reproduces the
+example's originally-intended output rather than just silencing the
+error.

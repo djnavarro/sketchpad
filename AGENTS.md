@@ -78,8 +78,11 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   silent, documented inertness for style properties that don't
   universally apply (e.g. `fill` itself already has no effect for
   `"path"`/`"points"`-geometry drawables).
-- **`point_set`** -- a polygon's vertices (`x`/`y` numeric vectors, equal
-  length). Named `point_set` rather than `points` so the exported
+- **`xy`** -- a collection of locations in 2D space (`x`/`y` numeric
+  vectors, equal length); not tied to any particular geometric
+  interpretation (polygon vertices, an open path, unconnected points, ...)
+  -- that meaning comes from whichever `drawable` produced it, via its
+  `geometry` property. Named `xy` rather than `points` so the exported
   constructor doesn't mask `graphics::points()`; every `drawable`'s
   `points` *property* (see below) is still called `points`, since a
   property isn't a top-level exported name and can't mask anything.
@@ -158,7 +161,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 - **`curve_line`** -- an open polyline through an arbitrary number (at
   least two) of control points `(x, y)`, connected by straight segments
   in order. Unlike every other drawable, its `points` getter does no
-  computation at all (`point_set(x = self@x, y = self@y)` directly), so
+  computation at all (`xy(x = self@x, y = self@y)` directly), so
   there's no `n` argument.
 - **`curve_spiral`** -- centroid (`x`/`y`) + `radius_start`/`radius_end`
   + `turns` + `n`; angle sweeps `2 * pi * turns` radians while radius
@@ -407,7 +410,7 @@ full debugging narrative):
   would collide. Named this package `sketchpad` instead.
 - **`points` was not available as an exported class/constructor name.**
   It would mask `graphics::points()` on `library(sketchpad)`. The class
-  is named `point_set` instead; the `points` *property* every `drawable`
+  is named `xy` instead; the `points` *property* every `drawable`
   exposes keeps its original name, since accessing it via `@points`
   never shadows the base function.
 - **`grid::pattern()` tiles containing *multiple* shapes can render
@@ -488,7 +491,7 @@ full debugging narrative):
   already exist, but not the `noise_field` class itself). `shape_twist.R`
   needs `noise_bridge` to exist for its own `path_distortion` property
   default.
-- `R/style.R`, `R/point_set.R`, `R/drawable.R` -- foundation classes, in
+- `R/style.R`, `R/xy.R`, `R/drawable.R` -- foundation classes, in
   load order (each depends on the previous).
 - `R/shape_bezier.R`, `R/shape_bezier_ribbon.R`, `R/curve_bezier.R`,
   `R/curve_line.R`, `R/curve_spiral.R`, `R/curve_scribble.R`,
@@ -527,7 +530,7 @@ full debugging narrative):
   `.onLoad()` calling `S7::methods_register()`, and the
   `globalVariables("properties")` workaround.
 - `DESCRIPTION`'s `Collate` field pins the load order above explicitly
-  (fill -> noise_field -> noise_bridge -> style -> point_set -> drawable
+  (fill -> noise_field -> noise_bridge -> style -> xy -> drawable
   -> shape_bezier -> shape_bezier_ribbon -> curve_bezier -> curve_line ->
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
   -> shape_circle -> shape_blob -> shape_ribbon -> shape_twist ->
@@ -561,7 +564,7 @@ full debugging narrative):
   matching the pkgdown reference category it belongs to (see
   `_pkgdown.yml`), so its `.Rd` page's "See Also" section cross-links its
   category siblings: `@family core structure` for `sketch`/`drawable`/
-  `draw`/`point_set`/`style`; `@family 2D shapes` for every `shape_*()`
+  `draw`/`xy`/`style`; `@family 2D shapes` for every `shape_*()`
   constructor; `@family 1D curves` for every `curve_*()` constructor;
   `@family 0D points` for `points_raw()`; `@family fill helpers` for
   every `fill_*()` constructor; `@family noise helpers` for `noise_field`/

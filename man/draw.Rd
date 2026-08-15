@@ -28,8 +28,8 @@ draw(s)
 Other core structure:
 \code{\link[=canvas]{canvas()}},
 \code{\link[=drawable]{drawable()}},
-\code{\link[=point_set]{point_set()}},
 \code{\link[=sketch]{sketch()}},
-\code{\link[=style]{style()}}
+\code{\link[=style]{style()}},
+\code{\link[=xy]{xy()}}
 }
 \concept{core structure}

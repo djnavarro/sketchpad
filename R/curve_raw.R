@@ -31,9 +31,9 @@ curve_raw <- S7::new_class(
     x = S7::class_numeric,
     y = S7::class_numeric,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
-        point_set(x = self@x, y = self@y)
+        xy(x = self@x, y = self@y)
       }
     )
   ),

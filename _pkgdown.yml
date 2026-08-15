@@ -12,7 +12,7 @@ reference:
   - canvas
   - drawable
   - draw
-  - point_set
+  - xy
   - style
 
 - title: 2D shapes

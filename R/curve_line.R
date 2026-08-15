@@ -27,8 +27,8 @@ curve_line <- S7::new_class(
     x = S7::class_numeric,
     y = S7::class_numeric,
     points = S7::new_property(
-      class = point_set,
-      getter = function(self) point_set(x = self@x, y = self@y)
+      class = xy,
+      getter = function(self) xy(x = self@x, y = self@y)
     )
   ),
   validator = function(self) {

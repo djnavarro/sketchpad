@@ -32,7 +32,7 @@ curve_bezier <- S7::new_class(
     y = S7::class_numeric,
     n = S7::class_integer,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) bezier_curve_points(self@x, self@y, self@n)
     )
   ),

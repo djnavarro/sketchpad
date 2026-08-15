@@ -60,7 +60,7 @@ curve_scribble <- S7::new_class(
     n           = S7::class_integer,
     seed        = S7::class_integer,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         line <- scribble_lines(
           n_lines = 1L,
@@ -70,12 +70,12 @@ curve_scribble <- S7::new_class(
           seed = self@seed
         )[[1]]
         if (self@direction == "horizontal") {
-          point_set(
+          xy(
             x = self@x + line$along * self@width,
             y = self@y + line$across * self@height
           )
         } else {
-          point_set(
+          xy(
             x = self@x + line$across * self@width,
             y = self@y + line$along * self@height
           )

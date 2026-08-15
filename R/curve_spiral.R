@@ -36,11 +36,11 @@ curve_spiral <- S7::new_class(
     turns        = S7::class_numeric,
     n            = S7::class_integer,
     points = S7::new_property(
-      class = point_set,
+      class = xy,
       getter = function(self) {
         angle <- seq(0, 2 * pi * self@turns, length.out = self@n)
         radius <- seq(self@radius_start, self@radius_end, length.out = self@n)
-        point_set(
+        xy(
           x = self@x + radius * cos(angle),
           y = self@y + radius * sin(angle)
         )

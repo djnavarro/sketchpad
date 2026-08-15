@@ -2,7 +2,7 @@
 #'
 #' `drawable` enforces structure on its subclasses: every drawable must
 #' carry a [style], a `geometry`, and expose a computed `points` property, of
-#' class [point_set]. It is not intended to be instantiated directly; use one
+#' class [xy]. It is not intended to be instantiated directly; use one
 #' of its subclasses ([shape_raw], [shape_circle], [shape_blob],
 #' [shape_ribbon], [shape_twist], [curve_raw], [points_raw], ...) instead.
 #'
@@ -39,8 +39,8 @@ drawable <- S7::new_class(
       default = "polygon"
     ),
     points = S7::new_property(
-      class = point_set,
-      getter = function(self) point_set(x = numeric(0L), y = numeric(0L))
+      class = xy,
+      getter = function(self) xy(x = numeric(0L), y = numeric(0L))
     )
   ),
   validator = function(self) {

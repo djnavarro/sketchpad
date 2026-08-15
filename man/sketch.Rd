@@ -32,7 +32,7 @@ Other core structure:
 \code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
 \code{\link[=drawable]{drawable()}},
-\code{\link[=point_set]{point_set()}},
-\code{\link[=style]{style()}}
+\code{\link[=style]{style()}},
+\code{\link[=xy]{xy()}}
 }
 \concept{core structure}
