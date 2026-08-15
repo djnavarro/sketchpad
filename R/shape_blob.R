@@ -11,6 +11,8 @@
 #' @param n Number of points used to approximate the outline. Default `100L`.
 #' @param distortion A [noise_field] controlling the radius distortion.
 #'   Default `noise_field()`.
+#' @param trans A [trans] object applied to the shape's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -38,10 +40,10 @@ shape_blob <- S7::new_class(
           y = self@y + sin(angle) * self@radius,
           to = self@radius + c(-1, 1) * self@range
         )
-        xy(
+        apply_trans(self@trans, xy(
           x = self@x + pointwise_radius * cos(angle),
           y = self@y + pointwise_radius * sin(angle)
-        )
+        ))
       }
     )
   ),
@@ -51,9 +53,10 @@ shape_blob <- S7::new_class(
                          range = 0.2,
                          n = 100L,
                          distortion = noise_field(),
+                         trans = trans_identity(),
                          ...) {
     S7::new_object(
-      drawable(),
+      drawable(trans = trans),
       x = x,
       y = y,
       radius = radius,

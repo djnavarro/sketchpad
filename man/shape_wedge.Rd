@@ -4,7 +4,16 @@
 \alias{shape_wedge}
 \title{A pie-slice wedge}
 \usage{
-shape_wedge(x = 0, y = 0, radius = 1, start = 0, end = pi/2, n = 100L, ...)
+shape_wedge(
+  x = 0,
+  y = 0,
+  radius = 1,
+  start = 0,
+  end = pi/2,
+  n = 100L,
+  trans = trans_identity(),
+  ...
+)
 }
 \arguments{
 \item{x, y}{Centroid coordinates. Default \code{0}.}
@@ -16,6 +25,9 @@ shape_wedge(x = 0, y = 0, radius = 1, start = 0, end = pi/2, n = 100L, ...)
 
 \item{n}{Number of points used to approximate the arc. Must be at least
 \code{2}. Default \code{100L}.}
+
+\item{trans}{A \link{trans} object applied to the shape's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

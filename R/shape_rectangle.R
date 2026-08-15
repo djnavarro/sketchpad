@@ -11,6 +11,8 @@
 #'   Default `1`.
 #' @param side Side length, for `shape_square()`. Must be non-negative.
 #'   Default `1`.
+#' @param trans A [trans] object applied to the shape's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -32,10 +34,10 @@ shape_rectangle <- S7::new_class(
       getter = function(self) {
         hw <- self@width / 2
         hh <- self@height / 2
-        xy(
+        apply_trans(self@trans, xy(
           x = self@x + c(-hw, hw, hw, -hw),
           y = self@y + c(-hh, -hh, hh, hh)
-        )
+        ))
       }
     )
   ),
@@ -47,9 +49,9 @@ shape_rectangle <- S7::new_class(
     if (self@width < 0) return("width must be a non-negative number")
     if (self@height < 0) return("height must be a non-negative number")
   },
-  constructor = function(x = 0, y = 0, width = 1, height = 1, ...) {
+  constructor = function(x = 0, y = 0, width = 1, height = 1, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(),
+      drawable(trans = trans),
       x = x,
       y = y,
       width = width,
@@ -62,6 +64,6 @@ shape_rectangle <- S7::new_class(
 #' @rdname shape_rectangle
 #' @family 2D shapes
 #' @export
-shape_square <- function(x = 0, y = 0, side = 1, ...) {
-  shape_rectangle(x = x, y = y, width = side, height = side, ...)
+shape_square <- function(x = 0, y = 0, side = 1, trans = trans_identity(), ...) {
+  shape_rectangle(x = x, y = y, width = side, height = side, trans = trans, ...)
 }

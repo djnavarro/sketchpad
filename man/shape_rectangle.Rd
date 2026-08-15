@@ -5,15 +5,25 @@
 \alias{shape_square}
 \title{A rectangle}
 \usage{
-shape_rectangle(x = 0, y = 0, width = 1, height = 1, ...)
+shape_rectangle(
+  x = 0,
+  y = 0,
+  width = 1,
+  height = 1,
+  trans = trans_identity(),
+  ...
+)
 
-shape_square(x = 0, y = 0, side = 1, ...)
+shape_square(x = 0, y = 0, side = 1, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{Centroid coordinates. Default \code{0}.}
 
 \item{width, height}{Rectangle dimensions. Must be non-negative.
 Default \code{1}.}
+
+\item{trans}{A \link{trans} object applied to the shape's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 

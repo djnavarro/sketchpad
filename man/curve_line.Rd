@@ -4,11 +4,14 @@
 \alias{curve_line}
 \title{An open polyline}
 \usage{
-curve_line(x, y, ...)
+curve_line(x, y, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{Numeric vectors of control point coordinates. Must be the
 same length, with at least two control points.}
+
+\item{trans}{A \link{trans} object applied to the curve's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

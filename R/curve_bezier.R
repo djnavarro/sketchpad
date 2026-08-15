@@ -17,6 +17,8 @@
 #' @param x,y Numeric vectors of control point coordinates. Must be the
 #'   same length, with at least two control points.
 #' @param n Number of points used to sample the curve. Default `100L`.
+#' @param trans A [trans] object applied to the curve's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -33,13 +35,15 @@ curve_bezier <- S7::new_class(
     n = S7::class_integer,
     points = S7::new_property(
       class = xy,
-      getter = function(self) bezier_curve_points(self@x, self@y, self@n)
+      getter = function(self) {
+        apply_trans(self@trans, bezier_curve_points(self@x, self@y, self@n))
+      }
     )
   ),
   validator = function(self) validate_bezier_args(self@x, self@y, self@n),
-  constructor = function(x, y, n = 100L, ...) {
+  constructor = function(x, y, n = 100L, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(geometry = "path"),
+      drawable(geometry = "path", trans = trans),
       x = x,
       y = y,
       n = n,

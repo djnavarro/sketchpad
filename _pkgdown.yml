@@ -49,3 +49,10 @@ reference:
   contents:
   - starts_with("fill_")
 
+- title: Transform helpers
+  desc: >
+    Affine transformations applied to a `drawable`'s computed `points`,
+    used by every `drawable`'s `trans` property.
+  contents:
+  - starts_with("trans")
+

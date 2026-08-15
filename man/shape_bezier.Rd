@@ -4,13 +4,16 @@
 \alias{shape_bezier}
 \title{A closed Bezier curve}
 \usage{
-shape_bezier(x, y, n = 100L, ...)
+shape_bezier(x, y, n = 100L, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{Numeric vectors of control point coordinates. Must be the
 same length, with at least two control points.}
 
 \item{n}{Number of points used to sample the curve. Default \code{100L}.}
+
+\item{trans}{A \link{trans} object applied to the shape's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

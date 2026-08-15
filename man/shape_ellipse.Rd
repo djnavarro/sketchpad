@@ -4,7 +4,15 @@
 \alias{shape_ellipse}
 \title{An ellipse}
 \usage{
-shape_ellipse(x = 0, y = 0, x_radius = 1, y_radius = 1, n = 100L, ...)
+shape_ellipse(
+  x = 0,
+  y = 0,
+  x_radius = 1,
+  y_radius = 1,
+  n = 100L,
+  trans = trans_identity(),
+  ...
+)
 }
 \arguments{
 \item{x, y}{Centroid coordinates. Default \code{0}.}
@@ -13,6 +21,9 @@ shape_ellipse(x = 0, y = 0, x_radius = 1, y_radius = 1, n = 100L, ...)
 non-negative. Default \code{1}.}
 
 \item{n}{Number of points used to approximate the ellipse. Default \code{100L}.}
+
+\item{trans}{A \link{trans} object applied to the shape's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

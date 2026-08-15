@@ -18,6 +18,8 @@
 #'   be non-negative. Default `0`/`1`.
 #' @param turns Number of full revolutions. Must be positive. Default `3`.
 #' @param n Number of points used to approximate the spiral. Default `200L`.
+#' @param trans A [trans] object applied to the curve's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -40,10 +42,10 @@ curve_spiral <- S7::new_class(
       getter = function(self) {
         angle <- seq(0, 2 * pi * self@turns, length.out = self@n)
         radius <- seq(self@radius_start, self@radius_end, length.out = self@n)
-        xy(
+        apply_trans(self@trans, xy(
           x = self@x + radius * cos(angle),
           y = self@y + radius * sin(angle)
-        )
+        ))
       }
     )
   ),
@@ -65,9 +67,10 @@ curve_spiral <- S7::new_class(
                          radius_end = 1,
                          turns = 3,
                          n = 200L,
+                         trans = trans_identity(),
                          ...) {
     S7::new_object(
-      drawable(geometry = "path"),
+      drawable(geometry = "path", trans = trans),
       x = x,
       y = y,
       radius_start = radius_start,

@@ -9,6 +9,8 @@
 #' @param x_radius,y_radius Radii along the x and y axes. Must be
 #'   non-negative. Default `1`.
 #' @param n Number of points used to approximate the ellipse. Default `100L`.
+#' @param trans A [trans] object applied to the shape's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -30,10 +32,10 @@ shape_ellipse <- S7::new_class(
       class = xy,
       getter = function(self) {
         angle <- seq(0, 2 * pi, length.out = self@n)
-        xy(
+        apply_trans(self@trans, xy(
           x = self@x + self@x_radius * cos(angle),
           y = self@y + self@y_radius * sin(angle)
-        )
+        ))
       }
     )
   ),
@@ -47,9 +49,10 @@ shape_ellipse <- S7::new_class(
     if (self@y_radius < 0) return("y_radius must be a non-negative number")
     if (self@n < 1L) return("n must be a positive integer")
   },
-  constructor = function(x = 0, y = 0, x_radius = 1, y_radius = 1, n = 100L, ...) {
+  constructor = function(x = 0, y = 0, x_radius = 1, y_radius = 1, n = 100L,
+                         trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(),
+      drawable(trans = trans),
       x = x,
       y = y,
       x_radius = x_radius,

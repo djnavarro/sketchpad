@@ -16,6 +16,7 @@ shape_bezier_ribbon(
   width = 0.2,
   n = 100L,
   distortion = noise_field(),
+  trans = trans_identity(),
   ...
 )
 }
@@ -34,6 +35,9 @@ shape_bezier_ribbon(
 
 \item{distortion}{A \link{noise_field} controlling the width modulation.
 Default \code{noise_field()}.}
+
+\item{trans}{A \link{trans} object applied to the shape's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

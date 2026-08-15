@@ -45,6 +45,8 @@ twisted_path_points <- function(x, y, xend, yend, n, width, path_distortion) {
 #'   Brownian bridge. Default `noise_bridge()`.
 #' @param distortion A [noise_field] controlling the width modulation.
 #'   Default `noise_field()`.
+#' @param trans A [trans] object applied to the shape's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -88,10 +90,10 @@ shape_twist <- S7::new_class(
         width <- displacement * taper * self@width
         dx <- self@xend - self@x
         dy <- self@yend - self@y
-        xy(
+        apply_trans(self@trans, xy(
           x = c(x - width * dy, x[self@n:1L] + width[self@n:1L] * dy),
           y = c(y + width * dx, y[self@n:1L] - width[self@n:1L] * dx)
-        )
+        ))
       }
     )
   ),
@@ -103,9 +105,10 @@ shape_twist <- S7::new_class(
                          n = 100L,
                          path_distortion = noise_bridge(),
                          distortion = noise_field(),
+                         trans = trans_identity(),
                          ...) {
     S7::new_object(
-      drawable(),
+      drawable(trans = trans),
       x = x,
       y = y,
       xend = xend,

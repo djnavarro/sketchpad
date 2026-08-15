@@ -32,15 +32,21 @@ curve_arc <- S7::new_class(
     n      = S7::class_integer,
     points = S7::new_property(
       class = xy,
-      getter = function(self) arc_points(self@x, self@y, self@radius, self@start, self@end, self@n)
+      getter = function(self) {
+        apply_trans(
+          self@trans,
+          arc_points(self@x, self@y, self@radius, self@start, self@end, self@n)
+        )
+      }
     )
   ),
   validator = function(self) {
     validate_arc_args(self@x, self@y, self@radius, self@start, self@end, self@n)
   },
-  constructor = function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L, ...) {
+  constructor = function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L,
+                         trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(geometry = "path"),
+      drawable(geometry = "path", trans = trans),
       x = x,
       y = y,
       radius = radius,

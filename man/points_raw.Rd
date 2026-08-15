@@ -4,12 +4,15 @@
 \alias{points_raw}
 \title{A scatter of points defined directly by their coordinates}
 \usage{
-points_raw(x, y, ...)
+points_raw(x, y, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x}{Numeric vector of x coordinates.}
 
 \item{y}{Numeric vector of y coordinates.}
+
+\item{trans}{A \link{trans} object applied to the computed points. Default
+\code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

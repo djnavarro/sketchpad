@@ -4,7 +4,7 @@
 \alias{shape_circle}
 \title{A circle}
 \usage{
-shape_circle(x = 0, y = 0, radius = 1, n = 100L, ...)
+shape_circle(x = 0, y = 0, radius = 1, n = 100L, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{Centroid coordinates. Default \code{0}.}
@@ -12,6 +12,9 @@ shape_circle(x = 0, y = 0, radius = 1, n = 100L, ...)
 \item{radius}{Radius. Must be non-negative. Default \code{1}.}
 
 \item{n}{Number of points used to approximate the circle. Default \code{100L}.}
+
+\item{trans}{A \link{trans} object applied to the shape's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

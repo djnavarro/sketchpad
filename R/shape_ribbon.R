@@ -10,6 +10,8 @@
 #' @param n Number of points used along the path. Default `100L`.
 #' @param distortion A [noise_field] controlling the width modulation.
 #'   Default `noise_field()`.
+#' @param trans A [trans] object applied to the shape's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -40,10 +42,10 @@ shape_ribbon <- S7::new_class(
         width <- displacement * taper * self@width
         dx <- self@xend - self@x
         dy <- self@yend - self@y
-        xy(
+        apply_trans(self@trans, xy(
           x = c(x - width * dy, x[self@n:1L] + width[self@n:1L] * dy),
           y = c(y + width * dx, y[self@n:1L] - width[self@n:1L] * dx)
-        )
+        ))
       }
     )
   ),
@@ -54,9 +56,10 @@ shape_ribbon <- S7::new_class(
                          width = 0.2,
                          n = 100L,
                          distortion = noise_field(),
+                         trans = trans_identity(),
                          ...) {
     S7::new_object(
-      drawable(),
+      drawable(trans = trans),
       x = x,
       y = y,
       xend = xend,

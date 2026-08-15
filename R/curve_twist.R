@@ -26,6 +26,8 @@
 #' @param n Number of points used along the path. Default `100L`.
 #' @param path_distortion A [noise_bridge] controlling the path's
 #'   Brownian bridge. Default `noise_bridge()`.
+#' @param trans A [trans] object applied to the curve's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -50,10 +52,10 @@ curve_twist <- S7::new_class(
     points = S7::new_property(
       class = xy,
       getter = function(self) {
-        twisted_path_points(
+        apply_trans(self@trans, twisted_path_points(
           x = self@x, y = self@y, xend = self@xend, yend = self@yend,
           n = self@n, width = self@scale, path_distortion = self@path_distortion
-        )
+        ))
       }
     )
   ),
@@ -64,9 +66,10 @@ curve_twist <- S7::new_class(
                          scale = 0.2,
                          n = 100L,
                          path_distortion = noise_bridge(),
+                         trans = trans_identity(),
                          ...) {
     S7::new_object(
-      drawable(geometry = "path"),
+      drawable(geometry = "path", trans = trans),
       x = x,
       y = y,
       xend = xend,

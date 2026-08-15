@@ -11,6 +11,7 @@ curve_spiral(
   radius_end = 1,
   turns = 3,
   n = 200L,
+  trans = trans_identity(),
   ...
 )
 }
@@ -23,6 +24,9 @@ be non-negative. Default \code{0}/\code{1}.}
 \item{turns}{Number of full revolutions. Must be positive. Default \code{3}.}
 
 \item{n}{Number of points used to approximate the spiral. Default \code{200L}.}
+
+\item{trans}{A \link{trans} object applied to the curve's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

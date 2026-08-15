@@ -4,7 +4,7 @@
 \alias{shape_polygon}
 \title{A regular polygon}
 \usage{
-shape_polygon(x = 0, y = 0, radius = 1, n = 6L, ...)
+shape_polygon(x = 0, y = 0, radius = 1, n = 6L, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{Centroid coordinates. Default \code{0}.}
@@ -12,6 +12,9 @@ shape_polygon(x = 0, y = 0, radius = 1, n = 6L, ...)
 \item{radius}{Radius. Must be non-negative. Default \code{1}.}
 
 \item{n}{Number of sides (vertices). Must be at least \code{3}. Default \code{6L}.}
+
+\item{trans}{A \link{trans} object applied to the shape's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

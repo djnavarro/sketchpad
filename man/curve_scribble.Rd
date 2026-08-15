@@ -14,6 +14,7 @@ curve_scribble(
   amplitude = 0.35,
   n = 200L,
   seed = 1L,
+  trans = trans_identity(),
   ...
 )
 }
@@ -38,6 +39,9 @@ number. Default \code{0.35}.}
 integer of at least \code{2L}. Default \code{200L}.}
 
 \item{seed}{Integer seed for the random harmonics. Default \code{1L}.}
+
+\item{trans}{A \link{trans} object applied to the curve's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

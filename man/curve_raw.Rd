@@ -4,12 +4,15 @@
 \alias{curve_raw}
 \title{An open path defined directly by its vertices}
 \usage{
-curve_raw(x, y, ...)
+curve_raw(x, y, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x}{Numeric vector of x coordinates.}
 
 \item{y}{Numeric vector of y coordinates.}
+
+\item{trans}{A \link{trans} object applied to the curve's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

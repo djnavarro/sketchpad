@@ -11,6 +11,7 @@ shape_blob(
   range = 0.2,
   n = 100L,
   distortion = noise_field(),
+  trans = trans_identity(),
   ...
 )
 }
@@ -26,6 +27,9 @@ Default \code{0.2}.}
 
 \item{distortion}{A \link{noise_field} controlling the radius distortion.
 Default \code{noise_field()}.}
+
+\item{trans}{A \link{trans} object applied to the shape's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

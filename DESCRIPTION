@@ -30,6 +30,7 @@ Remotes:
 Collate: 'fill.R'
     'noise_field.R'
     'noise_bridge.R'
+    'trans.R'
     'style.R'
     'xy.R'
     'drawable.R'

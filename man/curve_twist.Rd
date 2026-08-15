@@ -12,6 +12,7 @@ curve_twist(
   scale = 0.2,
   n = 100L,
   path_distortion = noise_bridge(),
+  trans = trans_identity(),
   ...
 )
 }
@@ -28,6 +29,9 @@ path). Must be non-negative. Default \code{0.2}.}
 
 \item{path_distortion}{A \link{noise_bridge} controlling the path's
 Brownian bridge. Default \code{noise_bridge()}.}
+
+\item{trans}{A \link{trans} object applied to the curve's computed points.
+Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
 
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
 }

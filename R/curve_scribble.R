@@ -39,6 +39,8 @@
 #' @param n Number of points sampled along the curve. Must be a positive
 #'   integer of at least `2L`. Default `200L`.
 #' @param seed Integer seed for the random harmonics. Default `1L`.
+#' @param trans A [trans] object applied to the curve's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -69,7 +71,7 @@ curve_scribble <- S7::new_class(
           resolution = self@n,
           seed = self@seed
         )[[1]]
-        if (self@direction == "horizontal") {
+        pts <- if (self@direction == "horizontal") {
           xy(
             x = self@x + line$along * self@width,
             y = self@y + line$across * self@height
@@ -80,6 +82,7 @@ curve_scribble <- S7::new_class(
             y = self@y + line$along * self@height
           )
         }
+        apply_trans(self@trans, pts)
       }
     )
   ),
@@ -111,9 +114,10 @@ curve_scribble <- S7::new_class(
                          amplitude = 0.35,
                          n = 200L,
                          seed = 1L,
+                         trans = trans_identity(),
                          ...) {
     S7::new_object(
-      drawable(geometry = "path"),
+      drawable(geometry = "path", trans = trans),
       x = x,
       y = y,
       width = width,

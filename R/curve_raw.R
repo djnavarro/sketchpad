@@ -17,6 +17,8 @@
 #'
 #' @param x Numeric vector of x coordinates.
 #' @param y Numeric vector of y coordinates.
+#' @param trans A [trans] object applied to the curve's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -33,7 +35,7 @@ curve_raw <- S7::new_class(
     points = S7::new_property(
       class = xy,
       getter = function(self) {
-        xy(x = self@x, y = self@y)
+        apply_trans(self@trans, xy(x = self@x, y = self@y))
       }
     )
   ),
@@ -42,9 +44,9 @@ curve_raw <- S7::new_class(
       "x and y must be the same length"
     }
   },
-  constructor = function(x, y, ...) {
+  constructor = function(x, y, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(geometry = "path"),
+      drawable(geometry = "path", trans = trans),
       x = x,
       y = y,
       style = style(...)

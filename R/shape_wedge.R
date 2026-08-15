@@ -45,6 +45,8 @@ validate_arc_args <- function(x, y, radius, start, end, n) {
 #'   `pi / 2`.
 #' @param n Number of points used to approximate the arc. Must be at least
 #'   `2`. Default `100L`.
+#' @param trans A [trans] object applied to the shape's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -67,16 +69,17 @@ shape_wedge <- S7::new_class(
       class = xy,
       getter = function(self) {
         arc <- arc_points(self@x, self@y, self@radius, self@start, self@end, self@n)
-        xy(x = c(self@x, arc@x), y = c(self@y, arc@y))
+        apply_trans(self@trans, xy(x = c(self@x, arc@x), y = c(self@y, arc@y)))
       }
     )
   ),
   validator = function(self) {
     validate_arc_args(self@x, self@y, self@radius, self@start, self@end, self@n)
   },
-  constructor = function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L, ...) {
+  constructor = function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L,
+                         trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(),
+      drawable(trans = trans),
       x = x,
       y = y,
       radius = radius,

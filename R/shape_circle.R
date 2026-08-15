@@ -6,6 +6,8 @@
 #' @param x,y Centroid coordinates. Default `0`.
 #' @param radius Radius. Must be non-negative. Default `1`.
 #' @param n Number of points used to approximate the circle. Default `100L`.
+#' @param trans A [trans] object applied to the shape's computed points.
+#'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
 #'
 #' @examples
@@ -26,10 +28,10 @@ shape_circle <- S7::new_class(
       class = xy,
       getter = function(self) {
         angle <- seq(0, 2 * pi, length.out = self@n)
-        xy(
+        apply_trans(self@trans, xy(
           x = self@x + self@radius * cos(angle),
           y = self@y + self@radius * sin(angle)
-        )
+        ))
       }
     )
   ),
@@ -41,9 +43,9 @@ shape_circle <- S7::new_class(
     if (self@radius < 0) return("radius must be a non-negative number")
     if (self@n < 1L) return("n must be a positive integer")
   },
-  constructor = function(x = 0, y = 0, radius = 1, n = 100L, ...) {
+  constructor = function(x = 0, y = 0, radius = 1, n = 100L, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(),
+      drawable(trans = trans),
       x = x,
       y = y,
       radius = radius,

@@ -4,7 +4,7 @@
 \alias{drawable}
 \title{Parent class for all drawable objects}
 \usage{
-drawable(..., geometry = "polygon")
+drawable(..., geometry = "polygon", trans = trans_identity())
 }
 \arguments{
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
@@ -13,6 +13,8 @@ drawable(..., geometry = "polygon")
 Not exposed as a constructor argument by any concrete drawable --
 each \verb{shape_*()}/\verb{curve_*()}/\code{points_raw()} constructor fixes one
 value internally instead (see details).}
+
+\item{trans}{A \link{trans}/\link{trans_warp}/\link{trans_chain} object. See details.}
 }
 \description{
 \code{drawable} enforces structure on its subclasses: every drawable must
@@ -30,6 +32,18 @@ e.g. \code{\link[=points_raw]{points_raw()}}), \code{"path"} (1D, an open \code{
 \verb{shape_*()} constructor uses). \code{style@fill} is ignored for
 \code{"points"}/\code{"path"} geometries, since only a closed polygon has an
 interior to fill.
+
+\code{trans} is a \link{trans} (an affine map: \code{\link[=trans_translate]{trans_translate()}},
+\code{\link[=trans_rotate]{trans_rotate()}}, \code{\link[=trans_scale]{trans_scale()}}, \code{\link[=trans_reflect]{trans_reflect()}}, \code{\link[=trans_shear]{trans_shear()}},
+\code{\link[=trans_affine]{trans_affine()}}), a \link{trans_warp} (a non-rigid, noise-based
+deformation), or a \link{trans_chain} combining several via \code{+}, applied to
+a drawable's computed \code{points} as the very last step -- after any
+shape-specific geometry (and, for \code{\link[=shape_blob]{shape_blob()}}/\code{\link[=shape_ribbon]{shape_ribbon()}}/
+\code{\link[=shape_twist]{shape_twist()}}, any noise-based distortion) has already been computed.
+This means a drawable's own defining parameters (e.g. \code{\link[=shape_circle]{shape_circle()}}'s
+centroid/radius) are never mutated or flattened by a transform -- only
+the final rendered coordinates are affected. Default \code{\link[=trans_identity]{trans_identity()}}
+(no transform).
 }
 \examples{
 circ <- shape_circle(radius = 1)
