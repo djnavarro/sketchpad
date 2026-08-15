@@ -6,6 +6,26 @@ test_that("every shape_*() defaults to polygon geometry", {
   expect_identical(shape_bezier(x = c(0, 1, 2), y = c(0, 1, 0))@geometry, "polygon")
 })
 
+test_that("pathlike defaults to FALSE and is validated as a single logical", {
+  expect_false(drawable()@pathlike)
+  expect_error(drawable(pathlike = c(TRUE, FALSE)), "pathlike")
+  expect_error(drawable(pathlike = NA), "pathlike")
+  expect_error(drawable(pathlike = "yes"), "pathlike")
+})
+
+test_that("pathlike is TRUE only for drawables with a genuine control-point path", {
+  expect_true(shape_raw(x = c(0, 1), y = c(0, 1))@pathlike)
+  expect_true(curve_raw(x = c(0, 1), y = c(0, 1))@pathlike)
+  expect_true(curve_line(x = c(0, 1), y = c(0, 1))@pathlike)
+  expect_true(shape_stroke(x = c(0, 1), y = c(0, 1), width = 0.1)@pathlike)
+  expect_true(shape_bezier(x = c(0, 1, 2), y = c(0, 1, 0))@pathlike)
+  expect_true(curve_bezier(x = c(0, 1, 2), y = c(0, 1, 0))@pathlike)
+  expect_true(points_raw(x = c(0, 1), y = c(0, 1))@pathlike)
+
+  expect_false(shape_circle()@pathlike)
+  expect_false(shape_ribbon()@pathlike)
+})
+
 test_that("geometry is validated as one of the three allowed values", {
   # no shape_*() constructor exposes `geometry` yet (every shape_*() is
   # fixed to "polygon"; curve_*()/points_raw() fix "path"/"points"

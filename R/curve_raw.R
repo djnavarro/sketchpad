@@ -46,7 +46,7 @@ curve_raw <- S7::new_class(
   },
   constructor = function(x, y, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(geometry = "path", trans = trans),
+      drawable(geometry = "path", trans = trans, pathlike = TRUE),
       x = x,
       y = y,
       style = style(...)

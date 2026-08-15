@@ -152,7 +152,7 @@ shape_stroke <- S7::new_class(
                          trans = trans_identity(),
                          ...) {
     S7::new_object(
-      drawable(trans = trans),
+      drawable(trans = trans, pathlike = TRUE),
       x = x,
       y = y,
       width = width,

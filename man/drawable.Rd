@@ -4,7 +4,7 @@
 \alias{drawable}
 \title{Parent class for all drawable objects}
 \usage{
-drawable(..., geometry = "polygon", trans = trans_identity())
+drawable(..., geometry = "polygon", trans = trans_identity(), pathlike = FALSE)
 }
 \arguments{
 \item{...}{Arguments passed to \code{\link[=style]{style()}}.}
@@ -15,6 +15,11 @@ each \verb{shape_*()}/\verb{curve_*()}/\code{points_raw()} constructor fixes one
 value internally instead (see details).}
 
 \item{trans}{A \link{trans}/\link{trans_warp}/\link{trans_chain} object. See details.}
+
+\item{pathlike}{A single \code{TRUE}/\code{FALSE} (default \code{FALSE}). Not exposed
+as a constructor argument by any concrete drawable -- each fixes its
+own value internally, the same convention \code{geometry} follows. See
+details.}
 }
 \description{
 \code{drawable} enforces structure on its subclasses: every drawable must
@@ -44,6 +49,31 @@ This means a drawable's own defining parameters (e.g. \code{\link[=shape_circle]
 centroid/radius) are never mutated or flattened by a transform -- only
 the final rendered coordinates are affected. Default \code{\link[=trans_identity]{trans_identity()}}
 (no transform).
+
+\code{pathlike} marks whether \code{x}/\code{y} (where present) hold a genuine,
+caller-ordered, perturbable control-point path -- as opposed to \code{x}/\code{y}
+meaning something else entirely (e.g. \code{\link[=shape_circle]{shape_circle()}}'s centroid, or
+one fixed endpoint of \code{\link[=shape_ribbon]{shape_ribbon()}}'s two-point segment). This is
+the distinction \code{\link[=sketchy]{sketchy()}}/\code{\link[=bristle_stroke]{bristle_stroke()}} need to decide whether
+jittering \code{x}/\code{y} produces a meaningful wobble; it's orthogonal to
+\code{geometry} -- a \code{pathlike} drawable can have any \code{geometry} (a future
+\verb{points_*()} constructor could reasonably be \code{pathlike} despite
+\code{geometry == "points"}). Currently \code{TRUE} for \code{\link[=shape_raw]{shape_raw()}},
+\code{\link[=curve_raw]{curve_raw()}}, \code{\link[=curve_line]{curve_line()}}, \code{\link[=shape_stroke]{shape_stroke()}}, \code{\link[=shape_bezier]{shape_bezier()}},
+\code{\link[=curve_bezier]{curve_bezier()}}, and \code{\link[=points_raw]{points_raw()}}; \code{FALSE} (the default) for every
+other concrete drawable, including \code{\link[=shape_ribbon]{shape_ribbon()}}/\code{\link[=shape_twist]{shape_twist()}}/
+\code{\link[=curve_twist]{curve_twist()}}/\code{\link[=shape_bezier_ribbon]{shape_bezier_ribbon()}} -- these do have a conceptual
+backbone, but it's exposed via \code{x}/\code{y}/\code{xend}/\code{yend} (or additional
+named control-point pairs), not a plain \code{x}/\code{y} vector. Whether a
+\code{pathlike} subclass actually has \code{x}/\code{y} properties is not enforced by
+\code{drawable}'s own validator -- every subclass constructor first builds
+a scaffold \code{drawable()} instance (validated on its own, before any
+subclass property exists) and only merges in \code{x}/\code{y} afterward via
+\code{S7::new_object()}, so a cross-property check here would fire on that
+scaffold and reject every \code{pathlike} subclass unconditionally (see
+"Gotchas"). Setting \code{pathlike = TRUE} on a subclass with no \code{x}/\code{y} is
+therefore an author error caught only when an effect tries to read
+\code{object@x}/\code{object@y}, not at construction time.
 }
 \examples{
 circ <- shape_circle(radius = 1)

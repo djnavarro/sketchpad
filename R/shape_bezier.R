@@ -93,7 +93,7 @@ shape_bezier <- S7::new_class(
   validator = function(self) validate_bezier_args(self@x, self@y, self@n),
   constructor = function(x, y, n = 100L, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(trans = trans),
+      drawable(trans = trans, pathlike = TRUE),
       x = x,
       y = y,
       n = n,

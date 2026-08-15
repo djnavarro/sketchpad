@@ -1785,3 +1785,125 @@ Verified with a full test suite run (812/812 passing) and
 `devtools::check()`/`rcmdcheck::rcmdcheck(args = c("--no-manual",
 "--as-cran"))` (0 errors/warnings, one pre-existing CRAN-submission-only
 NOTE unrelated to this change).
+
+## Systematizing `effects` around `object` + `S7::set_props()`
+
+Auditing `sketchy()`/`bristle_stroke()`/`textured_stroke()` together (all
+three built incrementally, in that order, over the previous three
+entries) surfaced a real design inconsistency: `sketchy()` took a bare
+constructor function `.f` plus raw `x`/`y`, forwarding every other
+argument (`width`, `distortion`, `color`, ...) through `...`;
+`bristle_stroke()` didn't even take `.f` -- it hardcoded `shape_stroke()`
+internally and duplicated its own path-perturbation logic rather than
+operating on a stroke object; and `textured_stroke` went furthest in the
+wrong direction, becoming its own S7 class with its own `x`/`y`/`width`/
+`n`/`distortion` properties and its own `textured_stroke_outline()`
+helper that recomputed `shape_stroke()`'s exact geometry a second time.
+None of the three let a caller build one drawable with the look they
+wanted and then hand *that object* to an effect -- every property had to
+be re-specified at the effect call site.
+
+**The fix: an effect takes an existing `drawable` `object` and produces
+its output by copying it with `S7::set_props(object, ...)`** (confirmed
+available and behaving as expected: returns a modified copy, re-running
+the class's validator), rather than a constructor function plus raw
+`x`/`y` and manual `...` forwarding. This means every property the
+effect doesn't itself vary carries over from `object` automatically, with
+no re-specification needed -- `sketchy(shape_stroke(x = ..., y = ...,
+width = 0.3, fill = "steelblue"), layers = 5)` keeps that stroke's own
+`width`/`fill` on every layer for free. Concretely:
+
+- `sketchy()`: `.f`/`x`/`y`/`...` replaced by a single `object` argument;
+  each layer is `S7::set_props(object, x = ..., y = ...)`.
+- `bristle_stroke()`: `x`/`y`/`width`/`distortion`/`...` replaced by
+  `object` (a template drawable, typically a `shape_stroke()`); each
+  bristle is `S7::set_props(object, x = ..., y = ..., width = ...)`
+  (plus `n = length(idx)` only if `object` actually has an `n` property,
+  via `do.call(S7::set_props, c(list(object = object), overrides))` --
+  keeps it working for any future pathlike drawable without an `n`).
+- `textured_stroke`: rebuilt to wrap an `object` (any `@geometry ==
+  "polygon"` drawable) rather than owning `x`/`y`/`width`/`n`/
+  `distortion` itself. Its `outline` getter collapsed from a
+  hand-duplicated copy of `shape_stroke()`'s own geometry down to a
+  one-line proxy, `self@object@points` -- and this is a genuine
+  generalization, not just a refactor: `textured_stroke()` now works on
+  `shape_blob()`/`shape_ribbon()`/any other closed shape, not only
+  strokes, since nothing about the masking technique was ever
+  stroke-specific.
+
+**A new internal `require_props(object, props, context)` helper**
+(`R/effects.R`, a new file collated right after `vectorize.R` --
+position doesn't matter, since it's an ordinary function, not an S7
+class) gives `sketchy()`/`bristle_stroke()` a clear, effect-specific
+error when `object` is missing a needed property, rather than a raw
+`@`-access or `set_props()` failure surfacing deep in the call stack.
+
+All three effects' test files were rewritten around the new call shape
+(`sketchy(curve_line(...))` instead of `sketchy(curve_line, x = ...,
+y = ...)`, etc.); `textured_stroke()`'s argument-validation tests
+specifically -- previously exercising `x`/`y`/`width`/`n` directly --
+were replaced with tests that its wrapped `object`'s own validation
+already covers the same ground. Verified with a full test suite run and
+`devtools::check()` (0 errors/warnings/notes both before and after).
+
+## Adding a `pathlike` property to `drawable`
+
+A follow-up to the `effects` systematization above: `require_props(object,
+c("x", "y"), ...)` checked property *names* only, which is a weaker
+contract than it looks. Several drawables already have scalar `x`/`y`
+properties with a completely different meaning than "control-point
+path" -- `shape_circle()`'s centroid, or `shape_ribbon()`'s segment start
+point -- so the check only rejected them by accident, via a separate
+"at least two control points" length check running immediately
+afterward. `sketchy(shape_ribbon(...))` would fail, but for the wrong
+reason, with a message that didn't actually describe the problem.
+
+**Added `pathlike` (`TRUE`/`FALSE`, default `FALSE`) directly to
+`drawable`** to make the real contract explicit: does `x`/`y` hold a
+genuine, caller-ordered, perturbable control-point path, independent of
+`geometry` (a future `points_*()` constructor could reasonably be
+`pathlike` despite `geometry == "points"` -- which is exactly why
+`points_raw()` itself was marked `pathlike = TRUE` here, even though
+nothing is drawn connecting its points: `sketchy()`'s arc-length jitter
+still produces a sensible "wobbled scatter"). Set `TRUE` for
+`shape_raw()`/`curve_raw()`/`curve_line()`/`shape_stroke()`/
+`shape_bezier()`/`curve_bezier()`/`points_raw()`; left at the default
+`FALSE` for every centroid-based shape and for
+`shape_ribbon()`/`shape_twist()`/`curve_twist()`/`shape_bezier_ribbon()`,
+whose backbones exist conceptually but aren't exposed as a plain `x`/`y`
+vector (they use `x`/`y`/`xend`/`yend` or additional named control-point
+pairs instead). `sketchy()`/`bristle_stroke()` now call a new
+`require_pathlike(object, context)` (`R/effects.R`, alongside the
+existing `require_props()`) instead of duck-typing on `x`/`y` names --
+`sketchy(shape_ribbon(...))` now fails immediately with a
+`pathlike`-specific message instead of an incidental length-check one.
+
+**Discovered a real S7 constructor-ordering bug while implementing
+this**, worth its own note since it's a general trap, not a one-off:
+the first attempt added a cross-check to `drawable`'s own validator --
+`if (self@pathlike) stopifnot(all(c("x", "y") %in% S7::prop_names(self)))`
+-- reasoning that the validator runs after the full object is
+constructed, so subclass properties would already be visible. This
+immediately broke every `pathlike` subclass's constructor (`shape_bezier()`,
+`shape_stroke()`, ...) with "pathlike drawables must expose x/y
+control-point properties" -- on objects that plainly *do* have `x`/`y`.
+The cause: every concrete constructor here calls `drawable(trans = trans,
+pathlike = TRUE)` *first*, to get a validated scaffold instance, and only
+merges in its own `x`/`y` afterward via `S7::new_object(<scaffold>, x =
+x, y = y, ...)`. That first call validates the scaffold **as a
+standalone `drawable`**, before any subclass property exists, so the
+cross-check fired on the scaffold and rejected every subclass
+unconditionally. Fixed by simply not attempting the cross-check in
+`drawable`'s validator at all -- `pathlike = TRUE` on a subclass with no
+real `x`/`y` is now an author error surfaced only when an effect later
+reads `object@x`, not at construction time. Documented as a new entry in
+`AGENTS.md`'s Gotchas: **a parent class's validator cannot cross-check a
+property against a subclass-only property**, as long as subclasses keep
+building themselves this "scaffold first, merge subclass properties
+after" way.
+
+Both this and the `effects` systematization entry above were planned in
+Plan mode before implementation (two separate planning passes, since the
+`pathlike` property came out of a follow-up design question after the
+first was already shipped). Verified with a full test suite run
+(825/825 passing) and `devtools::check()` (0 errors/warnings/notes).

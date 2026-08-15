@@ -5,24 +5,24 @@
 \title{A fanned bristle/dry-brush effect along a path}
 \usage{
 bristle_stroke(
-  x,
-  y,
+  object,
   n_bristles = 9L,
   spread = 0.3,
-  width = 0.05,
   width_jitter = 0.3,
   fray = 0.15,
   jitter = 0.015,
   jitter_frequency = 1.2,
   n = 100L,
-  distortion = noise_field(),
-  seed = 1L,
-  ...
+  seed = 1L
 )
 }
 \arguments{
-\item{x, y}{Numeric vectors of control point coordinates for the
-backbone path. Must be the same length, with at least two points.}
+\item{object}{A template pathlike \link{drawable} (\verb{@pathlike == TRUE}, see
+\link{drawable}'s docs) with a \code{width} property -- typically
+\code{\link[=shape_stroke]{shape_stroke()}}. Every bristle is a copy of \code{object} with its own
+fanned \code{x}/\code{y}, scaled \code{width}, and (if \code{object} has an \code{n}
+property) resampled \code{n}; all other properties (style, \code{distortion},
+\code{trans}, ...) carry over unchanged.}
 
 \item{n_bristles}{Number of bristles to fan out. Must be a positive
 integer. Default \code{9L}.}
@@ -30,12 +30,10 @@ integer. Default \code{9L}.}
 \item{spread}{Total perpendicular distance the bristles fan across,
 centred on the backbone. Must be non-negative. Default \code{0.3}.}
 
-\item{width}{Base bristle width, before per-bristle \code{width_jitter}
-scaling. Must be non-negative. Default \code{0.05}.}
-
 \item{width_jitter}{Fractional random variation applied to each
-bristle's own \code{width} (e.g. \code{0.3} scales width by a factor drawn
-uniformly from \verb{[0.7, 1.3]}). Must be in \verb{[0, 1)}. Default \code{0.3}.}
+bristle's own \code{object@width} (e.g. \code{0.3} scales width by a factor
+drawn uniformly from \verb{[0.7, 1.3]}). Must be in \verb{[0, 1)}. Default
+\code{0.3}.}
 
 \item{fray}{Maximum fraction of the backbone's own length randomly
 trimmed from each bristle's start and end. Must be in \verb{[0, 0.5)}.
@@ -45,28 +43,23 @@ Default \code{0.15}.}
 of the same name, controlling each bristle's independent wobble.
 Defaults \code{0.015}/\code{1.2}.}
 
-\item{n}{Number of points used along each bristle's resampled path.
+\item{n}{Number of points used along the backbone when fanning
+bristles out (independent of any \code{n} property \code{object} itself has).
 Must be at least \code{2}. Default \code{100L}.}
-
-\item{distortion}{A \link{noise_field} controlling each bristle's own width
-("pressure") modulation, as in \code{\link[=shape_stroke]{shape_stroke()}}. Default
-\code{noise_field()}.}
 
 \item{seed}{Integer seed for the per-bristle randomization and wobble.
 Default \code{1L}.}
-
-\item{...}{Additional arguments passed unchanged to every bristle's
-\code{\link[=shape_stroke]{shape_stroke()}} (e.g. \code{fill}/\code{fill_alpha}/\code{color}).}
 }
 \value{
 A \link{sketch} containing \code{n_bristles} drawables.
 }
 \description{
-\code{bristle_stroke()} builds a \link{sketch} of \code{n_bristles} thin
-\code{\link[=shape_stroke]{shape_stroke()}}s, fanned out perpendicular to a backbone path -- like
-\code{\link[=sketchy]{sketchy()}}, no single drawable can express this by itself, since a
-dry-brush look comes from several independently-frayed, independently
-wobbling strands laid side by side, not one stroke. Each bristle:
+\code{bristle_stroke()} builds a \link{sketch} of \code{n_bristles} copies of a
+template drawable, fanned out perpendicular to its own backbone path --
+like \code{\link[=sketchy]{sketchy()}}, no single drawable can express this by itself, since
+a dry-brush look comes from several independently-frayed, independently
+wobbling strands laid side by side, not one stroke. Each bristle is a
+copy of \code{object} (via \code{\link[S7:set_props]{S7::set_props()}}) that:
 }
 \details{
 \itemize{
@@ -77,13 +70,17 @@ the same per-point unit normal \code{\link[=shape_stroke]{shape_stroke()}} itsel
 (\code{fray} controls how much), so bristles start/end raggedly rather
 than in one clean line -- the same "frayed edge" a real brush's
 outer bristles show as it runs dry;
-\item has its own randomly-scaled \code{width} (via \code{width_jitter}); and
+\item has its own randomly-scaled \code{width} (via \code{width_jitter}, applied to
+\code{object@width}); and
 \item is independently wobbled via \code{\link[=sketchy]{sketchy()}} (\code{layers = 1L}, since the
 fanning here already does the layering work \code{sketchy()} normally
 provides -- one wobbling copy per bristle position, not several
 wobbling copies of one path).
 }
 
+Every other property of \code{object} -- style, \code{distortion}, \code{trans}, ... --
+carries over to every bristle unchanged, since each is built with
+\code{\link[S7:set_props]{S7::set_props()}} rather than a fresh constructor call.
 \code{\link[=shape_stroke]{shape_stroke()}}'s own taper-to-zero at both ends does double duty as
 each bristle's tip fade, needing no extra work here. Randomization
 (fray range, width scaling) is scoped per bristle with
@@ -94,9 +91,11 @@ never leaks into the caller's global random state.
 \examples{
 t <- seq(0, 8, length.out = 200)
 draw(bristle_stroke(
-  x = t, y = sin(t) * 1.2,
-  n_bristles = 11L, spread = 0.3, width = 0.06,
-  fill = "black", fill_alpha = 0.4, color = NA_character_
+  shape_stroke(
+    x = t, y = sin(t) * 1.2, width = 0.06,
+    fill = "black", fill_alpha = 0.4, color = NA_character_
+  ),
+  n_bristles = 11L, spread = 0.3
 ))
 
 }

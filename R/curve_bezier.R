@@ -44,7 +44,7 @@ curve_bezier <- S7::new_class(
   validator = function(self) validate_bezier_args(self@x, self@y, self@n),
   constructor = function(x, y, n = 100L, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(geometry = "path", trans = trans),
+      drawable(geometry = "path", trans = trans, pathlike = TRUE),
       x = x,
       y = y,
       n = n,

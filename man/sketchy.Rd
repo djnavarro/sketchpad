@@ -2,25 +2,15 @@
 % Please edit documentation in R/sketchy.R
 \name{sketchy}
 \alias{sketchy}
-\title{Layer jittered copies of a path drawable for a hand-drawn look}
+\title{Layer jittered copies of a drawable for a hand-drawn look}
 \usage{
-sketchy(
-  .f,
-  x,
-  y,
-  layers = 4L,
-  jitter = 0.05,
-  jitter_frequency = 0.5,
-  seed = 1L,
-  ...
-)
+sketchy(object, layers = 4L, jitter = 0.05, jitter_frequency = 0.5, seed = 1L)
 }
 \arguments{
-\item{.f}{A drawable constructor taking \code{x}/\code{y} control point vectors,
-e.g. \code{\link[=curve_line]{curve_line()}} or \code{\link[=shape_stroke]{shape_stroke()}}.}
-
-\item{x, y}{Numeric vectors of control point coordinates for the
-unperturbed path. Must be the same length, with at least two points.}
+\item{object}{A pathlike \link{drawable} (\verb{@pathlike == TRUE}, see
+\link{drawable}'s docs), e.g. \code{\link[=curve_line]{curve_line()}}, \code{\link[=shape_stroke]{shape_stroke()}},
+\code{\link[=shape_bezier]{shape_bezier()}}. Every other property is preserved unchanged
+across layers.}
 
 \item{layers}{Number of independently-jittered copies to layer. Must
 be a positive integer. Default \code{4L}.}
@@ -34,10 +24,6 @@ values give a slower, smoother wobble; higher values a jumpier one.
 Must be non-negative. Default \code{0.5}.}
 
 \item{seed}{Integer seed for the jitter noise. Default \code{1L}.}
-
-\item{...}{Additional arguments passed unchanged to every call of
-\code{.f} (e.g. \code{width}/\code{distortion} for \code{\link[=shape_stroke]{shape_stroke()}}, or
-\code{color}/\code{color_alpha} for either).}
 }
 \value{
 A \link{sketch} containing \code{layers} drawables.
@@ -47,13 +33,12 @@ No single \link{drawable} can express a hand-drawn ink/pencil look on its
 own -- what reads as "sketchy" is several independently wobbling
 copies of the same nominal path layered on top of each other, not one
 perfectly smooth line. \code{sketchy()} builds a \link{sketch} of \code{layers} such
-copies: each is constructed by calling \code{.f} (a drawable constructor
-taking \code{x}/\code{y} control point vectors, e.g. \code{\link[=curve_line]{curve_line()}} or
-\code{\link[=shape_stroke]{shape_stroke()}}) with \code{x}/\code{y} displaced by smooth, seed-offset simplex
-noise sampled along the path's own normalized arc-length -- the same
-ad hoc technique used, during development, to add a wobbling pencil
-edge on top of a \code{\link[=shape_stroke]{shape_stroke()}}'s tapered outline, or to layer a
-plain \code{\link[=curve_line]{curve_line()}} into a sketchier-looking line by itself.
+copies: each is a copy of \code{object} (via \code{\link[S7:set_props]{S7::set_props()}}) with its
+\code{x}/\code{y} displaced by smooth, seed-offset simplex noise sampled along
+the path's own normalized arc-length -- the same ad hoc technique used,
+during development, to add a wobbling pencil edge on top of a
+\code{\link[=shape_stroke]{shape_stroke()}}'s tapered outline, or to layer a plain \code{\link[=curve_line]{curve_line()}}
+into a sketchier-looking line by itself.
 }
 \details{
 Noise is sampled at each control point's own position along arc-length
@@ -67,22 +52,22 @@ convention \code{trans_warp()}/\code{twisted_path_points()} already use for
 their own independent-axis noise), so layers wobble independently
 rather than moving in lockstep.
 
-Every other drawable-specific argument (\code{width}/\code{distortion} for
-\code{\link[=shape_stroke]{shape_stroke()}}; \code{color}/\code{color_alpha}/\code{linewidth} for either) is
-forwarded via \code{...} to every layer unchanged -- \code{sketchy()} only varies
-\code{x}/\code{y} across layers, not style. Vary \code{color_alpha} down and/or
-\code{layers} up for a denser, more overlapping pencil/ink texture.
+Because each layer is built with \code{\link[S7:set_props]{S7::set_props()}} from \code{object}
+itself, every other property -- style, \code{width}/\code{distortion} for a
+\code{\link[=shape_stroke]{shape_stroke()}}, \code{trans}, ... -- carries over unchanged; \code{sketchy()}
+only varies \code{x}/\code{y} across layers. Vary \code{color_alpha} down and/or
+\code{layers} up (on \code{object} and via the \code{layers} argument, respectively)
+for a denser, more overlapping pencil/ink texture.
 }
 \examples{
 draw(sketchy(
-  curve_line,
-  x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
-  color_alpha = 0.4
+  curve_line(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), color_alpha = 0.4)
 ))
 draw(sketchy(
-  shape_stroke,
-  x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
-  width = 0.3, fill_alpha = 0.5, color = NA_character_,
+  shape_stroke(
+    x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
+    width = 0.3, fill_alpha = 0.5, color = NA_character_
+  ),
   layers = 3L, jitter = 0.03
 ))
 

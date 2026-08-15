@@ -36,7 +36,7 @@ shape_raw <- S7::new_class(
   },
   constructor = function(x, y, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(trans = trans),
+      drawable(trans = trans, pathlike = TRUE),
       x = x,
       y = y,
       style = style(...)

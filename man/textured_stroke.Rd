@@ -2,14 +2,10 @@
 % Please edit documentation in R/textured_stroke.R
 \name{textured_stroke}
 \alias{textured_stroke}
-\title{A paper-grain/textured-ink stroke, masked to its own tapered outline}
+\title{A paper-grain/textured-ink rendering of a drawable's own outline}
 \usage{
 textured_stroke(
-  x,
-  y,
-  width = 0.2,
-  n = 100L,
-  distortion = noise_field(),
+  object,
   grain = noise_field(frequency = 15, octaves = 2L, seed = 2L),
   resolution = 150L,
   color = "gray15",
@@ -18,16 +14,10 @@ textured_stroke(
 )
 }
 \arguments{
-\item{x, y}{Numeric vectors of control point coordinates for the
-backbone path. Must be the same length, with at least two points.}
-
-\item{width}{Maximum stroke width. Must be non-negative. Default \code{0.2}.}
-
-\item{n}{Number of points used along the resampled backbone. Must be
-at least \code{2}. Default \code{100L}.}
-
-\item{distortion}{A \link{noise_field} controlling the width ("pressure")
-modulation, as in \code{\link[=shape_stroke]{shape_stroke()}}. Default \code{noise_field()}.}
+\item{object}{A polygon-geometry \link{drawable} (\verb{@geometry == "polygon"})
+whose outline is textured -- e.g. \code{\link[=shape_stroke]{shape_stroke()}}, \code{\link[=shape_blob]{shape_blob()}},
+\code{\link[=shape_ribbon]{shape_ribbon()}}. \code{object@points} is used directly; \code{object@style}
+plays no role (textured_stroke draws its own grain raster instead).}
 
 \item{grain}{A \link{noise_field} controlling the paper-grain texture,
 sampled directly at each raster pixel's own world position (not
@@ -36,9 +26,9 @@ Default \code{noise_field(frequency = 15, octaves = 2L, seed = 2L)}
 (finer/denser than \code{noise_field()}'s own default, for a paper-grain
 rather than cloudy look).}
 
-\item{resolution}{Raster resolution (pixels per edge of the stroke's
-own bounding box). Must be a positive integer of at least \code{2L}.
-Default \code{150L}.}
+\item{resolution}{Raster resolution (pixels per edge of \code{object}'s own
+bounding box). Must be a positive integer of at least \code{2L}. Default
+\code{150L}.}
 
 \item{color}{Grain colour. Default \code{"gray15"}.}
 
@@ -52,25 +42,25 @@ transparency (showing whatever is drawn behind). Default \code{NA}.}
 A \code{textured_stroke} object.
 }
 \description{
-\code{textured_stroke} builds the same tapered, pressure-modulated outline as
-\code{\link[=shape_stroke]{shape_stroke()}} (sharing its internal \code{resample_by_length()}/
-\code{stroke_normals()} helpers), but instead of filling that outline with a
-\code{\link[=style]{style()}}\verb{@fill} via the ordinary \code{draw()}/\code{geometry_grob()} path, it
-composites a rasterised paper-grain texture and masks it to the exact
-outline shape using \code{\link[grid:as.mask]{grid::as.mask()}} -- the same masking technique
+\code{textured_stroke} takes an existing polygon-geometry \link{drawable}
+(\code{object}, e.g. \code{\link[=shape_stroke]{shape_stroke()}}, \code{\link[=shape_blob]{shape_blob()}}, \code{\link[=shape_ribbon]{shape_ribbon()}}) and
+renders its own outline (\code{object@points}) not with a \code{\link[=style]{style()}}\verb{@fill}
+via the ordinary \code{draw()}/\code{geometry_grob()} path, but by compositing a
+rasterised paper-grain texture and masking it to the outline's exact
+polygon shape via \code{\link[grid:as.mask]{grid::as.mask()}} -- the same masking technique
 \code{\link[=fill_vignette]{fill_vignette()}} already uses for its own radial fade, but applied to
-a real (possibly concave, tapering-to-a-point) stroke silhouette rather
-than a synthetic circle drawn purely to build the mask.
+\code{object}'s own real (possibly concave, tapering-to-a-point) silhouette
+rather than a synthetic circle drawn purely to build the mask.
 }
 \details{
-This is a different effect than filling a \code{\link[=shape_stroke]{shape_stroke()}} with
-\code{\link[=fill_charcoal]{fill_charcoal()}}/\code{\link[=fill_noise]{fill_noise()}} (already a good option for a stroke's
+This is a different effect than filling \code{object} with
+\code{\link[=fill_charcoal]{fill_charcoal()}}/\code{\link[=fill_noise]{fill_noise()}} (already a good option for a shape's
 interior -- see \code{\link[=fill_charcoal]{fill_charcoal()}}'s docs): those tile a periodic
 texture that repeats across the shape via \code{\link[grid:pattern]{grid::pattern()}}, sized
 relative to the target's own bounding box. \code{textured_stroke()} instead
-samples its grain \link{noise_field} once, directly, across the stroke's own
+samples its grain \link{noise_field} once, directly, across \code{object}'s own
 world coordinates -- a single non-repeating raster the size of the
-whole stroke, with no tiling seam to manage, at the cost of needing its
+whole shape, with no tiling seam to manage, at the cost of needing its
 own \code{draw()} method rather than reusing \code{geometry_grob()}'s existing
 \code{"polygon"}/\code{"path"}/\code{"points"} branches (\code{textured_stroke} is not a
 \link{drawable} subclass at all, since its rendering isn't expressible as a
@@ -86,12 +76,12 @@ mottled ink stroke instead of a sparse one.
 \examples{
 t <- seq(0, 8, length.out = 150)
 draw(textured_stroke(
-  x = t, y = sin(t),
-  width = 0.4, color = "gray10", alpha = 0.9
+  shape_stroke(x = t, y = sin(t), width = 0.4),
+  color = "gray10", alpha = 0.9
 ))
 draw(textured_stroke(
-  x = t, y = sin(t),
-  width = 0.4, color = "gray5", alpha = 0.85, background = "gray30"
+  shape_stroke(x = t, y = sin(t), width = 0.4),
+  color = "gray5", alpha = 0.85, background = "gray30"
 ))
 
 }

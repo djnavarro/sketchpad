@@ -151,22 +151,49 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   constructor doesn't mask `graphics::points()`; every `drawable`'s
   `points` *property* (see below) is still called `points`, since a
   property isn't a top-level exported name and can't mask anything.
-- **`drawable`** -- parent class of every shape. Declares four
+- **`drawable`** -- parent class of every shape. Declares five
   properties: `style` (default `style()`), `geometry` (a validated string,
   one of `"polygon"`/`"path"`/`"points"`, default `"polygon"` -- tells
   `draw()` which grob type to build, on a dimensional reading: `"points"`
   is 0D, `"path"` is 1D, `"polygon"` is 2D and the only value any current
   `shape_*()` constructor uses), `trans` (a [trans], default
-  `trans_identity()` -- see above), and a computed `points` property that
-  subclasses override. Not meant to be instantiated directly. `drawable`'s
-  own `constructor` sets `geometry`'s and `trans`'s defaults explicitly
-  (as argument defaults, not just `new_property(default = ...)` specs)
-  because it bypasses S7's auto-generated constructor -- see "Gotchas".
+  `trans_identity()` -- see above), `pathlike` (a validated
+  `TRUE`/`FALSE`, default `FALSE` -- marks whether `x`/`y` (where
+  present) hold a genuine, caller-ordered, perturbable control-point
+  path, as opposed to `x`/`y` meaning something else entirely, e.g.
+  `shape_circle()`'s centroid or one fixed endpoint of `shape_ribbon()`'s
+  two-point segment; orthogonal to `geometry` -- a future `points_*()`
+  constructor could reasonably be `pathlike` despite `geometry ==
+  "points"`, as `points_raw()` already is), and a computed `points`
+  property that subclasses override. `drawable`'s own validator does
+  *not* cross-check `pathlike` against `x`/`y` presence -- every
+  subclass constructor first builds a scaffold `drawable()` instance
+  (validated standalone, before any subclass property exists) and only
+  merges in `x`/`y` afterward via `S7::new_object()` (see "Gotchas"), so
+  a cross-property check inside `drawable`'s own validator would fire on
+  that scaffold and reject every `pathlike` subclass unconditionally;
+  setting `pathlike = TRUE` on a subclass with no `x`/`y` is therefore an
+  author error caught only when an effect tries to read `object@x`/
+  `object@y`, not at construction time. This is the distinction
+  `sketchy()`/`bristle_stroke()` need (see "Compositional effects"
+  below) and is currently `TRUE` for
+  `shape_raw()`/`curve_raw()`/`curve_line()`/`shape_stroke()`/
+  `shape_bezier()`/`curve_bezier()`/`points_raw()` -- every other
+  concrete drawable defaults to `FALSE`, including `shape_ribbon()`/
+  `shape_twist()`/`curve_twist()`/`shape_bezier_ribbon()`, whose
+  conceptual backbones are exposed via `x`/`y`/`xend`/`yend` (or
+  additional named control-point pairs) rather than a plain `x`/`y`
+  vector. Not meant to be instantiated directly. `drawable`'s own
+  `constructor` sets `geometry`'s, `trans`'s, and `pathlike`'s defaults
+  explicitly (as argument defaults, not just `new_property(default =
+  ...)` specs) because it bypasses S7's auto-generated constructor --
+  see "Gotchas".
 - **`shape_raw`** -- the trivial drawable: `x`/`y` supplied directly as
   `points`. Usually produced by `convert()`, not constructed by hand.
   `curve_raw`/`points_raw` are its `"path"`/`"points"`-geometry analogs
   (see below) -- together the three form a "raw" family covering all
-  three `geometry` values with the same trivial constructor shape.
+  three `geometry` values with the same trivial constructor shape. All
+  three are `pathlike`.
 - **`shape_circle`** -- centroid + radius + `n` (point count); `points`
   is `n` evenly-spaced points around the circumference.
 - **`shape_rectangle`** -- centroid (`x`/`y`) + `width`/`height`;
@@ -244,6 +271,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   building block for ink/brush/pencil-style stroke rendering -- see
   `.agents/PLAN.md` for compositional techniques (layered jitter,
   textured fill) that build on top of it without further class changes.
+  `pathlike` (its `x`/`y` are the pre-resampling control points).
 - **`shape_bezier`** -- outline follows a Bezier curve through an
   arbitrary number of control points (`x`/`y`), evaluated via the
   Bernstein polynomial basis (internal `bernstein()` helper, *not* De
@@ -255,7 +283,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   curve's last point connects straight back to its first) -- for the
   same curve as an open path instead, see `curve_bezier`. The original's
   separate `bezier_ribbon` drawable has also since been ported, as
-  `shape_bezier_ribbon` (see below).
+  `shape_bezier_ribbon` (see below). `pathlike`.
 - **`shape_bezier_ribbon`** -- like `shape_ribbon`, but its backbone
   follows a cubic Bezier curve -- through `(x, y)`, two control points
   (`x_ctrl1`/`y_ctrl1`, `x_ctrl2`/`y_ctrl2`), and `(xend, yend)` -- rather
@@ -274,6 +302,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   just passes `drawable(geometry = "path")` instead of bare `drawable()`.
   `style@fill` is accepted (forwarded to `style()` like any other
   drawable) but has no visible effect, per `drawable`'s `geometry` docs.
+  `pathlike`, like `shape_bezier`.
 - **`curve_twist`** -- [shape_twist]'s path alone, with no ribbon width:
   an open, wandering polyline between `(x, y)` and `(xend, yend)`,
   displaced by a `path_distortion` [noise_bridge]. Shares its path
@@ -288,7 +317,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   least two) of control points `(x, y)`, connected by straight segments
   in order. Unlike every other drawable, its `points` getter does no
   computation at all (`xy(x = self@x, y = self@y)` directly), so
-  there's no `n` argument.
+  there's no `n` argument. `pathlike`.
 - **`curve_spiral`** -- centroid (`x`/`y`) + `radius_start`/`radius_end`
   + `turns` + `n`; angle sweeps `2 * pi * turns` radians while radius
   interpolates linearly from `radius_start` to `radius_end`, giving an
@@ -318,6 +347,10 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   every line-related `style` property (`linewidth`/`linetype`/`linejoin`/
   `lineend`/`linemitre`) and `fill` have no effect, per `drawable`'s
   `geometry` docs -- only `style@color` is used, as the marker colour.
+  `pathlike` -- despite `geometry == "points"`, `x`/`y` is still a real,
+  caller-ordered coordinate vector that `sketchy()`'s arc-length jitter
+  can meaningfully perturb into a "wobbled scatter", even with no drawn
+  connecting line.
 - **`canvas`** -- not a `drawable`; a small value class (parallel to
   `style`, but for a `sketch` as a whole rather than one shape) bundling
   `background` (a `style@fill`-style value: plain colour string or
@@ -520,64 +553,95 @@ Shared argument validation lives in the internal `validate_fill_args()`
 
 ### Compositional effects: `sketchy()`
 
-`sketchy()` (`R/sketchy.R`) is the first member of a new, non-class
-family: a plain function (no S7 class) that composes several drawables
-into a [sketch] for a visual effect no single drawable can express by
-itself. It builds `layers` independently-jittered copies of a path --
-each one a call to a caller-supplied drawable constructor `.f` (e.g.
-`curve_line()`/`shape_stroke()`) with `x`/`y` displaced by smooth,
+All three `@family effects` functions share one contract: **an effect
+takes an existing `drawable` `object` and produces its output by copying
+that object with `S7::set_props(object, ...)`** (or, for
+`textured_stroke`, by reading `object@points` directly) rather than a
+caller-supplied constructor function plus raw `x`/`y` and manual `...`
+forwarding. This means every property the effect doesn't itself vary --
+style, `width`/`distortion`, `trans`, ... -- carries over from `object`
+automatically, with no re-specification needed at the effect call site;
+a caller builds one drawable with the look they want, then hands it to
+an effect to multiply/perturb/re-render it. Two internal checks in
+`R/effects.R` (ordinary functions, not S7 class definitions, so their own
+`DESCRIPTION` `Collate` position doesn't matter, for the same reason
+`vectorize.R`'s doesn't) guard this: `require_pathlike(object, context)`
+checks `object@pathlike` is `TRUE` (see `drawable`'s own docs/AGENTS.md
+entry above for exactly what that means and which concrete classes set
+it), used by both `sketchy()` and `bristle_stroke()` to reject a drawable
+whose `x`/`y` doesn't hold a genuine, perturbable control-point path --
+e.g. `sketchy(shape_ribbon(...))` fails directly with a `pathlike`-specific
+message, since `shape_ribbon`'s `x`/`y` is a segment's start point, not a
+path, even though the property names alone would otherwise look
+plausible. `require_props(object, props, context)` checks for any
+*additional* named properties an effect needs beyond the `pathlike`
+contract itself -- currently only `bristle_stroke()`'s `width` check,
+since `width` isn't part of what `pathlike` guarantees (e.g. `curve_line()`
+is `pathlike` but has no `width`).
+
+`sketchy()` (`R/sketchy.R`) is the first member of this family: a plain
+function (no S7 class) that composes several drawables into a `sketch`
+for a visual effect no single drawable can express by itself. It builds
+`layers` independently-jittered copies of `object`'s own path -- each a
+`S7::set_props(object, x = ..., y = ...)` copy, displaced by smooth,
 seed-offset simplex noise sampled along the path's own normalized
 arc-length (not raw `x`/`y` position, so the jitter's shape doesn't
-depend on the path's own scale) -- collected into one `sketch`. Every
-other argument (`width`/`distortion`/`color`/`color_alpha`/...) is
-forwarded via `...` to every layer unchanged; only `x`/`y` vary across
-layers. This formalizes an ad hoc technique used, during
-`shape_stroke()`'s own development, to add a wobbling pencil-edge look
-on top of a stroke or to make a plain `curve_line()` read as
-hand-drawn. Documented under its own new pkgdown reference section,
-"Effects" (`@family effects`), separate from the `shape_*`/`curve_*`
-geometry families and the `fill_*`/`trans_*` per-drawable helper
-families, since it operates one level up -- composing whole drawables,
-not producing one.
+depend on the path's own scale) -- collected into one `sketch`. This
+formalizes an ad hoc technique used, during `shape_stroke()`'s own
+development, to add a wobbling pencil-edge look on top of a stroke or to
+make a plain `curve_line()` read as hand-drawn. Documented under its own
+pkgdown reference section, "Effects" (`@family effects`), separate from
+the `shape_*`/`curve_*` geometry families and the `fill_*`/`trans_*`
+per-drawable helper families, since it operates one level up -- composing
+whole drawables, not producing one.
 
-`bristle_stroke()` (`R/bristle_stroke.R`) is the second `effects`
-family member: a plain function fanning `n_bristles` thin
-`shape_stroke()`s out perpendicular to a backbone path, reusing
-`shape_stroke()`'s own internal `stroke_normals()` helper for the
-perpendicular direction and `sketchy()` itself (one `layers = 1L` call
-per bristle) for each bristle's independent wobble -- composing both
-existing `effects`/`shape_*` building blocks rather than duplicating
-their logic. Each bristle is also trimmed to a random sub-range of the
-backbone (`fray`) and given a randomly-scaled `width` (`width_jitter`),
-so bristles start/end raggedly and vary in thickness rather than
-fanning out as one clean, uniform sheaf; `shape_stroke()`'s own
-taper-to-zero at both ends does double duty as each bristle's tip fade,
-needing no extra work. Per-bristle randomization (`fray`/`width_jitter`)
-is scoped with `withr::with_seed()`, the same reproducibility
-convention `fill_stipple()`/`fill_scatter()`/`fill_halftone()` already
-use, so it never leaks into the caller's global random state -- unlike
-`sketchy()`'s own jitter, which needs no such scoping since simplex
-noise is a pure function of its own seed argument, not `stats::runif()`
-against the global generator.
+`bristle_stroke()` (`R/bristle_stroke.R`) is the second `effects` family
+member: a plain function fanning `n_bristles` copies of a template
+`object` (typically a `shape_stroke()`) out perpendicular to its own
+backbone path, reusing `shape_stroke()`'s own internal
+`stroke_normals()` helper for the perpendicular direction and
+`sketchy()` itself (one `layers = 1L` call per bristle) for each
+bristle's independent wobble -- composing both existing
+`effects`/`shape_*` building blocks rather than duplicating their logic.
+Each bristle is a `S7::set_props(object, x = ..., y = ..., width = ...)`
+copy (plus `n = length(idx)` when `object` has an `n` property), trimmed
+to a random sub-range of the backbone (`fray`) and given a
+randomly-scaled `width` (`width_jitter`, scaling `object@width`), so
+bristles start/end raggedly and vary in thickness rather than fanning
+out as one clean, uniform sheaf; `shape_stroke()`'s own taper-to-zero at
+both ends does double duty as each bristle's tip fade, needing no extra
+work. Every other property of `object` (style, `distortion`, `trans`,
+...) carries over to every bristle unchanged, via the same `set_props()`
+mechanism. Per-bristle randomization (`fray`/`width_jitter`) is scoped
+with `withr::with_seed()`, the same reproducibility convention
+`fill_stipple()`/`fill_scatter()`/`fill_halftone()` already use, so it
+never leaks into the caller's global random state -- unlike `sketchy()`'s
+own jitter, which needs no such scoping since simplex noise is a pure
+function of its own seed argument, not `stats::runif()` against the
+global generator.
 
 `textured_stroke` (`R/textured_stroke.R`) is the third `effects` family
 member, and the first that isn't a plain function returning a `sketch`
-of ordinary drawables. It builds the same tapered outline as
-`shape_stroke()` (an `outline` computed property sharing that file's
-`resample_by_length()`/`stroke_normals()` internal helpers) but renders
-it by compositing a rasterised paper-grain texture -- its `grain`
+of ordinary drawables. It wraps an arbitrary polygon-geometry `object`
+(any `drawable` with `@geometry == "polygon"` -- `shape_stroke()`,
+`shape_blob()`, `shape_ribbon()`, ... -- validated in its own
+`validator`) and renders `object@points` (its `outline` computed
+property is a one-line proxy, `self@object@points`) not via a `style()`
+fill, but by compositing a rasterised paper-grain texture -- its `grain`
 [noise_field] sampled directly at every raster pixel's own world
 `(x, y)` position, a single non-repeating raster the size of the whole
-stroke rather than a `grid::pattern()` tile -- and masking that raster
-to the outline's exact polygon shape via `grid::as.mask()`, the same
+shape rather than a `grid::pattern()` tile -- and masking that raster to
+the outline's exact polygon shape via `grid::as.mask()`, the same
 masking technique `fill_vignette()` uses for its own radial fade, but
-built from the stroke's own real silhouette rather than a synthetic
+built from `object`'s own real silhouette rather than a synthetic
 circle. Grain renders as `color`'s opacity fading between `0` and
 `alpha` at the noise field's extremes (`fill_noise()`'s own convention),
 optionally revealing a solid `background` colour underneath instead of
-true transparency (`fill_vignette()`'s own `background` argument). Since
-its rendering isn't a single `points`-based grob expressible through
-`geometry_grob()`'s `"polygon"`/`"path"`/`"points"` switch,
+true transparency (`fill_vignette()`'s own `background` argument).
+`object@style` plays no role here -- `textured_stroke` draws its own
+grain raster instead, regardless of what `object`'s own `style` says.
+Since its rendering isn't a single `points`-based grob expressible
+through `geometry_grob()`'s `"polygon"`/`"path"`/`"points"` switch,
 `textured_stroke` is not a `drawable` subclass at all -- it has its own
 `S7::method(draw, textured_stroke)` (`R/textured_stroke.R`, collated
 right after `draw.R` so the `draw` generic already exists to register
@@ -620,6 +684,31 @@ full debugging narrative):
   to `new_object()` by name. **Any future property added to `drawable`
   needs the same treatment** as long as its constructor keeps bypassing
   the auto-generated one.
+- **A parent class's validator cannot cross-check a property against a
+  subclass-only property, when that subclass builds itself the way every
+  `drawable` subclass here does.** Every concrete constructor calls
+  `drawable(trans = trans, pathlike = TRUE)` *first*, to get a validated
+  scaffold instance with `style`/`geometry`/`trans`/`pathlike` already
+  set, and only afterward merges in its own `x`/`y`/etc. via
+  `S7::new_object(<scaffold>, x = x, y = y, ...)`. That first call
+  validates the scaffold **as a standalone `drawable`**, before any
+  subclass property exists -- so a validator check like `if
+  (self@pathlike) stopifnot("x" %in% S7::prop_names(self))` inside
+  `drawable`'s own validator fires on that bare scaffold and rejects
+  every `pathlike` subclass unconditionally, confirmed while adding the
+  `pathlike` property (see "Class hierarchy" above): every
+  `shape_bezier()`/`shape_stroke()`/`bristle_stroke()`-that-builds-one
+  call failed with `"pathlike drawables must expose x/y control-point
+  properties"` even though the final object plainly does. Fixed by
+  simply not attempting that cross-check in `drawable`'s validator --
+  `pathlike = TRUE` on a subclass with no real `x`/`y` is an author
+  error surfaced only when an effect later reads `object@x`, not at
+  construction time. **Any future property that depends on a
+  *subclass's* properties (not just properties `drawable` itself
+  declares) cannot be validated inside `drawable`'s own validator** as
+  long as subclasses keep building this way -- validate it in the
+  subclass's own validator instead, where the object is already fully
+  constructed.
 - **A drawable's `shape_raw(x = ..., y = ..., style = from@style)`
   shortcut doesn't work.** `shape_raw()`'s constructor only has named
   `x`/`y` parameters; everything else in `...` is forwarded to
@@ -805,11 +894,16 @@ full debugging narrative):
   doesn't actually matter -- function bodies are evaluated lazily, only
   S7 class definitions need their dependencies already loaded at parse
   time.
+- `R/effects.R` -- the internal `require_pathlike()`/`require_props()`
+  helpers shared by `sketchy()`/`bristle_stroke()` (see "Compositional
+  effects: `sketchy()`" above). Collated right after `vectorize.R`; like
+  `vectorize.R`, its exact `Collate` position doesn't actually matter,
+  since these are ordinary functions, not S7 classes.
 - `R/sketchy.R` -- the `sketchy()` compositional effect (see "Compositional
-  effects: `sketchy()`" above). Collated right after `vectorize.R`, since
-  it also builds a `sketch` from its results and calls `sketch()`
-  directly; like `vectorize.R`, its exact `Collate` position doesn't
-  actually matter, since it's an ordinary function, not an S7 class.
+  effects: `sketchy()`" above). Collated right after `effects.R`, since
+  it calls `require_pathlike()`; like `vectorize.R`, its exact `Collate`
+  position doesn't actually matter, since it's an ordinary function, not
+  an S7 class.
 - `R/bristle_stroke.R` -- the `bristle_stroke()` compositional effect
   (see "Compositional effects: `sketchy()`" above). Collated right after
   `sketchy.R`, since it calls `sketchy()` directly (as well as
@@ -833,8 +927,8 @@ full debugging narrative):
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
-  curve_twist -> shape_stroke -> canvas -> sketch -> vectorize -> sketchy
-  -> bristle_stroke -> draw -> textured_stroke -> convert ->
+  curve_twist -> shape_stroke -> canvas -> sketch -> vectorize -> effects
+  -> sketchy -> bristle_stroke -> draw -> textured_stroke -> convert ->
   sketchpad-package). **Any new drawable
   subclass must be added to
   `Collate` after `drawable.R`**, or `devtools::load_all()`/`R CMD check`

@@ -49,7 +49,7 @@ points_raw <- S7::new_class(
   },
   constructor = function(x, y, trans = trans_identity(), ...) {
     S7::new_object(
-      drawable(geometry = "points", trans = trans),
+      drawable(geometry = "points", trans = trans, pathlike = TRUE),
       x = x,
       y = y,
       style = style(...)

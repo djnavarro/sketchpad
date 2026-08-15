@@ -27,12 +27,41 @@
 #' the final rendered coordinates are affected. Default [trans_identity()]
 #' (no transform).
 #'
+#' `pathlike` marks whether `x`/`y` (where present) hold a genuine,
+#' caller-ordered, perturbable control-point path -- as opposed to `x`/`y`
+#' meaning something else entirely (e.g. [shape_circle()]'s centroid, or
+#' one fixed endpoint of [shape_ribbon()]'s two-point segment). This is
+#' the distinction [sketchy()]/[bristle_stroke()] need to decide whether
+#' jittering `x`/`y` produces a meaningful wobble; it's orthogonal to
+#' `geometry` -- a `pathlike` drawable can have any `geometry` (a future
+#' `points_*()` constructor could reasonably be `pathlike` despite
+#' `geometry == "points"`). Currently `TRUE` for [shape_raw()],
+#' [curve_raw()], [curve_line()], [shape_stroke()], [shape_bezier()],
+#' [curve_bezier()], and [points_raw()]; `FALSE` (the default) for every
+#' other concrete drawable, including [shape_ribbon()]/[shape_twist()]/
+#' [curve_twist()]/[shape_bezier_ribbon()] -- these do have a conceptual
+#' backbone, but it's exposed via `x`/`y`/`xend`/`yend` (or additional
+#' named control-point pairs), not a plain `x`/`y` vector. Whether a
+#' `pathlike` subclass actually has `x`/`y` properties is not enforced by
+#' `drawable`'s own validator -- every subclass constructor first builds
+#' a scaffold `drawable()` instance (validated on its own, before any
+#' subclass property exists) and only merges in `x`/`y` afterward via
+#' `S7::new_object()`, so a cross-property check here would fire on that
+#' scaffold and reject every `pathlike` subclass unconditionally (see
+#' "Gotchas"). Setting `pathlike = TRUE` on a subclass with no `x`/`y` is
+#' therefore an author error caught only when an effect tries to read
+#' `object@x`/`object@y`, not at construction time.
+#'
 #' @param ... Arguments passed to [style()].
 #' @param geometry One of `"polygon"` (default), `"path"`, or `"points"`.
 #'   Not exposed as a constructor argument by any concrete drawable --
 #'   each `shape_*()`/`curve_*()`/`points_raw()` constructor fixes one
 #'   value internally instead (see details).
 #' @param trans A [trans]/[trans_warp]/[trans_chain] object. See details.
+#' @param pathlike A single `TRUE`/`FALSE` (default `FALSE`). Not exposed
+#'   as a constructor argument by any concrete drawable -- each fixes its
+#'   own value internally, the same convention `geometry` follows. See
+#'   details.
 #'
 #' @examples
 #' circ <- shape_circle(radius = 1)
@@ -55,6 +84,10 @@ drawable <- S7::new_class(
       class = trans_any,
       default = trans_identity()
     ),
+    pathlike = S7::new_property(
+      class = S7::class_logical,
+      default = FALSE
+    ),
     points = S7::new_property(
       class = xy,
       getter = function(self) xy(x = numeric(0L), y = numeric(0L))
@@ -65,13 +98,17 @@ drawable <- S7::new_class(
     if (!self@geometry %in% c("polygon", "path", "points")) {
       return('geometry must be one of "polygon", "path", or "points"')
     }
+    if (length(self@pathlike) != 1 || !is.logical(self@pathlike) || is.na(self@pathlike)) {
+      return("pathlike must be a single TRUE/FALSE value")
+    }
   },
-  constructor = function(..., geometry = "polygon", trans = trans_identity()) {
+  constructor = function(..., geometry = "polygon", trans = trans_identity(), pathlike = FALSE) {
     S7::new_object(
       S7::S7_object(),
       style = style(...),
       geometry = geometry,
-      trans = trans
+      trans = trans,
+      pathlike = pathlike
     )
   }
 )

@@ -1,16 +1,15 @@
-#' Layer jittered copies of a path drawable for a hand-drawn look
+#' Layer jittered copies of a drawable for a hand-drawn look
 #'
 #' No single [drawable] can express a hand-drawn ink/pencil look on its
 #' own -- what reads as "sketchy" is several independently wobbling
 #' copies of the same nominal path layered on top of each other, not one
 #' perfectly smooth line. `sketchy()` builds a [sketch] of `layers` such
-#' copies: each is constructed by calling `.f` (a drawable constructor
-#' taking `x`/`y` control point vectors, e.g. [curve_line()] or
-#' [shape_stroke()]) with `x`/`y` displaced by smooth, seed-offset simplex
-#' noise sampled along the path's own normalized arc-length -- the same
-#' ad hoc technique used, during development, to add a wobbling pencil
-#' edge on top of a [shape_stroke()]'s tapered outline, or to layer a
-#' plain [curve_line()] into a sketchier-looking line by itself.
+#' copies: each is a copy of `object` (via [S7::set_props()]) with its
+#' `x`/`y` displaced by smooth, seed-offset simplex noise sampled along
+#' the path's own normalized arc-length -- the same ad hoc technique used,
+#' during development, to add a wobbling pencil edge on top of a
+#' [shape_stroke()]'s tapered outline, or to layer a plain [curve_line()]
+#' into a sketchier-looking line by itself.
 #'
 #' Noise is sampled at each control point's own position along arc-length
 #' (`0` to `1`), not at its raw `x`/`y` coordinates, so the jitter's shape
@@ -23,16 +22,17 @@
 #' their own independent-axis noise), so layers wobble independently
 #' rather than moving in lockstep.
 #'
-#' Every other drawable-specific argument (`width`/`distortion` for
-#' [shape_stroke()]; `color`/`color_alpha`/`linewidth` for either) is
-#' forwarded via `...` to every layer unchanged -- `sketchy()` only varies
-#' `x`/`y` across layers, not style. Vary `color_alpha` down and/or
-#' `layers` up for a denser, more overlapping pencil/ink texture.
+#' Because each layer is built with [S7::set_props()] from `object`
+#' itself, every other property -- style, `width`/`distortion` for a
+#' [shape_stroke()], `trans`, ... -- carries over unchanged; `sketchy()`
+#' only varies `x`/`y` across layers. Vary `color_alpha` down and/or
+#' `layers` up (on `object` and via the `layers` argument, respectively)
+#' for a denser, more overlapping pencil/ink texture.
 #'
-#' @param .f A drawable constructor taking `x`/`y` control point vectors,
-#'   e.g. [curve_line()] or [shape_stroke()].
-#' @param x,y Numeric vectors of control point coordinates for the
-#'   unperturbed path. Must be the same length, with at least two points.
+#' @param object A pathlike [drawable] (`@pathlike == TRUE`, see
+#'   [drawable]'s docs), e.g. [curve_line()], [shape_stroke()],
+#'   [shape_bezier()]. Every other property is preserved unchanged
+#'   across layers.
 #' @param layers Number of independently-jittered copies to layer. Must
 #'   be a positive integer. Default `4L`.
 #' @param jitter Maximum displacement amplitude applied to each layer's
@@ -42,36 +42,30 @@
 #'   values give a slower, smoother wobble; higher values a jumpier one.
 #'   Must be non-negative. Default `0.5`.
 #' @param seed Integer seed for the jitter noise. Default `1L`.
-#' @param ... Additional arguments passed unchanged to every call of
-#'   `.f` (e.g. `width`/`distortion` for [shape_stroke()], or
-#'   `color`/`color_alpha` for either).
 #' @return A [sketch] containing `layers` drawables.
 #'
 #' @examples
 #' draw(sketchy(
-#'   curve_line,
-#'   x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
-#'   color_alpha = 0.4
+#'   curve_line(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), color_alpha = 0.4)
 #' ))
 #' draw(sketchy(
-#'   shape_stroke,
-#'   x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
-#'   width = 0.3, fill_alpha = 0.5, color = NA_character_,
+#'   shape_stroke(
+#'     x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
+#'     width = 0.3, fill_alpha = 0.5, color = NA_character_
+#'   ),
 #'   layers = 3L, jitter = 0.03
 #' ))
 #'
 #' @family effects
 #' @export
-sketchy <- function(.f,
-                     x,
-                     y,
+sketchy <- function(object,
                      layers = 4L,
                      jitter = 0.05,
                      jitter_frequency = 0.5,
-                     seed = 1L,
-                     ...) {
-  if (!is.function(.f)) rlang::abort(".f must be a function")
-  if (length(x) != length(y)) rlang::abort("x and y must be the same length")
+                     seed = 1L) {
+  require_pathlike(object, "sketchy()")
+  x <- object@x
+  y <- object@y
   if (length(x) < 2) rlang::abort("at least two control points are required")
   if (length(layers) != 1 || layers < 1L || layers != round(layers)) {
     rlang::abort("layers must be a single positive integer")
@@ -95,7 +89,7 @@ sketchy <- function(.f,
     dy <- ambient::gen_simplex(
       x = s, y = 100, frequency = jitter_frequency, seed = layer_seed + 1L
     ) * jitter
-    .f(x = x + dx, y = y + dy, ...)
+    S7::set_props(object, x = x + dx, y = y + dy)
   })
   sketch(shapes = shapes)
 }
