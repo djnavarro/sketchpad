@@ -1659,3 +1659,58 @@ compatibility, argument validation, and a `draw()` smoke test; three new
 tests appended to `tests/testthat/test-fill.R` for `fill_charcoal()`)
 and a full `devtools::check()` (0 errors/warnings/notes, after fixing
 the example bug above).
+
+## `bristle_stroke()`: fanning shape_stroke()/sketchy() into a dry-brush effect
+
+Prototyped in conversation (console only, not committed) before writing
+any package code, following the same "formalize an ad hoc technique"
+path as `sketchy()`/`fill_charcoal()`: several parallel bristles fanned
+perpendicular to a backbone path, each independently wobbled and
+raggedly trimmed, rather than one clean parallel comb -- a plain, evenly
+spaced fan of identical-length bristles read as too uniform to pass for
+a dry brush; the convincing version needed randomized per-bristle length
+(fraying) and width, plus enough perpendicular overlap between adjacent
+bristles for a darker, denser core with only the outer bristles visibly
+separating.
+
+**Reused existing building blocks rather than duplicating their logic.**
+The perpendicular fan direction is exactly `shape_stroke()`'s own
+per-point unit normal, so `bristle_stroke()` calls `shape_stroke.R`'s
+internal `stroke_normals()`/`resample_by_length()` helpers directly
+(same package, no `:::` needed, unlike the console prototype which had
+to reach into the namespace this way since it wasn't part of the package
+yet). Each bristle's own independent wobble is a `sketchy()` call with
+`layers = 1L` -- `sketchy()`'s per-layer jitter mechanism is exactly what
+a single independently-wobbling bristle needs, just invoked once per
+bristle position rather than once per layer of the same path.
+`shape_stroke()`'s own taper-to-zero at both ends was already exactly
+the "bristle tip fade" effect wanted, needing no extra code.
+
+**Randomization needed `withr::with_seed()`, unlike `sketchy()`'s own
+jitter.** `sketchy()`'s jitter is a pure function of its own seed
+argument (`ambient::gen_simplex()` takes a seed directly, no global RNG
+involved), but the console prototype's fray/width-jitter used
+`stats::runif()` against R's global random state -- fine for an
+interactive script, but a real package function must not leak side
+effects into the caller's own RNG state. Scoped each bristle's
+`stats::runif()` calls inside `withr::with_seed(bristle_seed, {...})`,
+the same convention `fill_stipple()`/`fill_scatter()`/`fill_halftone()`
+already use for exactly this reason. Verified with a dedicated test that
+`.Random.seed` is unchanged after a `bristle_stroke()` call.
+
+**A `seq(..., length.out = 1)` edge case caught before it shipped.**
+`n_bristles = 1L` needs a single bristle centered on the backbone (offset
+`0`), but `seq(-spread / 2, spread / 2, length.out = 1)` returns `-spread
+/ 2` (the `from` value), not `0` -- confirmed with a quick console check
+before writing the fix, not discovered via a failing test. Handled with
+an explicit `if (n_bristles == 1L) 0 else seq(...)` branch, together
+with a dedicated `n_bristles = 1L` test.
+
+Implemented as `R/bristle_stroke.R`, the second member of the `effects`
+pkgdown family (alongside `sketchy()`), collated right after `sketchy.R`.
+`tests/testthat/test-bristle-stroke.R` covers bristle count, per-bristle
+class, the single-bristle edge case, seed reproducibility, no RNG leakage,
+`...` forwarding, that bristles actually land at distinct perpendicular
+offsets, argument validation, and a `draw()` smoke test. Verified with a
+full test suite run (798/798 passing) and `devtools::check()` (0 errors/
+warnings/notes).

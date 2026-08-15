@@ -149,21 +149,14 @@ CSV palettes. sketchpad could depend on or bundle from it rather than
 every series/example inlining its own palette vector (as all four
 `README.Rmd` examples currently do).
 
-### Stylized stroke rendering: still open beyond `shape_stroke()`/`sketchy()`/`fill_charcoal()`
+### Stylized stroke rendering: still open beyond `shape_stroke()`/`sketchy()`/`bristle_stroke()`/`fill_charcoal()`
 
 The variable-width ribbon-from-path idea is now implemented as
 `shape_stroke()`, the layered/jittered multi-stroke idea as `sketchy()`,
-and the "textured fill reads as charcoal/marker grain" finding as
-`fill_charcoal()` -- see `.agents/HISTORY.md`. Still open, from the same
-original brainstorm:
+the bristle/dry-brush idea as `bristle_stroke()`, and the "textured fill
+reads as charcoal/marker grain" finding as `fill_charcoal()` -- see
+`.agents/HISTORY.md`. Still open, from the same original brainstorm:
 
-- **Bristle/dry-brush effect** -- several parallel sub-paths offset
-  perpendicular to the main path (a "comb" of thin, partially
-  transparent strokes, each with its own small-amplitude noise wobble),
-  approximating bristles fanning out. Compositional, like `sketchy()`,
-  but perpendicular offset rather than jitter -- not yet built, and not
-  a natural fit for `sketchy()`'s own signature (which only perturbs a
-  single path, not several parallel ones).
 - **Rasterized/textured stroke** -- composite a raster texture (paper
   grain, scanned ink) masked to the stroke's own outline, the same
   masking technique `fill_vignette()` already uses. Heaviest option,

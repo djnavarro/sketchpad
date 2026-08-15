@@ -87,4 +87,8 @@ draw(sketchy(
 ))
 
 }
+\seealso{
+Other effects:
+\code{\link[=bristle_stroke]{bristle_stroke()}}
+}
 \concept{effects}

@@ -540,6 +540,26 @@ geometry families and the `fill_*`/`trans_*` per-drawable helper
 families, since it operates one level up -- composing whole drawables,
 not producing one.
 
+`bristle_stroke()` (`R/bristle_stroke.R`) is the second `effects`
+family member: a plain function fanning `n_bristles` thin
+`shape_stroke()`s out perpendicular to a backbone path, reusing
+`shape_stroke()`'s own internal `stroke_normals()` helper for the
+perpendicular direction and `sketchy()` itself (one `layers = 1L` call
+per bristle) for each bristle's independent wobble -- composing both
+existing `effects`/`shape_*` building blocks rather than duplicating
+their logic. Each bristle is also trimmed to a random sub-range of the
+backbone (`fray`) and given a randomly-scaled `width` (`width_jitter`),
+so bristles start/end raggedly and vary in thickness rather than
+fanning out as one clean, uniform sheaf; `shape_stroke()`'s own
+taper-to-zero at both ends does double duty as each bristle's tip fade,
+needing no extra work. Per-bristle randomization (`fray`/`width_jitter`)
+is scoped with `withr::with_seed()`, the same reproducibility
+convention `fill_stipple()`/`fill_scatter()`/`fill_halftone()` already
+use, so it never leaks into the caller's global random state -- unlike
+`sketchy()`'s own jitter, which needs no such scoping since simplex
+noise is a pure function of its own seed argument, not `stats::runif()`
+against the global generator.
+
 ## Gotchas worth remembering
 
 A handful of non-obvious S7 behaviors that would bite a future edit if
@@ -761,6 +781,12 @@ full debugging narrative):
   it also builds a `sketch` from its results and calls `sketch()`
   directly; like `vectorize.R`, its exact `Collate` position doesn't
   actually matter, since it's an ordinary function, not an S7 class.
+- `R/bristle_stroke.R` -- the `bristle_stroke()` compositional effect
+  (see "Compositional effects: `sketchy()`" above). Collated right after
+  `sketchy.R`, since it calls `sketchy()` directly (as well as
+  `shape_stroke.R`'s internal `stroke_normals()`/`resample_by_length()`
+  helpers); like `sketchy.R`, its exact `Collate` position doesn't
+  actually matter, since it's an ordinary function, not an S7 class.
 - `R/draw.R` -- the `draw` generic and its three methods.
 - `R/convert.R` -- the `convert(drawable, shape_raw)` method.
 - `R/sketchpad-package.R` -- package-level doc, `#' @import S7`, the
@@ -773,7 +799,8 @@ full debugging narrative):
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
   curve_twist -> shape_stroke -> canvas -> sketch -> vectorize -> sketchy
-  -> draw -> convert -> sketchpad-package). **Any new drawable
+  -> bristle_stroke -> draw -> convert -> sketchpad-package). **Any new
+  drawable
   subclass must be added to
   `Collate` after `drawable.R`**, or `devtools::load_all()`/`R CMD check`
   will fail with an "object 'drawable' not found" error.
