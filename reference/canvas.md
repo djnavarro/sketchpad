@@ -76,9 +76,9 @@ exceed that range.
 Other core structure:
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
 [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
-[`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
-[`style()`](https://sketchpad.djnavarro.net/reference/style.md)
+[`style()`](https://sketchpad.djnavarro.net/reference/style.md),
+[`xy()`](https://sketchpad.djnavarro.net/reference/xy.md)
 
 ## Examples
 

@@ -13,8 +13,8 @@ independent of any specific drawable.
   : Parent class for all drawable objects
 - [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) : Draw a
   drawable or sketch
-- [`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md)
-  : A set of polygon vertices
+- [`xy()`](https://sketchpad.djnavarro.net/reference/xy.md) : A set of
+  locations in 2D space
 - [`style()`](https://sketchpad.djnavarro.net/reference/style.md) :
   Graphical style for a drawable object
 

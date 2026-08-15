@@ -34,7 +34,6 @@
 <url><loc>https://sketchpad.djnavarro.net/reference/noise_bridge.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/noise_field.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/noise_sample.html</loc></url>
-<url><loc>https://sketchpad.djnavarro.net/reference/point_set.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/points_raw.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_bezier.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/shape_bezier_ribbon.html</loc></url>
@@ -46,5 +45,6 @@
 <url><loc>https://sketchpad.djnavarro.net/reference/sketch.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/sketchpad-package.html</loc></url>
 <url><loc>https://sketchpad.djnavarro.net/reference/style.html</loc></url>
+<url><loc>https://sketchpad.djnavarro.net/reference/xy.html</loc></url>
 </urlset>
 

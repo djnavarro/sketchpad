@@ -132,8 +132,8 @@ Other core structure:
 [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md),
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
 [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
-[`point_set()`](https://sketchpad.djnavarro.net/reference/point_set.md),
-[`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md)
+[`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
+[`xy()`](https://sketchpad.djnavarro.net/reference/xy.md)
 
 ## Examples
 

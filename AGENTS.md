@@ -93,8 +93,11 @@ how the API got here, see
   convention of silent, documented inertness for style properties that
   don’t universally apply (e.g. `fill` itself already has no effect for
   `"path"`/`"points"`-geometry drawables).
-- **`point_set`** – a polygon’s vertices (`x`/`y` numeric vectors, equal
-  length). Named `point_set` rather than `points` so the exported
+- **`xy`** – a collection of locations in 2D space (`x`/`y` numeric
+  vectors, equal length); not tied to any particular geometric
+  interpretation (polygon vertices, an open path, unconnected points, …)
+  – that meaning comes from whichever `drawable` produced it, via its
+  `geometry` property. Named `xy` rather than `points` so the exported
   constructor doesn’t mask
   [`graphics::points()`](https://rdrr.io/r/graphics/points.html); every
   `drawable`’s `points` *property* (see below) is still called `points`,
@@ -187,8 +190,8 @@ how the API got here, see
 - **`curve_line`** – an open polyline through an arbitrary number (at
   least two) of control points `(x, y)`, connected by straight segments
   in order. Unlike every other drawable, its `points` getter does no
-  computation at all (`point_set(x = self@x, y = self@y)` directly), so
-  there’s no `n` argument.
+  computation at all (`xy(x = self@x, y = self@y)` directly), so there’s
+  no `n` argument.
 - **`curve_spiral`** – centroid (`x`/`y`) + `radius_start`/`radius_end`
   - `turns` + `n`; angle sweeps `2 * pi * turns` radians while radius
     interpolates linearly from `radius_start` to `radius_end`, giving an
@@ -514,9 +517,9 @@ full debugging narrative):
   It would mask
   [`graphics::points()`](https://rdrr.io/r/graphics/points.html) on
   [`library(sketchpad)`](https://sketchpad.djnavarro.net/). The class is
-  named `point_set` instead; the `points` *property* every `drawable`
-  exposes keeps its original name, since accessing it via `@points`
-  never shadows the base function.
+  named `xy` instead; the `points` *property* every `drawable` exposes
+  keeps its original name, since accessing it via `@points` never
+  shadows the base function.
 - **[`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) tiles
   containing *multiple* shapes can render visibly distorted once the
   tile actually repeats.** Found while building
@@ -609,8 +612,8 @@ full debugging narrative):
   already exist, but not the `noise_field` class itself).
   `shape_twist.R` needs `noise_bridge` to exist for its own
   `path_distortion` property default.
-- `R/style.R`, `R/point_set.R`, `R/drawable.R` – foundation classes, in
-  load order (each depends on the previous).
+- `R/style.R`, `R/xy.R`, `R/drawable.R` – foundation classes, in load
+  order (each depends on the previous).
 - `R/shape_bezier.R`, `R/shape_bezier_ribbon.R`, `R/curve_bezier.R`,
   `R/curve_line.R`, `R/curve_spiral.R`, `R/curve_scribble.R`,
   `R/shape_raw.R`, `R/curve_raw.R`, `R/points_raw.R`,
@@ -651,8 +654,8 @@ full debugging narrative):
   [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html),
   and the `globalVariables("properties")` workaround.
 - `DESCRIPTION`’s `Collate` field pins the load order above explicitly
-  (fill -\> noise_field -\> noise_bridge -\> style -\> point_set -\>
-  drawable -\> shape_bezier -\> shape_bezier_ribbon -\> curve_bezier -\>
+  (fill -\> noise_field -\> noise_bridge -\> style -\> xy -\> drawable
+  -\> shape_bezier -\> shape_bezier_ribbon -\> curve_bezier -\>
   curve_line -\> curve_spiral -\> curve_scribble -\> shape_raw -\>
   curve_raw -\> points_raw -\> shape_circle -\> shape_blob -\>
   shape_ribbon -\> shape_twist -\> curve_twist -\> canvas -\> sketch -\>
@@ -688,8 +691,8 @@ full debugging narrative):
   matching the pkgdown reference category it belongs to (see
   `_pkgdown.yml`), so its `.Rd` page’s “See Also” section cross-links
   its category siblings: `@family core structure` for
-  `sketch`/`drawable`/ `draw`/`point_set`/`style`; `@family 2D shapes`
-  for every `shape_*()` constructor; `@family 1D curves` for every
+  `sketch`/`drawable`/ `draw`/`xy`/`style`; `@family 2D shapes` for
+  every `shape_*()` constructor; `@family 1D curves` for every
   `curve_*()` constructor; `@family 0D points` for
   [`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md);
   `@family fill helpers` for every `fill_*()` constructor;
