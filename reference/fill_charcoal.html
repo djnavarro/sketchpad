@@ -134,12 +134,13 @@ use as the <code>fill</code> argument to <code><a href="https://rdrr.io/r/grid/g
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Found, while prototyping <code><a href="shape_stroke.html">shape_stroke()</a></code>'s interior texture, to be a
 substantially better fit than <code><a href="fill_scribble.html">fill_scribble()</a></code> for a curved stroke's
-body – <code><a href="fill_scribble.html">fill_scribble()</a></code>'s fixed horizontal/vertical direction doesn't
-track a curved path's own tangent (see the "Deferred: arbitrary angle
-for <code><a href="fill_scribble.html">fill_scribble()</a></code>" item in <code>.agents/PLAN.md</code>), producing hatching
-that visibly cuts across the stroke at odd angles wherever the path
-bends, while <code><a href="fill_noise.html">fill_noise()</a></code>'s directionless mottling has no orientation
-to clash with the curve.</p>
+body – <code><a href="fill_scribble.html">fill_scribble()</a></code>'s <code>angle</code> is a single fixed value for the
+whole tile (and only tiles exactly seamlessly at a multiple of 90
+degrees; see its "Known limitation" docs section), so it can't track a
+curved path's own continuously-varying tangent, producing hatching that
+visibly cuts across the stroke at odd angles wherever the path bends,
+while <code><a href="fill_noise.html">fill_noise()</a></code>'s directionless mottling has no orientation to
+clash with the curve.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

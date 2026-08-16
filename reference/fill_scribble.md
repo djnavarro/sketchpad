@@ -12,7 +12,7 @@ hand-drawn scribble texture built from genuinely continuous strokes.
 ``` r
 fill_scribble(
   color = "black",
-  direction = c("horizontal", "vertical"),
+  angle = 0,
   n_lines = 5L,
   n_harmonics = 3L,
   amplitude = 0.35,
@@ -34,10 +34,15 @@ fill_scribble(
   (the default) colours every line the same, matching the original
   behaviour. Default `"black"`.
 
-- direction:
+- angle:
 
-  Either `"horizontal"` (lines run left-right) or `"vertical"` (lines
-  run top-bottom). Default `"horizontal"`.
+  Line angle in degrees, measured counterclockwise from horizontal
+  (matching
+  [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+  own `angle` convention). `0`/`90`/`180`/`270` (the old
+  `direction = "horizontal"`/`"vertical"`) tile exactly seamlessly; any
+  other angle rotates the tile content as an approximation only – see
+  "Known limitation" below. Default `0`.
 
 - n_lines:
 
@@ -121,25 +126,31 @@ polygon-in-a-genuinely-repeated-tile issue documented at
 [`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md),
 open-line content showed no clipping or distortion in testing).
 
-## Known limitation – direction is fixed, not an arbitrary angle
+## Known limitation – arbitrary angle is only approximate
 
 Every other angled helper
 ([`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)/[`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)/
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md))
 achieves an arbitrary angle by reshaping the *tile* itself (via
 `hatch_tile_dims()`) around content that's a plain corner-to-corner
-diagonal. That trick was tried here first and found not to generalize:
-reshaping the tile around a *wandering* line just anisotropically
-stretches its wiggle rather than rotating it, since the line's content
-isn't a bare diagonal the tile shape can reinterpret. A genuinely
-rotated wandering line would need the tile built as a rotated/sheared
-parallelogram with edge-matching worked out for a curve rather than a
-segment – no such technique exists in this package yet. `direction` is
-therefore restricted to `"horizontal"` (lines run left-right, periodic
-tiling along that axis) or `"vertical"` (lines run top-bottom instead,
-i.e. `along`/`across` from `scribble_lines()` mapped to `y`/`x` rather
-than `x`/`y`) – there is no `angle` argument. Revisit if a real sketch
-needs an arbitrary angle.
+diagonal. That trick doesn't generalize here: reshaping the tile around
+a *wandering* line just anisotropically stretches its wiggle rather than
+rotating it, since the line's content isn't a bare diagonal the tile
+shape can reinterpret. A genuinely rotated wandering line would need the
+tile built as a rotated/sheared parallelogram with edge-matching worked
+out for a curve rather than a segment – no such technique exists in this
+package. At `angle` a multiple of 90 degrees, `fill_scribble()` instead
+swaps/reflects the `along`/`across` axes directly (no trigonometry
+involved), so tiling stays exactly seamless – this is what
+`angle = 0`/`90` (the old `direction = "horizontal"`/`"vertical"`)
+already relied on, now extended to `180`/`270` for free. Any other
+`angle` instead rotates the whole tile's content about its own centre,
+which is only an approximation: the underlying wandering line is
+periodic along its own local axis, not around an arbitrary rotated one,
+so a non-right-angle rotation can leave a visible seam where adjacent
+tile copies meet, and may leave small gaps near the tile corners that no
+line's wiggle reaches. Revisit if a real sketch needs a genuinely
+seamless arbitrary angle.
 
 ## See also
 
@@ -168,9 +179,17 @@ Other fill helpers:
 draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
 
 
-# direction = "vertical" runs the wandering lines top-to-bottom instead
+# angle = 90 runs the wandering lines top-to-bottom instead, tiling
+# exactly as seamlessly as angle = 0
 draw(shape_circle(
-  fill = fill_scribble(n_lines = 4L, direction = "vertical", seed = 6602L)
+  fill = fill_scribble(n_lines = 4L, angle = 90, seed = 6602L)
+))
+
+
+# any other angle rotates the tile content -- an approximation only,
+# so a seam can be visible at the tile edges
+draw(shape_circle(
+  fill = fill_scribble(n_lines = 4L, angle = 30, seed = 6602L)
 ))
 
 

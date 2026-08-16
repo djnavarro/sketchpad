@@ -58,7 +58,7 @@ scribble texture built from genuinely continuous strokes.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fill_scribble</span><span class="op">(</span></span>
 <span>  color <span class="op">=</span> <span class="st">"black"</span>,</span>
-<span>  direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"horizontal"</span>, <span class="st">"vertical"</span><span class="op">)</span>,</span>
+<span>  angle <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  n_lines <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  n_harmonics <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  amplitude <span class="op">=</span> <span class="fl">0.35</span>,</span>
@@ -82,9 +82,12 @@ single colour (the default) colours every line the same, matching the
 original behaviour. Default <code>"black"</code>.</p></dd>
 
 
-<dt id="arg-direction">direction<a class="anchor" aria-label="anchor" href="#arg-direction"></a></dt>
-<dd><p>Either <code>"horizontal"</code> (lines run left-right) or
-<code>"vertical"</code> (lines run top-bottom). Default <code>"horizontal"</code>.</p></dd>
+<dt id="arg-angle">angle<a class="anchor" aria-label="anchor" href="#arg-angle"></a></dt>
+<dd><p>Line angle in degrees, measured counterclockwise from
+horizontal (matching <code><a href="fill_hatch.html">fill_hatch()</a></code>'s own <code>angle</code> convention).
+<code>0</code>/<code>90</code>/<code>180</code>/<code>270</code> (the old <code>direction = "horizontal"</code>/<code>"vertical"</code>)
+tile exactly seamlessly; any other angle rotates the tile content as an
+approximation only – see "Known limitation" below. Default <code>0</code>.</p></dd>
 
 
 <dt id="arg-n-lines">n_lines<a class="anchor" aria-label="anchor" href="#arg-n-lines"></a></dt>
@@ -161,24 +164,30 @@ documented at <code><a href="fill_scatter.html">fill_scatter()</a></code>, open-
 distortion in testing).</p>
     </div>
     <div class="section level2">
-    <h2 id="known-limitation-direction-is-fixed-not-an-arbitrary-angle">Known limitation – direction is fixed, not an arbitrary angle<a class="anchor" aria-label="anchor" href="#known-limitation-direction-is-fixed-not-an-arbitrary-angle"></a></h2>
+    <h2 id="known-limitation-arbitrary-angle-is-only-approximate">Known limitation – arbitrary angle is only approximate<a class="anchor" aria-label="anchor" href="#known-limitation-arbitrary-angle-is-only-approximate"></a></h2>
 
 
 <p>Every other angled helper (<code><a href="fill_hatch.html">fill_hatch()</a></code>/<code><a href="fill_crosshatch.html">fill_crosshatch()</a></code>/
 <code><a href="fill_stripe.html">fill_stripe()</a></code>) achieves an arbitrary angle by reshaping the <em>tile</em>
 itself (via <code>hatch_tile_dims()</code>) around content that's a plain
-corner-to-corner diagonal. That trick was tried here first and found
-not to generalize: reshaping the tile around a <em>wandering</em> line just
-anisotropically stretches its wiggle rather than rotating it, since
-the line's content isn't a bare diagonal the tile shape can
-reinterpret. A genuinely rotated wandering line would need the tile
-built as a rotated/sheared parallelogram with edge-matching worked
-out for a curve rather than a segment – no such technique exists in
-this package yet. <code>direction</code> is therefore restricted to <code>"horizontal"</code>
-(lines run left-right, periodic tiling along that axis) or
-<code>"vertical"</code> (lines run top-bottom instead, i.e. <code>along</code>/<code>across</code> from
-<code>scribble_lines()</code> mapped to <code>y</code>/<code>x</code> rather than <code>x</code>/<code>y</code>) – there is
-no <code>angle</code> argument. Revisit if a real sketch needs an arbitrary
+corner-to-corner diagonal. That trick doesn't generalize here:
+reshaping the tile around a <em>wandering</em> line just anisotropically
+stretches its wiggle rather than rotating it, since the line's content
+isn't a bare diagonal the tile shape can reinterpret. A genuinely
+rotated wandering line would need the tile built as a rotated/sheared
+parallelogram with edge-matching worked out for a curve rather than a
+segment – no such technique exists in this package. At <code>angle</code> a
+multiple of 90 degrees, <code>fill_scribble()</code> instead swaps/reflects the
+<code>along</code>/<code>across</code> axes directly (no trigonometry involved), so tiling
+stays exactly seamless – this is what <code>angle = 0</code>/<code>90</code> (the old
+<code>direction = "horizontal"</code>/<code>"vertical"</code>) already relied on, now
+extended to <code>180</code>/<code>270</code> for free. Any other <code>angle</code> instead rotates
+the whole tile's content about its own centre, which is only an
+approximation: the underlying wandering line is periodic along its own
+local axis, not around an arbitrary rotated one, so a non-right-angle
+rotation can leave a visible seam where adjacent tile copies meet, and
+may leave small gaps near the tile corners that no line's wiggle
+reaches. Revisit if a real sketch needs a genuinely seamless arbitrary
 angle.</p>
     </div>
     <div class="section level2">
@@ -208,11 +217,19 @@ angle.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_scribble</span><span class="op">(</span>n_lines <span class="op">=</span> <span class="fl">4L</span>, seed <span class="op">=</span> <span class="fl">6602L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_scribble-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># direction = "vertical" runs the wandering lines top-to-bottom instead</span></span></span>
+<span class="r-in"><span><span class="co"># angle = 90 runs the wandering lines top-to-bottom instead, tiling</span></span></span>
+<span class="r-in"><span><span class="co"># exactly as seamlessly as angle = 0</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_scribble</span><span class="op">(</span>n_lines <span class="op">=</span> <span class="fl">4L</span>, direction <span class="op">=</span> <span class="st">"vertical"</span>, seed <span class="op">=</span> <span class="fl">6602L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_scribble</span><span class="op">(</span>n_lines <span class="op">=</span> <span class="fl">4L</span>, angle <span class="op">=</span> <span class="fl">90</span>, seed <span class="op">=</span> <span class="fl">6602L</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_scribble-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># any other angle rotates the tile content -- an approximation only,</span></span></span>
+<span class="r-in"><span><span class="co"># so a seam can be visible at the tile edges</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_scribble</span><span class="op">(</span>n_lines <span class="op">=</span> <span class="fl">4L</span>, angle <span class="op">=</span> <span class="fl">30</span>, seed <span class="op">=</span> <span class="fl">6602L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_scribble-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># more harmonics and higher amplitude give a more agitated scribble</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
@@ -223,7 +240,7 @@ angle.</p>
 <span class="r-in"><span>    seed <span class="op">=</span> <span class="fl">6602L</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="fill_scribble-3.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="fill_scribble-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># a colour vector is recycled across the wandering lines</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
@@ -233,7 +250,7 @@ angle.</p>
 <span class="r-in"><span>    seed <span class="op">=</span> <span class="fl">6602L</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="fill_scribble-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="fill_scribble-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -833,9 +833,14 @@ dots/stamps,
 [`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)
 (wandering lines built from random integer-frequency sine harmonics via
 the internal `scribble_lines()` helper – periodic by construction, so
-tiles with no seam; `direction` is fixed to `"horizontal"` or
-`"vertical"` only, not an arbitrary angle – see its “Known limitation”
-docs section; `color` recycles across the `n_lines` wandering lines),
+tiles with no seam; `angle` a multiple of 90 degrees (the old
+`direction = "horizontal"`/`"vertical"`, now generalized to
+`0`/`90`/`180`/`270`) swaps/ reflects the `along`/`across` axes directly
+and stays exactly seamless, while any other `angle` rotates the tile
+content about its own centre as an approximation only, since a genuinely
+seamless arbitrary-angle rotation of a wandering-line tile has no known
+technique in this package – see its “Known limitation” docs section;
+`color` recycles across the `n_lines` wandering lines),
 [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)
 (a rasterised `ambient` simplex/fractal field, sampled on a torus for
 seamless tiling),
