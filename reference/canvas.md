@@ -76,6 +76,7 @@ exceed that range.
 Other core structure:
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
 [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
+[`group()`](https://sketchpad.djnavarro.net/reference/group.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md),
 [`xy()`](https://sketchpad.djnavarro.net/reference/xy.md)

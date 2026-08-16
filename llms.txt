@@ -63,6 +63,8 @@ independent of any specific drawable.
   locations in 2D space
 - [`style()`](https://sketchpad.djnavarro.net/reference/style.md) :
   Graphical style for a drawable object
+- [`group()`](https://sketchpad.djnavarro.net/reference/group.md) : A
+  nested collection of drawables sharing one transform/style
 
 ## Two-dimensional shapes
 

@@ -59,6 +59,7 @@ Other core structure:
 [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md),
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
 [`drawable()`](https://sketchpad.djnavarro.net/reference/drawable.md),
+[`group()`](https://sketchpad.djnavarro.net/reference/group.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md)
 

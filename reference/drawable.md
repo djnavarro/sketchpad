@@ -131,6 +131,7 @@ not at construction time.
 Other core structure:
 [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md),
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md),
+[`group()`](https://sketchpad.djnavarro.net/reference/group.md),
 [`sketch()`](https://sketchpad.djnavarro.net/reference/sketch.md),
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md),
 [`xy()`](https://sketchpad.djnavarro.net/reference/xy.md)
