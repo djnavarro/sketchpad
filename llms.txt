@@ -64,7 +64,7 @@ independent of any specific drawable.
 - [`style()`](https://sketchpad.djnavarro.net/reference/style.md) :
   Graphical style for a drawable object
 
-## 2D shapes
+## Two-dimensional shapes
 
 Closed, fillable `drawable`s (`geometry = "polygon"`).
 
@@ -107,7 +107,7 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
   [`shape_wedges()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)
   : A pie-slice wedge
 
-## 1D curves
+## One-dimensional curves
 
 Open, stroked `drawable`s (`geometry = "path"`).
 
@@ -133,7 +133,7 @@ Open, stroked `drawable`s (`geometry = "path"`).
   [`curve_twists()`](https://sketchpad.djnavarro.net/reference/curve_twist.md)
   : An open, wandering path following a random walk
 
-## 0D points
+## Zero-dimensional points
 
 Unconnected marker `drawable`s (`geometry = "points"`).
 
@@ -141,7 +141,7 @@ Unconnected marker `drawable`s (`geometry = "points"`).
   [`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
   : A scatter of points defined directly by their coordinates
 
-## Noise helpers
+## Noise tools
 
 Scalar noise fields used to distort a shape’s points, used by
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)/[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md).
@@ -153,7 +153,7 @@ Scalar noise fields used to distort a shape’s points, used by
 - [`noise_sample()`](https://sketchpad.djnavarro.net/reference/noise_sample.md)
   : Sample a noise object
 
-## Fill helpers
+## Fill tools
 
 Textures and patterns for
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md)’s `fill`
@@ -194,10 +194,10 @@ argument, used by 2D shapes.
 - [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
   : Vignette fill
 
-## Transform helpers
+## Transformation tools
 
-Affine transformations applied to a `drawable`’s computed `points`, used
-by every `drawable`’s `trans` property.
+Transformations applied to a `drawable`’s computed `points`, used by
+every `drawable`’s `trans` property.
 
 - [`trans()`](https://sketchpad.djnavarro.net/reference/trans.md) : A 2D
   affine transformation
@@ -220,7 +220,7 @@ by every `drawable`’s `trans` property.
 - [`trans_warp()`](https://sketchpad.djnavarro.net/reference/trans_warp.md)
   : A non-rigid, noise-based deformation
 
-## Effects
+## Effects tools
 
 Helpers that compose several drawables together for a particular visual
 effect, rather than constructing a single drawable.
