@@ -300,18 +300,18 @@ how the API got here, see
   `.agents/PLAN.md` for compositional techniques (layered jitter,
   textured fill) that build on top of it without further class changes.
   `pathlike` (its `x`/`y` are the pre-resampling control points).
-- **[`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)**
-  – not its own S7 class; a plain function (`R/shape_ribbonpath.R`) that
+- **[`shape_strokepath()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)**
+  – not its own S7 class; a plain function (`R/shape_strokepath.R`) that
   builds a `shape_stroke` from an arbitrary `curve_*()` drawable’s own
   computed `points` (i.e. any `drawable` with `geometry == "path"`,
-  validated by the internal `validate_ribbonpath_path()` helper):
+  validated by the internal `validate_strokepath_path()` helper):
   `path@points@x`/`@y` are passed straight through as
   [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
   own `x`/`y`. This is the general “ribbon around an arbitrary curve”
   replacement for the earlier `shape_bezier_ribbon()` (removed) – unlike
   that class’s single shared offset direction (only accurate for a
   nearly-straight backbone),
-  [`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+  [`shape_strokepath()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)
   inherits
   [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
   true per-point unit normals for free, so it renders correctly for any
@@ -322,12 +322,16 @@ how the API got here, see
   `shape_stroke`, it’s already `pathlike` with no extra work, and
   [`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md)/[`effect_bristle()`](https://sketchpad.djnavarro.net/reference/effect_bristle.md)
   apply to it unchanged.
-  [`shape_ribbonpaths()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+  [`shape_strokepaths()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)
   is its vectorized counterpart; since `path` is a single drawable
   object per shape rather than a numeric vector, it needs no list-column
   convention – a single shared `path` recycles automatically via
   `vectorize_shapes()`’s existing rules, the same way a shared
-  `distortion` does.
+  `distortion` does. Named to share
+  [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
+  own prefix (rather than the earlier `shape_ribbonpath()`), since it’s
+  a thin wrapper around that same constructor with a different backbone
+  source, not a conceptually distinct shape.
 - **`shape_bezier`** – outline follows a Bezier curve through an
   arbitrary number of control points (`x`/`y`), evaluated via the
   Bernstein polynomial basis (internal `bernstein()` helper, *not* De
@@ -342,7 +346,7 @@ how the API got here, see
   path instead, see `curve_bezier`. The original’s separate
   `bezier_ribbon` drawable was ported as `shape_bezier_ribbon`, then
   later removed in favor of the more general
-  [`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+  [`shape_strokepath()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)
   (see below) once
   [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
   existed to build it on top of. `pathlike`.
@@ -496,7 +500,7 @@ Every closed (`geometry = "polygon"`) drawable’s constructor shares the
 [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md),
 [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
 [`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
-[`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
+[`shape_strokepath()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)
 (a plain function wrapping
 [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
 not its own class – see “Class hierarchy” above), and the trivial
@@ -1289,8 +1293,8 @@ full debugging narrative):
   constructor shape. `shape_stroke.R` needs no such sharing either –
   it’s the last concrete `drawable` subclass, collated right after
   `curve_twist.R`.
-- `R/shape_ribbonpath.R` –
-  [`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)/[`shape_ribbonpaths()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md),
+- `R/shape_strokepath.R` –
+  [`shape_strokepath()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)/[`shape_strokepaths()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md),
   plain functions (not S7 classes) that build a tapered, noise-modulated
   ribbon by feeding an arbitrary `curve_*()` drawable’s own computed
   `points` into
@@ -1302,7 +1306,7 @@ full debugging narrative):
   position doesn’t actually matter, the same way `vectorize.R`’s
   doesn’t.
 - `R/canvas.R` – the `canvas` class, collated right after
-  `R/shape_ribbonpath.R` since it has no dependency on `drawable`
+  `R/shape_strokepath.R` since it has no dependency on `drawable`
   itself, only on `fill_class` (from `fill.R`); `sketch.R` needs
   `canvas` to exist for its own `canvas` property.
 - `R/sketch.R` – the `sketch` class, three `+` methods:
@@ -1373,7 +1377,7 @@ full debugging narrative):
   points_raw -\> shape_circle -\> shape_rectangle -\> shape_polygon -\>
   shape_ellipse -\> shape_wedge -\> curve_arc -\> shape_blob -\>
   shape_ribbon -\> shape_twist -\> curve_twist -\> shape_stroke -\>
-  shape_ribbonpath -\> canvas -\> sketch -\> vectorize -\> effects -\>
+  shape_strokepath -\> canvas -\> sketch -\> vectorize -\> effects -\>
   effect_tremor -\> effect_bristle -\> draw -\> effect_grain -\> convert
   -\> save -\> sketchpad-package). **Any new drawable subclass must be
   added to `Collate` after `drawable.R`**, or

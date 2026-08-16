@@ -48,12 +48,12 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
 - [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   [`shape_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   : A tapered ribbon between two points
-- [`shape_ribbonpath()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
-  [`shape_ribbonpaths()`](https://sketchpad.djnavarro.net/reference/shape_ribbonpath.md)
-  : A ribbon following an arbitrary curve
 - [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
   [`shape_strokes()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
   : A tapered, pressure-modulated stroke along an arbitrary path
+- [`shape_strokepath()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)
+  [`shape_strokepaths()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)
+  : A ribbon following an arbitrary curve
 - [`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
   [`shape_twists()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
   : A twisted ribbon following a random path
