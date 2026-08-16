@@ -272,26 +272,29 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `.agents/PLAN.md` for compositional techniques (layered jitter,
   textured fill) that build on top of it without further class changes.
   `pathlike` (its `x`/`y` are the pre-resampling control points).
-- **`shape_ribbonpath()`** -- not its own S7 class; a plain function
-  (`R/shape_ribbonpath.R`) that builds a `shape_stroke` from an arbitrary
+- **`shape_strokepath()`** -- not its own S7 class; a plain function
+  (`R/shape_strokepath.R`) that builds a `shape_stroke` from an arbitrary
   `curve_*()` drawable's own computed `points` (i.e. any `drawable` with
   `geometry == "path"`, validated by the internal
-  `validate_ribbonpath_path()` helper): `path@points@x`/`@y` are passed
+  `validate_strokepath_path()` helper): `path@points@x`/`@y` are passed
   straight through as `shape_stroke()`'s own `x`/`y`. This is the
   general "ribbon around an arbitrary curve" replacement for the earlier
   `shape_bezier_ribbon()` (removed) -- unlike that class's single shared
   offset direction (only accurate for a nearly-straight backbone),
-  `shape_ribbonpath()` inherits `shape_stroke()`'s true per-point unit
+  `shape_strokepath()` inherits `shape_stroke()`'s true per-point unit
   normals for free, so it renders correctly for any backbone shape,
   including ones that loop or bend sharply (`curve_twist()`,
   `curve_spiral()`), not just a Bezier curve. Since the object it returns
   is literally a `shape_stroke`, it's already `pathlike` with no extra
   work, and `effect_tremor()`/`effect_bristle()` apply to it unchanged.
-  `shape_ribbonpaths()` is its vectorized counterpart; since `path` is a
+  `shape_strokepaths()` is its vectorized counterpart; since `path` is a
   single drawable object per shape rather than a numeric vector, it needs
   no list-column convention -- a single shared `path` recycles
   automatically via `vectorize_shapes()`'s existing rules, the same way a
-  shared `distortion` does.
+  shared `distortion` does. Named to share `shape_stroke()`'s own prefix
+  (rather than the earlier `shape_ribbonpath()`), since it's a thin
+  wrapper around that same constructor with a different backbone source,
+  not a conceptually distinct shape.
 - **`shape_bezier`** -- outline follows a Bezier curve through an
   arbitrary number of control points (`x`/`y`), evaluated via the
   Bernstein polynomial basis (internal `bernstein()` helper, *not* De
@@ -303,7 +306,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   curve's last point connects straight back to its first) -- for the
   same curve as an open path instead, see `curve_bezier`. The original's
   separate `bezier_ribbon` drawable was ported as `shape_bezier_ribbon`,
-  then later removed in favor of the more general `shape_ribbonpath()`
+  then later removed in favor of the more general `shape_strokepath()`
   (see below) once `shape_stroke()` existed to build it on top of.
   `pathlike`.
 - **`curve_bezier`** -- the first `curve_*()`-prefixed drawable: an open
@@ -424,7 +427,7 @@ Every closed (`geometry = "polygon"`) drawable's constructor shares the
 `shape_*` prefix (`shape_circle()`, `shape_rectangle()`/`shape_square()`,
 `shape_polygon()`, `shape_ellipse()`, `shape_wedge()`, `shape_blob()`,
 `shape_ribbon()`, `shape_twist()`, `shape_stroke()`, `shape_bezier()`,
-`shape_ribbonpath()` (a plain function wrapping `shape_stroke()`, not its
+`shape_strokepath()` (a plain function wrapping `shape_stroke()`, not its
 own class -- see "Class hierarchy" above), and the trivial `shape_raw()`),
 mirroring the `fill_*()` family below -- this groups the
 "produces a closed drawable polygon" functions under one discoverable,
@@ -1029,7 +1032,7 @@ full debugging narrative):
   three form a parallel "raw" family with the same trivial constructor
   shape. `shape_stroke.R` needs no such sharing either -- it's the last
   concrete `drawable` subclass, collated right after `curve_twist.R`.
-- `R/shape_ribbonpath.R` -- `shape_ribbonpath()`/`shape_ribbonpaths()`,
+- `R/shape_strokepath.R` -- `shape_strokepath()`/`shape_strokepaths()`,
   plain functions (not S7 classes) that build a tapered, noise-modulated
   ribbon by feeding an arbitrary `curve_*()` drawable's own computed
   `points` into `shape_stroke()` (see "Class hierarchy" above). Collated
@@ -1037,7 +1040,7 @@ full debugging narrative):
   -- though as an ordinary function, its exact `Collate` position doesn't
   actually matter, the same way `vectorize.R`'s doesn't.
 - `R/canvas.R` -- the `canvas` class, collated right after
-  `R/shape_ribbonpath.R` since it
+  `R/shape_strokepath.R` since it
   has no dependency on `drawable` itself, only on `fill_class` (from
   `fill.R`); `sketch.R` needs `canvas` to exist for its own `canvas`
   property.
@@ -1098,7 +1101,7 @@ full debugging narrative):
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
-  curve_twist -> shape_stroke -> shape_ribbonpath -> canvas -> sketch ->
+  curve_twist -> shape_stroke -> shape_strokepath -> canvas -> sketch ->
   vectorize -> effects
   -> effect_tremor -> effect_bristle -> draw -> effect_grain -> convert ->
   save -> sketchpad-package). **Any new drawable
