@@ -30,6 +30,7 @@ Config/testthat/edition: 3
 Remotes: 
     djnavarro/waeponwifestre
 Collate: 'fill.R'
+    'palette.R'
     'noise_field.R'
     'noise_bridge.R'
     'trans.R'
@@ -66,3 +67,5 @@ Collate: 'fill.R'
     'effect_grain.R'
     'convert.R'
     'sketchpad-package.R'
+Depends: 
+    R (>= 3.5)

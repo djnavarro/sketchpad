@@ -62,3 +62,11 @@ reference:
   contents:
   - starts_with("effect_")
 
+- title: Palette tools
+  desc: >
+    Functions returning a plain character vector of colours, for use in
+    `style()`'s `color`/`fill` arguments or any `fill_*()` helper's own
+    colour vector.
+  contents:
+  - starts_with("palette_")
+
