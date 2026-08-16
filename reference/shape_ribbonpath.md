@@ -158,6 +158,14 @@ draw(shape_ribbonpath(
 ))
 
 
+# a ribbon around a spiral -- a backbone shape_ribbon()/shape_twist()'s
+# shared single offset direction couldn't render correctly
+draw(shape_ribbonpath(
+  curve_spiral(radius_start = 0.1, radius_end = 1, turns = 3),
+  width = 0.1, fill = fill_charcoal()
+))
+
+
 draw(shape_ribbonpaths(
   path = list(
     curve_bezier(x = c(0, 0.25, 0.75, 1), y = c(0, 1, -1, 0)),

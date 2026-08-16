@@ -29,4 +29,8 @@ Other transform helpers:
 trans_identity()
 #> <sketchpad::trans>
 #>  @ matrix: num [1:3, 1:3] 1 0 0 0 1 0 0 0 1
+
+# the default trans for every drawable -- points are left unchanged
+draw(shape_rectangle(width = 1.5, height = 0.6, trans = trans_identity()))
+
 ```

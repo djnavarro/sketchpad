@@ -37,4 +37,20 @@ Other transform helpers:
 ``` r
 draw(shape_square(side = 1, trans = trans_rotate(pi / 4)))
 
+
+# overlay the original (faded) with the rotated copy (solid)
+original <- shape_rectangle(width = 1.5, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+draw(sketch() + original + (original + trans_rotate(pi / 6)))
+
+
+# rotating about a pivot away from the shape's own centroid sweeps it
+# around that point instead -- shown here against a fixed frame, with
+# a small marker at the pivot
+square <- shape_square(x = 2, side = 0.5, fill_alpha = 0.3, color_alpha = 0.3)
+pivot <- shape_circle(radius = 0.05, fill = "tomato", color = NA_character_)
+draw(
+  sketch() + square + (square + trans_rotate(pi / 2, about_x = 0, about_y = 0)) + pivot,
+  xlim = c(-2.5, 2.5), ylim = c(-2.5, 2.5)
+)
+
 ```

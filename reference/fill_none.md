@@ -57,4 +57,9 @@ Other fill helpers:
 ``` r
 draw(shape_circle(fill = fill_none(), linewidth = 2))
 
+
+# still a closed outline: the edge from the last point back to the
+# first is drawn even though the interior isn't filled
+draw(shape_polygon(n = 5L, fill = fill_none(), color = "steelblue", linewidth = 3))
+
 ```

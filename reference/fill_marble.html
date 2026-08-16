@@ -177,6 +177,16 @@ same mismatch would produce in a plain opacity fade.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_marble</span><span class="op">(</span>stripes <span class="op">=</span> <span class="fl">4L</span>, seed <span class="op">=</span> <span class="fl">1274L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_marble-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># more stripes and stronger warp give busier, more tangled veining</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_marble</span><span class="op">(</span>stripes <span class="op">=</span> <span class="fl">8L</span>, warp <span class="op">=</span> <span class="fl">8</span>, seed <span class="op">=</span> <span class="fl">1274L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_marble-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># a different colour pair changes the veining's contrast entirely</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_marble</span><span class="op">(</span>color1 <span class="op">=</span> <span class="st">"black"</span>, color2 <span class="op">=</span> <span class="st">"goldenrod"</span>, stripes <span class="op">=</span> <span class="fl">4L</span>, seed <span class="op">=</span> <span class="fl">1274L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_marble-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

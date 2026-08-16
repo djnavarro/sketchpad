@@ -129,4 +129,13 @@ draw(shape_stroke(
   fill = fill_charcoal(), color = NA_character_
 ))
 
+
+# a lighter tone and a curved backbone -- fill_charcoal()'s directionless
+# mottling tracks a bend that fill_scribble()'s fixed direction wouldn't
+t <- seq(0, 2 * pi, length.out = 200)
+draw(shape_stroke(
+  x = t, y = sin(t), width = 0.3,
+  fill = fill_charcoal(color = "gray40"), color = NA_character_
+))
+
 ```

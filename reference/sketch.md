@@ -114,4 +114,16 @@ s[1]
 #>  .. @ xlim      : NULL
 #>  .. @ ylim      : NULL
 #>  .. @ clip      : logi FALSE
+
+# a trans applied to a sketch composes onto every shape's own @trans
+draw(s + trans_rotate(pi / 6))
+
+
+# accumulate many shapes in a loop, e.g. a ring of circles
+ring <- sketch()
+for (angle in seq(0, 2 * pi, length.out = 9)[-9]) {
+  ring <- ring + shape_circle(x = cos(angle), y = sin(angle), radius = 0.3)
+}
+draw(ring)
+
 ```

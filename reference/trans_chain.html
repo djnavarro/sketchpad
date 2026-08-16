@@ -96,6 +96,37 @@ costs a little efficiency, not correctness.</p>
 <code><a href="trans_warp.html">trans_warp()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># combining an affine trans with a trans_warp produces a trans_chain,</span></span></span>
+<span class="r-in"><span><span class="co"># applied in the order given by +</span></span></span>
+<span class="r-in"><span><span class="va">chained</span> <span class="op">&lt;-</span> <span class="fu"><a href="trans_rotate.html">trans_rotate</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="trans_warp.html">trans_warp</a></span><span class="op">(</span>amount <span class="op">=</span> <span class="fl">0.08</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">chained</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;sketchpad::trans_chain&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ steps:List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ : &lt;sketchpad::trans&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..@ matrix: num [1:3, 1:3] 0.866 0.5 0 -0.5 0.866 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ : &lt;sketchpad::trans_warp&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..@ amount      : num 0.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..@ distortion_x: &lt;sketchpad::noise_field&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ noise    : function (x, y = NULL, z = NULL, t = NULL, frequency = 1, seed = NULL, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ...)  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ fractal  : function (base, new, strength, ...)  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ frequency: num 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ octaves  : int 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ seed     : int 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..@ distortion_y: &lt;sketchpad::noise_field&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ noise    : function (x, y = NULL, z = NULL, t = NULL, frequency = 1, seed = NULL, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ...)  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ fractal  : function (base, new, strength, ...)  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ frequency: num 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ octaves  : int 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. .. @ seed     : int 2</span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_rectangle.html">shape_rectangle</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">1.5</span>, height <span class="op">=</span> <span class="fl">0.6</span>, trans <span class="op">=</span> <span class="va">chained</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="trans_chain-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

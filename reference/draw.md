@@ -42,4 +42,13 @@ draw(shape_circle(radius = 1))
 s <- sketch() + shape_circle(radius = 1) + shape_blob(x = 2, radius = 0.5)
 draw(s)
 
+
+# an explicit xlim/ylim overrides both the sketch's own canvas and the
+# range of its shapes' own points, useful for zooming in/out or padding
+draw(shape_circle(radius = 1), xlim = c(-2, 2), ylim = c(-2, 2))
+
+
+# a non-drawable object is ignored, with a warning, rather than erroring
+draw("not a drawable")
+#> Warning: Non-drawable objects ignored by draw()
 ```

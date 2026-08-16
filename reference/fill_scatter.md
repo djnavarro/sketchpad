@@ -152,4 +152,10 @@ draw(shape_circle(
   fill = fill_scatter(unit = shape_circle(radius = 1), n = 8L, size = 0.15)
 ))
 
+
+# any small drawable works as the scattered unit, e.g. a triangle
+draw(shape_circle(
+  fill = fill_scatter(unit = shape_polygon(n = 3L, fill = "steelblue"), n = 10L, size = 0.2)
+))
+
 ```

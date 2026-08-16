@@ -178,6 +178,15 @@ use as the <code>fill</code> argument to <code><a href="https://rdrr.io/r/grid/g
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_charcoal-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># a lighter tone and a curved backbone -- fill_charcoal()'s directionless</span></span></span>
+<span class="r-in"><span><span class="co"># mottling tracks a bend that fill_scribble()'s fixed direction wouldn't</span></span></span>
+<span class="r-in"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_stroke.html">shape_stroke</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">0.3</span>,</span></span>
+<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_charcoal</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray40"</span><span class="op">)</span>, color <span class="op">=</span> <span class="cn">NA_character_</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_charcoal-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

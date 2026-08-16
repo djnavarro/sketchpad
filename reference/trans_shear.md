@@ -39,4 +39,13 @@ Other transform helpers:
 ``` r
 draw(shape_square(side = 1, trans = trans_shear(shx = 0.5)))
 
+
+# overlay the original (faded) with the sheared copy (solid)
+original <- shape_rectangle(width = 1, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+draw(sketch() + original + (original + trans_shear(shx = 0.6)))
+
+
+# shy shears vertically instead of horizontally
+draw(shape_square(side = 1, trans = trans_shear(shy = 0.5)))
+
 ```

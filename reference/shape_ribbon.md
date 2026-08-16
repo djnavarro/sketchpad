@@ -112,6 +112,25 @@ Other 2D shapes:
 draw(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1, width = 0.3))
 
 
+# a higher-frequency distortion modulates width more rapidly along the
+# ribbon's length, giving a more textured/organic edge
+draw(shape_ribbon(
+  x = 0, y = 0, xend = 1, yend = 1, width = 0.3,
+  distortion = noise_field(frequency = 8, seed = 99L)
+))
+
+
+draw(shape_ribbon(
+  x = 0, y = 0, xend = 2, yend = 0, width = 0.4,
+  fill = fill_gradient(colors = c("steelblue", "white"))
+))
+
+
 draw(shape_ribbons(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.3))
+
+
+# a fan of ribbons radiating from the origin
+angle <- seq(0, 2 * pi, length.out = 13)[-13]
+draw(shape_ribbons(x = 0, y = 0, xend = cos(angle), yend = sin(angle), width = 0.1))
 
 ```

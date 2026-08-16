@@ -91,4 +91,8 @@ Other fill helpers:
 ``` r
 draw(shape_circle(fill = fill_checker(color1 = "black", color2 = "white")))
 
+
+# a coarser, differently-coloured checkerboard
+draw(shape_circle(fill = fill_checker(color1 = "steelblue", color2 = "white", spacing = 0.4)))
+
 ```

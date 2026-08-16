@@ -191,6 +191,28 @@ that don't universally apply.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ color_alpha: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ fill_alpha : num 1</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># linejoin/linemitre are most visible on a thick-stroked shape with a</span></span></span>
+<span class="r-in"><span><span class="co"># sharp vertex</span></span></span>
+<span class="r-in"><span><span class="va">star</span> <span class="op">&lt;-</span> <span class="fu"><a href="shape_polygon.html">shape_polygon</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5L</span>, radius <span class="op">=</span> <span class="fl">1</span>, fill <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_stroke.html">shape_stroke</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">star</span><span class="op">@</span><span class="va">points</span><span class="op">@</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">star</span><span class="op">@</span><span class="va">points</span><span class="op">@</span><span class="va">y</span>, width <span class="op">=</span> <span class="fl">0.25</span>,</span></span>
+<span class="r-in"><span>  linejoin <span class="op">=</span> <span class="st">"mitre"</span>, linemitre <span class="op">=</span> <span class="fl">1.5</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="style-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># color_alpha/fill_alpha control stroke/fill opacity independently</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  radius <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="st">"tomato"</span>,</span></span>
+<span class="r-in"><span>  color_alpha <span class="op">=</span> <span class="fl">1</span>, fill_alpha <span class="op">=</span> <span class="fl">0.3</span>, linewidth <span class="op">=</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="style-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># lineend only affects a path's free endpoints, not a closed polygon</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="curve_line.html">curve_line</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">15</span>, lineend <span class="op">=</span> <span class="st">"square"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="style-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

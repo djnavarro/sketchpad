@@ -110,4 +110,12 @@ Other fill helpers:
 ``` r
 draw(shape_circle(fill = fill_stripe(angle = 30)))
 
+
+# width shifts the balance between the two colours within each period
+draw(shape_circle(fill = fill_stripe(color1 = "steelblue", color2 = "white", width = 0.25)))
+
+
+# narrower spacing gives more, thinner stripes
+draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
+
 ```

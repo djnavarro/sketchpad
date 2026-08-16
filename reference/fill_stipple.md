@@ -130,4 +130,8 @@ Other fill helpers:
 ``` r
 draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
 
+
+# more, smaller dots per tile give a denser stipple
+draw(shape_circle(fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)))
+
 ```

@@ -140,4 +140,14 @@ Other fill helpers:
 ``` r
 draw(shape_circle(fill = fill_marble(stripes = 4L, seed = 1274L)))
 
+
+# more stripes and stronger warp give busier, more tangled veining
+draw(shape_circle(fill = fill_marble(stripes = 8L, warp = 8, seed = 1274L)))
+
+
+# a different colour pair changes the veining's contrast entirely
+draw(shape_circle(
+  fill = fill_marble(color1 = "black", color2 = "goldenrod", stripes = 4L, seed = 1274L)
+))
+
 ```

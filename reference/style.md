@@ -174,4 +174,26 @@ style(fill = fill_hatch(angle = 30))
 #>  @ linemitre  : num 10
 #>  @ color_alpha: num 1
 #>  @ fill_alpha : num 1
+
+# linejoin/linemitre are most visible on a thick-stroked shape with a
+# sharp vertex
+star <- shape_polygon(n = 5L, radius = 1, fill = "white")
+draw(shape_stroke(
+  x = star@points@x, y = star@points@y, width = 0.25,
+  linejoin = "mitre", linemitre = 1.5
+))
+
+
+# color_alpha/fill_alpha control stroke/fill opacity independently
+draw(shape_circle(
+  radius = 1, color = "black", fill = "tomato",
+  color_alpha = 1, fill_alpha = 0.3, linewidth = 3
+))
+
+
+# lineend only affects a path's free endpoints, not a closed polygon
+draw(curve_line(
+  x = c(0, 1, 2), y = c(0, 1, 0), linewidth = 15, lineend = "square"
+))
+
 ```

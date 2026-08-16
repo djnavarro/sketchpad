@@ -101,4 +101,14 @@ Other fill helpers:
 ``` r
 draw(shape_circle(fill = fill_crosshatch(angle = 30)))
 
+
+# at a multiple of 90 degrees, the mirrored diagonals would coincide,
+# so a plain horizontal/vertical grid is drawn instead
+draw(shape_circle(fill = fill_crosshatch(angle = 0, spacing = 0.15)))
+
+
+# only angle = 45 gives genuinely perpendicular lines; other angles are
+# symmetric about the horizontal axis but not at right angles
+draw(shape_circle(fill = fill_crosshatch(angle = 20, spacing = 0.12)))
+
 ```

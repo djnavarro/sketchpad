@@ -149,6 +149,16 @@ and a vertical line instead (a simple grid).</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_crosshatch</span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_crosshatch-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># at a multiple of 90 degrees, the mirrored diagonals would coincide,</span></span></span>
+<span class="r-in"><span><span class="co"># so a plain horizontal/vertical grid is drawn instead</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_crosshatch</span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">0</span>, spacing <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_crosshatch-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># only angle = 45 gives genuinely perpendicular lines; other angles are</span></span></span>
+<span class="r-in"><span><span class="co"># symmetric about the horizontal axis but not at right angles</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_crosshatch</span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, spacing <span class="op">=</span> <span class="fl">0.12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_crosshatch-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

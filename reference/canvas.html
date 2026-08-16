@@ -129,12 +129,23 @@ sketch's own shapes, which by construction never exceed that range.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ xlim      : NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ ylim      : NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ clip      : logi FALSE</span>
-<span class="r-in"><span><span class="fu">canvas</span><span class="op">(</span>background <span class="op">=</span> <span class="st">"white"</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, clip <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;sketchpad::canvas&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  @ background: chr "white"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  @ xlim      : num [1:2] -2 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  @ ylim      : num [1:2] -2 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  @ clip      : logi TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># a background is drawn beneath every shape in the sketch</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="sketch.html">sketch</a></span><span class="op">(</span>canvas <span class="op">=</span> <span class="fu">canvas</span><span class="op">(</span>background <span class="op">=</span> <span class="st">"grey90"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="shape_blob.html">shape_blob</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="canvas-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># xlim/ylim alone only fix the coordinate scale -- a shape wider than the</span></span></span>
+<span class="r-in"><span><span class="co"># frame still overflows it</span></span></span>
+<span class="r-in"><span><span class="va">overflowing</span> <span class="op">&lt;-</span> <span class="fu"><a href="sketch.html">sketch</a></span><span class="op">(</span>canvas <span class="op">=</span> <span class="fu">canvas</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  background <span class="op">=</span> <span class="st">"white"</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">1.4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">overflowing</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="canvas-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># clip = TRUE hard-clips content at xlim/ylim instead</span></span></span>
+<span class="r-in"><span><span class="va">overflowing</span><span class="op">@</span><span class="va">canvas</span><span class="op">@</span><span class="va">clip</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">overflowing</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="canvas-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

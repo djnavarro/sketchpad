@@ -50,4 +50,17 @@ noise_bridge(smooth = 5L, seed = 4821L)
 #> <sketchpad::noise_bridge>
 #>  @ smooth: int 5
 #>  @ seed  : int 4821
+
+# more smoothing passes give a gentler bridge; embedding it in
+# shape_twist()'s path_distortion makes the effect easy to see
+draw(shape_twist(
+  x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
+  path_distortion = noise_bridge(smooth = 0L, seed = 7734L)
+))
+
+draw(shape_twist(
+  x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
+  path_distortion = noise_bridge(smooth = 20L, seed = 7734L)
+))
+
 ```

@@ -148,10 +148,36 @@ draw(shape_stroke(
 ))
 
 
+# a few widely-spaced control points give angular corners, since
+# resampling redistributes points but never smooths them
+draw(shape_stroke(x = c(0, 1, 0), y = c(0, 2, 0), width = 0.2))
+
+
+# denser input points (already sampled from a smooth function) give a
+# smoothly curving stroke instead
+t <- seq(0, 2 * pi, length.out = 200)
+draw(shape_stroke(x = t, y = sin(t), width = 0.15, fill = fill_charcoal()))
+
+
+# layer effect_tremor() on top for a hand-drawn ink look
+draw(effect_tremor(
+  shape_stroke(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), width = 0.2, fill_alpha = 0.4),
+  layers = 4L
+))
+
+
 draw(shape_strokes(
   x = list(c(0, 1, 2, 3), c(0, 1, 2, 3)),
   y = list(c(0, 1, 0, 1), c(1, 2, 1, 2)),
   width = 0.3
+))
+
+
+# a shared distortion recycles across every stroke; width can vary too
+draw(shape_strokes(
+  x = list(c(0, 1, 2), c(0, 1, 2)),
+  y = list(c(0, 1, 0), c(2, 3, 2)),
+  width = c(0.15, 0.35)
 ))
 
 ```

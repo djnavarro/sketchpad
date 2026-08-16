@@ -155,6 +155,16 @@ for a repeating pattern of small gradient motifs instead.</p>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_gradient</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"red"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"radial"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_gradient-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># three or more colours interpolate in sequence; angle rotates a linear</span></span></span>
+<span class="r-in"><span><span class="co"># gradient's direction</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_gradient</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"orange"</span>, <span class="st">"red"</span><span class="op">)</span>, angle <span class="op">=</span> <span class="fl">90</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_gradient-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># spacing &lt; 1 repeats the gradient as a small tiled motif instead of one</span></span></span>
+<span class="r-in"><span><span class="co"># smooth sweep across the whole shape</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_gradient</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"steelblue"</span><span class="op">)</span>, spacing <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_gradient-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

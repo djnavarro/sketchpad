@@ -192,6 +192,13 @@ more noticeable, for the same reason described at <code><a href="fill_marble.htm
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_flow</span><span class="op">(</span>warp <span class="op">=</span> <span class="fl">3</span>, seed <span class="op">=</span> <span class="fl">9350L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_flow-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># a larger warp gives a swirlier, more curl-noise-like look; warp = 0</span></span></span>
+<span class="r-in"><span><span class="co"># reduces to plain fill_noise()</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_flow</span><span class="op">(</span>warp <span class="op">=</span> <span class="fl">0</span>, seed <span class="op">=</span> <span class="fl">9350L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_flow-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_flow</span><span class="op">(</span>warp <span class="op">=</span> <span class="fl">6</span>, seed <span class="op">=</span> <span class="fl">9350L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_flow-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -79,6 +79,20 @@ draw(points_raw(
 ))
 
 
+# a random scatter, and the same points converted from a polygon's
+# own outline (only style-related properties survive the round trip)
+draw(points_raw(x = runif(200), y = runif(200)))
+
+draw(S7::convert(shape_blob(radius = 1, distortion = noise_field(seed = 42L)), points_raw))
+
+
+# points_raw() is pathlike, so effect_tremor() can wobble the scatter
+draw(effect_tremor(
+  points_raw(x = seq(0, 1, length.out = 30), y = rep(0.5, 30)),
+  layers = 6L, jitter = 0.08
+))
+
+
 draw(points_raws(
   x = list(seq(0, 1, length.out = 10), seq(0, 1, length.out = 10)),
   y = list(rep(0.25, 10), rep(0.75, 10)),

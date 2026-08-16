@@ -55,4 +55,9 @@ fill_solid("steelblue")
 #> [1] "steelblue"
 draw(shape_circle(fill = fill_solid("tomato")))
 
+
+# equivalent to passing the colour string directly, since style()'s own
+# `fill` default is fill_solid("black")
+draw(shape_circle(fill = "tomato"))
+
 ```

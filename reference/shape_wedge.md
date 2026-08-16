@@ -106,6 +106,20 @@ draw(shape_wedge(start = 0, end = pi / 2))
 draw(shape_wedge(x = 1, y = 1, radius = 0.5, start = pi, end = 2 * pi, color = "darkred"))
 
 
+# a nearly-full sweep gives a pac-man-like shape; the arc always closes
+# straight back to the centroid
+draw(shape_wedge(start = 0, end = 1.9 * pi, fill = "goldenrod"))
+
+
 draw(shape_wedges(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))
+
+
+# a pie chart: adjacent wedges sharing a centroid, one slice per value
+value <- c(30, 20, 50)
+cum <- c(0, cumsum(value)) / sum(value) * 2 * pi
+draw(shape_wedges(
+  start = cum[-length(cum)], end = cum[-1],
+  fill = c("steelblue", "tomato", "goldenrod")
+))
 
 ```
