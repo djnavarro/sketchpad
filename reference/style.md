@@ -26,7 +26,13 @@ style(
 
 - color:
 
-  Stroke colour. Default `"black"`.
+  Stroke colour: a single colour string recognised by
+  [`grDevices::col2rgb()`](https://rdrr.io/r/grDevices/col2rgb.html) (a
+  name, `"#RRGGBB"`/`"#RRGGBBAA"` hex string, ...), or `NA` for a fully
+  transparent stroke. Validated at construction time, rather than only
+  surfacing as a [grid](https://rdrr.io/r/graphics/grid.html) error once
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) is
+  called. Default `"black"`.
 
 - fill:
 

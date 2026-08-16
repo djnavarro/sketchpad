@@ -66,7 +66,11 @@ grid::gpar() when a drawable object is drawn."></head><body>
 
 
 <dl><dt id="arg-color">color<a class="anchor" aria-label="anchor" href="#arg-color"></a></dt>
-<dd><p>Stroke colour. Default <code>"black"</code>.</p></dd>
+<dd><p>Stroke colour: a single colour string recognised by
+<code><a href="https://rdrr.io/r/grDevices/col2rgb.html" class="external-link">grDevices::col2rgb()</a></code> (a name, <code>"#RRGGBB"</code>/<code>"#RRGGBBAA"</code> hex string,
+...), or <code>NA</code> for a fully transparent stroke. Validated at
+construction time, rather than only surfacing as a <a href="https://rdrr.io/r/graphics/grid.html" class="external-link">grid</a> error once
+<code><a href="draw.html">draw()</a></code> is called. Default <code>"black"</code>.</p></dd>
 
 
 <dt id="arg-fill">fill<a class="anchor" aria-label="anchor" href="#arg-fill"></a></dt>
