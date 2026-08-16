@@ -15,25 +15,25 @@ reference:
   - xy
   - style
 
-- title: 2D shapes
+- title: Two-dimensional shapes
   desc: >
     Closed, fillable `drawable`s (`geometry = "polygon"`).
   contents:
   - starts_with("shape_")
 
-- title: 1D curves
+- title: One-dimensional curves
   desc: >
     Open, stroked `drawable`s (`geometry = "path"`).
   contents:
   - starts_with("curve_")
 
-- title: 0D points
+- title: Zero-dimensional points
   desc: >
     Unconnected marker `drawable`s (`geometry = "points"`).
   contents:
   - starts_with("points_raw")
 
-- title: Noise helpers
+- title: Noise tools
   desc: >
     Scalar noise fields used to distort a shape's points, used by
     `shape_blob()`/`shape_ribbon()`/`shape_twist()`.
@@ -42,21 +42,21 @@ reference:
   - noise_bridge
   - noise_sample
 
-- title: Fill helpers
+- title: Fill tools
   desc: >
     Textures and patterns for `style()`'s `fill` argument, used by 2D
     shapes.
   contents:
   - starts_with("fill_")
 
-- title: Transform helpers
+- title: Transformation tools
   desc: >
-    Affine transformations applied to a `drawable`'s computed `points`,
+    Transformations applied to a `drawable`'s computed `points`,
     used by every `drawable`'s `trans` property.
   contents:
   - starts_with("trans")
 
-- title: Effects
+- title: Effects tools
   desc: >
     Helpers that compose several drawables together for a particular
     visual effect, rather than constructing a single drawable.
