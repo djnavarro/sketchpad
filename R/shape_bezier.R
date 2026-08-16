@@ -74,6 +74,15 @@ bezier_curve_points <- function(x, y, n) {
 #' @examples
 #' draw(shape_bezier(x = c(0, 0.5, 1, 0.5), y = c(0, 1, 0, -1)))
 #'
+#' # two control points collapse the curve to a straight-edged polygon
+#' draw(shape_bezier(x = c(0, 1), y = c(0, 1), fill = "steelblue"))
+#'
+#' # more control points give the curve more inflections
+#' draw(shape_bezier(
+#'   x = c(0, 0.3, 0.6, 1, 0.6, 0.3), y = c(0, 1, -1, 0, 1, -1),
+#'   fill = fill_hatch(angle = 60, spacing = 0.08)
+#' ))
+#'
 #' @family 2D shapes
 #' @export
 shape_bezier <- S7::new_class(

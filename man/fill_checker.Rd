@@ -50,6 +50,9 @@ squaring technique \code{\link[=fill_stipple]{fill_stipple()}} uses for its dots
 \examples{
 draw(shape_circle(fill = fill_checker(color1 = "black", color2 = "white")))
 
+# a coarser, differently-coloured checkerboard
+draw(shape_circle(fill = fill_checker(color1 = "steelblue", color2 = "white", spacing = 0.4)))
+
 }
 \seealso{
 Other fill helpers:

@@ -17,6 +17,10 @@
 #' fill_solid("steelblue")
 #' draw(shape_circle(fill = fill_solid("tomato")))
 #'
+#' # equivalent to passing the colour string directly, since style()'s own
+#' # `fill` default is fill_solid("black")
+#' draw(shape_circle(fill = "tomato"))
+#'
 #' @family fill helpers
 #' @export
 fill_solid <- function(color = "black") {
@@ -46,6 +50,10 @@ fill_solid <- function(color = "black") {
 #'
 #' @examples
 #' draw(shape_circle(fill = fill_none(), linewidth = 2))
+#'
+#' # still a closed outline: the edge from the last point back to the
+#' # first is drawn even though the interior isn't filled
+#' draw(shape_polygon(n = 5L, fill = fill_none(), color = "steelblue", linewidth = 3))
 #'
 #' @family fill helpers
 #' @export
@@ -134,6 +142,18 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' @examples
 #' draw(shape_circle(fill = fill_hatch(angle = 30, spacing = 0.15)))
 #'
+#' # a steeper angle and finer spacing
+#' draw(shape_circle(fill = fill_hatch(angle = 75, spacing = 0.06)))
+#'
+#' # exactly horizontal/vertical are handled as a special case (no
+#' # diagonal-tile trick needed)
+#' draw(shape_circle(fill = fill_hatch(angle = 0, spacing = 0.1)))
+#'
+#' # aspect corrects the rendered angle for a non-square bounding box --
+#' # without it, a 45 degree hatch looks skewed on a wide rectangle
+#' draw(shape_rectangle(width = 3, height = 1, fill = fill_hatch(angle = 45)))
+#' draw(shape_rectangle(width = 3, height = 1, fill = fill_hatch(angle = 45, aspect = 3)))
+#'
 #' @family fill helpers
 #' @export
 fill_hatch <- function(color = "black",
@@ -215,6 +235,14 @@ fill_hatch <- function(color = "black",
 #'
 #' @examples
 #' draw(shape_circle(fill = fill_crosshatch(angle = 30)))
+#'
+#' # at a multiple of 90 degrees, the mirrored diagonals would coincide,
+#' # so a plain horizontal/vertical grid is drawn instead
+#' draw(shape_circle(fill = fill_crosshatch(angle = 0, spacing = 0.15)))
+#'
+#' # only angle = 45 gives genuinely perpendicular lines; other angles are
+#' # symmetric about the horizontal axis but not at right angles
+#' draw(shape_circle(fill = fill_crosshatch(angle = 20, spacing = 0.12)))
 #'
 #' @family fill helpers
 #' @export
@@ -301,6 +329,9 @@ fill_crosshatch <- function(color = "black",
 #' @examples
 #' draw(shape_circle(fill = fill_checker(color1 = "black", color2 = "white")))
 #'
+#' # a coarser, differently-coloured checkerboard
+#' draw(shape_circle(fill = fill_checker(color1 = "steelblue", color2 = "white", spacing = 0.4)))
+#'
 #' @family fill helpers
 #' @export
 fill_checker <- function(color1 = "black",
@@ -383,6 +414,9 @@ fill_checker <- function(color1 = "black",
 #'
 #' @examples
 #' draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
+#'
+#' # more, smaller dots per tile give a denser stipple
+#' draw(shape_circle(fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)))
 #'
 #' @family fill helpers
 #' @export
@@ -510,6 +544,11 @@ fill_stipple <- function(color = "black",
 #'   fill = fill_scatter(unit = shape_circle(radius = 1), n = 8L, size = 0.15)
 #' ))
 #'
+#' # any small drawable works as the scattered unit, e.g. a triangle
+#' draw(shape_circle(
+#'   fill = fill_scatter(unit = shape_polygon(n = 3L, fill = "steelblue"), n = 10L, size = 0.2)
+#' ))
+#'
 #' @family fill helpers
 #' @export
 fill_scatter <- function(unit = shape_circle(radius = 1),
@@ -608,6 +647,9 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
 #'
 #' @examples
 #' draw(shape_circle(fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)))
+#'
+#' # a wider radius range gives more size contrast between dots
+#' draw(shape_circle(fill = fill_halftone(radius = c(0.02, 0.22), n = 6L, seed = 3187L)))
 #'
 #' @family fill helpers
 #' @export
@@ -771,6 +813,14 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #'
 #' @examples
 #' draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
+#'
+#' # direction = "vertical" runs the wandering lines top-to-bottom instead
+#' draw(shape_circle(fill = fill_scribble(n_lines = 4L, direction = "vertical", seed = 6602L)))
+#'
+#' # more harmonics and higher amplitude give a more agitated scribble
+#' draw(shape_circle(
+#'   fill = fill_scribble(n_lines = 6L, n_harmonics = 6L, amplitude = 0.6, seed = 6602L)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -947,6 +997,12 @@ torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
 #' @examples
 #' draw(shape_circle(fill = fill_noise(seed = 8843L)))
 #'
+#' # higher frequency/octaves give finer-grained texture
+#' draw(shape_circle(fill = fill_noise(frequency = 4, octaves = 4L, seed = 8843L)))
+#'
+#' # a lower alpha lets the shape's own outline/background show through more
+#' draw(shape_circle(fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)))
+#'
 #' @family fill helpers
 #' @export
 fill_noise <- function(color = "black",
@@ -1044,6 +1100,14 @@ fill_noise <- function(color = "black",
 #'
 #' @examples
 #' draw(shape_circle(fill = fill_marble(stripes = 4L, seed = 1274L)))
+#'
+#' # more stripes and stronger warp give busier, more tangled veining
+#' draw(shape_circle(fill = fill_marble(stripes = 8L, warp = 8, seed = 1274L)))
+#'
+#' # a different colour pair changes the veining's contrast entirely
+#' draw(shape_circle(
+#'   fill = fill_marble(color1 = "black", color2 = "goldenrod", stripes = 4L, seed = 1274L)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -1160,6 +1224,11 @@ fill_marble <- function(color1 = "white",
 #' @examples
 #' draw(shape_circle(fill = fill_flow(warp = 3, seed = 9350L)))
 #'
+#' # a larger warp gives a swirlier, more curl-noise-like look; warp = 0
+#' # reduces to plain fill_noise()
+#' draw(shape_circle(fill = fill_flow(warp = 0, seed = 9350L)))
+#' draw(shape_circle(fill = fill_flow(warp = 6, seed = 9350L)))
+#'
 #' @family fill helpers
 #' @export
 fill_flow <- function(color = "black",
@@ -1272,6 +1341,14 @@ fill_flow <- function(color = "black",
 #'   fill = fill_charcoal(), color = NA_character_
 #' ))
 #'
+#' # a lighter tone and a curved backbone -- fill_charcoal()'s directionless
+#' # mottling tracks a bend that fill_scribble()'s fixed direction wouldn't
+#' t <- seq(0, 2 * pi, length.out = 200)
+#' draw(shape_stroke(
+#'   x = t, y = sin(t), width = 0.3,
+#'   fill = fill_charcoal(color = "gray40"), color = NA_character_
+#' ))
+#'
 #' @family fill helpers
 #' @export
 fill_charcoal <- function(color = "gray15",
@@ -1338,6 +1415,11 @@ fill_charcoal <- function(color = "gray15",
 #' @examples
 #' img <- matrix(c("red", "white", "white", "blue"), nrow = 2)
 #' draw(shape_circle(fill = fill_image(img, preserve_aspect = FALSE)))
+#'
+#' # a non-square image, letterboxed (default) vs. stretched to fill the tile
+#' wide_img <- matrix(c("red", "white", "blue"), nrow = 1)
+#' draw(shape_rectangle(width = 2, height = 1, fill = fill_image(wide_img)))
+#' draw(shape_rectangle(width = 2, height = 1, fill = fill_image(wide_img, preserve_aspect = FALSE)))
 #'
 #' @family fill helpers
 #' @export
@@ -1449,6 +1531,14 @@ fill_image <- function(image,
 #' draw(shape_circle(fill = fill_gradient(c("white", "steelblue"))))
 #' draw(shape_circle(fill = fill_gradient(c("yellow", "red"), type = "radial")))
 #'
+#' # three or more colours interpolate in sequence; angle rotates a linear
+#' # gradient's direction
+#' draw(shape_circle(fill = fill_gradient(c("yellow", "orange", "red"), angle = 90)))
+#'
+#' # spacing < 1 repeats the gradient as a small tiled motif instead of one
+#' # smooth sweep across the whole shape
+#' draw(shape_circle(fill = fill_gradient(c("white", "steelblue"), spacing = 0.3)))
+#'
 #' @family fill helpers
 #' @export
 fill_gradient <- function(colors = c("white", "black"),
@@ -1544,6 +1634,10 @@ fill_gradient <- function(colors = c("white", "black"),
 #' @examples
 #' draw(shape_circle(fill = fill_vignette(color = "black")))
 #'
+#' # a non-NA background reveals a solid colour underneath the fade,
+#' # instead of true transparency
+#' draw(shape_circle(fill = fill_vignette(color = "steelblue", background = "white")))
+#'
 #' @family fill helpers
 #' @export
 fill_vignette <- function(color = "black",
@@ -1629,6 +1723,12 @@ fill_vignette <- function(color = "black",
 #'
 #' @examples
 #' draw(shape_circle(fill = fill_stripe(angle = 30)))
+#'
+#' # width shifts the balance between the two colours within each period
+#' draw(shape_circle(fill = fill_stripe(color1 = "steelblue", color2 = "white", width = 0.25)))
+#'
+#' # narrower spacing gives more, thinner stripes
+#' draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
 #'
 #' @family fill helpers
 #' @export

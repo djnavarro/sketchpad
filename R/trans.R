@@ -73,6 +73,11 @@ mat_about <- function(m, about_x, about_y) {
 #' trans_identity()
 #' trans_translate(1, 0) + trans_rotate(pi / 4)
 #'
+#' # overlay a shape's original outline (faded) with a transformed copy
+#' # (solid) to see a trans's effect directly
+#' original <- shape_rectangle(width = 1.5, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+#' draw(sketch() + original + (original + trans_rotate(pi / 6)))
+#'
 #' @family transform helpers
 #' @export
 trans <- S7::new_class(
@@ -123,6 +128,14 @@ trans <- S7::new_class(
 #' @examples
 #' draw(shape_circle(radius = 1, n = 200L, trans = trans_warp(amount = 0.15)))
 #'
+#' # a smaller amount gives a subtler wobble; distortion_x's own frequency
+#' # controls how quickly the warp varies across space
+#' draw(shape_circle(radius = 1, n = 200L, trans = trans_warp(amount = 0.03)))
+#' draw(shape_circle(
+#'   radius = 1, n = 200L,
+#'   trans = trans_warp(amount = 0.1, distortion_x = noise_field(frequency = 4))
+#' ))
+#'
 #' @family transform helpers
 #' @export
 trans_warp <- S7::new_class(
@@ -162,6 +175,13 @@ trans_warp <- S7::new_class(
 #' costs a little efficiency, not correctness.
 #'
 #' @param steps A list of [trans]/[trans_warp]/`trans_chain` objects.
+#'
+#' @examples
+#' # combining an affine trans with a trans_warp produces a trans_chain,
+#' # applied in the order given by +
+#' chained <- trans_rotate(pi / 6) + trans_warp(amount = 0.08)
+#' chained
+#' draw(shape_rectangle(width = 1.5, height = 0.6, trans = chained))
 #'
 #' @family transform helpers
 #' @export
@@ -299,6 +319,9 @@ method(apply_trans, trans_chain) <- function(object, pts) {
 #' @examples
 #' trans_identity()
 #'
+#' # the default trans for every drawable -- points are left unchanged
+#' draw(shape_rectangle(width = 1.5, height = 0.6, trans = trans_identity()))
+#'
 #' @family transform helpers
 #' @export
 trans_identity <- function() {
@@ -323,6 +346,18 @@ trans_identity <- function() {
 #' @examples
 #' draw(shape_square(side = 1, trans = trans_translate(2, 0)))
 #'
+#' # overlay the original (faded) with the translated copy (solid)
+#' original <- shape_rectangle(width = 1.5, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+#' draw(sketch() + original + (original + trans_translate(1, 0.5)))
+#'
+#' # composition order matters: translate-then-rotate differs from
+#' # rotate-then-translate -- a fixed xlim/ylim makes the difference in
+#' # final position visible (a lone shape otherwise always fills its own
+#' # auto-scaled frame)
+#' square <- shape_square(x = 1, side = 0.4)
+#' draw(square + trans_translate(1, 0) + trans_rotate(pi / 2), xlim = c(-1, 3), ylim = c(-1, 3))
+#' draw(square + trans_rotate(pi / 2) + trans_translate(1, 0), xlim = c(-1, 3), ylim = c(-1, 3))
+#'
 #' @family transform helpers
 #' @export
 trans_translate <- function(dx = 0, dy = 0) {
@@ -341,6 +376,20 @@ trans_translate <- function(dx = 0, dy = 0) {
 #'
 #' @examples
 #' draw(shape_square(side = 1, trans = trans_rotate(pi / 4)))
+#'
+#' # overlay the original (faded) with the rotated copy (solid)
+#' original <- shape_rectangle(width = 1.5, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+#' draw(sketch() + original + (original + trans_rotate(pi / 6)))
+#'
+#' # rotating about a pivot away from the shape's own centroid sweeps it
+#' # around that point instead -- shown here against a fixed frame, with
+#' # a small marker at the pivot
+#' square <- shape_square(x = 2, side = 0.5, fill_alpha = 0.3, color_alpha = 0.3)
+#' pivot <- shape_circle(radius = 0.05, fill = "tomato", color = NA_character_)
+#' draw(
+#'   sketch() + square + (square + trans_rotate(pi / 2, about_x = 0, about_y = 0)) + pivot,
+#'   xlim = c(-2.5, 2.5), ylim = c(-2.5, 2.5)
+#' )
 #'
 #' @family transform helpers
 #' @export
@@ -363,6 +412,20 @@ trans_rotate <- function(angle, about_x = 0, about_y = 0) {
 #' @examples
 #' draw(shape_square(side = 1, trans = trans_scale(2)))
 #' draw(shape_square(side = 1, trans = trans_scale(2, 0.5)))
+#'
+#' # overlay the original (faded) with the scaled copy (solid)
+#' original <- shape_rectangle(width = 1.5, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+#' draw(sketch() + original + (original + trans_scale(1.5, 0.7)))
+#'
+#' # scaling about a pivot other than the shape's own centroid also moves
+#' # it, since distance from the pivot is what gets scaled -- shown here
+#' # against a fixed frame, with a small marker at the pivot
+#' square <- shape_square(x = 1, side = 0.5, fill_alpha = 0.3, color_alpha = 0.3)
+#' pivot <- shape_circle(radius = 0.05, fill = "tomato", color = NA_character_)
+#' draw(
+#'   sketch() + square + (square + trans_scale(2, about_x = 0, about_y = 0)) + pivot,
+#'   xlim = c(-3, 3), ylim = c(-3, 3)
+#' )
 #'
 #' @family transform helpers
 #' @export
@@ -395,6 +458,17 @@ trans_scale <- function(sx = 1, sy = sx, about_x = 0, about_y = 0) {
 #' @examples
 #' draw(shape_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0.2), trans = trans_reflect(x = TRUE)))
 #'
+#' # overlay the original (faded) with each reflected copy (solid)
+#' original <- shape_rectangle(x = 1, width = 1, height = 0.4, fill_alpha = 0.3, color_alpha = 0.3)
+#' draw(sketch() + original + (original + trans_reflect(x = TRUE)))
+#' draw(sketch() + original + (original + trans_reflect(y = TRUE)))
+#'
+#' # reflecting through both axes is equivalent to a half turn
+#' draw(shape_bezier(
+#'   x = c(0, 0.5, 1), y = c(0, 1, 0.2),
+#'   trans = trans_reflect(x = TRUE, y = TRUE)
+#' ))
+#'
 #' @family transform helpers
 #' @export
 trans_reflect <- function(x = FALSE, y = FALSE, about_x = 0, about_y = 0) {
@@ -420,6 +494,13 @@ trans_reflect <- function(x = FALSE, y = FALSE, about_x = 0, about_y = 0) {
 #' @examples
 #' draw(shape_square(side = 1, trans = trans_shear(shx = 0.5)))
 #'
+#' # overlay the original (faded) with the sheared copy (solid)
+#' original <- shape_rectangle(width = 1, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+#' draw(sketch() + original + (original + trans_shear(shx = 0.6)))
+#'
+#' # shy shears vertically instead of horizontally
+#' draw(shape_square(side = 1, trans = trans_shear(shy = 0.5)))
+#'
 #' @family transform helpers
 #' @export
 trans_shear <- function(shx = 0, shy = 0, about_x = 0, about_y = 0) {
@@ -443,6 +524,11 @@ trans_shear <- function(shx = 0, shy = 0, about_x = 0, about_y = 0) {
 #' @examples
 #' # equivalent to trans_scale(2, 3)
 #' trans_affine(matrix(c(2, 0, 0, 0, 3, 0, 0, 0, 1), nrow = 3, byrow = TRUE))
+#'
+#' # the 2x3 form omits the trivial homogeneous third row
+#' draw(shape_square(
+#'   side = 1, trans = trans_affine(matrix(c(2, 0, 0, 0, 3, 0), nrow = 2, byrow = TRUE))
+#' ))
 #'
 #' @family transform helpers
 #' @export

@@ -25,6 +25,13 @@
 #' @examples
 #' draw(curve_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0)))
 #'
+#' # unlike shape_bezier(), the curve stops at its last control point
+#' # rather than closing back to the first
+#' draw(curve_bezier(x = c(0, 0.25, 0.75, 1), y = c(0, 1, -1, 0), linewidth = 3))
+#'
+#' # a ribbon can be built around any curve_*() path with shape_ribbonpath()
+#' draw(shape_ribbonpath(curve_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0)), width = 0.15))
+#'
 #' @family 1D curves
 #' @export
 curve_bezier <- S7::new_class(

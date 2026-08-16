@@ -17,6 +17,10 @@
 #' @examples
 #' draw(shape_ellipse(x_radius = 2, y_radius = 1))
 #' draw(shape_ellipse(x = 1, y = 1, x_radius = 0.5, y_radius = 1, n = 6L, color = "darkred"))
+#' draw(shape_ellipse(x_radius = 2, y_radius = 1, fill = fill_gradient(angle = 90)))
+#'
+#' # rotating an ellipse (rather than swapping its radii) tilts its axes
+#' draw(shape_ellipse(x_radius = 2, y_radius = 0.7, trans = trans_rotate(pi / 6)))
 #'
 #' @family 2D shapes
 #' @export
@@ -78,6 +82,10 @@ shape_ellipse <- S7::new_class(
 #'
 #' @examples
 #' draw(shape_ellipses(x = 1:3, x_radius = c(0.5, 1, 1.5), y_radius = 0.5))
+#' draw(shape_ellipses(
+#'   x = 0, y = 0, x_radius = 1, y_radius = 0.3,
+#'   trans = purrr::map(seq(0, pi, length.out = 6), trans_rotate)
+#' ))
 #'
 #' @family 2D shapes
 #' @export

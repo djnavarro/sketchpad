@@ -72,7 +72,20 @@ draw time), since \code{style()} is shared across every \code{geometry}.
 \examples{
 draw(curve_spiral(radius_start = 0, radius_end = 1, turns = 4))
 
+# radius_start > radius_end spirals inward instead of outward
+draw(curve_spiral(radius_start = 1, radius_end = 0.1, turns = 5, linewidth = 2))
+
+# equal start/end radii retrace a circle -- rarely useful on its own,
+# but shows turns has no effect on shape when radius doesn't change
+draw(curve_spiral(radius_start = 1, radius_end = 1, turns = 3))
+
 draw(curve_spirals(x = c(0, 3, 6), turns = c(2, 3, 4)))
+
+# nested spirals sharing a centroid, growing radius each time
+draw(curve_spirals(
+  radius_start = seq(0.1, 0.5, length.out = 4),
+  radius_end = seq(0.6, 1, length.out = 4)
+))
 
 }
 \seealso{

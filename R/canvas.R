@@ -39,7 +39,20 @@
 #' @examples
 #' canvas()
 #' canvas(background = "grey90")
-#' canvas(background = "white", xlim = c(-2, 2), ylim = c(-2, 2), clip = TRUE)
+#'
+#' # a background is drawn beneath every shape in the sketch
+#' draw(sketch(canvas = canvas(background = "grey90")) + shape_blob(radius = 1))
+#'
+#' # xlim/ylim alone only fix the coordinate scale -- a shape wider than the
+#' # frame still overflows it
+#' overflowing <- sketch(canvas = canvas(
+#'   background = "white", xlim = c(-1, 1), ylim = c(-1, 1)
+#' )) + shape_circle(radius = 1.4)
+#' draw(overflowing)
+#'
+#' # clip = TRUE hard-clips content at xlim/ylim instead
+#' overflowing@canvas@clip <- TRUE
+#' draw(overflowing)
 #'
 #' @family core structure
 #' @export

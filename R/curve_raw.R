@@ -24,6 +24,13 @@
 #' @examples
 #' draw(curve_raw(x = c(0, 1, 2), y = c(0, 1, 0)))
 #'
+#' # useful for "freezing" a wandering path's own computed points
+#' frozen <- S7::convert(
+#'   curve_twist(x = 0, y = 0, xend = 1, yend = 0, path_distortion = noise_bridge(seed = 99L)),
+#'   curve_raw
+#' )
+#' draw(frozen)
+#'
 #' @family 1D curves
 #' @export
 curve_raw <- S7::new_class(

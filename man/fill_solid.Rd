@@ -26,6 +26,10 @@ accept -- including for its own default -- once it's extended to take
 fill_solid("steelblue")
 draw(shape_circle(fill = fill_solid("tomato")))
 
+# equivalent to passing the colour string directly, since style()'s own
+# `fill` default is fill_solid("black")
+draw(shape_circle(fill = "tomato"))
+
 }
 \seealso{
 Other fill helpers:

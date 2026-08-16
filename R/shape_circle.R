@@ -14,6 +14,8 @@
 #' @examples
 #' draw(shape_circle(radius = 1))
 #' draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6L, color = "darkred"))
+#' draw(shape_circle(radius = 1, fill = "steelblue", color = NA_character_))
+#' draw(shape_circle(radius = 1, fill = fill_hatch(angle = 30)))
 #'
 #' @family 2D shapes
 #' @export
@@ -70,6 +72,14 @@ shape_circle <- S7::new_class(
 #'
 #' @examples
 #' draw(shape_circles(x = 1:3, radius = c(0.5, 1, 1.5)))
+#'
+#' # each argument recycles independently, so colour can vary alongside position
+#' draw(shape_circles(
+#'   x = cos(seq(0, 2 * pi, length.out = 9))[-9],
+#'   y = sin(seq(0, 2 * pi, length.out = 9))[-9],
+#'   radius = 0.3,
+#'   fill = rep(c("tomato", "steelblue"), length.out = 8)
+#' ))
 #'
 #' @family 2D shapes
 #' @export

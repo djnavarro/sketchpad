@@ -64,6 +64,9 @@ boundary.
 \examples{
 draw(shape_circle(fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)))
 
+# a wider radius range gives more size contrast between dots
+draw(shape_circle(fill = fill_halftone(radius = c(0.02, 0.22), n = 6L, seed = 3187L)))
+
 }
 \seealso{
 Other fill helpers:

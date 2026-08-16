@@ -72,6 +72,14 @@ for a repeating pattern of small gradient motifs instead.
 draw(shape_circle(fill = fill_gradient(c("white", "steelblue"))))
 draw(shape_circle(fill = fill_gradient(c("yellow", "red"), type = "radial")))
 
+# three or more colours interpolate in sequence; angle rotates a linear
+# gradient's direction
+draw(shape_circle(fill = fill_gradient(c("yellow", "orange", "red"), angle = 90)))
+
+# spacing < 1 repeats the gradient as a small tiled motif instead of one
+# smooth sweep across the whole shape
+draw(shape_circle(fill = fill_gradient(c("white", "steelblue"), spacing = 0.3)))
+
 }
 \seealso{
 Other fill helpers:

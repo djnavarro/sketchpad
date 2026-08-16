@@ -71,6 +71,11 @@ instead, matching \code{\link[=fill_noise]{fill_noise()}}'s own (always-stretche
 img <- matrix(c("red", "white", "white", "blue"), nrow = 2)
 draw(shape_circle(fill = fill_image(img, preserve_aspect = FALSE)))
 
+# a non-square image, letterboxed (default) vs. stretched to fill the tile
+wide_img <- matrix(c("red", "white", "blue"), nrow = 1)
+draw(shape_rectangle(width = 2, height = 1, fill = fill_image(wide_img)))
+draw(shape_rectangle(width = 2, height = 1, fill = fill_image(wide_img, preserve_aspect = FALSE)))
+
 }
 \seealso{
 Other fill helpers:

@@ -73,7 +73,17 @@ draw time), since \code{style()} is shared across every \code{geometry}.
 \examples{
 draw(curve_arc(start = 0, end = 3 * pi / 2))
 
+# unlike shape_wedge(), there's no centroid vertex or fill -- just the
+# arc itself
+draw(curve_arc(start = pi / 4, end = pi, linewidth = 4, lineend = "round"))
+
+# a start greater than end sweeps clockwise instead of counterclockwise
+draw(curve_arc(start = pi, end = 0))
+
 draw(curve_arcs(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))
+
+# concentric arcs of growing radius, all sweeping the same angle range
+draw(curve_arcs(radius = seq(0.2, 1, length.out = 5), start = 0, end = pi))
 
 }
 \seealso{

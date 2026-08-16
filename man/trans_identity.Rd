@@ -13,6 +13,9 @@ for every \link{drawable}.
 \examples{
 trans_identity()
 
+# the default trans for every drawable -- points are left unchanged
+draw(shape_rectangle(width = 1.5, height = 0.6, trans = trans_identity()))
+
 }
 \seealso{
 Other transform helpers:

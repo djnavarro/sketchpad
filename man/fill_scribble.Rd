@@ -104,6 +104,14 @@ angle.
 \examples{
 draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
 
+# direction = "vertical" runs the wandering lines top-to-bottom instead
+draw(shape_circle(fill = fill_scribble(n_lines = 4L, direction = "vertical", seed = 6602L)))
+
+# more harmonics and higher amplitude give a more agitated scribble
+draw(shape_circle(
+  fill = fill_scribble(n_lines = 6L, n_harmonics = 6L, amplitude = 0.6, seed = 6602L)
+))
+
 }
 \seealso{
 Other fill helpers:

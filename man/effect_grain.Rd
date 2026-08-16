@@ -75,14 +75,22 @@ mottled ink stroke instead of a sparse one.
 }
 \examples{
 t <- seq(0, 8, length.out = 150)
-draw(effect_grain(
-  shape_stroke(x = t, y = sin(t), width = 0.4),
-  color = "gray10", alpha = 0.9
-))
-draw(effect_grain(
-  shape_stroke(x = t, y = sin(t), width = 0.4),
-  color = "gray5", alpha = 0.85, background = "gray30"
-))
+template <- shape_stroke(x = t, y = sin(t), width = 0.4)
+
+# before: a plain filled stroke
+draw(template)
+
+# after: the same outline rendered as textured grain instead of a
+# solid style() fill
+draw(effect_grain(template, color = "gray10", alpha = 0.9))
+
+# a non-NA background reveals a solid colour underneath the grain,
+# instead of true transparency
+draw(effect_grain(template, color = "gray5", alpha = 0.85, background = "gray30"))
+
+# a coarser grain field (lower frequency) reads less like paper texture
+# and more like a mottled brushstroke
+draw(effect_grain(template, grain = noise_field(frequency = 3, seed = 2L)))
 
 }
 \seealso{

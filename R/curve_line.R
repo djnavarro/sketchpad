@@ -21,6 +21,13 @@
 #' @examples
 #' draw(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)))
 #'
+#' # a thick, square-capped line reads very differently from a thin,
+#' # round-capped one
+#' draw(curve_line(x = c(0, 1, 2), y = c(0, 1, 0), linewidth = 12, lineend = "square"))
+#'
+#' # layer several jittered copies for a hand-drawn look
+#' draw(effect_tremor(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)), layers = 5L))
+#'
 #' @family 1D curves
 #' @export
 curve_line <- S7::new_class(
@@ -72,6 +79,12 @@ curve_line <- S7::new_class(
 #' draw(curve_lines(
 #'   x = list(c(0, 1, 1, 2), c(2, 3, 3, 4)),
 #'   y = list(c(0, 1, 0, 1), c(0, 1, 0, 1))
+#' ))
+#'
+#' # a simple hatched grid of crossing lines
+#' draw(curve_lines(
+#'   x = list(c(0, 5), c(0, 5), c(0, 5)),
+#'   y = list(c(0, 5), c(1, 4), c(2, 3))
 #' ))
 #'
 #' @family 1D curves

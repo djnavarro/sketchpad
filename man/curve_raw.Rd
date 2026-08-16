@@ -54,6 +54,13 @@ draw time), since \code{style()} is shared across every \code{geometry}.
 \examples{
 draw(curve_raw(x = c(0, 1, 2), y = c(0, 1, 0)))
 
+# useful for "freezing" a wandering path's own computed points
+frozen <- S7::convert(
+  curve_twist(x = 0, y = 0, xend = 1, yend = 0, path_distortion = noise_bridge(seed = 99L)),
+  curve_raw
+)
+draw(frozen)
+
 draw(curve_raws(
   x = list(c(0, 1, 2), c(2, 3, 4)),
   y = list(c(0, 1, 0), c(0, 1, 0))

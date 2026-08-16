@@ -66,9 +66,20 @@ recycled row, rather than a single drawable.
 \examples{
 draw(shape_rectangle(width = 2, height = 1))
 draw(shape_square(x = 1, y = 1, side = 0.5, color = "darkred"))
+draw(shape_rectangle(width = 2, height = 1, fill = fill_checker()))
+
+# trans_rotate() tilts a rectangle about its own centroid by default
+draw(shape_rectangle(width = 2, height = 0.6, trans = trans_rotate(pi / 8)))
 
 draw(shape_rectangles(x = 1:3, width = c(0.5, 1, 1.5), height = 0.5))
 draw(shape_squares(x = 1:3, side = c(0.5, 1, 1.5)))
+
+# a checkerboard of squares, alternating fill colour
+grid_xy <- expand.grid(x = 1:5, y = 1:3)
+draw(shape_squares(
+  x = grid_xy$x, y = grid_xy$y, side = 0.9,
+  fill = c("grey20", "grey90")[(grid_xy$x + grid_xy$y) \%\% 2 + 1]
+))
 
 }
 \seealso{

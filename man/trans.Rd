@@ -31,6 +31,11 @@ deformation that can't be represented as a matrix) instead produces a
 trans_identity()
 trans_translate(1, 0) + trans_rotate(pi / 4)
 
+# overlay a shape's original outline (faded) with a transformed copy
+# (solid) to see a trans's effect directly
+original <- shape_rectangle(width = 1.5, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+draw(sketch() + original + (original + trans_rotate(pi / 6)))
+
 }
 \seealso{
 Other transform helpers:

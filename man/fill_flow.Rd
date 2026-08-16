@@ -92,6 +92,11 @@ more noticeable, for the same reason described at \code{\link[=fill_marble]{fill
 \examples{
 draw(shape_circle(fill = fill_flow(warp = 3, seed = 9350L)))
 
+# a larger warp gives a swirlier, more curl-noise-like look; warp = 0
+# reduces to plain fill_noise()
+draw(shape_circle(fill = fill_flow(warp = 0, seed = 9350L)))
+draw(shape_circle(fill = fill_flow(warp = 6, seed = 9350L)))
+
 }
 \seealso{
 Other fill helpers:

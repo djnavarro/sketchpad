@@ -82,6 +82,12 @@ avoid.
 \examples{
 draw(shape_circle(fill = fill_noise(seed = 8843L)))
 
+# higher frequency/octaves give finer-grained texture
+draw(shape_circle(fill = fill_noise(frequency = 4, octaves = 4L, seed = 8843L)))
+
+# a lower alpha lets the shape's own outline/background show through more
+draw(shape_circle(fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)))
+
 }
 \seealso{
 Other fill helpers:

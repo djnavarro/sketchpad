@@ -14,6 +14,13 @@
 #' s <- sketch() + shape_circle(radius = 1) + shape_blob(x = 2, radius = 0.5)
 #' draw(s)
 #'
+#' # an explicit xlim/ylim overrides both the sketch's own canvas and the
+#' # range of its shapes' own points, useful for zooming in/out or padding
+#' draw(shape_circle(radius = 1), xlim = c(-2, 2), ylim = c(-2, 2))
+#'
+#' # a non-drawable object is ignored, with a warning, rather than erroring
+#' draw("not a drawable")
+#'
 #' @family core structure
 #' @export
 draw <- S7::new_generic("draw", dispatch_args = "object")
@@ -118,7 +125,7 @@ S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
 
   # plotting area is a single viewport with equal-axis scaling
   if (is.null(xlim)) xlim <- range(object@points@x)
-  if (is.null(ylim)) ylim <- range(object@points@x)
+  if (is.null(ylim)) ylim <- range(object@points@y)
   x_width <- xlim[2] - xlim[1]
   y_width <- ylim[2] - ylim[1]
   vp <- grid::viewport(

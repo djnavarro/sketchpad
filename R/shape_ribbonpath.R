@@ -78,6 +78,13 @@ validate_ribbonpath_path <- function(path) {
 #'   width = 0.15
 #' ))
 #'
+#' # a ribbon around a spiral -- a backbone shape_ribbon()/shape_twist()'s
+#' # shared single offset direction couldn't render correctly
+#' draw(shape_ribbonpath(
+#'   curve_spiral(radius_start = 0.1, radius_end = 1, turns = 3),
+#'   width = 0.1, fill = fill_charcoal()
+#' ))
+#'
 #' @family 2D shapes
 #' @export
 shape_ribbonpath <- function(path,

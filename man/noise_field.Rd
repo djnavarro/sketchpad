@@ -47,6 +47,15 @@ configurable rather than hardcoded to \code{\link[ambient:gen_simplex]{ambient::
 \examples{
 noise_field(frequency = 2, octaves = 3L, seed = 4821L)
 
+# a noise_field's effect is easiest to see through a drawable that
+# samples it -- lower frequency gives broad, gentle undulation, higher
+# frequency a bumpier, more textured one
+draw(shape_blob(radius = 1, range = 0.4, distortion = noise_field(frequency = 0.5, seed = 4821L)))
+draw(shape_blob(radius = 1, range = 0.4, distortion = noise_field(frequency = 6, seed = 4821L)))
+
+# more octaves layer finer detail on top of the base frequency
+draw(shape_blob(radius = 1, range = 0.4, distortion = noise_field(octaves = 6L, seed = 4821L)))
+
 }
 \seealso{
 Other noise helpers:

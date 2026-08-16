@@ -45,8 +45,16 @@ raise an error). The result is a \link{sketch} containing one
 \examples{
 draw(shape_polygon(radius = 1, n = 3L))
 draw(shape_polygon(x = 1, y = 1, radius = 0.5, n = 8L, color = "darkred"))
+draw(shape_polygon(n = 5L, fill = fill_stripe(color1 = "white", color2 = "grey30")))
+
+# rotating a low-n polygon reorients its vertices
+draw(shape_polygon(n = 4L, trans = trans_rotate(pi / 4)))
 
 draw(shape_polygons(x = 1:3, n = c(3L, 4L, 6L)))
+draw(shape_polygons(
+  x = 0, y = 0, radius = seq(3, 0.5, length.out = 6), n = 6L,
+  fill = rep(c("grey20", "grey90"), length.out = 6)
+))
 
 }
 \seealso{

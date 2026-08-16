@@ -60,13 +60,19 @@
 #'
 #' @examples
 #' t <- seq(0, 8, length.out = 200)
-#' draw(effect_bristle(
-#'   shape_stroke(
-#'     x = t, y = sin(t) * 1.2, width = 0.06,
-#'     fill = "black", fill_alpha = 0.4, color = NA_character_
-#'   ),
-#'   n_bristles = 11L, spread = 0.3
-#' ))
+#' template <- shape_stroke(
+#'   x = t, y = sin(t) * 1.2, width = 0.06,
+#'   fill = "black", fill_alpha = 0.4, color = NA_character_
+#' )
+#'
+#' # before: a single plain stroke
+#' draw(template)
+#'
+#' # after: fanned into a dry-brush bristle effect
+#' draw(effect_bristle(template, n_bristles = 11L, spread = 0.3))
+#'
+#' # a wider spread and more fraying gives a rougher, more ragged brush
+#' draw(effect_bristle(template, n_bristles = 15L, spread = 0.5, fray = 0.3))
 #'
 #' @family effects
 #' @export

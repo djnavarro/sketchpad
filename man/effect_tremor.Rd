@@ -66,9 +66,15 @@ down and/or \code{layers} up (on \code{object} and via the \code{layers} argumen
 respectively) for a denser, more overlapping pencil/ink texture.
 }
 \examples{
-draw(effect_tremor(
-  curve_line(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), color_alpha = 0.4)
-))
+template <- curve_line(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1))
+faded <- curve_line(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), color_alpha = 0.4)
+
+# before: a single crisp line
+draw(template)
+
+# after: several jittered, faded copies read as hand-drawn
+draw(effect_tremor(faded))
+
 draw(effect_tremor(
   shape_stroke(
     x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
@@ -76,6 +82,9 @@ draw(effect_tremor(
   ),
   layers = 3L, jitter = 0.03
 ))
+
+# more layers and higher jitter give a denser, shakier scribble
+draw(effect_tremor(faded, layers = 10L, jitter = 0.15))
 
 }
 \seealso{

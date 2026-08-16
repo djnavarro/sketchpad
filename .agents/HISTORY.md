@@ -1945,3 +1945,60 @@ actually built and called at the time, not retroactively updated; this
 entry is the bridge from old names to current ones. Current-state facts
 (what each function is called today) live in `AGENTS.md`, already
 updated throughout.
+
+## Systematic pass to expand `@examples` across every exported topic
+
+Every `@examples` block package-wide (roughly 60 documented topics across
+core structure, `shape_*()`/`curve_*()`/`points_raw()`, `fill_*()`,
+noise helpers, `trans_*()`, and the `effect_*()` family) had previously
+been minimal -- typically the bare default plus one parameter tweak.
+Reworked family-by-family so drawables show a genuine variety of what
+they can produce (parameter ranges, style variations, noise/distortion
+contrasts, and a vectorized-plural example showing recycling), while
+`fill_*()`/`trans_*()`/`effect_*()` examples now demonstrate their effect
+*on* a drawable rather than showing the helper's return value in
+isolation -- most visibly for `trans_*()`, where each example overlays a
+faded "before" copy with a solid "after" copy of the same shape (or, for
+pivot-sensitive transforms, adds a small marker at the pivot and a fixed
+`xlim`/`ylim`, since a lone drawable's own auto-scaled viewport otherwise
+always fills the frame regardless of its actual position).
+
+Every new example line was executed directly (not just `devtools::
+document()`-checked) before being kept, which surfaced several real bugs
+along the way, now fixed as part of this pass:
+
+- **`draw(drawable)`'s own method computed `ylim` from
+  `object@points@x`** (a copy-paste error, not `@y`) -- silently
+  survived until an example needed a non-square single-drawable render
+  with an asymmetric aspect ratio to visibly demonstrate a transform's
+  effect. Fixed to read `@y`.
+- **`noise_bridge`'s `seed` (like `noise_field`'s) is `class_integer`,
+  not `class_numeric`** -- passing a bare `1`/`2`/`3` (rather than
+  `1L`/`2L`/`3L`) inside a `list()` of several distortions (e.g.
+  `shape_blobs()`/`curve_twists()`'s "vary per shape" examples) fails
+  construction with a type-mismatch error. Easy to miss because a
+  *scalar* `seed = 1` elsewhere still works via S7's implicit
+  double-to-integer coercion at the top-level constructor call; it's
+  specifically passing already-*constructed* objects through a plural
+  constructor's own vectorization that exposed it.
+- **`convert()` is S7's own generic, imported into sketchpad's namespace
+  via `#' @import S7` but never re-exported** -- calling bare `convert()`
+  after only `library(sketchpad)` (as `R CMD check`'s example runner
+  does) fails with "could not find function", even though it resolves
+  fine under `devtools::load_all()`/interactive use where `S7` happens to
+  already be attached. Every new example now calls `S7::convert()`
+  explicitly instead.
+- Several `purrr::pmap()`-recycling mistakes in plural-constructor
+  examples (e.g. an 8-shape ring with only 2 fill colours, or 6 polygons
+  with only 2) -- `vectorize_shapes()` requires every vector argument to
+  be either length 1 or the same common length, not modularly recycled;
+  fixed by using `rep(..., length.out = n)` explicitly.
+- A couple of `fill_*()` examples used a parameter name that didn't
+  exist on that particular helper (`fill_stripe()`/`fill_checker()` take
+  `color1`/`color2`, not `color`; `fill_gradient()` takes `colors`, not
+  `color`) -- each silently partial-matched or errored rather than
+  producing wrong output, so straightforward to catch by actually
+  running the code.
+
+No class/behavior changes beyond the four bug fixes above; this was
+documentation content work, not an API change.

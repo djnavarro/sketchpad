@@ -21,6 +21,14 @@ are \emph{not} automatically collapsed into one matrix when they're already
 part of a chain (only a bare \code{trans + trans} collapses); this only
 costs a little efficiency, not correctness.
 }
+\examples{
+# combining an affine trans with a trans_warp produces a trans_chain,
+# applied in the order given by +
+chained <- trans_rotate(pi / 6) + trans_warp(amount = 0.08)
+chained
+draw(shape_rectangle(width = 1.5, height = 0.6, trans = chained))
+
+}
 \seealso{
 Other transform helpers:
 \code{\link[=trans]{trans()}},

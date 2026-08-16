@@ -27,6 +27,14 @@ plane, matching \code{\link[ambient:fracture]{ambient::fracture()}}'s own interf
 \examples{
 noise_sample(noise_field(seed = 4821L), x = 1:5, y = 1:5, to = c(0, 1))
 
+# noise_bridge()'s method samples by point count instead of position
+noise_sample(noise_bridge(seed = 4821L), n = 5, scale = 1)
+
+# sampled values can drive a drawable's own geometry, e.g. shape_blob()'s
+# radius perturbation (see its `points` getter)
+angle <- seq(0, 2 * pi, length.out = 12)
+noise_sample(noise_field(seed = 4821L), x = cos(angle), y = sin(angle), to = c(0.8, 1.2))
+
 }
 \seealso{
 Other noise helpers:

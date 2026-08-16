@@ -14,6 +14,15 @@
 #' @examples
 #' draw(shape_raw(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1)))
 #'
+#' # any polygon can be "frozen" to a shape_raw by converting it
+#' frozen <- S7::convert(shape_blob(radius = 1, distortion = noise_field(seed = 5150L)), shape_raw)
+#' draw(frozen)
+#'
+#' draw(shape_raw(
+#'   x = c(0, 1, 0.5), y = c(0, 0, 1),
+#'   fill = "goldenrod", color = "black", linewidth = 2
+#' ))
+#'
 #' @family 2D shapes
 #' @export
 shape_raw <- S7::new_class(
