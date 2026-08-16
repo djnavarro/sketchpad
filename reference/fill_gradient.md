@@ -11,7 +11,7 @@ depending on `type`.
 
 ``` r
 fill_gradient(
-  colors = c("white", "black"),
+  color = c("white", "black"),
   type = c("linear", "radial"),
   angle = 45,
   stops = NULL,
@@ -23,7 +23,7 @@ fill_gradient(
 
 ## Arguments
 
-- colors:
+- color:
 
   Two or more colours to interpolate between.
 
@@ -38,8 +38,8 @@ fill_gradient(
 
 - stops:
 
-  Colour stop positions, as a numeric vector the same length as
-  `colors`, or `NULL` to space them evenly (the default used by
+  Colour stop positions, as a numeric vector the same length as `color`,
+  or `NULL` to space them evenly (the default used by
   [`grid::linearGradient()`](https://rdrr.io/r/grid/patterns.html)/[`grid::radialGradient()`](https://rdrr.io/r/grid/patterns.html)).
   Default `NULL`.
 

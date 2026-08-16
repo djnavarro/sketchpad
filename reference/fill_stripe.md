@@ -9,7 +9,7 @@ two colours to an arbitrary palette.
 
 ``` r
 fill_stripe(
-  colors = c("black", "white"),
+  color = c("black", "white"),
   angle = 45,
   spacing = 0.2,
   aspect = 1,
@@ -19,7 +19,7 @@ fill_stripe(
 
 ## Arguments
 
-- colors:
+- color:
 
   Two or more stripe colours, one equal-width band each (see details for
   biasing band widths). Default `c("black", "white")`.
@@ -31,7 +31,7 @@ fill_stripe(
 
 - spacing:
 
-  One full period through all of `colors`, as a fraction of the target's
+  One full period through all of `color`, as a fraction of the target's
   bounding box. Must be a positive number. Default `0.2`.
 
 - aspect:
@@ -78,9 +78,9 @@ around this gradient, but only once, as a single square
 does by default – not to create repetition, which the gradient already
 provides.
 
-Each of the `n = length(colors)` colours gets an equal-width band by
+Each of the `n = length(color)` colours gets an equal-width band by
 default (`1/n` of the period); there's no separate argument for unequal
-bands – repeat a colour in `colors` instead (e.g.
+bands – repeat a colour in `color` instead (e.g.
 `c("steelblue", "steelblue", "white")` gives a 2:1 ratio between the two
 colours), which reuses the same recycling mechanism rather than adding a
 second one.
@@ -112,7 +112,7 @@ draw(shape_circle(fill = fill_stripe(angle = 30)))
 
 
 # repeating a colour biases the band widths, rather than a separate argument
-draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "steelblue", "white"))))
+draw(shape_circle(fill = fill_stripe(color = c("steelblue", "steelblue", "white"))))
 
 
 # narrower spacing gives more, thinner stripes
@@ -120,6 +120,6 @@ draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
 
 
 # three or more colours repeat through the same period
-draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "white", "tomato"), angle = 30)))
+draw(shape_circle(fill = fill_stripe(color = c("steelblue", "white", "tomato"), angle = 30)))
 
 ```

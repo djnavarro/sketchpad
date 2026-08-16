@@ -232,3 +232,14 @@ effect, rather than constructing a single drawable.
 - [`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md)
   : Layer jittered copies of a drawable for a hand-drawn look
 
+## Palette tools
+
+Functions returning a plain character vector of colours, for use in
+[`style()`](https://sketchpad.djnavarro.net/reference/style.md)’s
+`color`/`fill` arguments or any `fill_*()` helper’s own colour vector.
+
+- [`palette_cosine()`](https://sketchpad.djnavarro.net/reference/palette_cosine.md)
+  : Colour palette from a linear cosine formula
+- [`palette_manual()`](https://sketchpad.djnavarro.net/reference/palette_manual.md)
+  : Colour palette drawn from a curated collection
+

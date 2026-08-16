@@ -19,7 +19,7 @@ fill_scatter(
   unit = shape_circle(radius = 1),
   n = 6L,
   size = 0.2,
-  colors = NULL,
+  color = NULL,
   spacing = 1,
   aspect = 1,
   seed = 1L,
@@ -45,7 +45,7 @@ fill_scatter(
   `unit`'s rescaled size, as a `"npc"` fraction of the tile. Must be a
   number strictly between `0` and `1`. Default `0.2`.
 
-- colors:
+- color:
 
   `NULL`, or one or more colours overriding `unit@style@color` for each
   stamp, recycled (in order, not randomly) across the `n` copies. `NULL`
@@ -167,9 +167,9 @@ draw(shape_circle(
 ))
 
 
-# a colors vector overrides unit's own style colour, recycled per stamp
+# a color vector overrides unit's own style colour, recycled per stamp
 draw(shape_circle(
-  fill = fill_scatter(colors = c("steelblue", "tomato", "goldenrod"), n = 9L, size = 0.15)
+  fill = fill_scatter(color = c("steelblue", "tomato", "goldenrod"), n = 9L, size = 0.15)
 ))
 
 ```

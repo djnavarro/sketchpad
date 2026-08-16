@@ -616,13 +616,13 @@ closed [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html)
 `color` accepts a vector recycled across its two lines),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)
 (a checkerboard generalized from two colours to an `n x n` grid,
-`n = length(colors)`),
+`n = length(color)`),
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md)
-(equal-width alternating bands, one per `colors` entry, via a
+(equal-width alternating bands, one per `color` entry, via a
 self-repeating hard-stop
 [`grid::linearGradient()`](https://rdrr.io/r/grid/patterns.html), not
-tile repetition – repeat a colour in `colors` to bias band widths,
-rather than a separate width argument),
+tile repetition – repeat a colour in `color` to bias band widths, rather
+than a separate width argument),
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)
 (scattered dots / arbitrary drawables / randomised-radius dots, all
 seeded via
@@ -635,7 +635,7 @@ docs;
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)’s
 `color` and
 [`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)’s
-`colors` each recycle a vector deterministically across the scattered
+`color` each recycle a vector deterministically across the scattered
 dots/stamps,
 [`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)’s
 `NULL` default still colouring every stamp from `unit`’s own style),
@@ -703,15 +703,19 @@ base S3 class `"GridPattern"`.
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),
 and
 [`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)
-all accept a vector of colours (an arbitrary-length `colors` argument
-for
-[`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)/[`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md)/[`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md),
-replacing their old `color1`/`color2` pair – a breaking rename with no
-deprecation shim, since this is a pre-1.0 package with no other
-consumers in this workspace; a widened `color`/`colors` accepting one
-*or more* colours everywhere else, fully backward compatible with a
-single string). Two distinct generalization patterns are used, matching
-what each helper’s existing multiplicity already was:
+all accept a vector of colours via a single `color` argument – named
+`colors` (plural) on
+[`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)/[`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md)/
+[`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md)/[`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md)
+during initial development (replacing
+[`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)/[`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md)/[`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md)’s
+older `color1`/`color2` pair), then renamed to `color` everywhere for
+consistency with every other `fill_*()` helper – a breaking rename with
+no deprecation shim, since this is a pre-1.0 package with no other
+consumers in this workspace. Every `fill_*()` helper’s colour-vector
+argument is `color`, fully backward compatible with a single string. Two
+distinct generalization patterns are used, matching what each helper’s
+existing multiplicity already was:
 
 - **Discrete repeated elements**
   ([`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)’s
@@ -749,7 +753,7 @@ what each helper’s existing multiplicity already was:
 - **[`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)**
   doesn’t fit either pattern cleanly – a checkerboard’s cell count and
   colour count aren’t independent concepts – so its `n x n` grid grows
-  with `length(colors)` instead: colour index at 0-based cell
+  with `length(color)` instead: colour index at 0-based cell
   `(row, col)` is `((row + col) %% n) + 1`, which reproduces the
   original 2x2 diagonal arrangement exactly for two colours. Three or
   more colours (a 3x3+ grid) can trigger the known multi-shape
@@ -757,8 +761,10 @@ what each helper’s existing multiplicity already was:
   risk” bullet in “Gotchas worth remembering”.
 
 Shared validation for all of these lives in the internal
-`validate_colors(colors, arg_name, min_length = 1)`, alongside
-`validate_fill_args()` (see below).
+`validate_colors(colors, arg_name, min_length = 1)` – an internal
+helper, so its own `colors` formal doesn’t need to match every caller’s
+public `color` argument name, which is passed through as `arg_name` for
+the error message – alongside `validate_fill_args()` (see below).
 
 The unifying design constraint across all of them:
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) tiles are
@@ -791,6 +797,59 @@ Shared argument validation lives in the internal `validate_fill_args()`
 (spacing/aspect, with an optional angle check via `angle = NULL`) and
 `validate_colors()` (a character vector of at least `min_length`, no
 `NA`s – see “Colour-vector generalization” above).
+
+### The `palette_*()` colour-vector family
+
+`R/palette.R` holds two functions, unrelated to any `drawable`/S7 class:
+each returns a plain character vector of `n` hex colours, for use
+anywhere a `fill_*()` helper or
+[`style()`](https://sketchpad.djnavarro.net/reference/style.md) already
+accepts a `color` vector.
+
+- **`palette_manual(n = NULL, index = 1L)`** selects one palette from
+  `manual_palettes`, an internal (`R/sysdata.rda`) vendored,
+  deduplicated copy of the curated palettes at
+  <https://github.com/djnavarro/palettes> (originally 5 CSVs of 5-colour
+  hex palettes each; whole-row exact duplicates across the 5 files were
+  dropped when vendoring, leaving 311 as of the 2026-08-16 vendoring
+  pass – see `data-raw/build_manual_palettes.R`, run by hand to
+  regenerate `manual_palettes` if the source repo changes, not part of
+  the normal package build). `n = NULL` (the default) returns the
+  selected palette’s own colours (5, for every currently vendored
+  palette) unchanged; a supplied `n` interpolates via
+  [`grDevices::colorRampPalette()`](https://rdrr.io/r/grDevices/colorRamp.html),
+  so it can up- or down-sample freely. An out-of-range `index` errors
+  with the actual valid range spliced into the message, rather than a
+  docs-hardcoded count that could drift if the vendored data is
+  regenerated.
+- **`palette_cosine(n, base = NULL, seed = 1L)`** ports the “linear
+  cosine palette” technique described at
+  <https://blog.djnavarro.net/posts/2025-09-14_cosine-palettes/> (itself
+  a minor tweak on Iñigo Quilez’s procedural-palette formula):
+  `f(t) = a + b * cos(2 * pi * (c * t + d))`, with `a = (0.5, 0.5, 0.5)`
+  fixed and `b`/`c`/`d` each an RGB triple sampled with replacement from
+  `base` (`NULL` defaults to `grDevices::colors(distinct = TRUE)`,
+  matching the blog). `seed` defaults to `1L` (always seeded, matching
+  this package’s own convention – e.g. `fill_stipple(seed = 1L)` –
+  rather than the blog’s optional `NULL`), scoped via
+  [`withr::with_seed()`](https://withr.r-lib.org/reference/with_seed.html)
+  exactly as
+  [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)/
+  [`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)
+  already do. Faithfully carries over one quirk from the source
+  algorithm: resulting values are clamped only on the high end
+  (`pal[pal > 1] <- 1`); values below 0 are folded back with
+  [`abs()`](https://rdrr.io/r/base/MathFun.html) rather than clamped to
+  0, occasionally producing a colour “reflected” around black rather
+  than a flat black – documented on the function itself as intentional,
+  not a bug.
+
+Both are ordinary functions (not S7 classes), so – like
+`vectorize.R`/`effects.R` – their exact `Collate` position doesn’t
+actually matter; `R/palette.R` is collated right after `R/fill.R` purely
+for thematic grouping (colour-producing helpers). Neither has a
+vectorized plural form, since each already returns a vector of colours
+rather than a `drawable`.
 
 ### Compositional effects: the `effect_*()` family
 
@@ -1071,7 +1130,7 @@ full debugging narrative):
   [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)’s
   colour-vector generalization hit the same issue for the first time
   when its checkerboard grid grew past 2x2 (the original 2x2/4-rectangle
-  tile always rendered fine; a `colors` vector of length 3 or more, and
+  tile always rendered fine; a `color` vector of length 3 or more, and
   its correspondingly larger grid, can collapse to a single solid colour
   at the default `spacing` – confirmed by re-rendering with
   `spacing = 1`, where the same content renders correctly). Documented
@@ -1135,6 +1194,13 @@ full debugging narrative):
   compile-time dependency on any other class, but `style.R` needs
   [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
   to exist for its own property default.
+- `R/palette.R` – the `palette_*()` colour-vector family
+  ([`palette_manual()`](https://sketchpad.djnavarro.net/reference/palette_manual.md)/[`palette_cosine()`](https://sketchpad.djnavarro.net/reference/palette_cosine.md),
+  see above). Ordinary functions with no dependency on any class,
+  collated right after `fill.R` purely for thematic grouping – like
+  `vectorize.R`, its exact `Collate` position doesn’t actually matter.
+  Uses the internal `manual_palettes` object vendored into
+  `R/sysdata.rda` via `data-raw/build_manual_palettes.R`.
 - `R/noise_field.R` – the `noise_field` class and
   [`noise_sample()`](https://sketchpad.djnavarro.net/reference/noise_sample.md)
   generic, loaded right after `fill.R`: no compile-time dependency on
@@ -1254,9 +1320,9 @@ full debugging narrative):
   [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html),
   and the `globalVariables("properties")` workaround.
 - `DESCRIPTION`’s `Collate` field pins the load order above explicitly
-  (fill -\> noise_field -\> noise_bridge -\> trans -\> style -\> xy -\>
-  drawable -\> shape_bezier -\> curve_bezier -\> curve_line -\>
-  curve_spiral -\> curve_scribble -\> shape_raw -\> curve_raw -\>
+  (fill -\> palette -\> noise_field -\> noise_bridge -\> trans -\> style
+  -\> xy -\> drawable -\> shape_bezier -\> curve_bezier -\> curve_line
+  -\> curve_spiral -\> curve_scribble -\> shape_raw -\> curve_raw -\>
   points_raw -\> shape_circle -\> shape_rectangle -\> shape_polygon -\>
   shape_ellipse -\> shape_wedge -\> curve_arc -\> shape_blob -\>
   shape_ribbon -\> shape_twist -\> curve_twist -\> shape_stroke -\>
@@ -1306,9 +1372,11 @@ full debugging narrative):
   `@family fill helpers` for every `fill_*()` constructor;
   `@family noise helpers` for `noise_field`/
   `noise_bridge`/`noise_sample`; `@family transform helpers` for
-  `trans`/ every `trans_*()` constructor. **Any new drawable, fill
-  helper, noise helper, or transform helper needs the matching `@family`
-  tag added alongside its `@export`.**
+  `trans`/ every `trans_*()` constructor; `@family palette helpers` for
+  [`palette_manual()`](https://sketchpad.djnavarro.net/reference/palette_manual.md)/[`palette_cosine()`](https://sketchpad.djnavarro.net/reference/palette_cosine.md).
+  **Any new drawable, fill helper, noise helper, transform helper, or
+  palette helper needs the matching `@family` tag added alongside its
+  `@export`.**
 
 ## Development workflow
 
