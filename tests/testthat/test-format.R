@@ -71,3 +71,37 @@ test_that("print(sketch) prints format(sketch)'s lines and returns its input inv
   expect_identical(withVisible(print(s)), list(value = s, visible = FALSE))
   expect_output(print(s), format(s)[1], fixed = TRUE)
 })
+
+test_that("format(group) reports shape count, each shape's class, trans, and style", {
+  g <- group() + shape_circle() + shape_blob(distortion = noise_field(seed = 1L))
+  out <- format(g)
+  expect_true(any(grepl("^<group: 2 shapes>$", out)))
+  expect_true(any(grepl("1: shape_circle", out)))
+  expect_true(any(grepl("2: shape_blob", out)))
+  expect_true(any(grepl("trans: identity", out)))
+  expect_true(any(grepl("style: none", out)))
+})
+
+test_that("format(group) handles an empty group and singular/plural shape counts", {
+  expect_true(any(grepl("^<group: 0 shapes>$", format(group()))))
+  expect_true(any(grepl("^<group: 1 shape>$", format(group() + shape_circle()))))
+})
+
+test_that("format(group) reports a nested group member by class name", {
+  nested <- group() + (group() + shape_circle())
+  out <- format(nested)
+  expect_true(any(grepl("1: group", out)))
+})
+
+test_that("format(group) reports a non-identity trans and a style override", {
+  g <- (group() + shape_circle()) + trans_rotate(pi / 6) + style(color = "tomato", linewidth = 2)
+  out <- format(g)
+  expect_true(any(grepl("trans: affine", out)))
+  expect_true(any(grepl("style: color = tomato.*linewidth = 2", out)))
+})
+
+test_that("print(group) prints format(group)'s lines and returns its input invisibly", {
+  g <- group() + shape_circle()
+  expect_identical(withVisible(print(g)), list(value = g, visible = FALSE))
+  expect_output(print(g), format(g)[1], fixed = TRUE)
+})

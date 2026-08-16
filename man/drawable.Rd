@@ -102,6 +102,7 @@ draw(shape_rectangle(
 Other core structure:
 \code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
+\code{\link[=group]{group()}},
 \code{\link[=sketch]{sketch()}},
 \code{\link[=style]{style()}},
 \code{\link[=xy]{xy()}}

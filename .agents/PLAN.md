@@ -15,11 +15,10 @@ the writeup.
 **0.1:**
 - Arbitrary angle for `fill_scribble()`
 - S7 class for `fill` objects
-- A `group` class
 
-(`star`, the last outstanding "additional primitive shapes" item, and
-"Multiple sub-paths and holes per drawable" are now done -- see
-`.agents/HISTORY.md`.)
+(`star`, the last outstanding "additional primitive shapes" item,
+"Multiple sub-paths and holes per drawable", and the `group` class are
+now done -- see `.agents/HISTORY.md`.)
 
 **0.2:**
 - Multi-frame/animation export helpers (and interactivity/event handling,
@@ -108,13 +107,6 @@ to pick up, reject, or refine later -- none are scheduled.
 still open is the concrete `curve_*()` constructor family and whether
 line styling needs to grow beyond the current single `linewidth` -- dash
 patterns, line caps/joins.)
-
-### A `group` class (0.1)
-
-A nested collection of drawables sharing one transform and/or style
-override, distinct from `sketch` (which represents the whole canvas of
-independently-styled shapes). Would pair naturally with the transform
-helpers above -- e.g. rotate a `group` as a unit.
 
 ### Multi-frame/animation export helpers (0.2)
 

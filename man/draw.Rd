@@ -35,6 +35,7 @@ draw("not a drawable")
 Other core structure:
 \code{\link[=canvas]{canvas()}},
 \code{\link[=drawable]{drawable()}},
+\code{\link[=group]{group()}},
 \code{\link[=sketch]{sketch()}},
 \code{\link[=style]{style()}},
 \code{\link[=xy]{xy()}}

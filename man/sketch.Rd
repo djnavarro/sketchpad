@@ -54,6 +54,7 @@ Other core structure:
 \code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
 \code{\link[=drawable]{drawable()}},
+\code{\link[=group]{group()}},
 \code{\link[=style]{style()}},
 \code{\link[=xy]{xy()}}
 }

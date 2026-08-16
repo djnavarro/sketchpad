@@ -47,8 +47,12 @@ sketch <- S7::new_class(
     canvas = canvas
   ),
   validator = function(self) {
-    if (!all(purrr::map_lgl(self@shapes, \(d) S7::S7_inherits(d, drawable)))) {
-      "shapes must be a list of drawable-classed objects"
+    ok <- purrr::map_lgl(
+      self@shapes,
+      \(d) S7::S7_inherits(d, drawable) || S7::S7_inherits(d, group)
+    )
+    if (!all(ok)) {
+      "shapes must be a list of drawable/group objects"
     }
   },
   # explicit argument defaults (rather than new_property(default = ...))

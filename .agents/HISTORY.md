@@ -2452,6 +2452,96 @@ higher-level entry point for the motivating "ring with a hole"/"several
 disjoint shapes sharing one style" cases specifically -- both were
 implemented, not just one.
 
+## A `group` class
+
+A nested collection of `drawable`/`group` objects sharing one transform
+and/or style override, distinct from `sketch` (which represents the
+whole canvas of independently-styled/-positioned shapes). Designed and
+implemented across three passes -- class/`+` methods, `draw()`, then
+`format()`/`print()` -- each verified against the full test suite before
+moving on.
+
+**Where it sits in the hierarchy.** `group` is not a `drawable`
+subclass -- it has no single `geometry`, so it can't satisfy `drawable`'s
+`points`/`geometry` contract. It's a sibling to `sketch`: another
+`shapes`-holding container, but one that carries its own `trans` and an
+optional `style` override, and a `group` can itself be nested inside a
+`sketch` or inside another `group`.
+
+**Properties and `+` methods.** `shapes` (list of `drawable`/`group`,
+default `list()`), `trans` (a `trans_any`, default `trans_identity()`,
+same as `drawable@trans`), and `style` (`class_any`, default `NULL`
+meaning "no override" -- needs `class_any` rather than a `style`-typed
+property for the same reason `canvas@xlim`/`@ylim` do: a narrower class
+would silently substitute something else for a bare `default = NULL`).
+Built up with `+` the same way `sketch` is: `group() + shape_circle() +
+shape_circle(x = 2)`. Registered `+` methods: `(group, drawable)`/
+`(group, group)` append to `@shapes` (nesting rather than flattening);
+`(group, trans/trans_warp/trans_fn/trans_chain)` compose onto `@trans`
+via a new `compose_group_trans()` helper (mirroring
+`compose_drawable_trans()`/`compose_sketch_trans()` in `R/sketch.R`) --
+applied to every member as a unit, without touching any member's own
+`@trans`; `(group, style)` sets the override directly; `(sketch, group)`
+appends a group into a sketch's own `@shapes` alongside plain drawables
+(required `sketch`'s own validator to start accepting `group` elements
+too, not just `drawable`).
+
+**`draw(group)` and the trans/style cascade.** Three internal helpers in
+`R/group.R` do the recursive work: `resolve_group_member()` (a plain
+`drawable` becomes a copy with `@trans` composed as `member@trans +
+ancestor_trans` -- member's own transform applies first, then every
+enclosing group's, outermost last, per `trans_translate()`'s own
+left-to-right composition convention -- and `@style` replaced by the
+nearest non-`NULL` enclosing override, or left alone if none exists; a
+`group` member instead recurses), `resolve_group()` (resolves one
+group's own `@trans`/`@style` against what's already accumulated from
+its ancestors, then maps `resolve_group_member()` over its own `shapes`
+and flattens), and `flatten_shapes()` (the entry point: resolves a
+top-level mixed drawable/group list with no ancestor context). Once
+flattened, `draw(group)` computes `xlim`/`ylim` from the resolved
+shapes' own points (mirroring `draw(sketch)`'s own fallback) and renders
+each through the existing `geometry_grob()` -- no new grob logic needed,
+since resolution folds every `trans`/`style` decision into ordinary
+drawables first. `draw(sketch)` was updated to call `flatten_shapes()`
+on `object@shapes` before computing limits/rendering, so a sketch
+containing `group` elements (nested arbitrarily) renders correctly too,
+with no special-casing needed at the `sketch` level.
+
+**Style cascade semantics.** "Nearest enclosing override wins, it does
+not stack": a nested `group` with no `style` of its own inherits its
+ancestor's override; a nested `group` that sets its own `style` keeps
+that instead, entirely replacing (not merging into) whatever an outer
+group specified. This is whole-object replacement, not per-field
+merging (e.g. overriding only `color` while leaving `fill` inherited) --
+matches `shape_combine()`'s existing precedent for the same "several
+drawables, one shared `style` object" tradeoff, and needed no new
+partial-style-merge helper.
+
+**`Collate` ordering.** `group.R` registers a method on the `draw`
+generic (defined in `R/draw.R`) and calls `format_prop_value()`/
+`format_trans_summary()` (defined in `R/format.R`), so it must be
+collated after both -- moved from its initial position (right after
+`sketch.R`, alongside `format.R`/`vectorize.R`) to right after `draw.R`
+(before `effect_grain.R`), the same reasoning `effect_grain.R` already
+follows for needing the `draw` generic to exist at source time. Calling
+`flatten_shapes()` from `draw(sketch)` in the earlier-collated `draw.R`
+is safe despite `group.R` loading later, since a function body is only
+evaluated at call time (after the whole package/namespace has loaded),
+not at source time -- the same "forward reference inside a function
+body is fine, inside a class/method registration is not" distinction
+`AGENTS.md`'s Collate section already documents elsewhere.
+
+**`format()`/`print()`.** Mirrors `format(sketch)`: shape count, each
+member's own class name in order (a nested `group` prints as
+`"group"`), a `trans` summary via the shared `format_trans_summary()`
+helper, and a `style` summary -- `"none"` when no override is set, or
+the same `color`/`fill`/`linewidth` line `format(drawable)` already uses
+for its own `style`. Registered in `group.R` itself (not `format.R`,
+which is collated earlier and can't reference the `group` class yet at
+source time) -- referencing `format.R`'s helpers from there is fine for
+the same lazy-evaluation reason `flatten_shapes()` is safe to call from
+`draw.R`.
+
 **Low-level primitive.** `shape_raw()`/`curve_raw()`/`points_raw()`
 (and their plural forms) all gained an `id` argument (integer, same
 length as `x`/`y`, default `NULL` -- filled in as a single sub-path,

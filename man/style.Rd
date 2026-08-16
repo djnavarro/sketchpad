@@ -125,6 +125,7 @@ Other core structure:
 \code{\link[=canvas]{canvas()}},
 \code{\link[=draw]{draw()}},
 \code{\link[=drawable]{drawable()}},
+\code{\link[=group]{group()}},
 \code{\link[=sketch]{sketch()}},
 \code{\link[=xy]{xy()}}
 }

@@ -165,6 +165,13 @@ S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
 #' @export
 #' @noRd
 S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
+  # a sketch's own @shapes can mix plain drawables with groups (each
+  # possibly nesting further groups); flatten_shapes() (R/group.R)
+  # resolves every group's own trans/style cascade and returns a plain
+  # list of drawables, so the rest of this method never needs to know
+  # about group at all
+  shapes <- flatten_shapes(object@shapes)
+
   # axis limits: an explicit draw() argument wins, then the sketch's own
   # canvas, then the shapes' own point ranges (canvas's xlim/ylim default to
   # NULL, so this falls through to the pre-canvas() default behavior)
@@ -172,14 +179,14 @@ S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
   if (is.null(ylim)) ylim <- object@canvas@ylim
   if (is.null(xlim)) {
     xlim <- c(
-      min(purrr::map_dbl(object@shapes, \(s) min(s@points@x))),
-      max(purrr::map_dbl(object@shapes, \(s) max(s@points@x)))
+      min(purrr::map_dbl(shapes, \(s) min(s@points@x))),
+      max(purrr::map_dbl(shapes, \(s) max(s@points@x)))
     )
   }
   if (is.null(ylim)) {
     ylim <- c(
-      min(purrr::map_dbl(object@shapes, \(s) min(s@points@y))),
-      max(purrr::map_dbl(object@shapes, \(s) max(s@points@y)))
+      min(purrr::map_dbl(shapes, \(s) min(s@points@y))),
+      max(purrr::map_dbl(shapes, \(s) max(s@points@y)))
     )
   }
 
@@ -201,7 +208,7 @@ S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
   if (!(is.character(bg) && length(bg) == 1 && is.na(bg))) {
     grid::grid.draw(grid::rectGrob(gp = grid::gpar(fill = bg, col = NA), vp = vp))
   }
-  for (s in object@shapes) {
+  for (s in shapes) {
     grob <- geometry_grob(s@points, s@style, s@geometry, vp)
     grid::grid.draw(grob)
   }
