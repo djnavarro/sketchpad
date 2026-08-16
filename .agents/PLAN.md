@@ -103,13 +103,11 @@ to pick up, reject, or refine later -- none are scheduled.
 `star`. (`rectangle`/`square` are now covered by `shape_rectangle()`/
 `shape_square()`; `polygon` is now covered by `shape_polygon()`;
 `ellipse` is now covered by `shape_ellipse()`; `arc`/`wedge` are now
-covered by `curve_arc()`/`shape_wedge()` -- these cover a partial circle,
-not an annulus segment (a wedge with a nonzero *inner* radius, i.e. a
-ring slice); revisit if a concrete use case needs one, since it's a
-reasonably natural `inner_radius` extension to `shape_wedge()`'s current
-`points` getter. A bare open `line` and a `spiral` were also on this
-list -- both are now covered by `curve_line()`/`curve_spiral()`; see
-`.agents/HISTORY.md`.)
+covered by `curve_arc()`/`shape_wedge()`, the latter now also covering
+an annulus segment/ring slice via `shape_wedge()`'s `inner_radius`
+argument -- see `.agents/HISTORY.md`. A bare open `line` and a `spiral`
+were also on this list -- both are now covered by `curve_line()`/
+`curve_spiral()`; see `.agents/HISTORY.md`.)
 
 ### Multiple sub-paths and holes per drawable (0.1)
 

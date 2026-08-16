@@ -2203,3 +2203,55 @@ at all -- `grep`ing a freshly `document()`-ed `NAMESPACE` for `format`/
 mechanism), with a short roxygen block for source-level readability
 only, no actual `.Rd` page generated. Tests live in
 `tests/testthat/test-format.R`.
+
+## Annulus segment / ring slice: `shape_wedge()`'s `inner_radius`
+
+The brainstormed "additional primitive shapes" list called out an
+annulus segment (a wedge with a nonzero inner radius, i.e. a ring slice)
+as a natural extension of `shape_wedge()`'s existing `points` getter,
+rather than a wholly new class -- see `.agents/PLAN.md`'s prior writeup.
+Implemented exactly that way: a new `inner_radius` property on
+`shape_wedge` (default `0`), no new S7 class.
+
+**Geometry.** `inner_radius == 0` (the default) reproduces the original
+pie-slice outline exactly (centroid vertex, then the outer arc from
+`start` to `end` -- `grid`'s own polygon closing draws the final edge
+back to the centroid). `inner_radius > 0` instead drops the centroid
+vertex entirely: the outline traces the outer arc forward (`start` to
+`end`) then a second arc of radius `inner_radius` *backward* (`end` to
+`start`), giving a four-sided ring-slice outline (two arcs, two straight
+radial edges) once `grid`'s own polygon closing draws the final edge
+back to the outer arc's first point. Sweeping the inner arc backward
+(rather than forward, matching the outer arc's own direction) is what
+keeps the outline from self-intersecting -- a polygon's vertices need to
+trace its boundary in one consistent rotational direction. `start = 0,
+end = 2 * pi` with `inner_radius > 0` gives a complete annulus (no
+radial seam visible, since the arc's start/end angle coincide).
+
+**Validation.** `inner_radius` must be a single non-negative number no
+greater than `radius` (equality allowed -- a zero-width ring slice is a
+valid, if degenerate, polygon, the same leniency `radius = 0` already
+gets for the pie-slice case). This check lives in `shape_wedge`'s own
+validator, not the `validate_arc_args()` helper it shares with
+`curve_arc()`, since `inner_radius` has no meaning for an open arc with
+no interior to speak of.
+
+**`curve_arc()` untouched.** `curve_arc()` is the arc alone with no
+centroid vertex or fill -- there's no analogous "ring slice" reading for
+an open path, so it keeps its existing two-argument (`radius` only)
+shape. Confirmed via a fresh `devtools::document()` pass that
+`curve_arc()`'s own `@inheritParams shape_wedge` pulls in no stray
+`inner_radius` entry -- roxygen2's `@inheritParams` only copies `@param`
+text for parameters actually present in the *inheriting* function's own
+formals, not every documented parameter of the source function.
+
+**`shape_wedges()`.** Gained `inner_radius` as an ordinary vectorized
+argument (default `0`), recycled against the others via the existing
+`vectorize_shapes()` engine -- no special-casing needed, matching every
+other scalar argument. A donut-chart example was added alongside the
+existing pie-chart one.
+
+Tests added to `tests/testthat/test-wedge.R`: the `inner_radius = 0`
+pie-slice-outline equivalence, the reversed-inner-arc geometry, both
+validator boundaries, the complete-annulus case, and `shape_wedges()`'s
+own vectorization of `inner_radius`.

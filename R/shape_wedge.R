@@ -46,7 +46,7 @@ validate_arc_args <- function(x, y, radius, start, end, n) {
   }
 }
 
-#' A pie-slice wedge
+#' A pie-slice wedge or annulus segment
 #'
 #' `shape_wedge` is a [drawable] defined by a centroid, a radius, and a
 #' `start`/`end` angle (in radians): its outline is the centroid, followed by
@@ -56,8 +56,24 @@ validate_arc_args <- function(x, y, radius, start, end, n) {
 #' the arc's last point to the centroid, giving the familiar pie-slice/wedge
 #' shape. [curve_arc()] is the arc alone, with no centroid vertex or fill.
 #'
+#' `inner_radius` (default `0`) turns the pie slice into a ring slice (an
+#' annulus segment): when greater than `0`, the centroid vertex is dropped
+#' entirely, and the outline instead traces the outer arc from `start` to
+#' `end` followed by a second, inner arc of radius `inner_radius` swept back
+#' from `end` to `start` -- `grid`'s own polygon closing then draws the
+#' final straight edge back to the outer arc's first point, giving a
+#' four-sided (two arcs, two straight radial edges) ring-slice outline
+#' rather than a pie slice's three-sided one (two straight edges meeting at
+#' the centroid, one arc). `inner_radius = 0` (the default) recovers the
+#' original pie-slice outline exactly, since a zero-radius "inner arc"
+#' would otherwise degenerate to the centroid repeated `n` times.
+#'
 #' @param x,y Centroid coordinates. Default `0`.
 #' @param radius Radius. Must be non-negative. Default `1`.
+#' @param inner_radius Inner radius. Must be non-negative and no greater
+#'   than `radius`. Default `0` (a pie-slice wedge, i.e. no inner arc; see
+#'   Details for the ring-slice/annulus-segment shape a positive value
+#'   gives instead).
 #' @param start,end Start/end angle of the arc, in radians. Default `0`/
 #'   `pi / 2`.
 #' @param n Number of points used to approximate the arc. Must be at least
@@ -82,6 +98,17 @@ validate_arc_args <- function(x, y, radius, start, end, n) {
 #' # straight back to the centroid
 #' draw(shape_wedge(start = 0, end = 1.9 * pi, fill = "goldenrod"))
 #'
+#' # inner_radius > 0 gives a ring slice (annulus segment) instead of a
+#' # pie slice -- no centroid vertex, a hole in the middle
+#' draw(shape_wedge(
+#'   radius = 1, inner_radius = 0.6, start = 0, end = 1.5 * pi,
+#'   fill = "steelblue"
+#' ))
+#'
+#' # a full sweep (start = 0, end = 2 * pi) with inner_radius > 0 gives a
+#' # complete ring/annulus
+#' draw(shape_wedge(radius = 1, inner_radius = 0.7, start = 0, end = 2 * pi))
+#'
 #' @family 2D shapes
 #' @export
 shape_wedge <- S7::new_class(
@@ -91,27 +118,45 @@ shape_wedge <- S7::new_class(
     x = S7::class_numeric,
     y = S7::class_numeric,
     radius = S7::class_numeric,
+    inner_radius = S7::class_numeric,
     start = S7::class_numeric,
     end = S7::class_numeric,
     n = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
-        arc <- arc_points(self@x, self@y, self@radius, self@start, self@end, self@n)
-        apply_trans(self@trans, xy(x = c(self@x, arc@x), y = c(self@y, arc@y)))
+        outer <- arc_points(self@x, self@y, self@radius, self@start, self@end, self@n)
+        if (self@inner_radius == 0) {
+          return(apply_trans(self@trans, xy(x = c(self@x, outer@x), y = c(self@y, outer@y))))
+        }
+        inner <- arc_points(self@x, self@y, self@inner_radius, self@end, self@start, self@n)
+        apply_trans(self@trans, xy(x = c(outer@x, inner@x), y = c(outer@y, inner@y)))
       }
     )
   ),
   validator = function(self) {
-    validate_arc_args(self@x, self@y, self@radius, self@start, self@end, self@n)
+    msg <- validate_arc_args(self@x, self@y, self@radius, self@start, self@end, self@n)
+    if (!is.null(msg)) {
+      return(msg)
+    }
+    if (length(self@inner_radius) != 1) {
+      return("inner_radius must be length 1")
+    }
+    if (self@inner_radius < 0) {
+      return("inner_radius must be a non-negative number")
+    }
+    if (self@inner_radius > self@radius) {
+      return("inner_radius must be less than or equal to radius")
+    }
   },
-  constructor = function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L,
-                         trans = trans_identity(), ...) {
+  constructor = function(x = 0, y = 0, radius = 1, inner_radius = 0, start = 0, end = pi / 2,
+                         n = 100L, trans = trans_identity(), ...) {
     S7::new_object(
       drawable(trans = trans),
       x = x,
       y = y,
       radius = radius,
+      inner_radius = inner_radius,
       start = start,
       end = end,
       n = as_integerish(n, "n"),
@@ -145,12 +190,22 @@ shape_wedge <- S7::new_class(
 #'   fill = c("steelblue", "tomato", "goldenrod")
 #' ))
 #'
+#' # a donut chart: the same idea, with inner_radius > 0
+#' draw(shape_wedges(
+#'   inner_radius = 0.5,
+#'   start = cum[-length(cum)], end = cum[-1],
+#'   fill = c("steelblue", "tomato", "goldenrod")
+#' ))
+#'
 #' @family 2D shapes
 #' @export
-shape_wedges <- function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L,
-                         trans = trans_identity(), ...) {
+shape_wedges <- function(x = 0, y = 0, radius = 1, inner_radius = 0, start = 0, end = pi / 2,
+                         n = 100L, trans = trans_identity(), ...) {
   vectorize_shapes(shape_wedge, c(
-    list(x = x, y = y, radius = radius, start = start, end = end, n = n, trans = trans),
+    list(
+      x = x, y = y, radius = radius, inner_radius = inner_radius,
+      start = start, end = end, n = n, trans = trans
+    ),
     list(...)
   ))
 }

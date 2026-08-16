@@ -3,12 +3,13 @@
 \name{shape_wedge}
 \alias{shape_wedge}
 \alias{shape_wedges}
-\title{A pie-slice wedge}
+\title{A pie-slice wedge or annulus segment}
 \usage{
 shape_wedge(
   x = 0,
   y = 0,
   radius = 1,
+  inner_radius = 0,
   start = 0,
   end = pi/2,
   n = 100L,
@@ -20,6 +21,7 @@ shape_wedges(
   x = 0,
   y = 0,
   radius = 1,
+  inner_radius = 0,
   start = 0,
   end = pi/2,
   n = 100L,
@@ -31,6 +33,11 @@ shape_wedges(
 \item{x, y}{Centroid coordinates. Default \code{0}.}
 
 \item{radius}{Radius. Must be non-negative. Default \code{1}.}
+
+\item{inner_radius}{Inner radius. Must be non-negative and no greater
+than \code{radius}. Default \code{0} (a pie-slice wedge, i.e. no inner arc; see
+Details for the ring-slice/annulus-segment shape a positive value
+gives instead).}
 
 \item{start, end}{Start/end angle of the arc, in radians. Default \code{0}/
 \code{pi / 2}.}
@@ -63,6 +70,18 @@ single drawable.
 the arc's last point to the centroid, giving the familiar pie-slice/wedge
 shape. \code{\link[=curve_arc]{curve_arc()}} is the arc alone, with no centroid vertex or fill.
 
+\code{inner_radius} (default \code{0}) turns the pie slice into a ring slice (an
+annulus segment): when greater than \code{0}, the centroid vertex is dropped
+entirely, and the outline instead traces the outer arc from \code{start} to
+\code{end} followed by a second, inner arc of radius \code{inner_radius} swept back
+from \code{end} to \code{start} -- \code{grid}'s own polygon closing then draws the
+final straight edge back to the outer arc's first point, giving a
+four-sided (two arcs, two straight radial edges) ring-slice outline
+rather than a pie slice's three-sided one (two straight edges meeting at
+the centroid, one arc). \code{inner_radius = 0} (the default) recovers the
+original pie-slice outline exactly, since a zero-radius "inner arc"
+would otherwise degenerate to the centroid repeated \code{n} times.
+
 Recycling uses \code{purrr::pmap()}'s own vctrs-based rules: any length-1
 element is broadcast to the common length; mismatched lengths greater
 than 1 raise an error.
@@ -82,12 +101,30 @@ draw(shape_wedge(
 # straight back to the centroid
 draw(shape_wedge(start = 0, end = 1.9 * pi, fill = "goldenrod"))
 
+# inner_radius > 0 gives a ring slice (annulus segment) instead of a
+# pie slice -- no centroid vertex, a hole in the middle
+draw(shape_wedge(
+  radius = 1, inner_radius = 0.6, start = 0, end = 1.5 * pi,
+  fill = "steelblue"
+))
+
+# a full sweep (start = 0, end = 2 * pi) with inner_radius > 0 gives a
+# complete ring/annulus
+draw(shape_wedge(radius = 1, inner_radius = 0.7, start = 0, end = 2 * pi))
+
 draw(shape_wedges(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))
 
 # a pie chart: adjacent wedges sharing a centroid, one slice per value
 value <- c(30, 20, 50)
 cum <- c(0, cumsum(value)) / sum(value) * 2 * pi
 draw(shape_wedges(
+  start = cum[-length(cum)], end = cum[-1],
+  fill = c("steelblue", "tomato", "goldenrod")
+))
+
+# a donut chart: the same idea, with inner_radius > 0
+draw(shape_wedges(
+  inner_radius = 0.5,
   start = cum[-length(cum)], end = cum[-1],
   fill = c("steelblue", "tomato", "goldenrod")
 ))

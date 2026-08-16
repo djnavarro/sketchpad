@@ -218,13 +218,27 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `shape_circle` is the special case where both are equal (not
   implemented in terms of `shape_ellipse`, though, since it predates it
   and the two constructors are simple enough not to share code).
-- **`shape_wedge`** -- centroid + radius + `start`/`end` angle (radians) +
-  `n`; `points` is the centroid followed by `n` points along the circular
-  arc from `start` to `end` -- `grid::polygonGrob()`'s own closing edge
-  then draws the final straight side back from the arc's last point to
-  the centroid, giving the familiar pie-slice shape. Shares its arc
-  computation and argument validation with `curve_arc` via two internal
-  helpers factored into `R/shape_wedge.R` (`arc_points()`,
+- **`shape_wedge`** -- centroid + radius + `inner_radius` + `start`/`end`
+  angle (radians) + `n`. At the default `inner_radius = 0`, `points` is
+  the centroid followed by `n` points along the circular arc from
+  `start` to `end` -- `grid::polygonGrob()`'s own closing edge then draws
+  the final straight side back from the arc's last point to the
+  centroid, giving the familiar pie-slice shape. At `inner_radius > 0`,
+  the centroid vertex is dropped instead, and `points` traces the outer
+  arc forward (`start` to `end`) followed by a second arc of radius
+  `inner_radius` swept *backward* (`end` to `start`) -- `grid`'s own
+  closing edge then draws the final side back to the outer arc's first
+  point, giving a four-sided ring-slice (annulus-segment) outline
+  instead of a pie slice's three-sided one; sweeping the inner arc
+  backward (opposite the outer arc's own direction) is what keeps the
+  outline from self-intersecting. `start = 0, end = 2 * pi` with
+  `inner_radius > 0` gives a complete annulus. `inner_radius` must be
+  non-negative and no greater than `radius` (validated in `shape_wedge`'s
+  own validator, not the shared `validate_arc_args()` helper below,
+  since it has no meaning for `curve_arc`'s open, interior-less arc).
+  Shares its arc computation and argument validation (aside from
+  `inner_radius` itself) with `curve_arc` via two internal helpers
+  factored into `R/shape_wedge.R` (`arc_points()`,
   `validate_arc_args()`).
 - **`curve_arc`** -- `shape_wedge`'s arc alone, with no centroid vertex:
   an open path of `n` points swept from `start` to `end`. Reuses
