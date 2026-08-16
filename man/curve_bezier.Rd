@@ -64,8 +64,8 @@ draw(curve_bezier(
   x = c(0, 0.25, 0.75, 1), y = c(0, 1, -1, 0), linewidth = 3
 ))
 
-# a ribbon can be built around any curve_*() path with shape_ribbonpath()
-draw(shape_ribbonpath(
+# a ribbon can be built around any curve_*() path with shape_strokepath()
+draw(shape_strokepath(
   curve_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0)),
   width = 0.15
 ))
