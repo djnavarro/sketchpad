@@ -77,14 +77,17 @@ that's applied to its computed <code>points</code> as the very last step – see
 whose effect is "apply <code>t1</code> first, then <code>t2</code>" – see <code><a href="trans_translate.html">trans_translate()</a></code>'s
 Details for the composition order convention and a worked example.
 Composing a <code>trans</code> with a <a href="trans_warp.html">trans_warp</a> (a non-rigid, noise-based
-deformation that can't be represented as a matrix) instead produces a
-<a href="trans_chain.html">trans_chain</a> – see there.</p>
+deformation) or a <a href="trans_fn.html">trans_fn</a> (a non-rigid deformation from an
+arbitrary caller-supplied function) – neither of which can be
+represented as a matrix – instead produces a <a href="trans_chain.html">trans_chain</a> – see
+there.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other transform helpers:
 <code><a href="trans_affine.html">trans_affine()</a></code>,
 <code><a href="trans_chain.html">trans_chain()</a></code>,
+<code><a href="trans_fn.html">trans_fn()</a></code>,
 <code><a href="trans_identity.html">trans_identity()</a></code>,
 <code><a href="trans_reflect.html">trans_reflect()</a></code>,
 <code><a href="trans_rotate.html">trans_rotate()</a></code>,

@@ -59,7 +59,7 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
   : A twisted ribbon following a random path
 - [`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)
   [`shape_wedges()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md)
-  : A pie-slice wedge
+  : A pie-slice wedge or annulus segment
 
 ## One-dimensional curves
 
@@ -159,6 +159,8 @@ every `drawable`’s `trans` property.
   : Build a custom affine transform
 - [`trans_chain()`](https://sketchpad.djnavarro.net/reference/trans_chain.md)
   : A sequence of composed transforms
+- [`trans_fn()`](https://sketchpad.djnavarro.net/reference/trans_fn.md)
+  : An arbitrary-function, non-rigid deformation
 - [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md)
   : The identity transform
 - [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md)

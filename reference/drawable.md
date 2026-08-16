@@ -37,7 +37,7 @@ drawable(..., geometry = "polygon", trans = trans_identity(), pathlike = FALSE)
 - trans:
 
   A
-  [trans](https://sketchpad.djnavarro.net/reference/trans.md)/[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)/[trans_chain](https://sketchpad.djnavarro.net/reference/trans_chain.md)
+  [trans](https://sketchpad.djnavarro.net/reference/trans.md)/[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)/[trans_fn](https://sketchpad.djnavarro.net/reference/trans_fn.md)/[trans_chain](https://sketchpad.djnavarro.net/reference/trans_chain.md)
   object. See details.
 
 - pathlike:
@@ -72,7 +72,10 @@ closed polygon has an interior to fill.
 [`trans_shear()`](https://sketchpad.djnavarro.net/reference/trans_shear.md),
 [`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md)),
 a [trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)
-(a non-rigid, noise-based deformation), or a
+(a non-rigid, noise-based deformation), a
+[trans_fn](https://sketchpad.djnavarro.net/reference/trans_fn.md) (a
+non-rigid deformation from an arbitrary caller-supplied displacement
+function), or a
 [trans_chain](https://sketchpad.djnavarro.net/reference/trans_chain.md)
 combining several via `+`, applied to a drawable's computed `points` as
 the very last step – after any shape-specific geometry (and, for

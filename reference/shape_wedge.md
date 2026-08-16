@@ -1,4 +1,4 @@
-# A pie-slice wedge
+# A pie-slice wedge or annulus segment
 
 `shape_wedge` is a
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
@@ -18,6 +18,7 @@ shape_wedge(
   x = 0,
   y = 0,
   radius = 1,
+  inner_radius = 0,
   start = 0,
   end = pi/2,
   n = 100L,
@@ -29,6 +30,7 @@ shape_wedges(
   x = 0,
   y = 0,
   radius = 1,
+  inner_radius = 0,
   start = 0,
   end = pi/2,
   n = 100L,
@@ -46,6 +48,12 @@ shape_wedges(
 - radius:
 
   Radius. Must be non-negative. Default `1`.
+
+- inner_radius:
+
+  Inner radius. Must be non-negative and no greater than `radius`.
+  Default `0` (a pie-slice wedge, i.e. no inner arc; see Details for the
+  ring-slice/annulus-segment shape a positive value gives instead).
 
 - start, end:
 
@@ -82,6 +90,18 @@ from the arc's last point to the centroid, giving the familiar
 pie-slice/wedge shape.
 [`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md)
 is the arc alone, with no centroid vertex or fill.
+
+`inner_radius` (default `0`) turns the pie slice into a ring slice (an
+annulus segment): when greater than `0`, the centroid vertex is dropped
+entirely, and the outline instead traces the outer arc from `start` to
+`end` followed by a second, inner arc of radius `inner_radius` swept
+back from `end` to `start` – `grid`'s own polygon closing then draws the
+final straight edge back to the outer arc's first point, giving a
+four-sided (two arcs, two straight radial edges) ring-slice outline
+rather than a pie slice's three-sided one (two straight edges meeting at
+the centroid, one arc). `inner_radius = 0` (the default) recovers the
+original pie-slice outline exactly, since a zero-radius "inner arc"
+would otherwise degenerate to the centroid repeated `n` times.
 
 Recycling uses
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
@@ -123,6 +143,19 @@ draw(shape_wedge(
 draw(shape_wedge(start = 0, end = 1.9 * pi, fill = "goldenrod"))
 
 
+# inner_radius > 0 gives a ring slice (annulus segment) instead of a
+# pie slice -- no centroid vertex, a hole in the middle
+draw(shape_wedge(
+  radius = 1, inner_radius = 0.6, start = 0, end = 1.5 * pi,
+  fill = "steelblue"
+))
+
+
+# a full sweep (start = 0, end = 2 * pi) with inner_radius > 0 gives a
+# complete ring/annulus
+draw(shape_wedge(radius = 1, inner_radius = 0.7, start = 0, end = 2 * pi))
+
+
 draw(shape_wedges(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))
 
 
@@ -130,6 +163,14 @@ draw(shape_wedges(start = 0, end = seq(pi / 2, 2 * pi, length.out = 3)))
 value <- c(30, 20, 50)
 cum <- c(0, cumsum(value)) / sum(value) * 2 * pi
 draw(shape_wedges(
+  start = cum[-length(cum)], end = cum[-1],
+  fill = c("steelblue", "tomato", "goldenrod")
+))
+
+
+# a donut chart: the same idea, with inner_radius > 0
+draw(shape_wedges(
+  inner_radius = 0.5,
   start = cum[-length(cum)], end = cum[-1],
   fill = c("steelblue", "tomato", "goldenrod")
 ))

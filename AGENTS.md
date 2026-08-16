@@ -97,25 +97,43 @@ how the API got here, see
   `noise_field`/`noise_bridge`, and unlike the `trans_*()` affine
   family, which are separate wrapper functions sharing the single
   `trans` class).
+- **`trans_fn`** – also not a `drawable`; the general-purpose escape
+  hatch for a non-rigid deformation, wrapping a caller-supplied
+  displacement function directly (`R/trans.R`) – the same relationship
+  [`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md)
+  has to the rigid `trans_*()` family. Its single `fn` property is
+  called as `fn(x, y)` (plain numeric vectors, not an `xy` object) and
+  must return a `list(x = ..., y = ...)` of the same length – checked at
+  apply time inside `apply_trans()`, not at construction, since `fn`’s
+  own behavior can’t be verified without calling it. Unlike
+  `noise_field`/`noise_bridge`/`trans_warp`, it takes no other
+  properties – `fn` alone fully determines the deformation, so there’s
+  no separate `amount` to scale it (the function can incorporate that
+  itself). Strictly more general than `trans_warp`: any noise-based warp
+  could be expressed as a `trans_fn` closing over a `noise_field`, but
+  so can a deterministic formula (swirl/pinch/bulge) or a warp driven by
+  something a `noise_field` can’t express at all, e.g. a second
+  drawable’s own geometry captured in `fn`’s enclosing environment.
 - **`trans_chain`** – also not a `drawable`; an ordered list of `steps`
-  (each a `trans`/`trans_warp`/`trans_chain`), applied in sequence. This
-  is what `+` produces when composing two transforms that can’t collapse
-  into a single affine matrix – e.g. a `trans_warp` combined with
-  another `trans_warp` or with a `trans`. Not usually constructed
-  directly.
-- Every `trans`/`trans_warp`/`trans_chain` combination composes with
-  `+`, via the internal `combine_trans()` helper backing nine
-  `method(\`+\`,
-  list(…))`registrations (one per ordered pair of the three classes): two plain`trans`(affine) objects still collapse into a single`trans`via matrix multiplication (`t1 +
+  (each a `trans`/`trans_warp`/`trans_fn`/`trans_chain`), applied in
+  sequence. This is what `+` produces when composing two transforms that
+  can’t collapse into a single affine matrix – e.g. a `trans_warp`
+  combined with another `trans_warp` or with a `trans`. Not usually
+  constructed directly.
+- Every `trans`/`trans_warp`/`trans_fn`/`trans_chain` combination
+  composes with `+`, via the internal `combine_trans()` helper backing
+  sixteen `method(\`+\`,
+  list(…))`registrations (one per ordered pair of the four classes): two plain`trans`(affine) objects still collapse into a single`trans`via matrix multiplication (`t1 +
   t2`means "apply`t1`'s effect first, then`t2`'s";`(t1 +
   t2)@matrix`is`<t2@matrix> %*%
   <t1@matrix>`, since points are homogeneous column vectors transformed as`matrix
   %*%
-  point`-- documented and tested explicitly in`trans_translate()`'s docs, since composition order is an easy thing to get backwards); any combination involving a`trans_warp`/`trans_chain`instead builds/extends a`trans_chain`(via the internal`trans_steps()`helper, which flattens an existing chain's own`steps`rather than nesting chains). Every`drawable`carries a`trans`property (default`trans_identity()`, typed as the internal`trans_any`union of all three classes -- the same`S7::new_union()`-as-property-class pattern`<style@fill>`'s`fill_class`already uses), applied via the internal`apply_trans()`S7 generic (dispatching on the transform's own class alone, the same single-dispatch-argument pattern`noise_sample()`uses for`field`) as the very last step inside each subclass's own`points`getter -- *after* any shape-specific geometry or noise-based distortion has already been computed, so a drawable's own defining parameters (e.g.`shape_circle`'s centroid/radius) are never mutated or flattened by a transform, only the final rendered coordinates.`convert()`picks this up for free (no changes needed there), since it already reads`<from@points>`. As a fluent alternative to passing`trans
+  point`-- documented and tested explicitly in`trans_translate()`'s docs, since composition order is an easy thing to get backwards); any combination involving a`trans_warp`/`trans_fn`/`trans_chain`instead builds/extends a`trans_chain`(via the internal`trans_steps()`helper, which flattens an existing chain's own`steps`rather than nesting chains). Every`drawable`carries a`trans`property (default`trans_identity()`, typed as the internal`trans_any`union of all four classes -- the same`S7::new_union()`-as-property-class pattern`<style@fill>`'s`fill_class`already uses), applied via the internal`apply_trans()`S7 generic (dispatching on the transform's own class alone, the same single-dispatch-argument pattern`noise_sample()`uses for`field`) as the very last step inside each subclass's own`points`getter -- *after* any shape-specific geometry or noise-based distortion has already been computed, so a drawable's own defining parameters (e.g.`shape_circle`'s centroid/radius) are never mutated or flattened by a transform, only the final rendered coordinates.`convert()`picks this up for free (no changes needed there), since it already reads`<from@points>`. As a fluent alternative to passing`trans
   = `at construction time,`method(\`+\`, list(drawable,
   ))`(`R/sketch.R`, one registration per concrete class, sharing the internal`compose_drawable_trans()`helper) returns a copy of a drawable with`@trans`composed, and the analogous`method(\`+\`,
   list(sketch,
-  ))`/`compose_sketch_trans()`maps the same composition over every shape in a`sketch`at once. Arbitrary-function warps (rather than noise-driven ones) remain out of scope -- see`.agents/PLAN.md\`.
+  ))`/`compose_sketch_trans()`maps the same composition over every shape in a`sketch\`
+  at once.
 - **`style`** – container for `color`/`fill`/`linewidth`/`linetype`/
   `linejoin`/`lineend`/`linemitre`/`color_alpha`/`fill_alpha`, forwarded
   to [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html). `fill` accepts
@@ -243,14 +261,28 @@ how the API got here, see
   `shape_circle` is the special case where both are equal (not
   implemented in terms of `shape_ellipse`, though, since it predates it
   and the two constructors are simple enough not to share code).
-- **`shape_wedge`** – centroid + radius + `start`/`end` angle
-  (radians) + `n`; `points` is the centroid followed by `n` points along
-  the circular arc from `start` to `end` –
+- **`shape_wedge`** – centroid + radius + `inner_radius` + `start`/`end`
+  angle (radians) + `n`. At the default `inner_radius = 0`, `points` is
+  the centroid followed by `n` points along the circular arc from
+  `start` to `end` –
   [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html)’s
   own closing edge then draws the final straight side back from the
   arc’s last point to the centroid, giving the familiar pie-slice shape.
-  Shares its arc computation and argument validation with `curve_arc`
-  via two internal helpers factored into `R/shape_wedge.R`
+  At `inner_radius > 0`, the centroid vertex is dropped instead, and
+  `points` traces the outer arc forward (`start` to `end`) followed by a
+  second arc of radius `inner_radius` swept *backward* (`end` to
+  `start`) – `grid`’s own closing edge then draws the final side back to
+  the outer arc’s first point, giving a four-sided ring-slice
+  (annulus-segment) outline instead of a pie slice’s three-sided one;
+  sweeping the inner arc backward (opposite the outer arc’s own
+  direction) is what keeps the outline from self-intersecting.
+  `start = 0, end = 2 * pi` with `inner_radius > 0` gives a complete
+  annulus. `inner_radius` must be non-negative and no greater than
+  `radius` (validated in `shape_wedge`’s own validator, not the shared
+  `validate_arc_args()` helper below, since it has no meaning for
+  `curve_arc`’s open, interior-less arc). Shares its arc computation and
+  argument validation (aside from `inner_radius` itself) with
+  `curve_arc` via two internal helpers factored into `R/shape_wedge.R`
   (`arc_points()`, `validate_arc_args()`).
 - **`curve_arc`** – `shape_wedge`’s arc alone, with no centroid vertex:
   an open path of `n` points swept from `start` to `end`. Reuses
@@ -802,6 +834,54 @@ Shared argument validation lives in the internal `validate_fill_args()`
 `validate_colors()` (a character vector of at least `min_length`, no
 `NA`s – see “Colour-vector generalization” above).
 
+### `print()`/`format()` methods
+
+`drawable` and `sketch` each have dedicated
+[`format()`](https://rdrr.io/r/base/format.html)/[`print()`](https://rdrr.io/r/base/print.html)
+methods (`R/format.R`), registered on base R’s own generics the same way
+`+`/ `convert()` already are (`S7::method(format, drawable) <- ...`,
+etc.) – picked up automatically by the existing
+[`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html)
+call in `.onLoad()`, with no further registration needed. Each `print`
+method is a one-line `cat(format(x, ...), sep = "\n"); invisible(x)`
+wrapper over its own `format` method.
+
+`format(drawable)` reports the drawable’s own (short) class name via
+`S7::S7_class(x)@name`, then every property besides the five every
+`drawable` already shares (`style`/`geometry`/`trans`/`pathlike`/
+`points`) – read generically off
+[`S7::prop_names()`](https://rconsortium.github.io/S7/reference/prop_names.html),
+so no per-subclass method is needed. `points` itself is deliberately
+omitted even though it’s the “real” geometry, since it’s a computed
+property that can be expensive (noise-based distortion) or long (many
+points) to print in full – `@points` is still directly accessible. Also
+reports a short `style` summary (`color`/`fill`/`linewidth` only) and
+`geometry`/`trans`. A property value is rendered by the internal
+`format_prop_value()` helper: a scalar via
+[`format()`](https://rdrr.io/r/base/format.html); a short vector
+(`length <= 4`) as a comma-separated `[...]` list; a longer vector
+truncated to its first three elements plus a `(n total)` count; a nested
+S7 object (e.g. `distortion`’s `noise_field`) as `<class_name>` rather
+than recursing into its own properties; a plain list as `<list[n]>`. A
+drawable’s `trans` gets its own summary via the internal
+`format_trans_summary()`: an affine `trans` is `"identity"` when its
+matrix is exactly `diag(3)` (via
+[`all.equal()`](https://rdrr.io/r/base/all.equal.html), tolerating
+floating-point noise from composed transforms) or `"affine"` otherwise;
+a `trans_warp` is `"warp"`; a `trans_chain` is `"chain (n steps)"`.
+
+`format(sketch)` reports the shape count (`"<sketch: n shapes>"`,
+singular/plural handled explicitly), each shape’s own class name in list
+order, and a short `canvas` summary (`background`/`clip`, via the same
+`format_prop_value()` helper).
+
+As with `+`/`convert()`, each `method(format, ...)`/`method(print, ...)`
+assignment carries `#' @export`/`#' @noRd` for source-level readability
+only – confirmed to add no `NAMESPACE` entry at all; dispatch works
+purely through
+[`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html)
+in `.onLoad()`.
+
 ### The `save_*()` export family
 
 `R/save.R` holds three thin wrappers –
@@ -1334,6 +1414,18 @@ full debugging narrative):
   shape in a sketch – see \[trans\] above) – and its
   [`length()`](https://rdrr.io/r/base/length.html)/`` `[[` ``/`` `[` ``
   methods for list-like access to `@shapes`.
+- `R/format.R` –
+  [`format()`](https://rdrr.io/r/base/format.html)/[`print()`](https://rdrr.io/r/base/print.html)
+  methods for `drawable` and `sketch` (see
+  “[`print()`](https://rdrr.io/r/base/print.html)/[`format()`](https://rdrr.io/r/base/format.html)
+  methods” below), plus the internal
+  `format_prop_value()`/`format_trans_summary()` helpers they share.
+  Collated right after `sketch.R`, since its
+  `method(format, drawable) <- ...`/`method(format, sketch) <- ...`
+  assignments run at source time and need
+  `drawable`/`sketch`/`trans`/`trans_warp`/`trans_chain` already bound –
+  unlike `vectorize.R`/`effects.R` below, this file’s `Collate` position
+  *does* matter, for the same reason `effect_grain.R`’s does.
 - `R/vectorize.R` – the internal `vectorize_shapes()` engine shared by
   every plural
   `shape_*s()`/`curve_*s()`/[`points_raws()`](https://sketchpad.djnavarro.net/reference/points_raw.md)
@@ -1396,11 +1488,11 @@ full debugging narrative):
   curve_raw -\> points_raw -\> shape_circle -\> shape_rectangle -\>
   shape_polygon -\> shape_ellipse -\> shape_wedge -\> curve_arc -\>
   shape_blob -\> shape_ribbon -\> shape_twist -\> curve_twist -\>
-  shape_stroke -\> shape_strokepath -\> canvas -\> sketch -\> vectorize
-  -\> effects -\> effect_tremor -\> effect_bristle -\> draw -\>
-  effect_grain -\> convert -\> save -\> sketchpad-package). **Any new
-  drawable subclass must be added to `Collate` after `drawable.R`**, or
-  `devtools::load_all()`/`R CMD check` will fail with an “object
+  shape_stroke -\> shape_strokepath -\> canvas -\> sketch -\> format -\>
+  vectorize -\> effects -\> effect_tremor -\> effect_bristle -\> draw
+  -\> effect_grain -\> convert -\> save -\> sketchpad-package). **Any
+  new drawable subclass must be added to `Collate` after `drawable.R`**,
+  or `devtools::load_all()`/`R CMD check` will fail with an “object
   ‘drawable’ not found” error. Any new class that registers its own
   method on an *existing* generic (as `effect_grain` does for `draw`)
   must instead be collated after that generic’s own defining file.

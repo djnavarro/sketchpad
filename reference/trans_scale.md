@@ -29,6 +29,7 @@ Other transform helpers:
 [`trans()`](https://sketchpad.djnavarro.net/reference/trans.md),
 [`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md),
 [`trans_chain()`](https://sketchpad.djnavarro.net/reference/trans_chain.md),
+[`trans_fn()`](https://sketchpad.djnavarro.net/reference/trans_fn.md),
 [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md),
 [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md),
 [`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md),

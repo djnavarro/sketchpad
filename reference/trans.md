@@ -40,8 +40,10 @@ whose effect is "apply `t1` first, then `t2`" – see
 Details for the composition order convention and a worked example.
 Composing a `trans` with a
 [trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md) (a
-non-rigid, noise-based deformation that can't be represented as a
-matrix) instead produces a
+non-rigid, noise-based deformation) or a
+[trans_fn](https://sketchpad.djnavarro.net/reference/trans_fn.md) (a
+non-rigid deformation from an arbitrary caller-supplied function) –
+neither of which can be represented as a matrix – instead produces a
 [trans_chain](https://sketchpad.djnavarro.net/reference/trans_chain.md)
 – see there.
 
@@ -50,6 +52,7 @@ matrix) instead produces a
 Other transform helpers:
 [`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md),
 [`trans_chain()`](https://sketchpad.djnavarro.net/reference/trans_chain.md),
+[`trans_fn()`](https://sketchpad.djnavarro.net/reference/trans_fn.md),
 [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md),
 [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md),
 [`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md),

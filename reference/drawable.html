@@ -75,7 +75,8 @@ value internally instead (see details).</p></dd>
 
 
 <dt id="arg-trans">trans<a class="anchor" aria-label="anchor" href="#arg-trans"></a></dt>
-<dd><p>A <a href="trans.html">trans</a>/<a href="trans_warp.html">trans_warp</a>/<a href="trans_chain.html">trans_chain</a> object. See details.</p></dd>
+<dd><p>A <a href="trans.html">trans</a>/<a href="trans_warp.html">trans_warp</a>/<a href="trans_fn.html">trans_fn</a>/<a href="trans_chain.html">trans_chain</a> object.
+See details.</p></dd>
 
 
 <dt id="arg-pathlike">pathlike<a class="anchor" aria-label="anchor" href="#arg-pathlike"></a></dt>
@@ -98,7 +99,9 @@ interior to fill.</p>
 <p><code>trans</code> is a <a href="trans.html">trans</a> (an affine map: <code><a href="trans_translate.html">trans_translate()</a></code>,
 <code><a href="trans_rotate.html">trans_rotate()</a></code>, <code><a href="trans_scale.html">trans_scale()</a></code>, <code><a href="trans_reflect.html">trans_reflect()</a></code>, <code><a href="trans_shear.html">trans_shear()</a></code>,
 <code><a href="trans_affine.html">trans_affine()</a></code>), a <a href="trans_warp.html">trans_warp</a> (a non-rigid, noise-based
-deformation), or a <a href="trans_chain.html">trans_chain</a> combining several via <code>+</code>, applied to
+deformation), a <a href="trans_fn.html">trans_fn</a> (a non-rigid deformation from an arbitrary
+caller-supplied displacement function), or a <a href="trans_chain.html">trans_chain</a> combining
+several via <code>+</code>, applied to
 a drawable's computed <code>points</code> as the very last step – after any
 shape-specific geometry (and, for <code><a href="shape_blob.html">shape_blob()</a></code>/<code><a href="shape_ribbon.html">shape_ribbon()</a></code>/
 <code><a href="shape_twist.html">shape_twist()</a></code>, any noise-based distortion) has already been computed.

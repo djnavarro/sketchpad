@@ -57,10 +57,16 @@ Like [trans](https://sketchpad.djnavarro.net/reference/trans.md), a
 `trans_warp` is attached to a
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md) via
 its `trans` property/argument, and composes with `+` – combining it with
-another `trans_warp` or a
+another `trans_warp`, a
+[trans_fn](https://sketchpad.djnavarro.net/reference/trans_fn.md), or a
 [trans](https://sketchpad.djnavarro.net/reference/trans.md) produces a
 [trans_chain](https://sketchpad.djnavarro.net/reference/trans_chain.md),
-since a non-rigid warp can't collapse into a single matrix.
+since a non-rigid warp can't collapse into a single matrix. See
+[`trans_fn()`](https://sketchpad.djnavarro.net/reference/trans_fn.md)
+for a general-purpose escape hatch taking an arbitrary caller-supplied
+displacement function, rather than only a
+[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)-driven
+one.
 
 ## See also
 
@@ -68,6 +74,7 @@ Other transform helpers:
 [`trans()`](https://sketchpad.djnavarro.net/reference/trans.md),
 [`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md),
 [`trans_chain()`](https://sketchpad.djnavarro.net/reference/trans_chain.md),
+[`trans_fn()`](https://sketchpad.djnavarro.net/reference/trans_fn.md),
 [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md),
 [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md),
 [`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md),

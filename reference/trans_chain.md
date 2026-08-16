@@ -12,8 +12,9 @@ or a
 mixed with a
 [trans](https://sketchpad.djnavarro.net/reference/trans.md). It is not
 usually constructed directly; it holds an ordered list of `steps` (each
-a [trans](https://sketchpad.djnavarro.net/reference/trans.md) or
-[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)),
+a [trans](https://sketchpad.djnavarro.net/reference/trans.md),
+[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md),
+or [trans_fn](https://sketchpad.djnavarro.net/reference/trans_fn.md)),
 applied in sequence – `steps[[1]]` first, `steps[[length(steps)]]` last
 – exactly like chained `+` calls on a
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md) would
@@ -46,6 +47,7 @@ only costs a little efficiency, not correctness.
 Other transform helpers:
 [`trans()`](https://sketchpad.djnavarro.net/reference/trans.md),
 [`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md),
+[`trans_fn()`](https://sketchpad.djnavarro.net/reference/trans_fn.md),
 [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md),
 [`trans_reflect()`](https://sketchpad.djnavarro.net/reference/trans_reflect.md),
 [`trans_rotate()`](https://sketchpad.djnavarro.net/reference/trans_rotate.md),
