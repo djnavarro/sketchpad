@@ -46,6 +46,7 @@ reference:
     Textures and patterns for `style()`'s `fill` argument, used by 2D
     shapes.
   contents:
+  - fill
   - starts_with("fill_")
 
 - title: Transformation tools

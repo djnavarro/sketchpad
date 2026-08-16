@@ -7,7 +7,7 @@
 fill_marble(
   color = c("white", "black"),
   spacing = 0.5,
-  aspect = 1,
+  aspect = NULL,
   resolution = 32L,
   stripes = 3L,
   warp = 4,
@@ -25,7 +25,10 @@ via \code{grDevices::colorRamp()}. Default \code{c("white", "black")}.}
 box. Must be a positive number. Default \code{0.5}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+\code{\link[=draw]{draw()}} time -- see the \link{fill} class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.}
 
 \item{resolution}{Raster resolution (pixels per tile edge). Must be a
 positive integer of at least \code{2L}. Default \code{32L}.}
@@ -106,6 +109,7 @@ draw(shape_circle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

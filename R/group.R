@@ -298,7 +298,7 @@ method(format, group) <- function(x, ...) {
   } else {
     paste0(
       "color = ", format_prop_value(x@style@color),
-      ", fill = ", format_prop_value(x@style@fill),
+      ", fill = ", format_fill_summary(x@style@fill),
       ", linewidth = ", format_prop_value(x@style@linewidth)
     )
   }

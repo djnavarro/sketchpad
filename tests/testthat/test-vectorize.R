@@ -12,8 +12,8 @@ test_that("scalar-argument plural constructors recycle length-1 args and error o
 
 test_that("style arguments passed via ... are vectorized alongside the shape's own args", {
   s <- shape_circles(x = 1:2, fill = c("red", "blue"))
-  expect_equal(s[[1]]@style@fill, "red")
-  expect_equal(s[[2]]@style@fill, "blue")
+  expect_equal(fv(s[[1]]@style@fill), "red")
+  expect_equal(fv(s[[2]]@style@fill), "blue")
 })
 
 test_that("a shared scalar S7 object is recycled across every shape", {

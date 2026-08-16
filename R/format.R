@@ -43,6 +43,27 @@ format_prop_value <- function(value) {
 #' a [trans_warp] as `"warp"`; a [trans_fn] as `"fn"`; a [trans_chain] as
 #' `"chain (n steps)"`.
 #'
+#' Summarize a `fill` object for `format(drawable)`/`format(sketch)`
+#'
+#' A [fill] with no `resolve` (a fixed colour string, `GridPattern`, or an
+#' explicit-`aspect` pattern) is reported via `format_prop_value()` on its
+#' own `value`; one with a `resolve` (the default for every aspect-taking
+#' `fill_*()` helper -- see [fill_hatch()]'s own `aspect` docs) is
+#' reported the same way but suffixed `" (auto-aspect)"`, since its
+#' `value` is only a placeholder computed at `aspect = 1` until [draw()]
+#' resolves it against the real target.
+#'
+#' @param f A [fill] object.
+#' @return A single string.
+#' @noRd
+format_fill_summary <- function(f) {
+  if (!S7::S7_inherits(f, fill)) {
+    return(format_prop_value(f))
+  }
+  base <- format_prop_value(f@value)
+  if (is.null(f@resolve)) base else paste0(base, " (auto-aspect)")
+}
+
 #' @param x A [trans]/[trans_warp]/[trans_fn]/[trans_chain] object.
 #' @return A single string.
 #' @noRd
@@ -87,7 +108,7 @@ method(format, drawable) <- function(x, ...) {
   }
   style_line <- paste0(
     "  style: color = ", format_prop_value(x@style@color),
-    ", fill = ", format_prop_value(x@style@fill),
+    ", fill = ", format_fill_summary(x@style@fill),
     ", linewidth = ", format_prop_value(x@style@linewidth)
   )
   geometry_line <- paste0(
@@ -124,7 +145,7 @@ method(format, sketch) <- function(x, ...) {
     paste0("  ", seq_len(n), ": ", purrr::map_chr(x@shapes, \(d) S7::S7_class(d)@name))
   }
   canvas_line <- paste0(
-    "  canvas: background = ", format_prop_value(x@canvas@background),
+    "  canvas: background = ", format_fill_summary(x@canvas@background),
     ", clip = ", x@canvas@clip
   )
   c(header, shape_lines, canvas_line)

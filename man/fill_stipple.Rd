@@ -8,7 +8,7 @@ fill_stipple(
   color = "black",
   radius = 0.15,
   spacing = 0.3,
-  aspect = 1,
+  aspect = NULL,
   n = 4L,
   seed = 1L,
   extend = "repeat"
@@ -27,7 +27,10 @@ positive number. Default \code{0.15}.}
 box. Must be a positive number. Default \code{0.3}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+\code{\link[=draw]{draw()}} time -- see the \link{fill} class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.}
 
 \item{n}{Number of dots scattered per tile. Must be a positive integer.
 Default \code{4L}.}
@@ -53,9 +56,9 @@ there's no analogue of their tile-edge "dashing" problem here. There's
 still a circularity problem to correct for, though: \code{\link[grid:pattern]{grid::pattern()}}
 tiles are sized as a fraction of the target polygon's own bounding box,
 so a dot drawn with an \code{npc}-relative radius renders as an ellipse
-whenever that bounding box isn't square. Pass the bounding box's
-width-to-height ratio as \code{aspect} to keep dots circular; the default
-\code{aspect = 1} is only exact for a square bounding box.
+whenever that bounding box isn't square. \code{aspect} corrects for this
+automatically by default, keeping dots circular (see \code{\link[=fill_hatch]{fill_hatch()}}'s
+own \code{aspect} docs).
 }
 \section{Known rendering risk with multiple dots}{
  On this package's
@@ -93,6 +96,7 @@ draw(shape_circle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

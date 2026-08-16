@@ -8,7 +8,7 @@ fill_crosshatch(
   color = "black",
   angle = 45,
   spacing = 0.1,
-  aspect = 1,
+  aspect = NULL,
   linewidth = 1,
   extend = "repeat"
 )
@@ -26,7 +26,10 @@ positive x-axis. Default \code{45}.}
 box. Must be a positive number. Default \code{0.1}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+\code{\link[=draw]{draw()}} time -- see the \link{fill} class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.}
 
 \item{linewidth}{Line width. Must be a positive number. Default \code{1}.}
 
@@ -79,6 +82,7 @@ draw(shape_circle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_flow]{fill_flow()}},

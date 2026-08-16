@@ -8,7 +8,7 @@ fill_hatch(
   color = "black",
   angle = 45,
   spacing = 0.1,
-  aspect = 1,
+  aspect = NULL,
   linewidth = 1,
   extend = "repeat"
 )
@@ -23,7 +23,10 @@ positive x-axis. Default \code{45}.}
 box. Must be a positive number. Default \code{0.1}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+\code{\link[=draw]{draw()}} time -- see the \link{fill} class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.}
 
 \item{linewidth}{Line width. Must be a positive number. Default \code{1}.}
 
@@ -44,10 +47,11 @@ in place of a plain colour.
 own bounding box}, not a fixed physical square, so a tile that looks
 square in that relative sense can be a stretched rectangle in absolute
 terms whenever the target's bounding box isn't square itself -- which
-distorts any angle baked directly into the pattern content. Pass the
-target's bounding-box aspect ratio (width / height) as \code{aspect} to
-correct for this; the default \code{aspect = 1} is only exact for a square
-bounding box.
+distorts any angle baked directly into the pattern content. This is
+corrected automatically: \code{aspect} defaults to \code{NULL}, resolved against
+the real target's own bounding-box aspect ratio (width / height) at
+\code{\link[=draw]{draw()}} time (see the \link{fill} class); pass a fixed number instead to
+compute the pattern once, immediately, against that value only.
 
 Internally, the hatch line is always drawn as a plain diagonal from one
 tile corner to the opposite corner (or the mirror image, for a
@@ -83,6 +87,7 @@ draw(shape_rectangle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

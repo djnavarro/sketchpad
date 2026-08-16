@@ -10,7 +10,7 @@ fill_solid(color = "black")
 \item{color}{Fill colour. Default \code{"black"}.}
 }
 \value{
-\code{color}, unchanged (a single string), after validating it.
+A \link{fill} object wrapping \code{color}.
 }
 \description{
 \code{fill_solid()} is the trivial member of the \verb{fill_*()} family: a plain
@@ -33,6 +33,7 @@ draw(shape_circle(fill = "tomato"))
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

@@ -25,9 +25,11 @@
 #'
 #' @param background Background fill, drawn beneath every shape in the
 #'   sketch. Either a plain colour string, or the output of a `fill_*()`
-#'   helper -- see [style()]'s `fill` argument for the full family. Default
-#'   [fill_none()] (no background drawn; the page's own background shows
-#'   through, matching `draw()`'s behavior before `canvas` existed).
+#'   helper -- see [style()]'s `fill` argument for the full family (a bare
+#'   colour string/`GridPattern` is coerced into a [fill] object
+#'   automatically). Default [fill_none()] (no background drawn; the
+#'   page's own background shows through, matching `draw()`'s behavior
+#'   before `canvas` existed).
 #' @param xlim,ylim Fixed axis limits, each a numeric vector of length 2, or
 #'   `NULL` (the default) to compute them from the sketch's own shapes at
 #'   draw time, as [draw()] already did before `canvas` existed. An explicit
@@ -59,7 +61,7 @@
 canvas <- S7::new_class(
   name = "canvas",
   properties = list(
-    background = S7::new_property(fill_class, default = fill_none()),
+    background = fill,
     # class_any (not class_numeric) so a literal NULL default is stored as
     # NULL, rather than S7 treating `default = NULL` as "no default given"
     # and substituting a zero-length numeric() -- see .agents/HISTORY.md
@@ -67,6 +69,23 @@ canvas <- S7::new_class(
     ylim       = S7::new_property(S7::class_any, default = NULL),
     clip       = S7::new_property(S7::class_logical, default = FALSE)
   ),
+  # explicit argument defaults (rather than new_property(default = ...))
+  # keep the auto-generated constructor's roxygen \usage line valid --
+  # embedding a pre-built fill()/fill_none() object directly as a property
+  # default renders as an unparseable "<object>" literal in the Rd \usage
+  # section -- see style()'s own constructor for the same reason.
+  constructor = function(background = fill_none(),
+                         xlim = NULL,
+                         ylim = NULL,
+                         clip = FALSE) {
+    S7::new_object(
+      S7::S7_object(),
+      background = as_fill(background),
+      xlim = xlim,
+      ylim = ylim,
+      clip = clip
+    )
+  },
   validator = function(self) {
     if (!is.null(self@xlim) && (!is.numeric(self@xlim) || length(self@xlim) != 2)) {
       return("xlim must be NULL or a numeric vector of length 2")

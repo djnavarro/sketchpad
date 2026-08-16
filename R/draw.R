@@ -84,16 +84,26 @@ apply_alpha <- function(color, alpha) {
 #' sub-path concept (no `id` support in [grid::pointsGrob()]), consistent
 #' with `fill` already being inert for both non-`"polygon"` geometries.
 #'
+#' `sty@fill` is a [fill] object; it's resolved against `aspect` (the
+#' target's own bounding-box aspect ratio, from the internal `bbox_aspect()`/
+#' `bbox_aspect_range()`) via the internal `resolve_fill()` helper before
+#' being handed to [grid::gpar()] -- this is what lets every aspect-taking
+#' `fill_*()` helper compute its own pattern automatically at draw time,
+#' rather than requiring the caller to pass `aspect` by hand.
+#'
 #' @param points A [xy].
 #' @param sty A [style].
 #' @param geometry One of `"polygon"`, `"path"`, or `"points"`.
 #' @param vp A [grid::viewport()].
+#' @param aspect The target's own bounding-box aspect ratio (width /
+#'   height), used to resolve `sty@fill` if it has a `resolve` function.
 #' @noRd
-geometry_grob <- function(points, sty, geometry, vp) {
-  fill <- if (is.character(sty@fill)) {
-    apply_alpha(sty@fill, sty@fill_alpha)
+geometry_grob <- function(points, sty, geometry, vp, aspect) {
+  resolved <- resolve_fill(sty@fill, aspect)
+  fill <- if (is.character(resolved)) {
+    apply_alpha(resolved, sty@fill_alpha)
   } else {
-    sty@fill
+    resolved
   }
   switch(geometry,
     polygon = grid::pathGrob(
@@ -154,8 +164,9 @@ S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
     height = grid::unit(min(1, y_width / x_width), "snpc"),
   )
 
-  # grob type depends on the drawable's geometry
-  grob <- geometry_grob(object@points, object@style, object@geometry, vp)
+  # grob type depends on the drawable's geometry; sty@fill (a fill object)
+  # is resolved against this drawable's own bounding-box aspect ratio
+  grob <- geometry_grob(object@points, object@style, object@geometry, vp, bbox_aspect(object))
 
   # draw the grob
   grid::grid.newpage()
@@ -202,14 +213,16 @@ S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
     clip   = if (object@canvas@clip) "on" else "off"
   )
 
-  # draw the page, canvas background, then every shape's grob on top
+  # draw the page, canvas background, then every shape's grob on top; the
+  # background has no single target drawable, so its own aspect comes from
+  # the shared viewport's xlim/ylim instead of bbox_aspect()
   grid::grid.newpage()
-  bg <- object@canvas@background
+  bg <- resolve_fill(object@canvas@background, bbox_aspect_range(xlim, ylim))
   if (!(is.character(bg) && length(bg) == 1 && is.na(bg))) {
     grid::grid.draw(grid::rectGrob(gp = grid::gpar(fill = bg, col = NA), vp = vp))
   }
   for (s in shapes) {
-    grob <- geometry_grob(s@points, s@style, s@geometry, vp)
+    grob <- geometry_grob(s@points, s@style, s@geometry, vp, bbox_aspect(s))
     grid::grid.draw(grob)
   }
 }

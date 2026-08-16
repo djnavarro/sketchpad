@@ -4,14 +4,16 @@
 \alias{canvas}
 \title{Canvas settings for a sketch}
 \usage{
-canvas(background = NA_character_, xlim = NULL, ylim = NULL, clip = FALSE)
+canvas(background = fill_none(), xlim = NULL, ylim = NULL, clip = FALSE)
 }
 \arguments{
 \item{background}{Background fill, drawn beneath every shape in the
 sketch. Either a plain colour string, or the output of a \verb{fill_*()}
-helper -- see \code{\link[=style]{style()}}'s \code{fill} argument for the full family. Default
-\code{\link[=fill_none]{fill_none()}} (no background drawn; the page's own background shows
-through, matching \code{draw()}'s behavior before \code{canvas} existed).}
+helper -- see \code{\link[=style]{style()}}'s \code{fill} argument for the full family (a bare
+colour string/\code{GridPattern} is coerced into a \link{fill} object
+automatically). Default \code{\link[=fill_none]{fill_none()}} (no background drawn; the
+page's own background shows through, matching \code{draw()}'s behavior
+before \code{canvas} existed).}
 
 \item{xlim, ylim}{Fixed axis limits, each a numeric vector of length 2, or
 \code{NULL} (the default) to compute them from the sketch's own shapes at

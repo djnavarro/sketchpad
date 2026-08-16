@@ -7,7 +7,7 @@
 fill_checker(
   color = c("black", "white"),
   spacing = 0.2,
-  aspect = 1,
+  aspect = NULL,
   extend = "repeat"
 )
 }
@@ -18,7 +18,10 @@ fill_checker(
 box. Must be a positive number. Default \code{0.2}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+\code{\link[=draw]{draw()}} time -- see the \link{fill} class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.}
 
 \item{extend}{Passed to \code{\link[grid:pattern]{grid::pattern()}}. Default \code{"repeat"}.}
 }
@@ -60,10 +63,10 @@ two \code{color}s for anything beyond casual use.
 As with the other \verb{fill_*()} helpers, \code{\link[grid:pattern]{grid::pattern()}} tiles are sized
 as a fraction of the target polygon's own bounding box rather than a
 fixed physical square, so the checker squares would render as
-rectangles, not squares, on a non-square bounding box. Pass the target's
-width-to-height ratio as \code{aspect} to correct for this -- the same tile-
-squaring technique \code{\link[=fill_stipple]{fill_stipple()}} uses for its dots -- so the default
-\code{aspect = 1} is only exact for a square bounding box.
+rectangles, not squares, on a non-square bounding box -- the same
+tile-squaring technique \code{\link[=fill_stipple]{fill_stipple()}} uses for its dots. \code{aspect}
+resolves this automatically by default (see \code{\link[=fill_hatch]{fill_hatch()}}'s own
+\code{aspect} docs).
 }
 
 \examples{
@@ -83,6 +86,7 @@ draw(shape_circle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},
 \code{\link[=fill_flow]{fill_flow()}},

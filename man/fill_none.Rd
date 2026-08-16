@@ -7,7 +7,7 @@
 fill_none()
 }
 \value{
-\code{NA_character_}.
+A \link{fill} object wrapping \code{NA_character_}.
 }
 \description{
 \code{fill_none()} leaves a \link{drawable}'s interior entirely unfilled, while
@@ -40,6 +40,7 @@ draw(shape_polygon(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

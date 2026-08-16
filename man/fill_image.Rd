@@ -8,7 +8,7 @@ fill_image(
   image,
   preserve_aspect = TRUE,
   spacing = 1,
-  aspect = 1,
+  aspect = NULL,
   interpolate = TRUE,
   extend = "repeat"
 )
@@ -28,7 +28,10 @@ Must be a positive number. Default \code{1} (one tile spans the whole
 shape).}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+\code{\link[=draw]{draw()}} time -- see the \link{fill} class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.}
 
 \item{interpolate}{Passed to \code{\link[grid:rasterGrob]{grid::rasterGrob()}}. Default \code{TRUE}.}
 
@@ -58,9 +61,11 @@ intensities.
 
 Unlike the other \verb{fill_*()} helpers, \code{fill_image()}'s content has its
 \emph{own} pixel aspect ratio to account for, on top of the usual
-target-bounding-box correction every helper needs (\code{aspect}, corrected
-for exactly as \code{\link[=fill_noise]{fill_noise()}} does -- keeping the tile physically
-square). With \code{preserve_aspect = TRUE} (the default), the image is
+target-bounding-box correction every helper needs (\code{aspect}, defaulting
+to automatic resolution exactly as every other helper -- see
+\code{\link[=fill_hatch]{fill_hatch()}}'s own \code{aspect} docs -- and corrected for exactly as
+\code{\link[=fill_noise]{fill_noise()}} does -- keeping the tile physically square). With
+\code{preserve_aspect = TRUE} (the default), the image is
 letterboxed to fit that square tile without distorting it: whichever of
 width/height is smaller in the image's own pixel dimensions is shrunk
 to fit, leaving the tile's remaining margin transparent. Set
@@ -83,6 +88,7 @@ draw(shape_rectangle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

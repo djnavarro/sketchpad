@@ -1,6 +1,64 @@
 #' @noRd
 fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern"))
 
+#' A resolved or auto-resolving fill value
+#'
+#' `fill` is the common representation stored in [style()]'s `fill`
+#' property and [canvas()]'s `background` property: a `value` (a plain
+#' colour string, or the `GridPattern` output of a `fill_*()` pattern/
+#' gradient helper) plus an optional `resolve` function. `resolve`, when
+#' present, is called with the real target's own bounding-box aspect ratio
+#' at [draw()] time to rebuild `value` with the correct tile shape -- see
+#' the internal `resolvable_fill()`/`resolve_fill()` helpers (`R/fill.R`),
+#' and [fill_hatch()]'s own `aspect` argument docs for the problem this
+#' solves. `resolve` is `NULL` whenever a helper's `aspect` was supplied
+#' explicitly (a fixed aspect, never automatically recomputed) or for a
+#' fill with no aspect-dependence at all ([fill_solid()], [fill_none()]).
+#'
+#' Not usually constructed directly -- every `fill_*()` helper already
+#' returns one, and [style()]/[canvas()] coerce a bare colour string or
+#' `GridPattern` into one automatically (via the internal `as_fill()`
+#' helper) if passed directly.
+#'
+#' @param value A plain colour string, or a `GridPattern` object (the
+#'   output of [grid::pattern()], as returned by every `fill_*()` helper
+#'   besides [fill_solid()]/[fill_none()]). Default `"black"`.
+#' @param resolve `NULL`, or a function of one argument (`aspect`)
+#'   rebuilding `value` for a newly-known target aspect ratio. Default
+#'   `NULL`.
+#'
+#' @family fill helpers
+#' @export
+fill <- S7::new_class(
+  name = "fill",
+  properties = list(
+    value = S7::new_property(fill_class, default = "black"),
+    resolve = S7::new_property(S7::class_any, default = NULL)
+  ),
+  validator = function(self) {
+    if (!is.null(self@resolve) && !is.function(self@resolve)) {
+      "resolve must be NULL or a function"
+    }
+  }
+)
+
+#' Coerce a bare fill value into a `fill` object
+#'
+#' Internal helper shared by `style()`'s and `canvas()`'s own constructors:
+#' a [fill] object passes through unchanged, while a plain colour string or
+#' `GridPattern` (e.g. typed directly rather than built via a `fill_*()`
+#' helper) is wrapped with no `resolve`.
+#'
+#' @param x A [fill] object, or a plain colour string/`GridPattern`.
+#' @return A [fill] object.
+#' @noRd
+as_fill <- function(x) {
+  if (S7::S7_inherits(x, fill)) {
+    return(x)
+  }
+  fill(value = x)
+}
+
 #' Graphical style for a drawable object
 #'
 #' `style` is a container for the graphical properties passed to
@@ -10,8 +68,9 @@ fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern")
 #' @param fill Fill colour or pattern. Either a plain colour string, or the
 #'   output of a `fill_*()` helper -- [fill_solid()], [fill_none()],
 #'   [fill_hatch()], [fill_crosshatch()], [fill_stipple()], [fill_noise()],
-#'   [fill_gradient()], or [fill_vignette()]. Default `fill_solid("black")`
-#'   (i.e. `"black"`).
+#'   [fill_gradient()], or [fill_vignette()]. A bare colour string/
+#'   `GridPattern` is coerced into a [fill] object automatically. Default
+#'   `fill_solid("black")` (i.e. `"black"`).
 #' @param linewidth Line width. Default `1`.
 #' @param linetype Line dash pattern, forwarded to [grid::gpar()]'s `lty`.
 #'   Either a named type (`"solid"`, `"dashed"`, `"dotted"`, `"dotdash"`,
@@ -100,7 +159,7 @@ style <- S7::new_class(
   name = "style",
   properties = list(
     color = S7::new_property(S7::class_character, default = "black"),
-    fill = S7::new_property(fill_class, default = fill_solid("black")),
+    fill = fill,
     linewidth = S7::new_property(S7::class_numeric, default = 1),
     linetype = S7::new_property(
       S7::new_union(S7::class_character, S7::class_numeric),
@@ -113,6 +172,38 @@ style <- S7::new_class(
     color_alpha = S7::new_property(S7::class_numeric, default = 1),
     fill_alpha = S7::new_property(S7::class_numeric, default = 1)
   ),
+  # explicit argument defaults (rather than new_property(default = ...))
+  # keep the auto-generated constructor's roxygen \usage line valid --
+  # embedding a pre-built fill() object directly as a property default
+  # renders as an unparseable "<object>" literal in the Rd \usage section
+  # (the same reason sketch()'s own canvas argument needs one -- see
+  # .agents/HISTORY.md). `fill`'s own default expression calls
+  # `fill_solid()`, not `fill()` itself, so there's no name-shadowing
+  # concern the way `canvas = canvas()` has.
+  constructor = function(color = "black",
+                         fill = fill_solid("black"),
+                         linewidth = 1,
+                         linetype = "solid",
+                         linejoin = "round",
+                         lineend = "round",
+                         linemitre = 10,
+                         rule = "evenodd",
+                         color_alpha = 1,
+                         fill_alpha = 1) {
+    S7::new_object(
+      S7::S7_object(),
+      color = color,
+      fill = as_fill(fill),
+      linewidth = linewidth,
+      linetype = linetype,
+      linejoin = linejoin,
+      lineend = lineend,
+      linemitre = linemitre,
+      rule = rule,
+      color_alpha = color_alpha,
+      fill_alpha = fill_alpha
+    )
+  },
   validator = function(self) {
     if (length(self@rule) != 1) {
       return("rule must be a single string")

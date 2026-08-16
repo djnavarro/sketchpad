@@ -10,7 +10,7 @@ fill_gradient(
   angle = 45,
   stops = NULL,
   spacing = 1,
-  aspect = 1,
+  aspect = NULL,
   extend = "pad"
 )
 }
@@ -31,7 +31,9 @@ Must be a positive number. Default \code{1} (one tile spans the whole
 shape).}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically at \code{\link[=draw]{draw()}} time -- see \code{\link[=fill_hatch]{fill_hatch()}}'s own \code{aspect}
+docs.}
 
 \item{extend}{Passed to the inner \code{\link[grid:linearGradient]{grid::linearGradient()}}/
 \code{\link[grid:radialGradient]{grid::radialGradient()}}, controlling what happens beyond the colour
@@ -48,8 +50,10 @@ is a single rectangle filled with a \code{\link[grid:linearGradient]{grid::linea
 }
 \details{
 Like the other \verb{fill_*()} helpers, this needs the target's bounding-box
-aspect ratio (\code{aspect}) to render true rather than stretched -- but the
-correction is applied differently here. Rather than adjusting the
+aspect ratio (\code{aspect}, resolved automatically by default -- see
+\code{\link[=fill_hatch]{fill_hatch()}}'s own \code{aspect} docs) to render true rather than
+stretched -- but the correction is applied differently here. Rather
+than adjusting the
 gradient's own coordinates (the way \code{\link[=fill_hatch]{fill_hatch()}} adjusts a segment's
 direction), \code{fill_gradient()} corrects the \emph{tile} itself to be physically
 square, exactly as \code{\link[=fill_stipple]{fill_stipple()}} does for its dots: once the tile is
@@ -87,6 +91,7 @@ draw(shape_circle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

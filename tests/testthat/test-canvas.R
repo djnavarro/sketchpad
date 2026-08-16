@@ -5,15 +5,15 @@ local_null_device <- function() {
 
 test_that("canvas() defaults to no background, auto limits, no clipping", {
   cv <- canvas()
-  expect_identical(cv@background, fill_none())
+  expect_identical(fv(cv@background), fv(fill_none()))
   expect_null(cv@xlim)
   expect_null(cv@ylim)
   expect_false(cv@clip)
 })
 
 test_that("canvas() accepts a plain colour or a fill_*() pattern as background", {
-  expect_identical(canvas(background = "grey90")@background, "grey90")
-  expect_true(inherits(canvas(background = fill_hatch())@background, "GridPattern"))
+  expect_identical(fv(canvas(background = "grey90")@background), "grey90")
+  expect_true(inherits(fv(canvas(background = fill_hatch())@background), "GridPattern"))
 })
 
 test_that("canvas() rejects malformed xlim/ylim/clip", {
@@ -28,7 +28,7 @@ test_that("sketch() defaults to canvas()", {
 
 test_that("sketch() accepts a custom canvas", {
   s <- sketch(canvas = canvas(background = "white"))
-  expect_identical(s@canvas@background, "white")
+  expect_identical(fv(s@canvas@background), "white")
 })
 
 test_that("draw() renders a sketch with a solid background without error", {

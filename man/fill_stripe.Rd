@@ -8,7 +8,7 @@ fill_stripe(
   color = c("black", "white"),
   angle = 45,
   spacing = 0.2,
-  aspect = 1,
+  aspect = NULL,
   extend = "repeat"
 )
 }
@@ -23,7 +23,10 @@ positive x-axis. Default \code{45}.}
 the target's bounding box. Must be a positive number. Default \code{0.2}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+\code{\link[=draw]{draw()}} time -- see the \link{fill} class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.}
 
 \item{extend}{Passed to the inner \code{\link[grid:linearGradient]{grid::linearGradient()}}, controlling
 what happens beyond the colour stops -- \emph{not} to the outer
@@ -52,9 +55,10 @@ colour stops (no smooth transition) and \code{extend = "repeat"}, which
 repeats \emph{itself} continuously along its own axis -- a fundamentally
 different (and for this purpose, simpler) mechanism than tiling a
 rasterised copy. \code{\link[grid:pattern]{grid::pattern()}} is still used around this gradient,
-but only once, as a single square (aspect-corrected) tile spanning the
-whole target shape, exactly as \code{\link[=fill_gradient]{fill_gradient()}} does by default -- not
-to create repetition, which the gradient already provides.
+but only once, as a single square (automatically aspect-corrected --
+see \code{\link[=fill_hatch]{fill_hatch()}}'s own \code{aspect} docs) tile spanning the whole target
+shape, exactly as \code{\link[=fill_gradient]{fill_gradient()}} does by default -- not to create
+repetition, which the gradient already provides.
 
 Each of the \code{n = length(color)} colours gets an equal-width band by
 default (\code{1/n} of the period); there's no separate argument for unequal
@@ -80,6 +84,7 @@ draw(shape_circle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

@@ -38,7 +38,7 @@ test_that("effect_bristle() preserves object's own style on every bristle", {
     ),
     n_bristles = 2L
   )
-  expect_equal(sk[[1]]@style@fill, "red")
+  expect_equal(fv(sk[[1]]@style@fill), "red")
   expect_equal(sk[[1]]@style@fill_alpha, 0.4)
 })
 

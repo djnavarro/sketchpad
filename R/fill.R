@@ -1,3 +1,47 @@
+#' Build a `fill` object from a `build(aspect)` closure
+#'
+#' Internal helper shared by every aspect-taking `fill_*()` helper below.
+#' `build` computes the actual `GridPattern` (or colour string) for a
+#' given aspect ratio; `aspect = NULL` (the default on every such helper)
+#' defers that computation to [draw()] time, against the real target's own
+#' bounding-box aspect, by keeping `build` itself as the returned [fill]'s
+#' `resolve`. Passing a fixed `aspect` instead computes `value` once,
+#' immediately, with no `resolve` -- matching every such helper's behavior
+#' before automatic resolution existed.
+#'
+#' @param build A function of one argument (`aspect`).
+#' @param aspect `NULL`, or a single positive number.
+#' @return A [fill] object.
+#' @noRd
+resolvable_fill <- function(build, aspect) {
+  fill(
+    value = build(if (is.null(aspect)) 1 else aspect),
+    resolve = if (is.null(aspect)) build else NULL
+  )
+}
+
+#' Resolve a `fill` object against a real target aspect ratio
+#'
+#' Internal helper used by [draw()]'s own `geometry_grob()`: a [fill]
+#' object with a `resolve` is rebuilt against `aspect`; one without simply
+#' returns its own stored `value`. A bare (non-`fill`) value is returned
+#' unchanged, so this is also safe to call defensively on anything that
+#' might not have been coerced yet.
+#'
+#' @param f A [fill] object (or a bare colour string/`GridPattern`).
+#' @param aspect A single positive number.
+#' @return A plain colour string or `GridPattern`.
+#' @noRd
+resolve_fill <- function(f, aspect) {
+  if (!S7::S7_inherits(f, fill)) {
+    return(f)
+  }
+  if (is.null(f@resolve)) {
+    return(f@value)
+  }
+  f@resolve(aspect)
+}
+
 #' Solid colour fill
 #'
 #' `fill_solid()` is the trivial member of the `fill_*()` family: a plain
@@ -11,7 +55,7 @@
 #'
 #' @param color Fill colour. Default `"black"`.
 #'
-#' @return `color`, unchanged (a single string), after validating it.
+#' @return A [fill] object wrapping `color`.
 #'
 #' @examples
 #' fill_solid("steelblue")
@@ -27,7 +71,7 @@ fill_solid <- function(color = "black") {
   if (!is.character(color) || length(color) != 1) {
     rlang::abort("color must be a single string")
   }
-  color
+  fill(value = color)
 }
 
 #' Unfilled (transparent) fill
@@ -46,7 +90,7 @@ fill_solid <- function(color = "black") {
 #' outline -- the edge connecting the last point back to the first is still
 #' drawn. It does not, by itself, produce an open/unstroked curve.
 #'
-#' @return `NA_character_`.
+#' @return A [fill] object wrapping `NA_character_`.
 #'
 #' @examples
 #' draw(shape_circle(fill = fill_none(), linewidth = 2))
@@ -63,7 +107,7 @@ fill_solid <- function(color = "black") {
 #' @family fill helpers
 #' @export
 fill_none <- function() {
-  NA_character_
+  fill(value = NA_character_)
 }
 
 #' Validate the shared arguments of a `fill_*()` helper
@@ -135,10 +179,11 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' own bounding box*, not a fixed physical square, so a tile that looks
 #' square in that relative sense can be a stretched rectangle in absolute
 #' terms whenever the target's bounding box isn't square itself -- which
-#' distorts any angle baked directly into the pattern content. Pass the
-#' target's bounding-box aspect ratio (width / height) as `aspect` to
-#' correct for this; the default `aspect = 1` is only exact for a square
-#' bounding box.
+#' distorts any angle baked directly into the pattern content. This is
+#' corrected automatically: `aspect` defaults to `NULL`, resolved against
+#' the real target's own bounding-box aspect ratio (width / height) at
+#' [draw()] time (see the [fill] class); pass a fixed number instead to
+#' compute the pattern once, immediately, against that value only.
 #'
 #' Internally, the hatch line is always drawn as a plain diagonal from one
 #' tile corner to the opposite corner (or the mirror image, for a
@@ -158,7 +203,10 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
 #'   box. Must be a positive number. Default `0.1`.
 #' @param aspect Width-to-height ratio of the target polygon's bounding box.
-#'   Must be a positive number. Default `1` (a square bounding box).
+#'   Must be a positive number, or `NULL` (the default) to resolve it
+#'   automatically from the real target's own bounding-box aspect ratio at
+#'   [draw()] time -- see the [fill] class. Passing a fixed number instead
+#'   computes the pattern once, immediately, against that value only.
 #' @param linewidth Line width. Must be a positive number. Default `1`.
 #' @param extend Passed to [grid::pattern()]. Default `"repeat"`.
 #'
@@ -189,9 +237,10 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 fill_hatch <- function(color = "black",
                        angle = 45,
                        spacing = 0.1,
-                       aspect = 1,
+                       aspect = NULL,
                        linewidth = 1,
                        extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(angle, spacing, aspect)
   if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
     rlang::abort("linewidth must be a single positive number")
@@ -234,6 +283,8 @@ fill_hatch <- function(color = "black",
   }
 
   grid::pattern(seg, width = dims["width"], height = dims["height"], extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Crosshatch pattern fill
@@ -290,9 +341,10 @@ fill_hatch <- function(color = "black",
 fill_crosshatch <- function(color = "black",
                             angle = 45,
                             spacing = 0.1,
-                            aspect = 1,
+                            aspect = NULL,
                             linewidth = 1,
                             extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(angle, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
@@ -339,6 +391,8 @@ fill_crosshatch <- function(color = "black",
   )
 
   grid::pattern(content, width = dims["width"], height = dims["height"], extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Checkerboard pattern fill
@@ -376,10 +430,10 @@ fill_crosshatch <- function(color = "black",
 #' As with the other `fill_*()` helpers, [grid::pattern()] tiles are sized
 #' as a fraction of the target polygon's own bounding box rather than a
 #' fixed physical square, so the checker squares would render as
-#' rectangles, not squares, on a non-square bounding box. Pass the target's
-#' width-to-height ratio as `aspect` to correct for this -- the same tile-
-#' squaring technique [fill_stipple()] uses for its dots -- so the default
-#' `aspect = 1` is only exact for a square bounding box.
+#' rectangles, not squares, on a non-square bounding box -- the same
+#' tile-squaring technique [fill_stipple()] uses for its dots. `aspect`
+#' resolves this automatically by default (see [fill_hatch()]'s own
+#' `aspect` docs).
 #'
 #' @param color Two or more checker colours. Default `c("black", "white")`.
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
@@ -407,8 +461,9 @@ fill_crosshatch <- function(color = "black",
 #' @export
 fill_checker <- function(color = c("black", "white"),
                          spacing = 0.2,
-                         aspect = 1,
+                         aspect = NULL,
                          extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color", min_length = 2)
 
@@ -433,6 +488,8 @@ fill_checker <- function(color = c("black", "white"),
   content <- grid::grobTree(do.call(grid::gList, rects))
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Stippled dot pattern fill
@@ -448,9 +505,9 @@ fill_checker <- function(color = c("black", "white"),
 #' still a circularity problem to correct for, though: [grid::pattern()]
 #' tiles are sized as a fraction of the target polygon's own bounding box,
 #' so a dot drawn with an `npc`-relative radius renders as an ellipse
-#' whenever that bounding box isn't square. Pass the bounding box's
-#' width-to-height ratio as `aspect` to keep dots circular; the default
-#' `aspect = 1` is only exact for a square bounding box.
+#' whenever that bounding box isn't square. `aspect` corrects for this
+#' automatically by default, keeping dots circular (see [fill_hatch()]'s
+#' own `aspect` docs).
 #'
 #' @section Known rendering risk with multiple dots: On this package's
 #'   development R build (4.6.1, a very recent/development version),
@@ -504,10 +561,11 @@ fill_checker <- function(color = c("black", "white"),
 fill_stipple <- function(color = "black",
                          radius = 0.15,
                          spacing = 0.3,
-                         aspect = 1,
+                         aspect = NULL,
                          n = 4L,
                          seed = 1L,
                          extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(radius) || length(radius) != 1 || radius <= 0) {
@@ -548,6 +606,8 @@ fill_stipple <- function(color = "black",
     width = spacing, height = spacing * aspect,
     extend = extend
   )
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Scattered-shape pattern fill
@@ -620,7 +680,9 @@ fill_stipple <- function(color = "black",
 #'   shape, since `spacing < 1` risks the tiling distortion described
 #'   above).
 #' @param aspect Width-to-height ratio of the target polygon's bounding
-#'   box. Must be a positive number. Default `1` (a square bounding box).
+#'   box. Must be a positive number, or `NULL` (the default) to resolve it
+#'   automatically at [draw()] time -- see [fill_hatch()]'s own `aspect`
+#'   docs.
 #' @param extend Passed to [grid::pattern()]. Default `"repeat"`.
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -656,9 +718,10 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
                          size = 0.2,
                          color = NULL,
                          spacing = 1,
-                         aspect = 1,
+                         aspect = NULL,
                          seed = 1L,
                          extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   if (!S7::S7_inherits(unit, drawable)) {
     rlang::abort("unit must be a drawable")
@@ -703,6 +766,11 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
   )
 
   stamp_colors <- if (is.null(color)) rep(unit@style@color, n) else rep_len(color, n)
+  # unit@style@fill is a fill object (possibly still unresolved, e.g. a
+  # nested fill_*() pattern with its own auto-resolving aspect); resolve it
+  # against unit's own bounding-box aspect before embedding it in a nested
+  # gpar(), the same way draw() resolves a top-level drawable's own fill
+  unit_fill <- resolve_fill(unit@style@fill, bbox_aspect(unit))
 
   stamps <- purrr::pmap(list(cx, cy, stamp_colors), function(ccx, ccy, ccol) {
     grid::polygonGrob(
@@ -710,7 +778,7 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
       default.units = "npc",
       gp = grid::gpar(
         col = ccol,
-        fill = unit@style@fill,
+        fill = unit_fill,
         lwd = unit@style@linewidth
       )
     )
@@ -718,6 +786,8 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
   content <- grid::grobTree(do.call(grid::gList, stamps))
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Halftone dot pattern fill
@@ -737,11 +807,11 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
 #' this while still getting a genuine scattered-dot texture, so **check
 #' rendered output visually** here too.
 #'
-#' As with [fill_stipple()], the target's bounding-box aspect ratio needs
-#' to be passed as `aspect` to keep the dots circular rather than
-#' elliptical; the default `aspect = 1` is only exact for a square
-#' bounding box. Dot centres are kept at least `max(radius)` from each
-#' tile edge, so even the largest possible dot isn't clipped away near a
+#' As with [fill_stipple()], `aspect` corrects for the target's own
+#' bounding-box aspect ratio automatically by default, keeping the dots
+#' circular rather than elliptical (see [fill_hatch()]'s own `aspect`
+#' docs). Dot centres are kept at least `max(radius)` from each tile
+#' edge, so even the largest possible dot isn't clipped away near a
 #' boundary.
 #'
 #' @param radius Dot radius range, as a length-2 numeric vector giving the
@@ -777,10 +847,11 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
 fill_halftone <- function(color = "black",
                           radius = c(0.05, 0.2),
                           spacing = 0.3,
-                          aspect = 1,
+                          aspect = NULL,
                           n = 4L,
                           seed = 1L,
                           extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(radius) || length(radius) != 2 || any(radius <= 0)) {
@@ -820,6 +891,8 @@ fill_halftone <- function(color = "black",
   content <- grid::grobTree(do.call(grid::gList, dots))
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Build the (along, across) coordinates of a random-harmonic wander line
@@ -974,10 +1047,11 @@ fill_scribble <- function(color = "black",
                           resolution = 200L,
                           linewidth = 1,
                           spacing = 0.25,
-                          aspect = 1,
+                          aspect = NULL,
                           seed = 1L,
                           extend = "repeat") {
   direction <- match.arg(direction)
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   if (!is.numeric(n_lines) || length(n_lines) != 1 ||
     n_lines < 1 || n_lines != round(n_lines)) {
@@ -1027,6 +1101,8 @@ fill_scribble <- function(color = "black",
   content <- grid::grobTree(do.call(grid::gList, strokes))
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Torus-mapped tile coordinates for a periodic raster fill
@@ -1190,13 +1266,14 @@ noise_to_pixels <- function(value01, color, alpha) {
 #' @export
 fill_noise <- function(color = "black",
                        spacing = 0.5,
-                       aspect = 1,
+                       aspect = NULL,
                        resolution = 32L,
                        alpha = 1,
                        frequency = 1,
                        octaves = 2L,
                        seed = 1L,
                        extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(resolution) || length(resolution) != 1 ||
@@ -1236,6 +1313,8 @@ fill_noise <- function(color = "black",
   )
 
   grid::pattern(raster, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Marbled, veined texture fill
@@ -1307,7 +1386,7 @@ fill_noise <- function(color = "black",
 #' @export
 fill_marble <- function(color = c("white", "black"),
                         spacing = 0.5,
-                        aspect = 1,
+                        aspect = NULL,
                         resolution = 32L,
                         stripes = 3L,
                         warp = 4,
@@ -1315,6 +1394,7 @@ fill_marble <- function(color = c("white", "black"),
                         octaves = 3L,
                         seed = 1L,
                         extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color", min_length = 2)
   if (!is.numeric(resolution) || length(resolution) != 1 ||
@@ -1362,6 +1442,8 @@ fill_marble <- function(color = c("white", "black"),
   )
 
   grid::pattern(raster, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Domain-warped noise texture fill
@@ -1423,7 +1505,7 @@ fill_marble <- function(color = c("white", "black"),
 #' @export
 fill_flow <- function(color = "black",
                       spacing = 0.5,
-                      aspect = 1,
+                      aspect = NULL,
                       resolution = 32L,
                       alpha = 1,
                       warp = 2,
@@ -1433,6 +1515,7 @@ fill_flow <- function(color = "black",
                       octaves = 2L,
                       seed = 1L,
                       extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(resolution) || length(resolution) != 1 ||
@@ -1489,6 +1572,8 @@ fill_flow <- function(color = "black",
   )
 
   grid::pattern(raster, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Charcoal/marker-style noise texture fill
@@ -1543,7 +1628,7 @@ fill_flow <- function(color = "black",
 #' @export
 fill_charcoal <- function(color = "gray15",
                           spacing = 0.25,
-                          aspect = 1,
+                          aspect = NULL,
                           resolution = 32L,
                           alpha = 1,
                           frequency = 4,
@@ -1577,9 +1662,11 @@ fill_charcoal <- function(color = "gray15",
 #'
 #' Unlike the other `fill_*()` helpers, `fill_image()`'s content has its
 #' *own* pixel aspect ratio to account for, on top of the usual
-#' target-bounding-box correction every helper needs (`aspect`, corrected
-#' for exactly as [fill_noise()] does -- keeping the tile physically
-#' square). With `preserve_aspect = TRUE` (the default), the image is
+#' target-bounding-box correction every helper needs (`aspect`, defaulting
+#' to automatic resolution exactly as every other helper -- see
+#' [fill_hatch()]'s own `aspect` docs -- and corrected for exactly as
+#' [fill_noise()] does -- keeping the tile physically square). With
+#' `preserve_aspect = TRUE` (the default), the image is
 #' letterboxed to fit that square tile without distorting it: whichever of
 #' width/height is smaller in the image's own pixel dimensions is shrunk
 #' to fit, leaving the tile's remaining margin transparent. Set
@@ -1620,9 +1707,10 @@ fill_charcoal <- function(color = "gray15",
 fill_image <- function(image,
                        preserve_aspect = TRUE,
                        spacing = 1,
-                       aspect = 1,
+                       aspect = NULL,
                        interpolate = TRUE,
                        extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   if (!is.matrix(image) && !is.array(image) && !inherits(image, "raster")) {
     rlang::abort(
@@ -1674,6 +1762,8 @@ fill_image <- function(image,
   )
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Gradient fill
@@ -1683,8 +1773,10 @@ fill_image <- function(image,
 #' [grid::radialGradient()], depending on `type`.
 #'
 #' Like the other `fill_*()` helpers, this needs the target's bounding-box
-#' aspect ratio (`aspect`) to render true rather than stretched -- but the
-#' correction is applied differently here. Rather than adjusting the
+#' aspect ratio (`aspect`, resolved automatically by default -- see
+#' [fill_hatch()]'s own `aspect` docs) to render true rather than
+#' stretched -- but the correction is applied differently here. Rather
+#' than adjusting the
 #' gradient's own coordinates (the way [fill_hatch()] adjusts a segment's
 #' direction), `fill_gradient()` corrects the *tile* itself to be physically
 #' square, exactly as [fill_stipple()] does for its dots: once the tile is
@@ -1714,7 +1806,9 @@ fill_image <- function(image,
 #'   Must be a positive number. Default `1` (one tile spans the whole
 #'   shape).
 #' @param aspect Width-to-height ratio of the target polygon's bounding box.
-#'   Must be a positive number. Default `1` (a square bounding box).
+#'   Must be a positive number, or `NULL` (the default) to resolve it
+#'   automatically at [draw()] time -- see [fill_hatch()]'s own `aspect`
+#'   docs.
 #' @param extend Passed to the inner [grid::linearGradient()]/
 #'   [grid::radialGradient()], controlling what happens beyond the colour
 #'   stops. Default `"pad"`.
@@ -1745,9 +1839,10 @@ fill_gradient <- function(color = c("white", "black"),
                           angle = 45,
                           stops = NULL,
                           spacing = 1,
-                          aspect = 1,
+                          aspect = NULL,
                           extend = "pad") {
   type <- match.arg(type)
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   if (!is.character(color) || length(color) < 2) {
     rlang::abort("color must be a character vector of at least length 2")
@@ -1787,6 +1882,8 @@ fill_gradient <- function(color = c("white", "black"),
   )
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = "repeat")
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Vignette fill
@@ -1802,9 +1899,10 @@ fill_gradient <- function(color = c("white", "black"),
 #'
 #' As with [fill_gradient()], the fade shape is kept circular by correcting
 #' the *tile* to be physically square via `aspect` (the target's
-#' bounding-box width-to-height ratio), the same technique [fill_stipple()]
-#' uses for its dots -- once the tile is square, a mask specified inside it
-#' in plain `"npc"` needs no further correction.
+#' bounding-box width-to-height ratio, resolved automatically by default
+#' -- see [fill_hatch()]'s own `aspect` docs), the same technique
+#' [fill_stipple()] uses for its dots -- once the tile is square, a mask
+#' specified inside it in plain `"npc"` needs no further correction.
 #'
 #' A mask must always be built with [grid::as.mask()] and an explicit
 #' `type = "alpha"` here, rather than passed as a bare grob (which defaults
@@ -1830,7 +1928,9 @@ fill_gradient <- function(color = c("white", "black"),
 #'   Must be a positive number. Default `1` (one tile spans the whole
 #'   shape).
 #' @param aspect Width-to-height ratio of the target polygon's bounding box.
-#'   Must be a positive number. Default `1` (a square bounding box).
+#'   Must be a positive number, or `NULL` (the default) to resolve it
+#'   automatically at [draw()] time -- see [fill_hatch()]'s own `aspect`
+#'   docs.
 #' @param extend Passed to [grid::pattern()]. Default `"repeat"`.
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -1853,8 +1953,9 @@ fill_gradient <- function(color = c("white", "black"),
 fill_vignette <- function(color = "black",
                           background = NA,
                           spacing = 1,
-                          aspect = 1,
+                          aspect = NULL,
                           extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (length(background) != 1 || !(is.na(background) || is.character(background))) {
@@ -1898,6 +1999,8 @@ fill_vignette <- function(color = "black",
   }
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Striped pattern fill
@@ -1918,9 +2021,10 @@ fill_vignette <- function(color = "black",
 #' repeats *itself* continuously along its own axis -- a fundamentally
 #' different (and for this purpose, simpler) mechanism than tiling a
 #' rasterised copy. [grid::pattern()] is still used around this gradient,
-#' but only once, as a single square (aspect-corrected) tile spanning the
-#' whole target shape, exactly as [fill_gradient()] does by default -- not
-#' to create repetition, which the gradient already provides.
+#' but only once, as a single square (automatically aspect-corrected --
+#' see [fill_hatch()]'s own `aspect` docs) tile spanning the whole target
+#' shape, exactly as [fill_gradient()] does by default -- not to create
+#' repetition, which the gradient already provides.
 #'
 #' Each of the `n = length(color)` colours gets an equal-width band by
 #' default (`1/n` of the period); there's no separate argument for unequal
@@ -1962,8 +2066,9 @@ fill_vignette <- function(color = "black",
 fill_stripe <- function(color = c("black", "white"),
                         angle = 45,
                         spacing = 0.2,
-                        aspect = 1,
+                        aspect = NULL,
                         extend = "repeat") {
+  build <- function(aspect) {
   validate_fill_args(angle, spacing, aspect)
   validate_colors(color, "color", min_length = 2)
 
@@ -1989,13 +2094,18 @@ fill_stripe <- function(color = c("black", "white"),
   )
 
   grid::pattern(content, width = 1, height = aspect, extend = "repeat")
+  }
+  resolvable_fill(build, aspect)
 }
 
 #' Bounding-box aspect ratio of a drawable
 #'
 #' Internal helper. Computes the width-to-height ratio of a [drawable]
 #' object's own points, for use as the `aspect` argument to fill helpers
-#' like [fill_hatch()] and [fill_crosshatch()].
+#' like [fill_hatch()] and [fill_crosshatch()] -- and, since every such
+#' helper now resolves its own `aspect` automatically at [draw()] time
+#' (see the [fill] class), the value [draw()] itself passes to
+#' `resolve_fill()`.
 #'
 #' @param object A [drawable] object.
 #'
@@ -2003,4 +2113,19 @@ fill_stripe <- function(color = c("black", "white"),
 #' @noRd
 bbox_aspect <- function(object) {
   diff(range(object@points@x)) / diff(range(object@points@y))
+}
+
+#' Bounding-box aspect ratio of an explicit coordinate range
+#'
+#' Internal helper, `bbox_aspect()`'s counterpart for [draw()]'s `sketch`
+#' method: a sketch's own `canvas@background` has no single target
+#' drawable to measure, so its aspect is computed from the shared
+#' viewport's own `xlim`/`ylim` instead.
+#'
+#' @param xlim,ylim Each a numeric vector of length 2.
+#'
+#' @return A single positive number.
+#' @noRd
+bbox_aspect_range <- function(xlim, ylim) {
+  diff(xlim) / diff(ylim)
 }

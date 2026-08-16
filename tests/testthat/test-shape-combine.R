@@ -35,12 +35,12 @@ test_that("shape_combine() defaults style to the first input's own style", {
   a <- shape_circle(fill = "tomato")
   b <- shape_circle(x = 5)
   combined <- shape_combine(a, b)
-  expect_identical(combined@style@fill, "tomato")
+  expect_identical(fv(combined@style@fill), "tomato")
 })
 
 test_that("shape_combine() accepts an explicit style override", {
   combined <- shape_combine(shape_circle(), shape_circle(x = 5), style = style(fill = "goldenrod"))
-  expect_identical(combined@style@fill, "goldenrod")
+  expect_identical(fv(combined@style@fill), "goldenrod")
 })
 
 test_that("shape_combine() bakes in each input's own trans/distortion", {

@@ -14,11 +14,11 @@ the writeup.
 
 **0.1:**
 - Arbitrary angle for `fill_scribble()`
-- S7 class for `fill` objects
 
 (`star`, the last outstanding "additional primitive shapes" item,
-"Multiple sub-paths and holes per drawable", and the `group` class are
-now done -- see `.agents/HISTORY.md`.)
+"Multiple sub-paths and holes per drawable", the `group` class, and the
+S7 `fill` class (with automatic `aspect` resolution) are now done -- see
+`.agents/HISTORY.md`.)
 
 **0.2:**
 - Multi-frame/animation export helpers (and interactivity/event handling,
@@ -72,24 +72,6 @@ parallelogram with edge-matching worked out for a curve rather than a
 segment; no such technique exists in this package yet, and none was
 prototyped successfully. Revisit if a real sketch needs an arbitrary
 angle.
-
-## Deferred: S7 class for `fill` objects (0.1)
-
-All fifteen `fill_*()` helpers in `R/fill.R` currently return either a
-plain colour string (`fill_solid()`) or whatever `grid::pattern()`
-produces (`"GridPattern"`-classed S3 objects, everything else) --
-`style@fill` stores this directly, and `draw()` hands it straight to
-`grid::gpar(fill = ...)`, which already accepts either kind
-interchangeably with no branching needed. Considered wrapping these in a
-proper S7 `fill` class (e.g. `fill(pattern = <string or GridPattern>)`)
-to match the rest of the package's S7-based design and give a dispatch
-target for any future `fill_*()` that needs behavior beyond "hand this
-to `gpar()`" -- e.g. `draw()`-time recomputation against the target
-polygon, or device-capability warnings. Deferred: no current `fill_*()`
-needs this, so the wrapper would add an unwrap-at-every-call-site cost
-(`style()`'s validator, `draw()`) for no present behavioral gain. Revisit
-if a concrete `fill_*()` idea comes up that can't be expressed as a bare
-colour string or `GridPattern`.
 
 ## Candidate features (brainstormed, not yet prioritized)
 

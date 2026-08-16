@@ -2596,3 +2596,85 @@ single arc-length parametrization across the whole of `object@x`/
 object's sub-paths aren't actually connected, so that arc-length would
 bridge a fake segment across each sub-path boundary. A per-sub-path
 jitter/fan is a possible future enhancement, not implemented here.
+
+## S7 `fill` class, with automatic `aspect` resolution
+
+Every `fill_*()` helper used to return a bare colour string or the
+`grid::pattern()`-produced `GridPattern` S3 object directly, stored as-is
+in `style@fill`/`canvas@background` (typed as `fill_class`, a union of
+the two). This left every aspect-taking pattern helper (`fill_hatch()`,
+`fill_stipple()`, ...) requiring the caller to compute the target's own
+bounding-box aspect ratio by hand and pass it as `aspect` -- real
+bookkeeping friction, and the concrete gap that motivated finally
+building the "S7 class for `fill` objects" item deferred earlier (see the
+removed entry in `.agents/PLAN.md`'s history).
+
+**Design.** A new `fill` class (`R/style.R`, alongside `fill_class`,
+which it depends on) wraps `value` (the same bare colour string/
+`GridPattern` as before) plus an optional `resolve` function of one
+argument (`aspect`). Every aspect-taking `fill_*()` helper's own
+`aspect` argument default changed from a fixed `1` to `NULL`; internally,
+each helper's whole body (previously ending in a bare `grid::pattern()`
+call) is now wrapped in a local `build <- function(aspect) { ... }`
+closure, with the helper's own last line calling the internal
+`resolvable_fill(build, aspect)` (`R/fill.R`): `aspect = NULL` computes
+`value` once against `aspect = 1` but keeps `build` itself as `resolve`
+(deferring the real computation); an explicit `aspect` computes `value`
+once, immediately, with `resolve = NULL` (matching every such helper's
+old, fixed-aspect behavior exactly). `fill_solid()`/`fill_none()` (no
+aspect-dependence) just wrap their value directly, always with
+`resolve = NULL`. The internal `resolve_fill(f, aspect)` is the
+counterpart used at draw time: a `fill` with a `resolve` is rebuilt
+against the real `aspect`; one without simply returns its own stored
+`value`; a bare non-`fill` value (defensive fallback) passes through
+unchanged.
+
+**Where it slots in.** `style@fill` and `canvas@background` retyped from
+`fill_class` to `fill` itself. Both classes needed a custom `constructor`
+(mirroring `sketch`'s own `canvas` property, for the identical reason --
+see the "embedding an already-evaluated S7 object as a property default"
+gotcha) that coerces a bare colour string/`GridPattern`/`fill_*()` output
+into a `fill` via the internal `as_fill()` helper, so `style(fill =
+"tomato")` and `style(fill = fill_hatch())` both still work unchanged at
+the call site. `draw()`'s own `geometry_grob()` gained an `aspect`
+parameter and now calls `resolve_fill(sty@fill, aspect)` before handing
+the result to `grid::gpar()`; `aspect` itself comes from two new internal
+helpers in `R/fill.R`: `bbox_aspect(object)` (already existed, for a
+single drawable's own points) and the new `bbox_aspect_range(xlim,
+ylim)` (for a sketch's own `canvas@background`, which has no single
+target drawable -- its aspect comes from the shared viewport's own
+`xlim`/`ylim` instead). `format_prop_value()`'s generic S7-object
+handling would have collapsed every `fill` to a bare `<fill>` in
+`format(drawable)`/`format(sketch)`'s own style/canvas summary lines, so
+a dedicated `format_fill_summary()` (`R/format.R`) reports the
+underlying `value` instead, suffixed `" (auto-aspect)"` when a `resolve`
+is present.
+
+**A real bug found along the way.** `fill_scatter()`'s own body reads a
+scattered `unit` drawable's `unit@style@fill` directly, to render each
+stamp with the unit's own fill -- but that's now an unresolved `fill`
+object, not a raw colour/`GridPattern`, and embedding an S7 object
+directly in a nested `grid::gpar()` call corrupts the rendered grob in a
+way that only surfaces at actual draw time (`grid.Call.graphics(...):
+LENGTH or similar applied to object object`), not when merely inspecting
+the returned pattern's own structure -- caught by `R CMD check`'s example
+run, not by the unit tests (which never called `grid.draw()` on a
+`fill_scatter()` output). Fixed by resolving `unit@style@fill` via
+`resolve_fill(unit@style@fill, bbox_aspect(unit))` before embedding it.
+No other `fill_*()` helper reads a nested drawable's own `@style@fill`
+this way.
+
+**Test fallout.** Every `fill_*()` helper's own return value changed
+from a bare `GridPattern`/colour string to a `fill` object, breaking the
+large majority of `test-fill.R`'s existing assertions (`expect_s3_class(
+fill_hatch(), "GridPattern")`, `environment(fill$f)$grob$children`, ...),
+plus several tests elsewhere comparing `@style@fill`/`@canvas@background`
+against a raw string directly (`test-style.R`, `test-canvas.R`,
+`test-vectorize.R`, `test-shape-combine.R`, `test-effect-bristle.R`). A
+shared `fv(f, aspect = 1) <- resolve_fill(f, aspect)` test helper
+(`tests/testthat/helper-fill.R`) unwraps a `fill` back to its resolved
+value the same way `draw()` does, and every affected assertion now wraps
+its `fill_*()`/`@fill`/`@background` value in `fv()` before comparing.
+Deliberately no back-compat shim (bare-value return) was kept -- this is
+a pre-1.0 package with no other consumers in this workspace, matching
+every other breaking rename here.

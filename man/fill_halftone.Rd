@@ -8,7 +8,7 @@ fill_halftone(
   color = "black",
   radius = c(0.05, 0.2),
   spacing = 0.3,
-  aspect = 1,
+  aspect = NULL,
   n = 4L,
   seed = 1L,
   extend = "repeat"
@@ -29,7 +29,10 @@ the first must be no larger than the second. Default \code{c(0.05, 0.2)}.}
 box. Must be a positive number. Default \code{0.3}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default \code{1} (a square bounding box).}
+Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+\code{\link[=draw]{draw()}} time -- see the \link{fill} class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.}
 
 \item{n}{Number of dots scattered per tile. Must be a positive integer.
 Default \code{4L}.}
@@ -59,11 +62,11 @@ build; see that section for details). There is no known way to avoid
 this while still getting a genuine scattered-dot texture, so \strong{check
 rendered output visually} here too.
 
-As with \code{\link[=fill_stipple]{fill_stipple()}}, the target's bounding-box aspect ratio needs
-to be passed as \code{aspect} to keep the dots circular rather than
-elliptical; the default \code{aspect = 1} is only exact for a square
-bounding box. Dot centres are kept at least \code{max(radius)} from each
-tile edge, so even the largest possible dot isn't clipped away near a
+As with \code{\link[=fill_stipple]{fill_stipple()}}, \code{aspect} corrects for the target's own
+bounding-box aspect ratio automatically by default, keeping the dots
+circular rather than elliptical (see \code{\link[=fill_hatch]{fill_hatch()}}'s own \code{aspect}
+docs). Dot centres are kept at least \code{max(radius)} from each tile
+edge, so even the largest possible dot isn't clipped away near a
 boundary.
 }
 \examples{
@@ -88,6 +91,7 @@ draw(shape_circle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

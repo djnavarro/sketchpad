@@ -10,7 +10,7 @@ fill_scatter(
   size = 0.2,
   color = NULL,
   spacing = 1,
-  aspect = 1,
+  aspect = NULL,
   seed = 1L,
   extend = "repeat"
 )
@@ -36,7 +36,9 @@ shape, since \code{spacing < 1} risks the tiling distortion described
 above).}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding
-box. Must be a positive number. Default \code{1} (a square bounding box).}
+box. Must be a positive number, or \code{NULL} (the default) to resolve it
+automatically at \code{\link[=draw]{draw()}} time -- see \code{\link[=fill_hatch]{fill_hatch()}}'s own \code{aspect}
+docs.}
 
 \item{seed}{Integer seed for the scatter positions. Default \code{1L}.}
 
@@ -126,6 +128,7 @@ draw(shape_circle(
 }
 \seealso{
 Other fill helpers:
+\code{\link[=fill]{fill()}},
 \code{\link[=fill_charcoal]{fill_charcoal()}},
 \code{\link[=fill_checker]{fill_checker()}},
 \code{\link[=fill_crosshatch]{fill_crosshatch()}},

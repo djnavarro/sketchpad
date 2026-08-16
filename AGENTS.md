@@ -472,8 +472,9 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   directly via its own `id` argument.
 - **`canvas`** -- not a `drawable`; a small value class (parallel to
   `style`, but for a `sketch` as a whole rather than one shape) bundling
-  `background` (a `style@fill`-style value: plain colour string or
-  `fill_*()` output, default `fill_none()`), `xlim`/`ylim` (each `NULL`
+  `background` (a `style@fill`-style [fill] value: plain colour string or
+  `fill_*()` output, coerced the same way, default `fill_none()`),
+  `xlim`/`ylim` (each `NULL`
   or a length-2 numeric, default `NULL` -- computed from the sketch's own
   shapes at draw time when left `NULL`), and `clip` (logical, default
   `FALSE`). `xlim`/`ylim` only fix the coordinate scale `draw()` maps
@@ -624,13 +625,47 @@ later shapes are drawn on top.
 
 `draw()` itself needs no special-casing for pattern/gradient fills:
 `grid::gpar(fill = ...)` already accepts a colour string or a
-`"GridPattern"`-inheriting object interchangeably, so `object@style@fill`
-is passed straight through either way.
+`"GridPattern"`-inheriting object interchangeably; `object@style@fill`
+(a [fill] object -- see below) is resolved to one or the other via the
+internal `resolve_fill()` before being passed through.
+
+### The `fill` class and automatic `aspect` resolution
+
+`style@fill`/`canvas@background` are both typed as `fill` (`R/style.R`,
+alongside the `fill_class` union it wraps): a `value` (the plain colour
+string/`GridPattern` `grid::gpar()` actually needs) plus an optional
+`resolve` function of one argument (`aspect`). `style`/`canvas` both
+needed a custom `constructor` (mirroring `sketch`'s own `canvas`
+property, for the same "embedding an already-evaluated S7 object as a
+property default" gotcha) that coerces a bare colour string/`GridPattern`
+into a `fill` via the internal `as_fill()` helper, so `style(fill =
+"tomato")`/`style(fill = fill_hatch())` both still work unchanged at the
+call site. `resolve`, when present, is called at `draw()` time with the
+real target's own bounding-box aspect ratio (via the internal
+`bbox_aspect(object)`, for a single drawable, or `bbox_aspect_range(xlim,
+ylim)`, for a sketch's own `canvas@background`, which has no single
+target drawable) to rebuild `value` with the correct tile shape -- this
+is what lets every aspect-taking `fill_*()` helper below resolve its own
+`aspect` automatically, rather than requiring the caller to compute the
+target's bounding-box aspect ratio by hand and pass it explicitly.
+`draw()`'s own `geometry_grob()` calls the internal `resolve_fill(f,
+aspect)` (a `fill` with a `resolve` is rebuilt against `aspect`; one
+without simply returns its own stored `value`) right before building
+`gpar()`. A `fill_*()` helper that itself renders a *nested* drawable's
+own fill (as `fill_scatter()` does for its scattered `unit`) must resolve
+that fill explicitly too (`resolve_fill(unit@style@fill,
+bbox_aspect(unit))`) before embedding it in a nested `gpar()` call --
+embedding an unresolved `fill` object directly corrupts the rendered
+grob in a way that only surfaces at actual draw time, not when merely
+inspecting the returned pattern's own structure (see `.agents/HISTORY.md`
+for the bug this caused in `fill_scatter()` before it was fixed).
 
 ### The `fill_*()` texture family
 
-`R/fill.R` holds seventeen `fill_*()` constructors for `style@fill`:
-`fill_solid()` (a validated colour string, no `grid::pattern()` involved),
+`R/fill.R` holds seventeen `fill_*()` constructors for `style@fill`,
+each returning a `fill` object (see above) rather than a bare colour
+string/`GridPattern` directly: `fill_solid()` (a validated colour
+string, no `grid::pattern()` involved),
 `fill_none()` (a thin `fill_solid(NA_character_)` wrapper -- `NA` is
 already a valid, transparent `grid::gpar()` colour, but the wrapper reads
 more clearly at a call site; note it still renders as a *closed* unfilled
@@ -730,8 +765,11 @@ The unifying design constraint across all of them: `grid::pattern()`
 tiles are sized as a fraction of the *target polygon's own bounding box*,
 not a fixed physical square, so every helper takes an `aspect` argument
 (the target's bounding-box width/height ratio) to correct for this --
-computed via the internal `bbox_aspect()` helper. Two different
-corrections are needed depending on what's drawn:
+default `NULL`, resolved automatically at `draw()` time against the real
+target (see "The `fill` class and automatic `aspect` resolution" above);
+passing a fixed number instead computes the pattern once, immediately,
+against that value only. Two different corrections are needed depending
+on what's drawn:
 
 - Directional content that must tile seamlessly (`fill_hatch()`/
   `fill_crosshatch()`) draws a plain corner-to-corner diagonal and
