@@ -28,7 +28,9 @@ fill_charcoal(
 
 - color:
 
-  Fill colour. Default `"gray15"` (lighter than
+  One or more fill colours, as in
+  [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md).
+  Default `"gray15"` (lighter than
   [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)'s
   own `"black"` default, closer to a charcoal tone).
 
@@ -51,8 +53,9 @@ fill_charcoal(
 
 - alpha:
 
-  Maximum opacity, at the noise field's peak. Must be a number in
-  `(0, 1]`. Default `1`.
+  Opacity. For a single `color`, the maximum opacity at the noise
+  field's peak; for two or more, a flat opacity applied uniformly. Must
+  be a number in `(0, 1]`. Default `1`.
 
 - frequency:
 

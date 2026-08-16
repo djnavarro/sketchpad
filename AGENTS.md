@@ -611,13 +611,18 @@ as a *closed* unfilled outline, since every `drawable` currently draws a
 closed [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html)
 – see “Deferred: open/stroked curve support” in `.agents/PLAN.md`),
 [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)/[`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)
-(diagonal hatching, sharing a tile-shape technique – see below),
+(diagonal hatching, sharing a tile-shape technique – see below;
+[`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)’s
+`color` accepts a vector recycled across its two lines),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)
-(a two-colour checkerboard),
+(a checkerboard generalized from two colours to an `n x n` grid,
+`n = length(colors)`),
 [`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md)
-(solid alternating bands via a self-repeating hard-stop
+(equal-width alternating bands, one per `colors` entry, via a
+self-repeating hard-stop
 [`grid::linearGradient()`](https://rdrr.io/r/grid/patterns.html), not
-tile repetition),
+tile repetition – repeat a colour in `colors` to bias band widths,
+rather than a separate width argument),
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)
 (scattered dots / arbitrary drawables / randomised-radius dots, all
 seeded via
@@ -626,13 +631,20 @@ like
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)’s
 noise – see “Known rendering risk” in
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)’s
-docs),
+docs;
+[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)’s
+`color` and
+[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)’s
+`colors` each recycle a vector deterministically across the scattered
+dots/stamps,
+[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)’s
+`NULL` default still colouring every stamp from `unit`’s own style),
 [`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)
 (wandering lines built from random integer-frequency sine harmonics via
 the internal `scribble_lines()` helper – periodic by construction, so
 tiles with no seam; `direction` is fixed to `"horizontal"` or
 `"vertical"` only, not an arbitrary angle – see its “Known limitation”
-docs section),
+docs section; `color` recycles across the `n_lines` wandering lines),
 [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)
 (a rasterised `ambient` simplex/fractal field, sampled on a torus for
 seamless tiling),
@@ -669,13 +681,84 @@ pixel aspect ratio),
 [`grid::linearGradient()`](https://rdrr.io/r/grid/patterns.html)/`radialGradient()`),
 and
 [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
-(a colour faded via a
+(colour faded via a
 [`grid::as.mask()`](https://rdrr.io/r/grid/as.mask.html) alpha mask –
-the only helper using masks). All but
+the only helper using masks; `color` blends radially across two or more
+colours before that mask is applied). All but
 [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
 return an object from
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html), sharing the
 base S3 class `"GridPattern"`.
+
+**Colour-vector generalization.**
+[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md),
+[`fill_flow()`](https://sketchpad.djnavarro.net/reference/fill_flow.md),
+[`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md),
+[`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
+[`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md),
+[`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md),
+[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
+[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md),
+[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md),
+[`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),
+and
+[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)
+all accept a vector of colours (an arbitrary-length `colors` argument
+for
+[`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)/[`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md)/[`fill_stripe()`](https://sketchpad.djnavarro.net/reference/fill_stripe.md),
+replacing their old `color1`/`color2` pair – a breaking rename with no
+deprecation shim, since this is a pre-1.0 package with no other
+consumers in this workspace; a widened `color`/`colors` accepting one
+*or more* colours everywhere else, fully backward compatible with a
+single string). Two distinct generalization patterns are used, matching
+what each helper’s existing multiplicity already was:
+
+- **Discrete repeated elements**
+  ([`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)/[`fill_halftone()`](https://sketchpad.djnavarro.net/reference/fill_halftone.md)’s
+  dots,
+  [`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)’s
+  wandering lines,
+  [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)’s
+  two hatch lines,
+  [`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)’s
+  stamps) recycle the colour vector deterministically, in order
+  ([`rep_len()`](https://rdrr.io/r/base/rep.html)), across the existing
+  elements – no new randomness, so seed-based reproducibility tests are
+  unaffected.
+- **Continuous fields/blends**
+  ([`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)/[`fill_flow()`](https://sketchpad.djnavarro.net/reference/fill_flow.md)’s
+  raster,
+  [`fill_marble()`](https://sketchpad.djnavarro.net/reference/fill_marble.md)’s
+  banding,
+  [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)’s
+  radial fade) blend through
+  [`grDevices::colorRamp()`](https://rdrr.io/r/grDevices/colorRamp.html)
+  (or, for
+  [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md),
+  a genuine
+  [`grid::radialGradient()`](https://rdrr.io/r/grid/patterns.html))
+  driven by the same scalar value the old two-colour/single-colour
+  version already computed, rather than a manual linear interpolation.
+  [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)/[`fill_flow()`](https://sketchpad.djnavarro.net/reference/fill_flow.md)
+  share this via one new internal helper, `noise_to_pixels()`: for
+  exactly one colour it reproduces their original
+  alpha-fade-to-transparent behavior bit for bit; for two or more, hue
+  blends across the ramp while `alpha` is held flat (a fading multi-hue
+  blend can’t also fade to transparent without one colour vanishing
+  arbitrarily before the others).
+- **[`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)**
+  doesn’t fit either pattern cleanly – a checkerboard’s cell count and
+  colour count aren’t independent concepts – so its `n x n` grid grows
+  with `length(colors)` instead: colour index at 0-based cell
+  `(row, col)` is `((row + col) %% n) + 1`, which reproduces the
+  original 2x2 diagonal arrangement exactly for two colours. Three or
+  more colours (a 3x3+ grid) can trigger the known multi-shape
+  pattern-tile rendering risk described below – see the “Known rendering
+  risk” bullet in “Gotchas worth remembering”.
+
+Shared validation for all of these lives in the internal
+`validate_colors(colors, arg_name, min_length = 1)`, alongside
+`validate_fill_args()` (see below).
 
 The unifying design constraint across all of them:
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) tiles are
@@ -705,7 +788,9 @@ needed depending on what’s drawn:
   inside it needs no further correction.
 
 Shared argument validation lives in the internal `validate_fill_args()`
-(spacing/aspect, with an optional angle check via `angle = NULL`).
+(spacing/aspect, with an optional angle check via `angle = NULL`) and
+`validate_colors()` (a character vector of at least `min_length`, no
+`NA`s – see “Colour-vector generalization” above).
 
 ### Compositional effects: the `effect_*()` family
 
@@ -983,6 +1068,18 @@ full debugging narrative):
   safe, since
   [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)’s
   whole purpose requires genuine tile repetition.
+  [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)’s
+  colour-vector generalization hit the same issue for the first time
+  when its checkerboard grid grew past 2x2 (the original 2x2/4-rectangle
+  tile always rendered fine; a `colors` vector of length 3 or more, and
+  its correspondingly larger grid, can collapse to a single solid colour
+  at the default `spacing` – confirmed by re-rendering with
+  `spacing = 1`, where the same content renders correctly). Documented
+  on
+  [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)
+  itself alongside
+  [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)’s
+  existing note.
 - **`new_property(class = class_numeric, default = NULL)` does not store
   a literal `NULL`.** S7 treats a bare `default = NULL` on a property
   spec as “no default was given” rather than the value `NULL`, silently

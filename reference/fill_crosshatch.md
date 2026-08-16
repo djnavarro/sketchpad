@@ -22,7 +22,10 @@ fill_crosshatch(
 
 - color:
 
-  Line colour. Default `"black"`.
+  One or more line colours. A vector of length 2 colours the two lines
+  independently; a single colour (the default) colours both the same,
+  matching the original behaviour. Longer vectors are recycled to
+  length 2. Default `"black"`.
 
 - angle:
 
@@ -112,5 +115,9 @@ draw(shape_circle(fill = fill_crosshatch(angle = 0, spacing = 0.15)))
 # only angle = 45 gives genuinely perpendicular lines; other angles are
 # symmetric about the horizontal axis but not at right angles
 draw(shape_circle(fill = fill_crosshatch(angle = 20, spacing = 0.12)))
+
+
+# a two-colour vector colours the two lines independently
+draw(shape_circle(fill = fill_crosshatch(color = c("steelblue", "tomato"), angle = 45)))
 
 ```

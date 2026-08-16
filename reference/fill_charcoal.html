@@ -74,8 +74,9 @@ tiling, and finer noise detail.</p>
 
 
 <dl><dt id="arg-color">color<a class="anchor" aria-label="anchor" href="#arg-color"></a></dt>
-<dd><p>Fill colour. Default <code>"gray15"</code> (lighter than
-<code><a href="fill_noise.html">fill_noise()</a></code>'s own <code>"black"</code> default, closer to a charcoal tone).</p></dd>
+<dd><p>One or more fill colours, as in <code><a href="fill_noise.html">fill_noise()</a></code>. Default
+<code>"gray15"</code> (lighter than <code><a href="fill_noise.html">fill_noise()</a></code>'s own <code>"black"</code> default, closer
+to a charcoal tone).</p></dd>
 
 
 <dt id="arg-spacing">spacing<a class="anchor" aria-label="anchor" href="#arg-spacing"></a></dt>
@@ -95,8 +96,9 @@ positive integer of at least <code>2L</code>. Default <code>32L</code>.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
-<dd><p>Maximum opacity, at the noise field's peak. Must be a number
-in <code>(0, 1]</code>. Default <code>1</code>.</p></dd>
+<dd><p>Opacity. For a single <code>color</code>, the maximum opacity at the
+noise field's peak; for two or more, a flat opacity applied uniformly.
+Must be a number in <code>(0, 1]</code>. Default <code>1</code>.</p></dd>
 
 
 <dt id="arg-frequency">frequency<a class="anchor" aria-label="anchor" href="#arg-frequency"></a></dt>

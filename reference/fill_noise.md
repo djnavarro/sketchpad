@@ -35,7 +35,13 @@ fill_noise(
 
 - color:
 
-  Fill colour. Default `"black"`.
+  One or more fill colours. A single colour (the default) fades in
+  opacity from fully transparent to `alpha`, exactly as before this
+  argument accepted a vector. Two or more colours instead blend across a
+  [`grDevices::colorRamp()`](https://rdrr.io/r/grDevices/colorRamp.html)
+  built from them, driven by the noise value, with `alpha` applied as a
+  flat opacity across the whole fill (see the internal
+  `noise_to_pixels()` helper). Default `"black"`.
 
 - spacing:
 
@@ -54,8 +60,9 @@ fill_noise(
 
 - alpha:
 
-  Maximum opacity, at the noise field's peak. Must be a number in
-  `(0, 1]`. Default `1`.
+  Opacity. For a single `color`, the maximum opacity at the noise
+  field's peak; for two or more, a flat opacity applied uniformly. Must
+  be a number in `(0, 1]`. Default `1`.
 
 - frequency:
 
@@ -149,5 +156,9 @@ draw(shape_circle(fill = fill_noise(frequency = 4, octaves = 4L, seed = 8843L)))
 
 # a lower alpha lets the shape's own outline/background show through more
 draw(shape_circle(fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)))
+
+
+# two or more colours blend across the field instead of fading to transparent
+draw(shape_circle(fill = fill_noise(color = c("steelblue", "white", "tomato"), seed = 8843L)))
 
 ```

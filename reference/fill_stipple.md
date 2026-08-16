@@ -31,7 +31,10 @@ fill_stipple(
 
 - color:
 
-  Dot colour. Default `"black"`.
+  One or more dot colours. A vector shorter than `n` is recycled (in
+  order, not randomly) across the scattered dots – a single colour (the
+  default) colours every dot the same, matching the original behaviour.
+  Default `"black"`.
 
 - radius:
 
@@ -133,5 +136,9 @@ draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
 
 # more, smaller dots per tile give a denser stipple
 draw(shape_circle(fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)))
+
+
+# a colour vector is recycled across the dots
+draw(shape_circle(fill = fill_stipple(color = c("steelblue", "tomato"), n = 8L, seed = 2091L)))
 
 ```

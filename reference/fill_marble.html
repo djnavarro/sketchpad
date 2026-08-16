@@ -60,8 +60,7 @@ turbulence" recipe for procedural marble.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fill_marble</span><span class="op">(</span></span>
-<span>  color1 <span class="op">=</span> <span class="st">"white"</span>,</span>
-<span>  color2 <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>  spacing <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  aspect <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  resolution <span class="op">=</span> <span class="fl">32L</span>,</span>
@@ -78,9 +77,9 @@ turbulence" recipe for procedural marble.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-color-color-">color1, color2<a class="anchor" aria-label="anchor" href="#arg-color-color-"></a></dt>
-<dd><p>The two colours blended across each band. Defaults
-<code>"white"</code> and <code>"black"</code>.</p></dd>
+<dl><dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
+<dd><p>Two or more colours blended across each band, in order,
+via <code><a href="https://rdrr.io/r/grDevices/colorRamp.html" class="external-link">grDevices::colorRamp()</a></code>. Default <code>c("white", "black")</code>.</p></dd>
 
 
 <dt id="arg-spacing">spacing<a class="anchor" aria-label="anchor" href="#arg-spacing"></a></dt>
@@ -143,9 +142,9 @@ technique <code><a href="fill_noise.html">fill_noise()</a></code> uses for its o
 function to another (here, inside a further <code><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin()</a></code>) stays periodic, so
 the combined result still tiles with no seam.</p>
 <p>Unlike <code><a href="fill_noise.html">fill_noise()</a></code> (opacity of one colour), the banding is rendered
-as a blend between <code>color1</code> and <code>color2</code>, since a marble texture's
-visual interest is the veining pattern itself rather than a fade to
-transparency.</p>
+as a blend across <code>colors</code> via <code><a href="https://rdrr.io/r/grDevices/colorRamp.html" class="external-link">grDevices::colorRamp()</a></code>, since a marble
+texture's visual interest is the veining pattern itself rather than a
+fade to transparency.</p>
 <p><code><a href="fill_noise.html">fill_noise()</a></code>'s own faint tile-boundary rasterization seam (see its
 details) can be more noticeable here: <code><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin()</a></code> turns a small mismatch in
 the turbulence field into a visibly sharper edge in a band than the
@@ -183,9 +182,15 @@ same mismatch would produce in a plain opacity fade.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># a different colour pair changes the veining's contrast entirely</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_marble</span><span class="op">(</span>color1 <span class="op">=</span> <span class="st">"black"</span>, color2 <span class="op">=</span> <span class="st">"goldenrod"</span>, stripes <span class="op">=</span> <span class="fl">4L</span>, seed <span class="op">=</span> <span class="fl">1274L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_marble</span><span class="op">(</span>colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"goldenrod"</span><span class="op">)</span>, stripes <span class="op">=</span> <span class="fl">4L</span>, seed <span class="op">=</span> <span class="fl">1274L</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_marble-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># three or more colours blend across the band in sequence</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_marble</span><span class="op">(</span>colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"goldenrod"</span>, <span class="st">"white"</span><span class="op">)</span>, stripes <span class="op">=</span> <span class="fl">4L</span>, seed <span class="op">=</span> <span class="fl">1274L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_marble-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

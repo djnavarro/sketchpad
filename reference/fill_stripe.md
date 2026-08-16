@@ -2,16 +2,15 @@
 
 `fill_stripe()` builds a
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) fill value
-that renders repeating solid bands of two colours, at a given `angle`.
+that renders repeating solid bands, at a given `angle`, generalized from
+two colours to an arbitrary palette.
 
 ## Usage
 
 ``` r
 fill_stripe(
-  color1 = "black",
-  color2 = "white",
+  colors = c("black", "white"),
   angle = 45,
-  width = 0.5,
   spacing = 0.2,
   aspect = 1,
   extend = "repeat"
@@ -20,25 +19,20 @@ fill_stripe(
 
 ## Arguments
 
-- color1, color2:
+- colors:
 
-  The two stripe colours. Defaults `"black"` and `"white"`.
+  Two or more stripe colours, one equal-width band each (see details for
+  biasing band widths). Default `c("black", "white")`.
 
 - angle:
 
   Hatch angle in degrees, measured counterclockwise from the positive
   x-axis. Default `45`.
 
-- width:
-
-  Fraction of each stripe period that is `color1` (the rest is
-  `color2`). Must be a number strictly between `0` and `1`. Default
-  `0.5` (equal bands).
-
 - spacing:
 
-  One stripe period (`color1` band plus `color2` band), as a fraction of
-  the target's bounding box. Must be a positive number. Default `0.2`.
+  One full period through all of `colors`, as a fraction of the target's
+  bounding box. Must be a positive number. Default `0.2`.
 
 - aspect:
 
@@ -71,19 +65,25 @@ where a thin line happens to cross, a single diagonal split of a tile
 turns out not to tile seamlessly at an arbitrary angle the way a thin
 hatch line does. Instead, `fill_stripe()` sidesteps
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html)'s tile-copy
-repetition altogether: the stripe angle and period come from a short
-two-colour
+repetition altogether: the stripe angle and period come from a
 [`grid::linearGradient()`](https://rdrr.io/r/grid/patterns.html) with
 hard colour stops (no smooth transition) and `extend = "repeat"`, which
 repeats *itself* continuously along its own axis – a fundamentally
 different (and for this purpose, simpler) mechanism than tiling a
 rasterised copy.
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) is still used
-around this gradient, but only once, as a single square (aspect-
-corrected) tile spanning the whole target shape, exactly as
+around this gradient, but only once, as a single square
+(aspect-corrected) tile spanning the whole target shape, exactly as
 [`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md)
 does by default – not to create repetition, which the gradient already
 provides.
+
+Each of the `n = length(colors)` colours gets an equal-width band by
+default (`1/n` of the period); there's no separate argument for unequal
+bands – repeat a colour in `colors` instead (e.g.
+`c("steelblue", "steelblue", "white")` gives a 2:1 ratio between the two
+colours), which reuses the same recycling mechanism rather than adding a
+second one.
 
 ## See also
 
@@ -111,11 +111,15 @@ Other fill helpers:
 draw(shape_circle(fill = fill_stripe(angle = 30)))
 
 
-# width shifts the balance between the two colours within each period
-draw(shape_circle(fill = fill_stripe(color1 = "steelblue", color2 = "white", width = 0.25)))
+# repeating a colour biases the band widths, rather than a separate argument
+draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "steelblue", "white"))))
 
 
 # narrower spacing gives more, thinner stripes
 draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
+
+
+# three or more colours repeat through the same period
+draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "white", "tomato"), angle = 30)))
 
 ```

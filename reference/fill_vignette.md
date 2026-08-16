@@ -2,10 +2,12 @@
 
 `fill_vignette()` builds a
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) fill value
-that fades a colour out towards the edges of each tile, using
+that fades colour out towards the edges of each tile, using
 [`grid::as.mask()`](https://rdrr.io/r/grid/as.mask.html) – the one
 `grid` capability the rest of the `fill_*()` family doesn't touch. A
-solid `color` layer is masked by a radial alpha mask (opaque at the tile
+`color` layer (solid for a single colour, or a
+[`grid::radialGradient()`](https://rdrr.io/r/grid/patterns.html) blend
+for two or more) is masked by a radial alpha mask (opaque at the tile
 centre, fully transparent at its edge), optionally revealing a solid
 `background` layer underneath rather than true transparency.
 
@@ -25,7 +27,11 @@ fill_vignette(
 
 - color:
 
-  Fill colour at the tile's centre. Default `"black"`.
+  One or more fill colours, blended from the tile's centre outward. A
+  single colour (the default) is a solid fade, exactly as before this
+  argument accepted a vector; two or more blend via a
+  [`grid::radialGradient()`](https://rdrr.io/r/grid/patterns.html)
+  before the same alpha mask is applied. Default `"black"`.
 
 - background:
 
@@ -111,5 +117,9 @@ draw(shape_circle(fill = fill_vignette(color = "black")))
 # a non-NA background reveals a solid colour underneath the fade,
 # instead of true transparency
 draw(shape_circle(fill = fill_vignette(color = "steelblue", background = "white")))
+
+
+# two or more colours blend radially before fading via the alpha mask
+draw(shape_circle(fill = fill_vignette(color = c("goldenrod", "steelblue"))))
 
 ```

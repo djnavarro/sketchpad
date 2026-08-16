@@ -76,7 +76,10 @@ scribble texture built from genuinely continuous strokes.</p>
 
 
 <dl><dt id="arg-color">color<a class="anchor" aria-label="anchor" href="#arg-color"></a></dt>
-<dd><p>Line colour. Default <code>"black"</code>.</p></dd>
+<dd><p>One or more line colours. A vector shorter than <code>n_lines</code> is
+recycled (in order, not randomly) across the wandering lines – a
+single colour (the default) colours every line the same, matching the
+original behaviour. Default <code>"black"</code>.</p></dd>
 
 
 <dt id="arg-direction">direction<a class="anchor" aria-label="anchor" href="#arg-direction"></a></dt>
@@ -210,6 +213,12 @@ angle.</p>
 <span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_scribble</span><span class="op">(</span>n_lines <span class="op">=</span> <span class="fl">6L</span>, n_harmonics <span class="op">=</span> <span class="fl">6L</span>, amplitude <span class="op">=</span> <span class="fl">0.6</span>, seed <span class="op">=</span> <span class="fl">6602L</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_scribble-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># a colour vector is recycled across the wandering lines</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  fill <span class="op">=</span> <span class="fu">fill_scribble</span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"steelblue"</span>, <span class="st">"tomato"</span><span class="op">)</span>, n_lines <span class="op">=</span> <span class="fl">4L</span>, seed <span class="op">=</span> <span class="fl">6602L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_scribble-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

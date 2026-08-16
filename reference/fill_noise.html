@@ -77,7 +77,12 @@ noise-wobbled outline share one visual vocabulary.</p>
 
 
 <dl><dt id="arg-color">color<a class="anchor" aria-label="anchor" href="#arg-color"></a></dt>
-<dd><p>Fill colour. Default <code>"black"</code>.</p></dd>
+<dd><p>One or more fill colours. A single colour (the default)
+fades in opacity from fully transparent to <code>alpha</code>, exactly as before
+this argument accepted a vector. Two or more colours instead blend
+across a <code><a href="https://rdrr.io/r/grDevices/colorRamp.html" class="external-link">grDevices::colorRamp()</a></code> built from them, driven by the noise
+value, with <code>alpha</code> applied as a flat opacity across the whole fill
+(see the internal <code>noise_to_pixels()</code> helper). Default <code>"black"</code>.</p></dd>
 
 
 <dt id="arg-spacing">spacing<a class="anchor" aria-label="anchor" href="#arg-spacing"></a></dt>
@@ -96,8 +101,9 @@ positive integer of at least <code>2L</code>. Default <code>32L</code>.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
-<dd><p>Maximum opacity, at the noise field's peak. Must be a number
-in <code>(0, 1]</code>. Default <code>1</code>.</p></dd>
+<dd><p>Opacity. For a single <code>color</code>, the maximum opacity at the
+noise field's peak; for two or more, a flat opacity applied uniformly.
+Must be a number in <code>(0, 1]</code>. Default <code>1</code>.</p></dd>
 
 
 <dt id="arg-frequency">frequency<a class="anchor" aria-label="anchor" href="#arg-frequency"></a></dt>
@@ -181,6 +187,10 @@ avoid.</p>
 <span class="r-in"><span><span class="co"># a lower alpha lets the shape's own outline/background show through more</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_noise</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"steelblue"</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, seed <span class="op">=</span> <span class="fl">8843L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fill_noise-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># two or more colours blend across the field instead of fading to transparent</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_circle.html">shape_circle</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">fill_noise</span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"steelblue"</span>, <span class="st">"white"</span>, <span class="st">"tomato"</span><span class="op">)</span>, seed <span class="op">=</span> <span class="fl">8843L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fill_noise-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

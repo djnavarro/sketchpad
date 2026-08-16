@@ -14,8 +14,7 @@ marble.
 
 ``` r
 fill_marble(
-  color1 = "white",
-  color2 = "black",
+  colors = c("white", "black"),
   spacing = 0.5,
   aspect = 1,
   resolution = 32L,
@@ -30,10 +29,11 @@ fill_marble(
 
 ## Arguments
 
-- color1, color2:
+- colors:
 
-  The two colours blended across each band. Defaults `"white"` and
-  `"black"`.
+  Two or more colours blended across each band, in order, via
+  [`grDevices::colorRamp()`](https://rdrr.io/r/grDevices/colorRamp.html).
+  Default `c("white", "black")`.
 
 - spacing:
 
@@ -105,9 +105,11 @@ periodic, so the combined result still tiles with no seam.
 
 Unlike
 [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)
-(opacity of one colour), the banding is rendered as a blend between
-`color1` and `color2`, since a marble texture's visual interest is the
-veining pattern itself rather than a fade to transparency.
+(opacity of one colour), the banding is rendered as a blend across
+`colors` via
+[`grDevices::colorRamp()`](https://rdrr.io/r/grDevices/colorRamp.html),
+since a marble texture's visual interest is the veining pattern itself
+rather than a fade to transparency.
 
 [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)'s
 own faint tile-boundary rasterization seam (see its details) can be more
@@ -147,7 +149,13 @@ draw(shape_circle(fill = fill_marble(stripes = 8L, warp = 8, seed = 1274L)))
 
 # a different colour pair changes the veining's contrast entirely
 draw(shape_circle(
-  fill = fill_marble(color1 = "black", color2 = "goldenrod", stripes = 4L, seed = 1274L)
+  fill = fill_marble(colors = c("black", "goldenrod"), stripes = 4L, seed = 1274L)
+))
+
+
+# three or more colours blend across the band in sequence
+draw(shape_circle(
+  fill = fill_marble(colors = c("black", "goldenrod", "white"), stripes = 4L, seed = 1274L)
 ))
 
 ```

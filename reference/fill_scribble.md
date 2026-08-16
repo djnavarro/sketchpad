@@ -29,7 +29,10 @@ fill_scribble(
 
 - color:
 
-  Line colour. Default `"black"`.
+  One or more line colours. A vector shorter than `n_lines` is recycled
+  (in order, not randomly) across the wandering lines – a single colour
+  (the default) colours every line the same, matching the original
+  behaviour. Default `"black"`.
 
 - direction:
 
@@ -166,6 +169,12 @@ draw(shape_circle(fill = fill_scribble(n_lines = 4L, direction = "vertical", see
 # more harmonics and higher amplitude give a more agitated scribble
 draw(shape_circle(
   fill = fill_scribble(n_lines = 6L, n_harmonics = 6L, amplitude = 0.6, seed = 6602L)
+))
+
+
+# a colour vector is recycled across the wandering lines
+draw(shape_circle(
+  fill = fill_scribble(color = c("steelblue", "tomato"), n_lines = 4L, seed = 6602L)
 ))
 
 ```
