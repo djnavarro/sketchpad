@@ -337,11 +337,12 @@ test_that("fill_halftone() recycles a colour vector across the dots", {
 
 test_that("fill_scribble() returns a fill object resolving to a grid pattern", {
   expect_s3_class(fv(fill_scribble()), "GridPattern")
-  expect_s3_class(fv(fill_scribble(direction = "vertical")), "GridPattern")
+  expect_s3_class(fv(fill_scribble(angle = 90)), "GridPattern")
+  expect_s3_class(fv(fill_scribble(angle = 30)), "GridPattern")
 })
 
 test_that("fill_scribble() validates its arguments", {
-  expect_error(fill_scribble(direction = "diagonal"))
+  expect_error(fill_scribble(angle = "diagonal"))
   expect_error(fill_scribble(spacing = 0), "spacing")
   expect_error(fill_scribble(spacing = -1), "spacing")
   expect_error(fill_scribble(aspect = 0), "aspect")
@@ -397,15 +398,43 @@ test_that("fill_scribble() recycles a colour vector across the wandering lines",
   expect_identical(cols, rep(c("steelblue", "tomato"), length.out = 5))
 })
 
-test_that("fill_scribble() horizontal and vertical transpose x/y", {
-  h <- fv(fill_scribble(direction = "horizontal", seed = 481L))
-  v <- fv(fill_scribble(direction = "vertical", seed = 481L))
+test_that("fill_scribble() angle = 0 and angle = 90 transpose x/y", {
+  h <- fv(fill_scribble(angle = 0, seed = 481L))
+  v <- fv(fill_scribble(angle = 90, seed = 481L))
   h_x <- as.numeric(environment(h$f)$grob$children[[1]]$x)
   h_y <- as.numeric(environment(h$f)$grob$children[[1]]$y)
   v_x <- as.numeric(environment(v$f)$grob$children[[1]]$x)
   v_y <- as.numeric(environment(v$f)$grob$children[[1]]$y)
   expect_identical(h_x, v_y)
   expect_identical(h_y, v_x)
+})
+
+test_that("fill_scribble() angle = 180/270 exactly reflect angle = 0/90", {
+  h <- fv(fill_scribble(angle = 0, seed = 481L))
+  h180 <- fv(fill_scribble(angle = 180, seed = 481L))
+  v <- fv(fill_scribble(angle = 90, seed = 481L))
+  v270 <- fv(fill_scribble(angle = 270, seed = 481L))
+  h_x <- as.numeric(environment(h$f)$grob$children[[1]]$x)
+  h_y <- as.numeric(environment(h$f)$grob$children[[1]]$y)
+  h180_x <- as.numeric(environment(h180$f)$grob$children[[1]]$x)
+  h180_y <- as.numeric(environment(h180$f)$grob$children[[1]]$y)
+  expect_identical(h180_x, 1 - h_x)
+  expect_identical(h180_y, 1 - h_y)
+
+  v_x <- as.numeric(environment(v$f)$grob$children[[1]]$x)
+  v_y <- as.numeric(environment(v$f)$grob$children[[1]]$y)
+  v270_x <- as.numeric(environment(v270$f)$grob$children[[1]]$x)
+  v270_y <- as.numeric(environment(v270$f)$grob$children[[1]]$y)
+  expect_identical(v270_x, 1 - v_x)
+  expect_identical(v270_y, 1 - v_y)
+})
+
+test_that("fill_scribble() a non-right angle rotates the tile content", {
+  h <- fv(fill_scribble(angle = 0, seed = 481L))
+  r30 <- fv(fill_scribble(angle = 30, seed = 481L))
+  h_x <- as.numeric(environment(h$f)$grob$children[[1]]$x)
+  r30_x <- as.numeric(environment(r30$f)$grob$children[[1]]$x)
+  expect_false(identical(h_x, r30_x))
 })
 
 test_that("fill_noise() returns a fill object resolving to a grid pattern", {

@@ -967,30 +967,39 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #' documented at [fill_scatter()], open-line content showed no clipping or
 #' distortion in testing).
 #'
-#' @section Known limitation -- direction is fixed, not an arbitrary angle:
+#' @section Known limitation -- arbitrary angle is only approximate:
 #'   Every other angled helper ([fill_hatch()]/[fill_crosshatch()]/
 #'   [fill_stripe()]) achieves an arbitrary angle by reshaping the *tile*
 #'   itself (via `hatch_tile_dims()`) around content that's a plain
-#'   corner-to-corner diagonal. That trick was tried here first and found
-#'   not to generalize: reshaping the tile around a *wandering* line just
-#'   anisotropically stretches its wiggle rather than rotating it, since
-#'   the line's content isn't a bare diagonal the tile shape can
-#'   reinterpret. A genuinely rotated wandering line would need the tile
-#'   built as a rotated/sheared parallelogram with edge-matching worked
-#'   out for a curve rather than a segment -- no such technique exists in
-#'   this package yet. `direction` is therefore restricted to `"horizontal"`
-#'   (lines run left-right, periodic tiling along that axis) or
-#'   `"vertical"` (lines run top-bottom instead, i.e. `along`/`across` from
-#'   `scribble_lines()` mapped to `y`/`x` rather than `x`/`y`) -- there is
-#'   no `angle` argument. Revisit if a real sketch needs an arbitrary
+#'   corner-to-corner diagonal. That trick doesn't generalize here:
+#'   reshaping the tile around a *wandering* line just anisotropically
+#'   stretches its wiggle rather than rotating it, since the line's content
+#'   isn't a bare diagonal the tile shape can reinterpret. A genuinely
+#'   rotated wandering line would need the tile built as a rotated/sheared
+#'   parallelogram with edge-matching worked out for a curve rather than a
+#'   segment -- no such technique exists in this package. At `angle` a
+#'   multiple of 90 degrees, `fill_scribble()` instead swaps/reflects the
+#'   `along`/`across` axes directly (no trigonometry involved), so tiling
+#'   stays exactly seamless -- this is what `angle = 0`/`90` (the old
+#'   `direction = "horizontal"`/`"vertical"`) already relied on, now
+#'   extended to `180`/`270` for free. Any other `angle` instead rotates
+#'   the whole tile's content about its own centre, which is only an
+#'   approximation: the underlying wandering line is periodic along its own
+#'   local axis, not around an arbitrary rotated one, so a non-right-angle
+#'   rotation can leave a visible seam where adjacent tile copies meet, and
+#'   may leave small gaps near the tile corners that no line's wiggle
+#'   reaches. Revisit if a real sketch needs a genuinely seamless arbitrary
 #'   angle.
 #'
 #' @param color One or more line colours. A vector shorter than `n_lines` is
 #'   recycled (in order, not randomly) across the wandering lines -- a
 #'   single colour (the default) colours every line the same, matching the
 #'   original behaviour. Default `"black"`.
-#' @param direction Either `"horizontal"` (lines run left-right) or
-#'   `"vertical"` (lines run top-bottom). Default `"horizontal"`.
+#' @param angle Line angle in degrees, measured counterclockwise from
+#'   horizontal (matching [fill_hatch()]'s own `angle` convention).
+#'   `0`/`90`/`180`/`270` (the old `direction = "horizontal"`/`"vertical"`)
+#'   tile exactly seamlessly; any other angle rotates the tile content as an
+#'   approximation only -- see "Known limitation" below. Default `0`.
 #' @param n_lines Number of wandering lines per tile. Must be a positive
 #'   integer. Default `5L`.
 #' @param n_harmonics Number of sine harmonics summed per line. Must be a
@@ -1013,9 +1022,16 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #' @examples
 #' draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
 #'
-#' # direction = "vertical" runs the wandering lines top-to-bottom instead
+#' # angle = 90 runs the wandering lines top-to-bottom instead, tiling
+#' # exactly as seamlessly as angle = 0
 #' draw(shape_circle(
-#'   fill = fill_scribble(n_lines = 4L, direction = "vertical", seed = 6602L)
+#'   fill = fill_scribble(n_lines = 4L, angle = 90, seed = 6602L)
+#' ))
+#'
+#' # any other angle rotates the tile content -- an approximation only,
+#' # so a seam can be visible at the tile edges
+#' draw(shape_circle(
+#'   fill = fill_scribble(n_lines = 4L, angle = 30, seed = 6602L)
 #' ))
 #'
 #' # more harmonics and higher amplitude give a more agitated scribble
@@ -1040,7 +1056,7 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #' @family fill helpers
 #' @export
 fill_scribble <- function(color = "black",
-                          direction = c("horizontal", "vertical"),
+                          angle = 0,
                           n_lines = 5L,
                           n_harmonics = 3L,
                           amplitude = 0.35,
@@ -1050,9 +1066,8 @@ fill_scribble <- function(color = "black",
                           aspect = NULL,
                           seed = 1L,
                           extend = "repeat") {
-  direction <- match.arg(direction)
   build <- function(aspect) {
-  validate_fill_args(NULL, spacing, aspect)
+  validate_fill_args(angle, spacing, aspect)
   if (!is.numeric(n_lines) || length(n_lines) != 1 ||
     n_lines < 1 || n_lines != round(n_lines)) {
     rlang::abort("n_lines must be a single positive integer")
@@ -1085,13 +1100,31 @@ fill_scribble <- function(color = "black",
   )
   line_colors <- rep_len(color, round(n_lines))
 
+  # Exact at multiples of 90 degrees (a plain axis swap/reflection, no
+  # trigonometry -- see "Known limitation" above); any other angle rotates
+  # the tile content about its own centre as an approximation only.
+  right_angle <- isTRUE(all.equal(angle %% 90, 0))
+  if (right_angle) {
+    quadrant <- round((angle %% 360) / 90) %% 4L
+  } else {
+    theta <- (angle %% 360) * pi / 180
+  }
+
   strokes <- purrr::map2(lines, line_colors, function(ln, cc) {
-    if (direction == "horizontal") {
-      x <- ln$along
-      y <- ln$across
+    if (right_angle) {
+      coords <- switch(quadrant + 1L,
+        list(x = ln$along, y = ln$across),
+        list(x = ln$across, y = ln$along),
+        list(x = 1 - ln$along, y = 1 - ln$across),
+        list(x = 1 - ln$across, y = 1 - ln$along)
+      )
+      x <- coords$x
+      y <- coords$y
     } else {
-      x <- ln$across
-      y <- ln$along
+      x0 <- ln$along - 0.5
+      y0 <- ln$across - 0.5
+      x <- 0.5 + x0 * cos(theta) - y0 * sin(theta)
+      y <- 0.5 + x0 * sin(theta) + y0 * cos(theta)
     }
     grid::linesGrob(
       x = x, y = y, default.units = "npc",
@@ -1586,12 +1619,13 @@ fill_flow <- function(color = "black",
 #'
 #' Found, while prototyping [shape_stroke()]'s interior texture, to be a
 #' substantially better fit than [fill_scribble()] for a curved stroke's
-#' body -- `fill_scribble()`'s fixed horizontal/vertical direction doesn't
-#' track a curved path's own tangent (see the "Deferred: arbitrary angle
-#' for `fill_scribble()`" item in `.agents/PLAN.md`), producing hatching
-#' that visibly cuts across the stroke at odd angles wherever the path
-#' bends, while [fill_noise()]'s directionless mottling has no orientation
-#' to clash with the curve.
+#' body -- `fill_scribble()`'s `angle` is a single fixed value for the
+#' whole tile (and only tiles exactly seamlessly at a multiple of 90
+#' degrees; see its "Known limitation" docs section), so it can't track a
+#' curved path's own continuously-varying tangent, producing hatching that
+#' visibly cuts across the stroke at odd angles wherever the path bends,
+#' while [fill_noise()]'s directionless mottling has no orientation to
+#' clash with the curve.
 #'
 #' @inheritParams fill_noise
 #' @param color One or more fill colours, as in [fill_noise()]. Default

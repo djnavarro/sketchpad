@@ -2678,3 +2678,54 @@ its `fill_*()`/`@fill`/`@background` value in `fv()` before comparing.
 Deliberately no back-compat shim (bare-value return) was kept -- this is
 a pre-1.0 package with no other consumers in this workspace, matching
 every other breaking rename here.
+
+## An `angle` argument for `fill_scribble()` (0.1)
+
+`fill_scribble()` previously only exposed `direction = "horizontal"`/
+`"vertical"`, with a documented "Known limitation" noting that
+`fill_hatch()`'s tile-reshaping trick for arbitrary angles doesn't
+generalize to wandering-line content (reshaping the tile around a
+wandering line anisotropically stretches its wiggle rather than rotating
+it). This was revisited and given a real, if partial, solution rather
+than left open indefinitely.
+
+**The mathematical constraint is real, not just unexplored effort.**
+`grid::pattern()` only tiles via axis-aligned translation. A pattern
+that's periodic along one axis (as `scribble_lines()`'s wandering lines
+are, by construction, along their own `along` parameter) is not, in
+general, periodic on that same square lattice once rotated -- exact
+seamless tiling after rotation only holds for special angles. This rules
+out a general closed-form "rotate and it just tiles" solution; the
+previous `direction` restriction wasn't an arbitrary limitation, it was
+exactly the angles (0/90 degrees) where the existing along/across
+parametrization is trivially still periodic after the transform.
+
+**What was implemented.** `direction` was replaced by `angle` (a
+breaking rename, no deprecation shim -- matching this package's usual
+pre-1.0 convention), in degrees measured counterclockwise from
+horizontal, matching `fill_hatch()`'s own `angle` convention:
+
+- At a multiple of 90 degrees, `fill_scribble()` swaps/reflects the
+  `along`/`across` axes directly (no trigonometry involved) -- `angle =
+  0`/`90` reproduce the old `direction = "horizontal"`/`"vertical"`
+  exactly, and `180`/`270` extend the same exact-tiling property for
+  free (each is a plain reflection of an already-periodic-and-symmetric
+  line, so the wraparound match at the tile edge is untouched).
+- At any other angle, the whole tile's content is rotated about its own
+  centre via a plain 2D rotation of each line's `(along, across)`
+  coordinates. This is only an approximation: it can leave a visible
+  seam where adjacent tile copies meet, and can leave small gaps near
+  the tile corners that no line's wiggle reaches, since a wandering line
+  periodic along its own local axis isn't periodic along an arbitrary
+  rotated one. This is documented explicitly in `fill_scribble()`'s
+  "Known limitation" section, framed the same way `fill_noise()`/
+  `fill_flow()`'s own "faint tile-boundary seam" caveat already is --
+  disclosed, not treated as a defect to keep chasing.
+
+`curve_scribble()` was left unchanged (`direction` still `"horizontal"`/
+`"vertical"` only) -- it draws a single standalone line, not a
+repeating tile, so it never had a tiling-seam problem to solve, and
+an `angle` there would just be an ordinary rotation with no such
+caveat needed, better done today by the caller composing a
+`trans_rotate()` onto the returned drawable instead of duplicating that
+rotation logic inside the constructor.

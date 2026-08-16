@@ -12,13 +12,12 @@ Open items below are triaged into three buckets. Update an item's own
 section heading (or this list) as its target changes; don't duplicate
 the writeup.
 
-**0.1:**
-- Arbitrary angle for `fill_scribble()`
+No 0.1 items currently open.
 
 (`star`, the last outstanding "additional primitive shapes" item,
-"Multiple sub-paths and holes per drawable", the `group` class, and the
-S7 `fill` class (with automatic `aspect` resolution) are now done -- see
-`.agents/HISTORY.md`.)
+"Multiple sub-paths and holes per drawable", the `group` class, the S7
+`fill` class (with automatic `aspect` resolution), and an `angle`
+argument for `fill_scribble()` are now done -- see `.agents/HISTORY.md`.)
 
 **0.2:**
 - Multi-frame/animation export helpers (and interactivity/event handling,
@@ -60,18 +59,6 @@ three `geometry` values a trivial "supply `x`/`y` directly" constructor.
 constructor -- previously reserved on the dimensional reading with
 nothing exposing it. No further `curve_*()`/`points_*()` constructor is
 currently planned.
-
-## Deferred: arbitrary angle for `fill_scribble()` (0.1)
-
-`fill_scribble()` only supports `direction = "horizontal"` or
-`"vertical"` -- see its "Known limitation" docs section and
-`.agents/HISTORY.md`'s write-up for why `fill_hatch()`'s tile-reshaping
-angle trick doesn't generalize to wandering-line content. A genuinely
-rotated wandering line would need the tile built as a rotated/sheared
-parallelogram with edge-matching worked out for a curve rather than a
-segment; no such technique exists in this package yet, and none was
-prototyped successfully. Revisit if a real sketch needs an arbitrary
-angle.
 
 ## Candidate features (brainstormed, not yet prioritized)
 
@@ -123,11 +110,12 @@ rasterized/textured stroke idea as `textured_stroke()` -- see
 currently open.
 
 `fill_scribble()` remains a poor fit for texturing a curved
-`shape_stroke()`'s interior (its fixed horizontal/vertical direction
-doesn't track a curved path's own tangent) -- the same underlying gap as
-the existing "Deferred: arbitrary angle for `fill_scribble()`" item
-above; `fill_charcoal()`/`fill_noise()`/`fill_marble()` don't have this
-problem and are the recommended textures for a `shape_stroke()` body.
+`shape_stroke()`'s interior: its `angle` is one fixed value for the whole
+tile (and only tiles exactly seamlessly at a multiple of 90 degrees --
+see `.agents/HISTORY.md`'s write-up), so it can't track a curved path's
+own continuously-varying tangent; `fill_charcoal()`/`fill_noise()`/
+`fill_marble()` don't have this problem and are the recommended textures
+for a `shape_stroke()` body.
 
 ### Explicitly flagged as possibly out of scope (0.2 if reconsidered)
 

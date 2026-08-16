@@ -689,9 +689,14 @@ the scattered dots/stamps, `fill_scatter()`'s `NULL` default still colouring
 every stamp from `unit`'s own style), `fill_scribble()` (wandering lines
 built from random integer-frequency sine harmonics via the internal
 `scribble_lines()` helper -- periodic by construction, so tiles with no
-seam; `direction` is fixed to `"horizontal"` or `"vertical"` only, not an
-arbitrary angle -- see its "Known limitation" docs section; `color`
-recycles across the `n_lines` wandering lines),
+seam; `angle` a multiple of 90 degrees (the old `direction =
+"horizontal"`/`"vertical"`, now generalized to `0`/`90`/`180`/`270`) swaps/
+reflects the `along`/`across` axes directly and stays exactly seamless,
+while any other `angle` rotates the tile content about its own centre as
+an approximation only, since a genuinely seamless arbitrary-angle rotation
+of a wandering-line tile has no known technique in this package -- see its
+"Known limitation" docs section; `color` recycles across the `n_lines`
+wandering lines),
 `fill_noise()` (a rasterised `ambient` simplex/fractal field, sampled on a
 torus for seamless tiling),
 `fill_marble()`/`fill_flow()` (variants of `fill_noise()` sharing its

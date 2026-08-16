@@ -6,7 +6,7 @@
 \usage{
 fill_scribble(
   color = "black",
-  direction = c("horizontal", "vertical"),
+  angle = 0,
   n_lines = 5L,
   n_harmonics = 3L,
   amplitude = 0.35,
@@ -24,8 +24,11 @@ recycled (in order, not randomly) across the wandering lines -- a
 single colour (the default) colours every line the same, matching the
 original behaviour. Default \code{"black"}.}
 
-\item{direction}{Either \code{"horizontal"} (lines run left-right) or
-\code{"vertical"} (lines run top-bottom). Default \code{"horizontal"}.}
+\item{angle}{Line angle in degrees, measured counterclockwise from
+horizontal (matching \code{\link[=fill_hatch]{fill_hatch()}}'s own \code{angle} convention).
+\code{0}/\code{90}/\code{180}/\code{270} (the old \code{direction = "horizontal"}/\code{"vertical"})
+tile exactly seamlessly; any other angle rotates the tile content as an
+approximation only -- see "Known limitation" below. Default \code{0}.}
 
 \item{n_lines}{Number of wandering lines per tile. Must be a positive
 integer. Default \code{5L}.}
@@ -87,32 +90,45 @@ repeated copies (unlike the polygon-in-a-genuinely-repeated-tile issue
 documented at \code{\link[=fill_scatter]{fill_scatter()}}, open-line content showed no clipping or
 distortion in testing).
 }
-\section{Known limitation -- direction is fixed, not an arbitrary angle}{
+\section{Known limitation -- arbitrary angle is only approximate}{
 
 Every other angled helper (\code{\link[=fill_hatch]{fill_hatch()}}/\code{\link[=fill_crosshatch]{fill_crosshatch()}}/
 \code{\link[=fill_stripe]{fill_stripe()}}) achieves an arbitrary angle by reshaping the \emph{tile}
 itself (via \code{hatch_tile_dims()}) around content that's a plain
-corner-to-corner diagonal. That trick was tried here first and found
-not to generalize: reshaping the tile around a \emph{wandering} line just
-anisotropically stretches its wiggle rather than rotating it, since
-the line's content isn't a bare diagonal the tile shape can
-reinterpret. A genuinely rotated wandering line would need the tile
-built as a rotated/sheared parallelogram with edge-matching worked
-out for a curve rather than a segment -- no such technique exists in
-this package yet. \code{direction} is therefore restricted to \code{"horizontal"}
-(lines run left-right, periodic tiling along that axis) or
-\code{"vertical"} (lines run top-bottom instead, i.e. \code{along}/\code{across} from
-\code{scribble_lines()} mapped to \code{y}/\code{x} rather than \code{x}/\code{y}) -- there is
-no \code{angle} argument. Revisit if a real sketch needs an arbitrary
+corner-to-corner diagonal. That trick doesn't generalize here:
+reshaping the tile around a \emph{wandering} line just anisotropically
+stretches its wiggle rather than rotating it, since the line's content
+isn't a bare diagonal the tile shape can reinterpret. A genuinely
+rotated wandering line would need the tile built as a rotated/sheared
+parallelogram with edge-matching worked out for a curve rather than a
+segment -- no such technique exists in this package. At \code{angle} a
+multiple of 90 degrees, \code{fill_scribble()} instead swaps/reflects the
+\code{along}/\code{across} axes directly (no trigonometry involved), so tiling
+stays exactly seamless -- this is what \code{angle = 0}/\code{90} (the old
+\code{direction = "horizontal"}/\code{"vertical"}) already relied on, now
+extended to \code{180}/\code{270} for free. Any other \code{angle} instead rotates
+the whole tile's content about its own centre, which is only an
+approximation: the underlying wandering line is periodic along its own
+local axis, not around an arbitrary rotated one, so a non-right-angle
+rotation can leave a visible seam where adjacent tile copies meet, and
+may leave small gaps near the tile corners that no line's wiggle
+reaches. Revisit if a real sketch needs a genuinely seamless arbitrary
 angle.
 }
 
 \examples{
 draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
 
-# direction = "vertical" runs the wandering lines top-to-bottom instead
+# angle = 90 runs the wandering lines top-to-bottom instead, tiling
+# exactly as seamlessly as angle = 0
 draw(shape_circle(
-  fill = fill_scribble(n_lines = 4L, direction = "vertical", seed = 6602L)
+  fill = fill_scribble(n_lines = 4L, angle = 90, seed = 6602L)
+))
+
+# any other angle rotates the tile content -- an approximation only,
+# so a seam can be visible at the tile edges
+draw(shape_circle(
+  fill = fill_scribble(n_lines = 4L, angle = 30, seed = 6602L)
 ))
 
 # more harmonics and higher amplitude give a more agitated scribble
