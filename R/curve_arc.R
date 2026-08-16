@@ -2,9 +2,10 @@
 #'
 #' `curve_arc` is [shape_wedge()]'s arc alone, with no centroid vertex: an
 #' open path of `n` points on the circle centred at `(x, y)` with the given
-#' `radius`, sweeping from angle `start` to `end` (radians). Shares its point
-#' computation and argument validation with `shape_wedge()` via two internal
-#' helpers factored into `R/shape_wedge.R` (`arc_points()`,
+#' `radius`, sweeping from angle `start` to `end` (radians).
+#'
+#' Shares its point computation and argument validation with `shape_wedge()`
+#' via two internal helpers factored into `R/shape_wedge.R` (`arc_points()`,
 #' `validate_arc_args()`), differing only in which `drawable(geometry = ...)`
 #' they construct from and the missing centroid vertex.
 #'
@@ -69,11 +70,13 @@ curve_arc <- S7::new_class(
 #' Multiple open arcs at once
 #'
 #' `curve_arcs()` is a vectorized version of [curve_arc()]: each
-#' argument may be a vector, recycled against the others via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
-#' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). The result is a [sketch] containing one
-#' `curve_arc()` per recycled row, rather than a single drawable.
+#' argument may be a vector, recycled against the others. The result is a
+#' [sketch] containing one `curve_arc()` per recycled row, rather than a
+#' single drawable.
+#'
+#' Recycling uses `purrr::pmap()`'s own vctrs-based rules: any length-1
+#' element is broadcast to the common length; mismatched lengths greater
+#' than 1 raise an error.
 #'
 #' @rdname curve_arc
 #' @return For `curve_arcs()`, a [sketch].

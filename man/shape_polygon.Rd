@@ -29,18 +29,22 @@ For \code{shape_polygons()}, a \link{sketch}.
 \description{
 \code{shape_polygon} is a \link{drawable} defined by a centroid and a radius; its
 vertices are \code{n} evenly spaced points around the circumference, giving a
-regular n-gon (e.g. \code{n = 3} a triangle, \code{n = 6} a hexagon). Unlike
-\code{\link[=shape_circle]{shape_circle()}}/\code{\link[=shape_blob]{shape_blob()}}, \code{points} does not repeat its first vertex
-at the end -- there are exactly \code{n} distinct vertices, since
+regular n-gon (e.g. \code{n = 3} a triangle, \code{n = 6} a hexagon).
+
+\code{shape_polygons()} is a vectorized version of \code{\link[=shape_polygon]{shape_polygon()}}: each
+argument may be a vector, recycled against the others. The result is a
+\link{sketch} containing one \code{shape_polygon()} per recycled row, rather than
+a single drawable.
+}
+\details{
+Unlike \code{\link[=shape_circle]{shape_circle()}}/\code{\link[=shape_blob]{shape_blob()}}, \code{points} does not repeat its
+first vertex at the end -- there are exactly \code{n} distinct vertices, since
 \code{grid::polygonGrob()} closes the path itself and a polygon has no
 approximation error to hide.
 
-\code{shape_polygons()} is a vectorized version of \code{\link[=shape_polygon]{shape_polygon()}}: each
-argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a \link{sketch} containing one
-\code{shape_polygon()} per recycled row, rather than a single drawable.
+Recycling uses \code{purrr::pmap()}'s own vctrs-based rules: any length-1
+element is broadcast to the common length; mismatched lengths greater
+than 1 raise an error.
 }
 \examples{
 draw(shape_polygon(radius = 1, n = 3L))

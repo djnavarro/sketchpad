@@ -35,18 +35,20 @@ Must be non-negative. Default \code{0.5}.}
 A \link{sketch} containing \code{layers} drawables.
 }
 \description{
+\code{effect_tremor()} builds a \link{sketch} of \code{layers} such copies: each is a
+copy of \code{object} (via \code{\link[S7:set_props]{S7::set_props()}}) with its \code{x}/\code{y} displaced by
+smooth, seed-offset simplex noise sampled along the path's own
+normalized arc-length.
+}
+\details{
 No single \link{drawable} can express a hand-drawn ink/pencil look on its
 own -- what reads as hand-drawn is several independently wobbling
 copies of the same nominal path layered on top of each other, not one
-perfectly smooth line. \code{effect_tremor()} builds a \link{sketch} of \code{layers}
-such copies: each is a copy of \code{object} (via \code{\link[S7:set_props]{S7::set_props()}}) with
-its \code{x}/\code{y} displaced by smooth, seed-offset simplex noise sampled
-along the path's own normalized arc-length -- the same ad hoc
-technique used, during development, to add a wobbling pencil edge on
-top of a \code{\link[=shape_stroke]{shape_stroke()}}'s tapered outline, or to layer a plain
-\code{\link[=curve_line]{curve_line()}} into a shakier-looking line by itself.
-}
-\details{
+perfectly smooth line. This is the same ad hoc technique used, during
+development, to add a wobbling pencil edge on top of a
+\code{\link[=shape_stroke]{shape_stroke()}}'s tapered outline, or to layer a plain \code{\link[=curve_line]{curve_line()}}
+into a shakier-looking line by itself.
+
 Noise is sampled at each control point's own position along arc-length
 (\code{0} to \code{1}), not at its raw \code{x}/\code{y} coordinates, so the jitter's shape
 is independent of the path's own scale or aspect ratio -- a long,

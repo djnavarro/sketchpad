@@ -5,10 +5,12 @@
 #' its own outline (`object@points`) not with a [style()]`@fill` via the
 #' ordinary `draw()`/`geometry_grob()` path, but by compositing a
 #' rasterised paper-grain texture and masking it to the outline's exact
-#' polygon shape via [grid::as.mask()] -- the same masking technique
-#' [fill_vignette()] already uses for its own radial fade, but applied to
-#' `object`'s own real (possibly concave, tapering-to-a-point) silhouette
-#' rather than a synthetic circle drawn purely to build the mask.
+#' polygon shape via [grid::as.mask()].
+#'
+#' This is the same masking technique [fill_vignette()] already uses for
+#' its own radial fade, but applied to `object`'s own real (possibly
+#' concave, tapering-to-a-point) silhouette rather than a synthetic
+#' circle drawn purely to build the mask.
 #'
 #' This is a different effect than filling `object` with
 #' [fill_charcoal()]/[fill_noise()] (already a good option for a shape's

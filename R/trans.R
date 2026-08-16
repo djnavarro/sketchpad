@@ -55,9 +55,11 @@ mat_about <- function(m, about_x, about_y) {
 #' matrix. It is not usually constructed directly -- use [trans_identity()],
 #' [trans_translate()], [trans_rotate()], [trans_scale()],
 #' [trans_reflect()], [trans_shear()], or the general-purpose
-#' [trans_affine()] instead. Every [drawable] carries a `trans` property
-#' (default [trans_identity()]) that's applied to its computed `points` as
-#' the very last step -- see [drawable]'s `trans` documentation.
+#' [trans_affine()] instead.
+#'
+#' Every [drawable] carries a `trans` property (default [trans_identity()])
+#' that's applied to its computed `points` as the very last step -- see
+#' [drawable]'s `trans` documentation.
 #'
 #' Two `trans` objects combine with `+`: `t1 + t2` produces a new `trans`
 #' whose effect is "apply `t1` first, then `t2`" -- see [trans_translate()]'s
@@ -100,10 +102,11 @@ trans <- S7::new_class(
 #'
 #' `trans_warp` displaces each point by simplex/fractal noise sampled at
 #' the point's own `(x, y)` position (domain warping), giving a wobbly,
-#' non-rigid distortion rather than an affine map -- unlike [trans]
-#' (translate/rotate/scale/reflect/shear), this can't be represented as a
-#' single matrix, since the displacement varies smoothly but irregularly
-#' from point to point.
+#' non-rigid distortion rather than an affine map.
+#'
+#' Unlike [trans] (translate/rotate/scale/reflect/shear), this can't be
+#' represented as a single matrix, since the displacement varies smoothly
+#' but irregularly from point to point.
 #'
 #' The x and y displacements are sampled from two independent
 #' [noise_field]s (`distortion_x`/`distortion_y`), each rescaled to
@@ -169,10 +172,12 @@ trans_warp <- S7::new_class(
 #' usually constructed directly; it holds an ordered list of `steps`
 #' (each a [trans] or [trans_warp]), applied in sequence -- `steps[[1]]`
 #' first, `steps[[length(steps)]]` last -- exactly like chained `+` calls
-#' on a [drawable] would suggest. Two consecutive [trans] (affine) steps
-#' are *not* automatically collapsed into one matrix when they're already
-#' part of a chain (only a bare `trans + trans` collapses); this only
-#' costs a little efficiency, not correctness.
+#' on a [drawable] would suggest.
+#'
+#' Two consecutive [trans] (affine) steps are *not* automatically
+#' collapsed into one matrix when they're already part of a chain (only a
+#' bare `trans + trans` collapses); this only costs a little efficiency,
+#' not correctness.
 #'
 #' @param steps A list of [trans]/[trans_warp]/`trans_chain` objects.
 #'

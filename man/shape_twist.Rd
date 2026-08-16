@@ -63,15 +63,18 @@ wandering, twisted appearance.
 
 \code{shape_twists()} is a vectorized version of \code{\link[=shape_twist]{shape_twist()}}: each
 argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). A shared \code{path_distortion}/\code{distortion} is
-automatically recycled across every twist; pass a \code{list()} of several
-different \link{noise_bridge}/\link{noise_field} objects instead to vary either
-per twist -- as in \code{README.Rmd}'s "Twists" example, which gives every
-twist the same \code{path_distortion} this way. The result is a \link{sketch}
+\code{purrr::pmap()}'s own vctrs-based rules. The result is a \link{sketch}
 containing one \code{shape_twist()} per recycled row, rather than a single
 drawable.
+}
+\details{
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. A shared
+\code{path_distortion}/\code{distortion} is automatically recycled across every
+twist; pass a \code{list()} of several different \link{noise_bridge}/\link{noise_field}
+objects instead to vary either per twist -- as in \code{README.Rmd}'s
+"Twists" example, which gives every twist the same \code{path_distortion}
+this way.
 }
 \examples{
 draw(shape_twist(

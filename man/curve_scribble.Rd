@@ -79,10 +79,7 @@ standalone open curve.
 each argument may be a vector, recycled against the others via
 \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
 broadcast to the common length; mismatched lengths greater than 1
-raise an error). Varying \code{seed} per curve is usually what makes
-several scribbles look distinct from each other. The result is a
-\link{sketch} containing one \code{curve_scribble()} per recycled row, rather
-than a single drawable.
+raise an error).
 }
 \details{
 The underlying line is generated in \verb{(along, across)} form, \code{along}
@@ -100,6 +97,10 @@ bottom-to-top instead.
 \code{geometry} documentation for why \code{"path"} geometries have no interior to
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
+
+Varying \code{seed} per curve is usually what makes several scribbles look
+distinct from each other. The result is a \link{sketch} containing one
+\code{curve_scribble()} per recycled row, rather than a single drawable.
 }
 \examples{
 draw(curve_scribble(width = 2, height = 0.5, seed = 5591L))

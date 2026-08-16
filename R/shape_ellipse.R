@@ -71,11 +71,13 @@ shape_ellipse <- S7::new_class(
 #' Multiple ellipses at once
 #'
 #' `shape_ellipses()` is a vectorized version of [shape_ellipse()]: each
-#' argument may be a vector, recycled against the others via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
-#' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). The result is a [sketch] containing one
-#' `shape_ellipse()` per recycled row, rather than a single drawable.
+#' argument may be a vector, recycled against the others. The result is a
+#' [sketch] containing one `shape_ellipse()` per recycled row, rather than
+#' a single drawable.
+#'
+#' Recycling uses `purrr::pmap()`'s own vctrs-based rules: any length-1
+#' element is broadcast to the common length; mismatched lengths greater
+#' than 1 raise an error.
 #'
 #' @rdname shape_ellipse
 #' @return For `shape_ellipses()`, a [sketch].

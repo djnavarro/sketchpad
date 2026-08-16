@@ -38,11 +38,14 @@ For \code{shape_circles()}, a \link{sketch}.
 vertices are computed as evenly spaced points around the circumference.
 
 \code{shape_circles()} is a vectorized version of \code{\link[=shape_circle]{shape_circle()}}: each
-argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a \link{sketch} containing one
-\code{shape_circle()} per recycled row, rather than a single drawable.
+argument may be a vector, recycled against the others. The result is a
+\link{sketch} containing one \code{shape_circle()} per recycled row, rather than
+a single drawable.
+}
+\details{
+Recycling uses \code{purrr::pmap()}'s own vctrs-based rules: any length-1
+element is broadcast to the common length; mismatched lengths greater
+than 1 raise an error.
 }
 \examples{
 draw(shape_circle(radius = 1))

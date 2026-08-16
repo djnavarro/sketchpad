@@ -210,12 +210,14 @@ fill_hatch <- function(color = "black",
 #'
 #' `fill_crosshatch()` builds a [grid::pattern()] fill value that renders two
 #' mirror-symmetric hatch lines, at `angle` and `-angle`, forming an "X"
-#' inside each tile. It shares [fill_hatch()]'s tile-shape technique: both
-#' lines are drawn as the two corner-to-corner diagonals of a single
-#' rectangular tile (rather than at an arbitrary baked-in slope), so both
-#' tile seamlessly under `extend = "repeat"`, and the tile's `width`/`height`
-#' ratio -- not the diagonals' own coordinates -- determines the rendered
-#' angle. See [fill_hatch()]'s details for why this matters.
+#' inside each tile.
+#'
+#' It shares [fill_hatch()]'s tile-shape technique: both lines are drawn as
+#' the two corner-to-corner diagonals of a single rectangular tile (rather
+#' than at an arbitrary baked-in slope), so both tile seamlessly under
+#' `extend = "repeat"`, and the tile's `width`/`height` ratio -- not the
+#' diagonals' own coordinates -- determines the rendered angle. See
+#' [fill_hatch()]'s details for why this matters.
 #'
 #' Because both lines share one tile shape, they are only *perpendicular*
 #' when `angle = 45` (the classic crosshatch look); for other angles the two
@@ -301,11 +303,13 @@ fill_crosshatch <- function(color = "black",
 #' Checkerboard pattern fill
 #'
 #' `fill_checker()` builds a [grid::pattern()] fill value that renders a
-#' two-colour checkerboard. It's the cheapest member of the hatch family to
-#' build: a checkerboard square has no direction the way a hatch line does
-#' (compare [fill_hatch()]'s corner-to-corner diagonal, needed specifically
-#' to tile a *sloped* line seamlessly), so the tile content here is just
-#' four plain quadrant rectangles -- the same two-colour-grid special case
+#' two-colour checkerboard.
+#'
+#' It's the cheapest member of the hatch family to build: a checkerboard
+#' square has no direction the way a hatch line does (compare
+#' [fill_hatch()]'s corner-to-corner diagonal, needed specifically to tile
+#' a *sloped* line seamlessly), so the tile content here is just four
+#' plain quadrant rectangles -- the same two-colour-grid special case
 #' [fill_crosshatch()] already falls back to when `angle` is a multiple of
 #' 90 degrees, pulled out into its own helper.
 #'
@@ -619,15 +623,17 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
 #' `fill_halftone()` is [fill_stipple()]'s other variant: instead of
 #' scattering dots of one fixed size, each dot's radius is drawn
 #' uniformly at random from `radius`, giving a mottled halftone-print
-#' look rather than a uniform stipple. Like [fill_stipple()] (and unlike
-#' [fill_scatter()]), it scatters plain [grid::circleGrob()]s, so it's
-#' immune to the *polygon*-specific rendering problems documented at
-#' [fill_scatter()] -- but it shares [fill_stipple()]'s own, separate
-#' "Known rendering risk with multiple dots" (repeated tiles containing
-#' several `circleGrob`s were, in testing, sometimes visibly distorted on
-#' this package's development R build; see that section for details).
-#' There is no known way to avoid this while still getting a genuine
-#' scattered-dot texture, so **check rendered output visually** here too.
+#' look rather than a uniform stipple.
+#'
+#' Like [fill_stipple()] (and unlike [fill_scatter()]), it scatters plain
+#' [grid::circleGrob()]s, so it's immune to the *polygon*-specific
+#' rendering problems documented at [fill_scatter()] -- but it shares
+#' [fill_stipple()]'s own, separate "Known rendering risk with multiple
+#' dots" (repeated tiles containing several `circleGrob`s were, in
+#' testing, sometimes visibly distorted on this package's development R
+#' build; see that section for details). There is no known way to avoid
+#' this while still getting a genuine scattered-dot texture, so **check
+#' rendered output visually** here too.
 #'
 #' As with [fill_stipple()], the target's bounding-box aspect ratio needs
 #' to be passed as `aspect` to keep the dots circular rather than
@@ -1309,15 +1315,16 @@ fill_flow <- function(color = "black",
 #' rendering, just different defaults -- tuned to read as hand-drawn
 #' charcoal or marker grain rather than [fill_noise()]'s more
 #' general-purpose rasterized field: a lighter base tone, finer/denser
-#' tiling, and finer noise detail. Found, while prototyping
-#' [shape_stroke()]'s interior texture, to be a substantially better fit
-#' than [fill_scribble()] for a curved stroke's body -- `fill_scribble()`'s
-#' fixed horizontal/vertical direction doesn't track a curved path's own
-#' tangent (see the "Deferred: arbitrary angle for `fill_scribble()`"
-#' item in `.agents/PLAN.md`), producing hatching that visibly cuts across
-#' the stroke at odd angles wherever the path bends, while
-#' [fill_noise()]'s directionless mottling has no orientation to clash
-#' with the curve.
+#' tiling, and finer noise detail.
+#'
+#' Found, while prototyping [shape_stroke()]'s interior texture, to be a
+#' substantially better fit than [fill_scribble()] for a curved stroke's
+#' body -- `fill_scribble()`'s fixed horizontal/vertical direction doesn't
+#' track a curved path's own tangent (see the "Deferred: arbitrary angle
+#' for `fill_scribble()`" item in `.agents/PLAN.md`), producing hatching
+#' that visibly cuts across the stroke at odd angles wherever the path
+#' bends, while [fill_noise()]'s directionless mottling has no orientation
+#' to clash with the curve.
 #'
 #' @inheritParams fill_noise
 #' @param color Fill colour. Default `"gray15"` (lighter than

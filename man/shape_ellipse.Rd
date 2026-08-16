@@ -50,11 +50,14 @@ circumference, generalizing \code{\link[=shape_circle]{shape_circle()}} (which i
 with equal radii in both directions).
 
 \code{shape_ellipses()} is a vectorized version of \code{\link[=shape_ellipse]{shape_ellipse()}}: each
-argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a \link{sketch} containing one
-\code{shape_ellipse()} per recycled row, rather than a single drawable.
+argument may be a vector, recycled against the others. The result is a
+\link{sketch} containing one \code{shape_ellipse()} per recycled row, rather than
+a single drawable.
+}
+\details{
+Recycling uses \code{purrr::pmap()}'s own vctrs-based rules: any length-1
+element is broadcast to the common length; mismatched lengths greater
+than 1 raise an error.
 }
 \examples{
 draw(shape_ellipse(x_radius = 2, y_radius = 1))

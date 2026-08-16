@@ -57,31 +57,34 @@ For \code{curve_twists()}, a \link{sketch}.
 \code{curve_twist} is \code{\link[=shape_twist]{shape_twist()}}'s path alone, with no ribbon width:
 an open \code{\link[=curve_line]{curve_line()}}-like polyline between \verb{(x, y)} and
 \verb{(xend, yend)}, displaced away from a straight line by a
-\link{noise_bridge}, giving a wandering, twisted appearance. Where
-\code{shape_twist()} also modulates a filled ribbon's width along this same
-kind of path (via a separate \code{distortion} \link{noise_field}), \code{curve_twist()}
-has no width or fill at all -- just the displaced backbone itself,
-rendered as an open \code{grid::polylineGrob()} (\code{geometry = "path"}).
-Shares its path computation with \code{shape_twist()} via the internal
-\code{twisted_path_points()} helper (\code{R/shape_twist.R}) rather than
-duplicating it.
+\link{noise_bridge}, giving a wandering, twisted appearance.
 
 \code{curve_twists()} is a vectorized version of \code{\link[=curve_twist]{curve_twist()}}: each
 argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). A shared \code{path_distortion} \link{noise_bridge} is
-automatically recycled across every path; pass a \code{list()} of several
-different \code{noise_bridge}s instead to vary it per path. The result is
+\code{purrr::pmap()}'s own vctrs-based rules. The result is
 a \link{sketch} containing one \code{curve_twist()} per recycled row, rather
 than a single drawable.
 }
 \details{
+Where \code{shape_twist()} also modulates a filled ribbon's width along this
+same kind of path (via a separate \code{distortion} \link{noise_field}),
+\code{curve_twist()} has no width or fill at all -- just the displaced
+backbone itself, rendered as an open \code{grid::polylineGrob()}
+(\code{geometry = "path"}). Shares its path computation with \code{shape_twist()}
+via the internal \code{twisted_path_points()} helper (\code{R/shape_twist.R})
+rather than duplicating it.
+
 \code{style@fill} has no effect for \code{curve_twist()} -- see \link{drawable}'s
 \code{geometry} documentation for why \code{"path"} geometries have no interior
 to fill. Passing \code{fill} via \code{...} is still accepted (it's simply
 ignored at draw time), since \code{style()} is shared across every
 \code{geometry}.
+
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. A shared \code{path_distortion}
+\link{noise_bridge} is automatically recycled across every path; pass a
+\code{list()} of several different \code{noise_bridge}s instead to vary it per
+path.
 }
 \examples{
 draw(curve_twist(

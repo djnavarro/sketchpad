@@ -16,7 +16,10 @@ Default \code{3L}.}
 \code{noise_bridge} bundles the settings needed to generate a smoothed
 Brownian bridge (via the internal \code{smooth_bridge()} helper): how many
 local-averaging \code{smooth}-ing passes to apply, and which \code{seed} to draw
-from. Unlike \link{noise_field} (sampled at arbitrary \verb{(x, y)} positions in
+from.
+}
+\details{
+Unlike \link{noise_field} (sampled at arbitrary \verb{(x, y)} positions in
 the plane), a Brownian bridge has no spatial position to sample at --
 \code{\link[=noise_sample]{noise_sample()}}'s method for \code{noise_bridge} instead takes a point
 count \code{n} and a \code{scale}, returning a length-\code{n} displacement vector.

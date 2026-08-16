@@ -57,11 +57,12 @@ bezier_curve_points <- function(x, y, n) {
 #' `shape_bezier` is a [drawable] whose outline follows a Bezier curve
 #' defined by an arbitrary number of control points (`x`, `y`). With two
 #' control points this is a straight line; with four, a cubic Bezier of
-#' the kind used to build ribbons and other flowing shapes. Since
-#' [draw()] renders every `"polygon"`-geometry `drawable`'s `points` as a
-#' closed polygon, the curve is implicitly closed from its last control
-#' point back to its first -- for an open Bezier curve/path instead, see
-#' [curve_bezier()].
+#' the kind used to build ribbons and other flowing shapes.
+#'
+#' Since [draw()] renders every `"polygon"`-geometry `drawable`'s `points`
+#' as a closed polygon, the curve is implicitly closed from its last
+#' control point back to its first -- for an open Bezier curve/path
+#' instead, see [curve_bezier()].
 #'
 #' @param x,y Numeric vectors of control point coordinates. Must be the
 #'   same length, with at least two control points.
@@ -118,12 +119,14 @@ shape_bezier <- S7::new_class(
 #' curve, `shape_beziers()` takes them as a `list()` of numeric vectors
 #' instead -- one vector of control points per shape -- rather than a
 #' bare vector (which `shape_circles()`-style constructors use for a
-#' plain per-shape scalar). Every other argument may be a plain vector,
-#' recycled against `x`/`y` via `purrr::pmap()`'s own vctrs-based rules
-#' (any length-1 element is broadcast to the common length; mismatched
-#' lengths greater than 1 raise an error). The result is a [sketch]
-#' containing one `shape_bezier()` per list element/recycled row, rather
-#' than a single drawable.
+#' plain per-shape scalar).
+#'
+#' Every other argument may be a plain vector, recycled against `x`/`y`
+#' via `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `shape_bezier()` per list element/recycled row, rather than a single
+#' drawable.
 #'
 #' @rdname shape_bezier
 #' @param x,y For `shape_bezier()`, numeric vectors of control point

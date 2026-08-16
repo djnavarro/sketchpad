@@ -5,14 +5,15 @@
 #' base noise function and fractal combinator to use
 #' ([ambient::fracture()]'s `noise`/`fractal` arguments), how coarse or
 #' fine the field is (`frequency`), how many octaves of detail to layer
-#' (`octaves`), and which `seed` to draw from. [noise_sample()] evaluates
-#' a `noise_field` at a set of positions and rescales the result into a
-#' target range -- the operation shared by [shape_blob()]'s radius
-#' perturbation and [shape_ribbon()]/[shape_twist()]'s width modulation,
-#' factored out here so it isn't duplicated across those three
-#' constructors, and so the noise/fractal functions themselves are
-#' configurable rather than hardcoded to [ambient::gen_simplex()]/
-#' [ambient::fbm()].
+#' (`octaves`), and which `seed` to draw from.
+#'
+#' [noise_sample()] evaluates a `noise_field` at a set of positions and
+#' rescales the result into a target range -- the operation shared by
+#' [shape_blob()]'s radius perturbation and [shape_ribbon()]/
+#' [shape_twist()]'s width modulation, factored out here so it isn't
+#' duplicated across those three constructors, and so the noise/fractal
+#' functions themselves are configurable rather than hardcoded to
+#' [ambient::gen_simplex()]/[ambient::fbm()].
 #'
 #' @param noise A noise-generating function, passed to
 #'   [ambient::fracture()]'s `noise` argument (e.g. [ambient::gen_simplex()],
@@ -75,11 +76,12 @@ noise_field <- S7::new_class(
 #' Sample a noise object
 #'
 #' `noise_sample()` evaluates a noise object at a set of positions and
-#' returns the (typically rescaled) sampled values. It is an S7 generic
-#' dispatching on `field`; each concrete noise class implements its own
-#' method, since what "a position" means differs by class -- a
-#' [noise_field] is sampled at arbitrary `(x, y)` coordinates in the
-#' plane, matching [ambient::fracture()]'s own interface, while a
+#' returns the (typically rescaled) sampled values.
+#'
+#' It is an S7 generic dispatching on `field`; each concrete noise class
+#' implements its own method, since what "a position" means differs by
+#' class -- a [noise_field] is sampled at arbitrary `(x, y)` coordinates
+#' in the plane, matching [ambient::fracture()]'s own interface, while a
 #' [noise_bridge] instead samples by point count alone, with no
 #' `(x, y)` positions involved.
 #'

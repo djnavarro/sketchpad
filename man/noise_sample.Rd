@@ -16,11 +16,13 @@ A numeric vector.
 }
 \description{
 \code{noise_sample()} evaluates a noise object at a set of positions and
-returns the (typically rescaled) sampled values. It is an S7 generic
-dispatching on \code{field}; each concrete noise class implements its own
-method, since what "a position" means differs by class -- a
-\link{noise_field} is sampled at arbitrary \verb{(x, y)} coordinates in the
-plane, matching \code{\link[ambient:fracture]{ambient::fracture()}}'s own interface, while a
+returns the (typically rescaled) sampled values.
+}
+\details{
+It is an S7 generic dispatching on \code{field}; each concrete noise class
+implements its own method, since what "a position" means differs by
+class -- a \link{noise_field} is sampled at arbitrary \verb{(x, y)} coordinates
+in the plane, matching \code{\link[ambient:fracture]{ambient::fracture()}}'s own interface, while a
 \link{noise_bridge} instead samples by point count alone, with no
 \verb{(x, y)} positions involved.
 }

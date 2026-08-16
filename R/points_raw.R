@@ -75,12 +75,14 @@ points_raw <- S7::new_class(
 #' single scatter, `points_raws()` takes them as a `list()` of numeric
 #' vectors instead -- one vector per scatter -- which is most useful for
 #' giving several distinct scatters different `style` arguments (e.g. a
-#' different `color` each). Every other argument may be a plain vector,
-#' recycled against `x`/`y` via `purrr::pmap()`'s own vctrs-based rules
-#' (any length-1 element is broadcast to the common length; mismatched
-#' lengths greater than 1 raise an error). The result is a [sketch]
-#' containing one `points_raw()` per list element/recycled row, rather
-#' than a single drawable.
+#' different `color` each).
+#'
+#' Every other argument may be a plain vector, recycled against `x`/`y`
+#' via `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' broadcast to the common length; mismatched lengths greater than 1
+#' raise an error). The result is a [sketch] containing one
+#' `points_raw()` per list element/recycled row, rather than a single
+#' drawable.
 #'
 #' @rdname points_raw
 #' @param x,y For `points_raw()`, a numeric vector of x/y coordinates. For

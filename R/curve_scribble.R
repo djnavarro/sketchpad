@@ -145,10 +145,11 @@ curve_scribble <- S7::new_class(
 #' each argument may be a vector, recycled against the others via
 #' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
 #' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). Varying `seed` per curve is usually what makes
-#' several scribbles look distinct from each other. The result is a
-#' [sketch] containing one `curve_scribble()` per recycled row, rather
-#' than a single drawable.
+#' raise an error).
+#'
+#' Varying `seed` per curve is usually what makes several scribbles look
+#' distinct from each other. The result is a [sketch] containing one
+#' `curve_scribble()` per recycled row, rather than a single drawable.
 #'
 #' @rdname curve_scribble
 #' @return For `curve_scribbles()`, a [sketch].

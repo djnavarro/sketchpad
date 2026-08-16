@@ -55,13 +55,13 @@ A \link{sketch} containing \code{n_bristles} drawables.
 }
 \description{
 \code{effect_bristle()} builds a \link{sketch} of \code{n_bristles} copies of a
-template drawable, fanned out perpendicular to its own backbone path --
-like \code{\link[=effect_tremor]{effect_tremor()}}, no single drawable can express this by itself,
+template drawable, fanned out perpendicular to its own backbone path.
+}
+\details{
+Like \code{\link[=effect_tremor]{effect_tremor()}}, no single drawable can express this by itself,
 since a dry-brush look comes from several independently-frayed,
 independently wobbling strands laid side by side, not one stroke. Each
 bristle is a copy of \code{object} (via \code{\link[S7:set_props]{S7::set_props()}}) that:
-}
-\details{
 \itemize{
 \item is offset from the backbone by a fixed perpendicular distance (via
 the same per-point unit normal \code{\link[=shape_stroke]{shape_stroke()}} itself uses,

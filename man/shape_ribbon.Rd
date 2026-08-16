@@ -58,13 +58,16 @@ ends and varies along its length according to simplex noise.
 
 \code{shape_ribbons()} is a vectorized version of \code{\link[=shape_ribbon]{shape_ribbon()}}: each
 argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). A shared \code{distortion} \link{noise_field} is automatically
-recycled across every ribbon; pass a \code{list()} of several different
-\code{noise_field}s instead to vary it per ribbon. The result is a
+\code{purrr::pmap()}'s own vctrs-based rules. The result is a
 \link{sketch} containing one \code{shape_ribbon()} per recycled row, rather
 than a single drawable.
+}
+\details{
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. A shared \code{distortion}
+\link{noise_field} is automatically recycled across every ribbon; pass a
+\code{list()} of several different \code{noise_field}s instead to vary it per
+ribbon.
 }
 \examples{
 draw(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1, width = 0.3))

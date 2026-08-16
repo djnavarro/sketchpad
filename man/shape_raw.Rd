@@ -33,12 +33,15 @@ It is most often produced by \code{\link[S7:convert]{convert()}}ing a more compl
 \code{shape_raws()} is a vectorized version of \code{\link[=shape_raw]{shape_raw()}}. Since \code{x}/\code{y}
 are themselves numeric vectors of vertex coordinates for a single
 polygon, \code{shape_raws()} takes them as a \code{list()} of numeric vectors
-instead -- one vector of vertices per shape. Every other argument may
-be a plain vector, recycled against \code{x}/\code{y} via \code{purrr::pmap()}'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result
-is a \link{sketch} containing one \code{shape_raw()} per list element/recycled
-row, rather than a single drawable.
+instead -- one vector of vertices per shape.
+}
+\details{
+Every other argument may be a plain vector, recycled against \code{x}/\code{y}
+via \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{shape_raw()} per list element/recycled row, rather than a single
+drawable.
 }
 \examples{
 draw(shape_raw(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1)))

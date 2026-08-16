@@ -2,9 +2,10 @@
 #'
 #' `shape_polygon` is a [drawable] defined by a centroid and a radius; its
 #' vertices are `n` evenly spaced points around the circumference, giving a
-#' regular n-gon (e.g. `n = 3` a triangle, `n = 6` a hexagon). Unlike
-#' [shape_circle()]/[shape_blob()], `points` does not repeat its first vertex
-#' at the end -- there are exactly `n` distinct vertices, since
+#' regular n-gon (e.g. `n = 3` a triangle, `n = 6` a hexagon).
+#'
+#' Unlike [shape_circle()]/[shape_blob()], `points` does not repeat its
+#' first vertex at the end -- there are exactly `n` distinct vertices, since
 #' `grid::polygonGrob()` closes the path itself and a polygon has no
 #' approximation error to hide.
 #'
@@ -68,11 +69,13 @@ shape_polygon <- S7::new_class(
 #' Multiple regular polygons at once
 #'
 #' `shape_polygons()` is a vectorized version of [shape_polygon()]: each
-#' argument may be a vector, recycled against the others via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
-#' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). The result is a [sketch] containing one
-#' `shape_polygon()` per recycled row, rather than a single drawable.
+#' argument may be a vector, recycled against the others. The result is a
+#' [sketch] containing one `shape_polygon()` per recycled row, rather than
+#' a single drawable.
+#'
+#' Recycling uses `purrr::pmap()`'s own vctrs-based rules: any length-1
+#' element is broadcast to the common length; mismatched lengths greater
+#' than 1 raise an error.
 #'
 #' @rdname shape_polygon
 #' @return For `shape_polygons()`, a [sketch].

@@ -47,12 +47,14 @@ e.g. \code{\link[=shape_stroke]{shape_stroke()}}, \code{\link[=shape_blob]{shape
 its own outline (\code{object@points}) not with a \code{\link[=style]{style()}}\verb{@fill} via the
 ordinary \code{draw()}/\code{geometry_grob()} path, but by compositing a
 rasterised paper-grain texture and masking it to the outline's exact
-polygon shape via \code{\link[grid:as.mask]{grid::as.mask()}} -- the same masking technique
-\code{\link[=fill_vignette]{fill_vignette()}} already uses for its own radial fade, but applied to
-\code{object}'s own real (possibly concave, tapering-to-a-point) silhouette
-rather than a synthetic circle drawn purely to build the mask.
+polygon shape via \code{\link[grid:as.mask]{grid::as.mask()}}.
 }
 \details{
+This is the same masking technique \code{\link[=fill_vignette]{fill_vignette()}} already uses for
+its own radial fade, but applied to \code{object}'s own real (possibly
+concave, tapering-to-a-point) silhouette rather than a synthetic
+circle drawn purely to build the mask.
+
 This is a different effect than filling \code{object} with
 \code{\link[=fill_charcoal]{fill_charcoal()}}/\code{\link[=fill_noise]{fill_noise()}} (already a good option for a shape's
 interior -- see \code{\link[=fill_charcoal]{fill_charcoal()}}'s docs): those tile a periodic

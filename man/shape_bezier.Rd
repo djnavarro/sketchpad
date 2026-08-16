@@ -31,23 +31,27 @@ For \code{shape_beziers()}, a \link{sketch}.
 \code{shape_bezier} is a \link{drawable} whose outline follows a Bezier curve
 defined by an arbitrary number of control points (\code{x}, \code{y}). With two
 control points this is a straight line; with four, a cubic Bezier of
-the kind used to build ribbons and other flowing shapes. Since
-\code{\link[=draw]{draw()}} renders every \code{"polygon"}-geometry \code{drawable}'s \code{points} as a
-closed polygon, the curve is implicitly closed from its last control
-point back to its first -- for an open Bezier curve/path instead, see
-\code{\link[=curve_bezier]{curve_bezier()}}.
+the kind used to build ribbons and other flowing shapes.
 
 \code{shape_beziers()} is a vectorized version of \code{\link[=shape_bezier]{shape_bezier()}}. Since
 \code{x}/\code{y} are themselves numeric vectors of control points for a single
 curve, \code{shape_beziers()} takes them as a \code{list()} of numeric vectors
 instead -- one vector of control points per shape -- rather than a
 bare vector (which \code{shape_circles()}-style constructors use for a
-plain per-shape scalar). Every other argument may be a plain vector,
-recycled against \code{x}/\code{y} via \code{purrr::pmap()}'s own vctrs-based rules
-(any length-1 element is broadcast to the common length; mismatched
-lengths greater than 1 raise an error). The result is a \link{sketch}
-containing one \code{shape_bezier()} per list element/recycled row, rather
-than a single drawable.
+plain per-shape scalar).
+}
+\details{
+Since \code{\link[=draw]{draw()}} renders every \code{"polygon"}-geometry \code{drawable}'s \code{points}
+as a closed polygon, the curve is implicitly closed from its last
+control point back to its first -- for an open Bezier curve/path
+instead, see \code{\link[=curve_bezier]{curve_bezier()}}.
+
+Every other argument may be a plain vector, recycled against \code{x}/\code{y}
+via \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{shape_bezier()} per list element/recycled row, rather than a single
+drawable.
 }
 \examples{
 draw(shape_bezier(x = c(0, 0.5, 1, 0.5), y = c(0, 1, 0, -1)))

@@ -65,9 +65,10 @@ curve_bezier <- S7::new_class(
 #' `curve_beziers()` is a vectorized version of [curve_bezier()]. Since
 #' `x`/`y` are themselves numeric vectors of control points for a single
 #' curve, `curve_beziers()` takes them as a `list()` of numeric vectors
-#' instead -- one vector of control points per curve. Every other
-#' argument may be a plain vector, recycled against `x`/`y` via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' instead -- one vector of control points per curve.
+#'
+#' Every other argument may be a plain vector, recycled against `x`/`y`
+#' via `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
 #' broadcast to the common length; mismatched lengths greater than 1
 #' raise an error). The result is a [sketch] containing one
 #' `curve_bezier()` per list element/recycled row, rather than a single

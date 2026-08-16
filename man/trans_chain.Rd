@@ -16,10 +16,13 @@ another \link{trans_warp}, or a \link{trans_warp} mixed with a \link{trans}. It 
 usually constructed directly; it holds an ordered list of \code{steps}
 (each a \link{trans} or \link{trans_warp}), applied in sequence -- \code{steps[[1]]}
 first, \code{steps[[length(steps)]]} last -- exactly like chained \code{+} calls
-on a \link{drawable} would suggest. Two consecutive \link{trans} (affine) steps
-are \emph{not} automatically collapsed into one matrix when they're already
-part of a chain (only a bare \code{trans + trans} collapses); this only
-costs a little efficiency, not correctness.
+on a \link{drawable} would suggest.
+}
+\details{
+Two consecutive \link{trans} (affine) steps are \emph{not} automatically
+collapsed into one matrix when they're already part of a chain (only a
+bare \code{trans + trans} collapses); this only costs a little efficiency,
+not correctness.
 }
 \examples{
 # combining an affine trans with a trans_warp produces a trans_chain,

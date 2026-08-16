@@ -57,13 +57,16 @@ Perlin/simplex noise generated with \pkg{ambient}.
 
 \code{shape_blobs()} is a vectorized version of \code{\link[=shape_blob]{shape_blob()}}: each
 argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). A shared \code{distortion} \link{noise_field} is automatically
-recycled across every blob; pass a \code{list()} of several different
-\code{noise_field}s instead to vary it per blob. The result is a \link{sketch}
+\code{purrr::pmap()}'s own vctrs-based rules. The result is a \link{sketch}
 containing one \code{shape_blob()} per recycled row, rather than a single
 drawable.
+}
+\details{
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. A shared \code{distortion}
+\link{noise_field} is automatically recycled across every blob; pass a
+\code{list()} of several different \code{noise_field}s instead to vary it per
+blob.
 }
 \examples{
 draw(shape_blob(radius = 1, range = 0.3, distortion = noise_field(seed = 4821L)))

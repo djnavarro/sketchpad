@@ -27,7 +27,9 @@ validate_ribbonpath_path <- function(path) {
 #' `shape_ribbonpath()` builds a tapered, noise-modulated ribbon (like
 #' [shape_stroke()]) whose backbone follows an arbitrary `curve_*()`
 #' drawable's own computed points, rather than raw `x`/`y` control
-#' points. It is a thin wrapper: `path@points` is extracted and fed
+#' points.
+#'
+#' It is a thin wrapper: `path@points` is extracted and fed
 #' straight into [shape_stroke()], so the object it returns is literally
 #' a `shape_stroke` -- `shape_ribbonpath()` exists only to save the
 #' caller from writing `shape_stroke(x = path@points@x, y =
@@ -110,16 +112,17 @@ shape_ribbonpath <- function(path,
 #'
 #' `shape_ribbonpaths()` is a vectorized version of
 #' [shape_ribbonpath()]: each argument may be a vector, recycled against
-#' the others via `purrr::pmap()`'s own vctrs-based rules (any length-1
-#' element is broadcast to the common length; mismatched lengths greater
-#' than 1 raise an error). Unlike the `x`/`y`-list-column constructors
-#' (e.g. [shape_beziers()]), `path` is a single [drawable] object per
-#' ribbon, not a numeric vector, so a single shared `path` recycles
-#' automatically across every ribbon (the same way a shared `distortion`
-#' [noise_field] already does); pass a `list()` of several different
-#' `curve_*()` objects instead to vary the backbone per ribbon. The
+#' the others via `purrr::pmap()`'s own vctrs-based rules. The
 #' result is a [sketch] containing one `shape_ribbonpath()` per recycled
 #' row, rather than a single drawable.
+#'
+#' Any length-1 element is broadcast to the common length; mismatched
+#' lengths greater than 1 raise an error. Unlike the `x`/`y`-list-column
+#' constructors (e.g. [shape_beziers()]), `path` is a single [drawable]
+#' object per ribbon, not a numeric vector, so a single shared `path`
+#' recycles automatically across every ribbon (the same way a shared
+#' `distortion` [noise_field] already does); pass a `list()` of several
+#' different `curve_*()` objects instead to vary the backbone per ribbon.
 #'
 #' @rdname shape_ribbonpath
 #' @return For `shape_ribbonpaths()`, a [sketch].

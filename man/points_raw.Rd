@@ -37,12 +37,7 @@ rather than a connected outline or path.
 single scatter, \code{points_raws()} takes them as a \code{list()} of numeric
 vectors instead -- one vector per scatter -- which is most useful for
 giving several distinct scatters different \code{style} arguments (e.g. a
-different \code{color} each). Every other argument may be a plain vector,
-recycled against \code{x}/\code{y} via \code{purrr::pmap()}'s own vctrs-based rules
-(any length-1 element is broadcast to the common length; mismatched
-lengths greater than 1 raise an error). The result is a \link{sketch}
-containing one \code{points_raw()} per list element/recycled row, rather
-than a single drawable.
+different \code{color} each).
 }
 \details{
 \code{style@fill} and every line-related \code{style} property (\code{linewidth},
@@ -51,6 +46,13 @@ than a single drawable.
 \code{geometry_grob()}'s internal dispatch (\code{R/draw.R}) for why a \code{"points"}
 geometry has no line to stroke and no interior to fill. Only \code{style@color}
 is used, as the marker colour.
+
+Every other argument may be a plain vector, recycled against \code{x}/\code{y}
+via \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{points_raw()} per list element/recycled row, rather than a single
+drawable.
 }
 \examples{
 draw(points_raw(

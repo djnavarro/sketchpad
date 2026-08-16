@@ -50,18 +50,23 @@ For \code{shape_rectangles()}/\code{shape_squares()}, a \link{sketch}.
 }
 \description{
 \code{shape_rectangle} is a \link{drawable} defined by a centroid and a width/height,
-rendered as an axis-aligned rectangle. \code{shape_square()} is a thin
-convenience wrapper around \code{shape_rectangle()} for the common case of
-\code{width == height}, taking a single \code{side} argument instead -- it returns a
-\code{shape_rectangle} object directly rather than being its own class.
+rendered as an axis-aligned rectangle.
 
 \code{shape_rectangles()}/\code{shape_squares()} are vectorized versions of
 \code{\link[=shape_rectangle]{shape_rectangle()}}/\code{\link[=shape_square]{shape_square()}}: each argument may be a vector,
-recycled against the others via \code{purrr::pmap()}'s own vctrs-based
-rules (any length-1 element is broadcast to the common length;
-mismatched lengths greater than 1 raise an error). The result is a
-\link{sketch} containing one \code{shape_rectangle()}/\code{shape_square()} per
-recycled row, rather than a single drawable.
+recycled against the others. The result is a \link{sketch} containing one
+\code{shape_rectangle()}/\code{shape_square()} per recycled row, rather than a
+single drawable.
+}
+\details{
+\code{shape_square()} is a thin convenience wrapper around \code{shape_rectangle()}
+for the common case of \code{width == height}, taking a single \code{side} argument
+instead -- it returns a \code{shape_rectangle} object directly rather than
+being its own class.
+
+Recycling uses \code{purrr::pmap()}'s own vctrs-based rules: any length-1
+element is broadcast to the common length; mismatched lengths greater
+than 1 raise an error.
 }
 \examples{
 draw(shape_rectangle(width = 2, height = 1))

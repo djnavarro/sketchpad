@@ -51,32 +51,25 @@ For \code{shape_strokes()}, a \link{sketch}.
 }
 \description{
 \code{shape_stroke} is a \link{drawable} polygon that follows an arbitrary open
-path through \verb{(x, y)} control points (resampled to \code{n} evenly
-arc-length-spaced points, unlike \code{\link[=curve_line]{curve_line()}}'s exact control-point
-vertices), offset into a ribbon whose width tapers to zero at both
-ends and varies along its length according to a \link{noise_field} --
-intended as a "pressure" curve, giving the outline an ink/brush-stroke
-look rather than a constant-width line. It generalizes \code{\link[=shape_ribbon]{shape_ribbon()}}
-from a single straight segment to any path, at the cost of computing a
-true per-point unit normal (via the internal \code{stroke_normals()} helper)
-rather than \code{\link[=shape_ribbon]{shape_ribbon()}}/\code{\link[=shape_twist]{shape_twist()}}'s shared single offset
-direction -- necessary once the path can genuinely curve, not just
-wander slightly off straight.
+path through \verb{(x, y)} control points, offset into a ribbon whose width
+tapers to zero at both ends and varies along its length according to a
+\link{noise_field} -- intended as a "pressure" curve, giving the outline an
+ink/brush-stroke look rather than a constant-width line.
 
 \code{shape_strokes()} is a vectorized version of \code{\link[=shape_stroke]{shape_stroke()}}. Since
 \code{x}/\code{y} are themselves numeric vectors of control points for a single
 stroke, \code{shape_strokes()} takes them as a \code{list()} of numeric vectors
-instead -- one vector of control points per stroke. Every other
-argument may be a plain vector, recycled against \code{x}/\code{y} via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). A shared \code{distortion} \link{noise_field} is automatically
-recycled across every stroke; pass a \code{list()} of several different
-\code{noise_field}s instead to vary it per stroke. The result is a \link{sketch}
-containing one \code{shape_stroke()} per list element/recycled row, rather
-than a single drawable.
+instead -- one vector of control points per stroke.
 }
 \details{
+The path is resampled to \code{n} evenly arc-length-spaced points (unlike
+\code{\link[=curve_line]{curve_line()}}'s exact control-point vertices). This generalizes
+\code{\link[=shape_ribbon]{shape_ribbon()}} from a single straight segment to any path, at the
+cost of computing a true per-point unit normal (via the internal
+\code{stroke_normals()} helper) rather than \code{\link[=shape_ribbon]{shape_ribbon()}}/\code{\link[=shape_twist]{shape_twist()}}'s
+shared single offset direction -- necessary once the path can genuinely
+curve, not just wander slightly off straight.
+
 Unlike \code{\link[=shape_ribbon]{shape_ribbon()}}'s own taper (which peaks at \code{0.5}, an
 undocumented quirk of its \code{sqrt(t * (1 - t))} formula), \code{shape_stroke}'s
 taper is normalized to peak at \code{1} at the path's midpoint, so \code{width}
@@ -89,6 +82,15 @@ A \code{shape_stroke()} built from only a few widely-spaced control points
 will still have visibly angular corners; supply a denser \code{x}/\code{y} (e.g.
 points already sampled from some smooth function) for a smoothly
 curving stroke.
+
+Every other argument may be a plain vector, recycled against \code{x}/\code{y} via
+\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). A shared \code{distortion} \link{noise_field} is automatically
+recycled across every stroke; pass a \code{list()} of several different
+\code{noise_field}s instead to vary it per stroke. The result is a \link{sketch}
+containing one \code{shape_stroke()} per list element/recycled row, rather
+than a single drawable.
 }
 \examples{
 draw(shape_stroke(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), width = 0.3))

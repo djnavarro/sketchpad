@@ -61,11 +61,13 @@ shape_circle <- S7::new_class(
 #' Multiple circles at once
 #'
 #' `shape_circles()` is a vectorized version of [shape_circle()]: each
-#' argument may be a vector, recycled against the others via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
-#' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). The result is a [sketch] containing one
-#' `shape_circle()` per recycled row, rather than a single drawable.
+#' argument may be a vector, recycled against the others. The result is a
+#' [sketch] containing one `shape_circle()` per recycled row, rather than
+#' a single drawable.
+#'
+#' Recycling uses `purrr::pmap()`'s own vctrs-based rules: any length-1
+#' element is broadcast to the common length; mismatched lengths greater
+#' than 1 raise an error.
 #'
 #' @rdname shape_circle
 #' @return For `shape_circles()`, a [sketch].

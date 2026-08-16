@@ -28,26 +28,29 @@ For \code{curve_lines()}, a \link{sketch}.
 \description{
 \code{curve_line} is a \link{drawable} whose path connects an arbitrary number of
 control points \verb{(x, y)} with straight segments, in order. With two control
-points this is a single line segment; with more, an open polyline. Unlike
-\code{\link[=curve_bezier]{curve_bezier()}}/\code{\link[=shape_bezier]{shape_bezier()}}, the control points are not smoothed or
-resampled -- \code{points} is exactly \verb{(x, y)}, so there is no \code{n} argument.
+points this is a single line segment; with more, an open polyline.
 
 \code{curve_lines()} is a vectorized version of \code{\link[=curve_line]{curve_line()}}. Since
 \code{x}/\code{y} are themselves numeric vectors of control points for a single
 polyline, \code{curve_lines()} takes them as a \code{list()} of numeric vectors
-instead -- one vector of control points per polyline. Every other
-argument may be a plain vector, recycled against \code{x}/\code{y} via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a \link{sketch} containing one
-\code{curve_line()} per list element/recycled row, rather than a single
-drawable.
+instead -- one vector of control points per polyline.
 }
 \details{
+Unlike \code{\link[=curve_bezier]{curve_bezier()}}/\code{\link[=shape_bezier]{shape_bezier()}}, the control points are not
+smoothed or resampled -- \code{points} is exactly \verb{(x, y)}, so there is no
+\code{n} argument.
+
 \code{style@fill} has no effect for \code{curve_line()} -- see \link{drawable}'s
 \code{geometry} documentation for why \code{"path"} geometries have no interior to
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
+
+Every other argument may be a plain vector, recycled against \code{x}/\code{y}
+via \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{curve_line()} per list element/recycled row, rather than a single
+drawable.
 }
 \examples{
 draw(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)))

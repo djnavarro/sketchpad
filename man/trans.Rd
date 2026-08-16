@@ -15,11 +15,13 @@ third row must be \code{c(0, 0, 1)}).}
 matrix. It is not usually constructed directly -- use \code{\link[=trans_identity]{trans_identity()}},
 \code{\link[=trans_translate]{trans_translate()}}, \code{\link[=trans_rotate]{trans_rotate()}}, \code{\link[=trans_scale]{trans_scale()}},
 \code{\link[=trans_reflect]{trans_reflect()}}, \code{\link[=trans_shear]{trans_shear()}}, or the general-purpose
-\code{\link[=trans_affine]{trans_affine()}} instead. Every \link{drawable} carries a \code{trans} property
-(default \code{\link[=trans_identity]{trans_identity()}}) that's applied to its computed \code{points} as
-the very last step -- see \link{drawable}'s \code{trans} documentation.
+\code{\link[=trans_affine]{trans_affine()}} instead.
 }
 \details{
+Every \link{drawable} carries a \code{trans} property (default \code{\link[=trans_identity]{trans_identity()}})
+that's applied to its computed \code{points} as the very last step -- see
+\link{drawable}'s \code{trans} documentation.
+
 Two \code{trans} objects combine with \code{+}: \code{t1 + t2} produces a new \code{trans}
 whose effect is "apply \code{t1} first, then \code{t2}" -- see \code{\link[=trans_translate]{trans_translate()}}'s
 Details for the composition order convention and a worked example.

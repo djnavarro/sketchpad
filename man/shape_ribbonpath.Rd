@@ -55,26 +55,21 @@ For \code{shape_ribbonpaths()}, a \link{sketch}.
 \code{shape_ribbonpath()} builds a tapered, noise-modulated ribbon (like
 \code{\link[=shape_stroke]{shape_stroke()}}) whose backbone follows an arbitrary \verb{curve_*()}
 drawable's own computed points, rather than raw \code{x}/\code{y} control
-points. It is a thin wrapper: \code{path@points} is extracted and fed
+points.
+
+\code{shape_ribbonpaths()} is a vectorized version of
+\code{\link[=shape_ribbonpath]{shape_ribbonpath()}}: each argument may be a vector, recycled against
+the others via \code{purrr::pmap()}'s own vctrs-based rules. The
+result is a \link{sketch} containing one \code{shape_ribbonpath()} per recycled
+row, rather than a single drawable.
+}
+\details{
+It is a thin wrapper: \code{path@points} is extracted and fed
 straight into \code{\link[=shape_stroke]{shape_stroke()}}, so the object it returns is literally
 a \code{shape_stroke} -- \code{shape_ribbonpath()} exists only to save the
 caller from writing \code{shape_stroke(x = path@points@x, y = path@points@y, ...)} by hand, and to make the "ribbon around a curve"
 use case discoverable under its own name.
 
-\code{shape_ribbonpaths()} is a vectorized version of
-\code{\link[=shape_ribbonpath]{shape_ribbonpath()}}: each argument may be a vector, recycled against
-the others via \code{purrr::pmap()}'s own vctrs-based rules (any length-1
-element is broadcast to the common length; mismatched lengths greater
-than 1 raise an error). Unlike the \code{x}/\code{y}-list-column constructors
-(e.g. \code{\link[=shape_beziers]{shape_beziers()}}), \code{path} is a single \link{drawable} object per
-ribbon, not a numeric vector, so a single shared \code{path} recycles
-automatically across every ribbon (the same way a shared \code{distortion}
-\link{noise_field} already does); pass a \code{list()} of several different
-\verb{curve_*()} objects instead to vary the backbone per ribbon. The
-result is a \link{sketch} containing one \code{shape_ribbonpath()} per recycled
-row, rather than a single drawable.
-}
-\details{
 Because the result is a \code{shape_stroke}, its width offset uses a true
 per-point unit normal (\code{shape_stroke()}'s own \code{stroke_normals()}
 helper) rather than a single shared offset direction -- this is what
@@ -90,6 +85,14 @@ peaked at \code{0.5}; \code{shape_ribbonpath()} instead inherits
 \code{shape_stroke()}'s true per-point normals and its taper formula
 (which peaks at \code{1}, so \code{width} is exactly the maximum rendered
 width).
+
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. Unlike the \code{x}/\code{y}-list-column
+constructors (e.g. \code{\link[=shape_beziers]{shape_beziers()}}), \code{path} is a single \link{drawable}
+object per ribbon, not a numeric vector, so a single shared \code{path}
+recycles automatically across every ribbon (the same way a shared
+\code{distortion} \link{noise_field} already does); pass a \code{list()} of several
+different \verb{curve_*()} objects instead to vary the backbone per ribbon.
 }
 \examples{
 draw(shape_ribbonpath(

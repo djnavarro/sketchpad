@@ -148,15 +148,17 @@ shape_twist <- S7::new_class(
 #'
 #' `shape_twists()` is a vectorized version of [shape_twist()]: each
 #' argument may be a vector, recycled against the others via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
-#' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). A shared `path_distortion`/`distortion` is
-#' automatically recycled across every twist; pass a `list()` of several
-#' different [noise_bridge]/[noise_field] objects instead to vary either
-#' per twist -- as in `README.Rmd`'s "Twists" example, which gives every
-#' twist the same `path_distortion` this way. The result is a [sketch]
+#' `purrr::pmap()`'s own vctrs-based rules. The result is a [sketch]
 #' containing one `shape_twist()` per recycled row, rather than a single
 #' drawable.
+#'
+#' Any length-1 element is broadcast to the common length; mismatched
+#' lengths greater than 1 raise an error. A shared
+#' `path_distortion`/`distortion` is automatically recycled across every
+#' twist; pass a `list()` of several different [noise_bridge]/[noise_field]
+#' objects instead to vary either per twist -- as in `README.Rmd`'s
+#' "Twists" example, which gives every twist the same `path_distortion`
+#' this way.
 #'
 #' @rdname shape_twist
 #' @return For `shape_twists()`, a [sketch].

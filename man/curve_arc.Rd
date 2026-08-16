@@ -51,24 +51,27 @@ For \code{curve_arcs()}, a \link{sketch}.
 \description{
 \code{curve_arc} is \code{\link[=shape_wedge]{shape_wedge()}}'s arc alone, with no centroid vertex: an
 open path of \code{n} points on the circle centred at \verb{(x, y)} with the given
-\code{radius}, sweeping from angle \code{start} to \code{end} (radians). Shares its point
-computation and argument validation with \code{shape_wedge()} via two internal
-helpers factored into \code{R/shape_wedge.R} (\code{arc_points()},
+\code{radius}, sweeping from angle \code{start} to \code{end} (radians).
+
+\code{curve_arcs()} is a vectorized version of \code{\link[=curve_arc]{curve_arc()}}: each
+argument may be a vector, recycled against the others. The result is a
+\link{sketch} containing one \code{curve_arc()} per recycled row, rather than a
+single drawable.
+}
+\details{
+Shares its point computation and argument validation with \code{shape_wedge()}
+via two internal helpers factored into \code{R/shape_wedge.R} (\code{arc_points()},
 \code{validate_arc_args()}), differing only in which \code{drawable(geometry = ...)}
 they construct from and the missing centroid vertex.
 
-\code{curve_arcs()} is a vectorized version of \code{\link[=curve_arc]{curve_arc()}}: each
-argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a \link{sketch} containing one
-\code{curve_arc()} per recycled row, rather than a single drawable.
-}
-\details{
 \code{style@fill} has no effect for \code{curve_arc()} -- see \link{drawable}'s
 \code{geometry} documentation for why \code{"path"} geometries have no interior to
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
+
+Recycling uses \code{purrr::pmap()}'s own vctrs-based rules: any length-1
+element is broadcast to the common length; mismatched lengths greater
+than 1 raise an error.
 }
 \examples{
 draw(curve_arc(start = 0, end = 3 * pi / 2))

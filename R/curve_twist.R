@@ -3,14 +3,15 @@
 #' `curve_twist` is [shape_twist()]'s path alone, with no ribbon width:
 #' an open [curve_line()]-like polyline between `(x, y)` and
 #' `(xend, yend)`, displaced away from a straight line by a
-#' [noise_bridge], giving a wandering, twisted appearance. Where
-#' `shape_twist()` also modulates a filled ribbon's width along this same
-#' kind of path (via a separate `distortion` [noise_field]), `curve_twist()`
-#' has no width or fill at all -- just the displaced backbone itself,
-#' rendered as an open `grid::polylineGrob()` (`geometry = "path"`).
-#' Shares its path computation with `shape_twist()` via the internal
-#' `twisted_path_points()` helper (`R/shape_twist.R`) rather than
-#' duplicating it.
+#' [noise_bridge], giving a wandering, twisted appearance.
+#'
+#' Where `shape_twist()` also modulates a filled ribbon's width along this
+#' same kind of path (via a separate `distortion` [noise_field]),
+#' `curve_twist()` has no width or fill at all -- just the displaced
+#' backbone itself, rendered as an open `grid::polylineGrob()`
+#' (`geometry = "path"`). Shares its path computation with `shape_twist()`
+#' via the internal `twisted_path_points()` helper (`R/shape_twist.R`)
+#' rather than duplicating it.
 #'
 #' `style@fill` has no effect for `curve_twist()` -- see [drawable]'s
 #' `geometry` documentation for why `"path"` geometries have no interior
@@ -107,13 +108,15 @@ curve_twist <- S7::new_class(
 #'
 #' `curve_twists()` is a vectorized version of [curve_twist()]: each
 #' argument may be a vector, recycled against the others via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
-#' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). A shared `path_distortion` [noise_bridge] is
-#' automatically recycled across every path; pass a `list()` of several
-#' different `noise_bridge`s instead to vary it per path. The result is
+#' `purrr::pmap()`'s own vctrs-based rules. The result is
 #' a [sketch] containing one `curve_twist()` per recycled row, rather
 #' than a single drawable.
+#'
+#' Any length-1 element is broadcast to the common length; mismatched
+#' lengths greater than 1 raise an error. A shared `path_distortion`
+#' [noise_bridge] is automatically recycled across every path; pass a
+#' `list()` of several different `noise_bridge`s instead to vary it per
+#' path.
 #'
 #' @rdname curve_twist
 #' @return For `curve_twists()`, a [sketch].

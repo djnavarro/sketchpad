@@ -2,9 +2,11 @@
 #'
 #' `curve_line` is a [drawable] whose path connects an arbitrary number of
 #' control points `(x, y)` with straight segments, in order. With two control
-#' points this is a single line segment; with more, an open polyline. Unlike
-#' [curve_bezier()]/[shape_bezier()], the control points are not smoothed or
-#' resampled -- `points` is exactly `(x, y)`, so there is no `n` argument.
+#' points this is a single line segment; with more, an open polyline.
+#'
+#' Unlike [curve_bezier()]/[shape_bezier()], the control points are not
+#' smoothed or resampled -- `points` is exactly `(x, y)`, so there is no
+#' `n` argument.
 #'
 #' `style@fill` has no effect for `curve_line()` -- see [drawable]'s
 #' `geometry` documentation for why `"path"` geometries have no interior to
@@ -60,9 +62,10 @@ curve_line <- S7::new_class(
 #' `curve_lines()` is a vectorized version of [curve_line()]. Since
 #' `x`/`y` are themselves numeric vectors of control points for a single
 #' polyline, `curve_lines()` takes them as a `list()` of numeric vectors
-#' instead -- one vector of control points per polyline. Every other
-#' argument may be a plain vector, recycled against `x`/`y` via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
+#' instead -- one vector of control points per polyline.
+#'
+#' Every other argument may be a plain vector, recycled against `x`/`y`
+#' via `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
 #' broadcast to the common length; mismatched lengths greater than 1
 #' raise an error). The result is a [sketch] containing one
 #' `curve_line()` per list element/recycled row, rather than a single

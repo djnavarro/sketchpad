@@ -1,8 +1,9 @@
 #' A fanned bristle/dry-brush effect along a path
 #'
 #' `effect_bristle()` builds a [sketch] of `n_bristles` copies of a
-#' template drawable, fanned out perpendicular to its own backbone path --
-#' like [effect_tremor()], no single drawable can express this by itself,
+#' template drawable, fanned out perpendicular to its own backbone path.
+#'
+#' Like [effect_tremor()], no single drawable can express this by itself,
 #' since a dry-brush look comes from several independently-frayed,
 #' independently wobbling strands laid side by side, not one stroke. Each
 #' bristle is a copy of `object` (via [S7::set_props()]) that:

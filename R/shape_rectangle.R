@@ -1,10 +1,12 @@
 #' A rectangle
 #'
 #' `shape_rectangle` is a [drawable] defined by a centroid and a width/height,
-#' rendered as an axis-aligned rectangle. `shape_square()` is a thin
-#' convenience wrapper around `shape_rectangle()` for the common case of
-#' `width == height`, taking a single `side` argument instead -- it returns a
-#' `shape_rectangle` object directly rather than being its own class.
+#' rendered as an axis-aligned rectangle.
+#'
+#' `shape_square()` is a thin convenience wrapper around `shape_rectangle()`
+#' for the common case of `width == height`, taking a single `side` argument
+#' instead -- it returns a `shape_rectangle` object directly rather than
+#' being its own class.
 #'
 #' @param x,y Centroid coordinates. Default `0`.
 #' @param width,height Rectangle dimensions. Must be non-negative.
@@ -77,11 +79,13 @@ shape_square <- function(x = 0, y = 0, side = 1, trans = trans_identity(), ...) 
 #'
 #' `shape_rectangles()`/`shape_squares()` are vectorized versions of
 #' [shape_rectangle()]/[shape_square()]: each argument may be a vector,
-#' recycled against the others via `purrr::pmap()`'s own vctrs-based
-#' rules (any length-1 element is broadcast to the common length;
-#' mismatched lengths greater than 1 raise an error). The result is a
-#' [sketch] containing one `shape_rectangle()`/`shape_square()` per
-#' recycled row, rather than a single drawable.
+#' recycled against the others. The result is a [sketch] containing one
+#' `shape_rectangle()`/`shape_square()` per recycled row, rather than a
+#' single drawable.
+#'
+#' Recycling uses `purrr::pmap()`'s own vctrs-based rules: any length-1
+#' element is broadcast to the common length; mismatched lengths greater
+#' than 1 raise an error.
 #'
 #' @rdname shape_rectangle
 #' @return For `shape_rectangles()`/`shape_squares()`, a [sketch].

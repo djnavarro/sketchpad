@@ -93,13 +93,15 @@ shape_blob <- S7::new_class(
 #'
 #' `shape_blobs()` is a vectorized version of [shape_blob()]: each
 #' argument may be a vector, recycled against the others via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
-#' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). A shared `distortion` [noise_field] is automatically
-#' recycled across every blob; pass a `list()` of several different
-#' `noise_field`s instead to vary it per blob. The result is a [sketch]
+#' `purrr::pmap()`'s own vctrs-based rules. The result is a [sketch]
 #' containing one `shape_blob()` per recycled row, rather than a single
 #' drawable.
+#'
+#' Any length-1 element is broadcast to the common length; mismatched
+#' lengths greater than 1 raise an error. A shared `distortion`
+#' [noise_field] is automatically recycled across every blob; pass a
+#' `list()` of several different `noise_field`s instead to vary it per
+#' blob.
 #'
 #' @rdname shape_blob
 #' @return For `shape_blobs()`, a [sketch].

@@ -43,17 +43,19 @@ use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 \code{fill_halftone()} is \code{\link[=fill_stipple]{fill_stipple()}}'s other variant: instead of
 scattering dots of one fixed size, each dot's radius is drawn
 uniformly at random from \code{radius}, giving a mottled halftone-print
-look rather than a uniform stipple. Like \code{\link[=fill_stipple]{fill_stipple()}} (and unlike
-\code{\link[=fill_scatter]{fill_scatter()}}), it scatters plain \code{\link[grid:circleGrob]{grid::circleGrob()}}s, so it's
-immune to the \emph{polygon}-specific rendering problems documented at
-\code{\link[=fill_scatter]{fill_scatter()}} -- but it shares \code{\link[=fill_stipple]{fill_stipple()}}'s own, separate
-"Known rendering risk with multiple dots" (repeated tiles containing
-several \code{circleGrob}s were, in testing, sometimes visibly distorted on
-this package's development R build; see that section for details).
-There is no known way to avoid this while still getting a genuine
-scattered-dot texture, so \strong{check rendered output visually} here too.
+look rather than a uniform stipple.
 }
 \details{
+Like \code{\link[=fill_stipple]{fill_stipple()}} (and unlike \code{\link[=fill_scatter]{fill_scatter()}}), it scatters plain
+\code{\link[grid:circleGrob]{grid::circleGrob()}}s, so it's immune to the \emph{polygon}-specific
+rendering problems documented at \code{\link[=fill_scatter]{fill_scatter()}} -- but it shares
+\code{\link[=fill_stipple]{fill_stipple()}}'s own, separate "Known rendering risk with multiple
+dots" (repeated tiles containing several \code{circleGrob}s were, in
+testing, sometimes visibly distorted on this package's development R
+build; see that section for details). There is no known way to avoid
+this while still getting a genuine scattered-dot texture, so \strong{check
+rendered output visually} here too.
+
 As with \code{\link[=fill_stipple]{fill_stipple()}}, the target's bounding-box aspect ratio needs
 to be passed as \code{aspect} to keep the dots circular rather than
 elliptical; the default \code{aspect = 1} is only exact for a square

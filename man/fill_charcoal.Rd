@@ -55,15 +55,17 @@ use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 rendering, just different defaults -- tuned to read as hand-drawn
 charcoal or marker grain rather than \code{\link[=fill_noise]{fill_noise()}}'s more
 general-purpose rasterized field: a lighter base tone, finer/denser
-tiling, and finer noise detail. Found, while prototyping
-\code{\link[=shape_stroke]{shape_stroke()}}'s interior texture, to be a substantially better fit
-than \code{\link[=fill_scribble]{fill_scribble()}} for a curved stroke's body -- \code{fill_scribble()}'s
-fixed horizontal/vertical direction doesn't track a curved path's own
-tangent (see the "Deferred: arbitrary angle for \code{fill_scribble()}"
-item in \code{.agents/PLAN.md}), producing hatching that visibly cuts across
-the stroke at odd angles wherever the path bends, while
-\code{\link[=fill_noise]{fill_noise()}}'s directionless mottling has no orientation to clash
-with the curve.
+tiling, and finer noise detail.
+}
+\details{
+Found, while prototyping \code{\link[=shape_stroke]{shape_stroke()}}'s interior texture, to be a
+substantially better fit than \code{\link[=fill_scribble]{fill_scribble()}} for a curved stroke's
+body -- \code{fill_scribble()}'s fixed horizontal/vertical direction doesn't
+track a curved path's own tangent (see the "Deferred: arbitrary angle
+for \code{fill_scribble()}" item in \code{.agents/PLAN.md}), producing hatching
+that visibly cuts across the stroke at odd angles wherever the path
+bends, while \code{\link[=fill_noise]{fill_noise()}}'s directionless mottling has no orientation
+to clash with the curve.
 }
 \examples{
 draw(shape_stroke(

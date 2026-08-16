@@ -36,14 +36,16 @@ use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 \description{
 \code{fill_crosshatch()} builds a \code{\link[grid:pattern]{grid::pattern()}} fill value that renders two
 mirror-symmetric hatch lines, at \code{angle} and \code{-angle}, forming an "X"
-inside each tile. It shares \code{\link[=fill_hatch]{fill_hatch()}}'s tile-shape technique: both
-lines are drawn as the two corner-to-corner diagonals of a single
-rectangular tile (rather than at an arbitrary baked-in slope), so both
-tile seamlessly under \code{extend = "repeat"}, and the tile's \code{width}/\code{height}
-ratio -- not the diagonals' own coordinates -- determines the rendered
-angle. See \code{\link[=fill_hatch]{fill_hatch()}}'s details for why this matters.
+inside each tile.
 }
 \details{
+It shares \code{\link[=fill_hatch]{fill_hatch()}}'s tile-shape technique: both lines are drawn as
+the two corner-to-corner diagonals of a single rectangular tile (rather
+than at an arbitrary baked-in slope), so both tile seamlessly under
+\code{extend = "repeat"}, and the tile's \code{width}/\code{height} ratio -- not the
+diagonals' own coordinates -- determines the rendered angle. See
+\code{\link[=fill_hatch]{fill_hatch()}}'s details for why this matters.
+
 Because both lines share one tile shape, they are only \emph{perpendicular}
 when \code{angle = 45} (the classic crosshatch look); for other angles the two
 lines are symmetric about the horizontal axis but not at right angles to

@@ -65,17 +65,18 @@ stroke_normals <- function(x, y) {
 #' A tapered, pressure-modulated stroke along an arbitrary path
 #'
 #' `shape_stroke` is a [drawable] polygon that follows an arbitrary open
-#' path through `(x, y)` control points (resampled to `n` evenly
-#' arc-length-spaced points, unlike [curve_line()]'s exact control-point
-#' vertices), offset into a ribbon whose width tapers to zero at both
-#' ends and varies along its length according to a [noise_field] --
-#' intended as a "pressure" curve, giving the outline an ink/brush-stroke
-#' look rather than a constant-width line. It generalizes [shape_ribbon()]
-#' from a single straight segment to any path, at the cost of computing a
-#' true per-point unit normal (via the internal `stroke_normals()` helper)
-#' rather than [shape_ribbon()]/[shape_twist()]'s shared single offset
-#' direction -- necessary once the path can genuinely curve, not just
-#' wander slightly off straight.
+#' path through `(x, y)` control points, offset into a ribbon whose width
+#' tapers to zero at both ends and varies along its length according to a
+#' [noise_field] -- intended as a "pressure" curve, giving the outline an
+#' ink/brush-stroke look rather than a constant-width line.
+#'
+#' The path is resampled to `n` evenly arc-length-spaced points (unlike
+#' [curve_line()]'s exact control-point vertices). This generalizes
+#' [shape_ribbon()] from a single straight segment to any path, at the
+#' cost of computing a true per-point unit normal (via the internal
+#' `stroke_normals()` helper) rather than [shape_ribbon()]/[shape_twist()]'s
+#' shared single offset direction -- necessary once the path can genuinely
+#' curve, not just wander slightly off straight.
 #'
 #' Unlike [shape_ribbon()]'s own taper (which peaks at `0.5`, an
 #' undocumented quirk of its `sqrt(t * (1 - t))` formula), `shape_stroke`'s
@@ -183,8 +184,9 @@ shape_stroke <- S7::new_class(
 #' `shape_strokes()` is a vectorized version of [shape_stroke()]. Since
 #' `x`/`y` are themselves numeric vectors of control points for a single
 #' stroke, `shape_strokes()` takes them as a `list()` of numeric vectors
-#' instead -- one vector of control points per stroke. Every other
-#' argument may be a plain vector, recycled against `x`/`y` via
+#' instead -- one vector of control points per stroke.
+#'
+#' Every other argument may be a plain vector, recycled against `x`/`y` via
 #' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
 #' broadcast to the common length; mismatched lengths greater than 1
 #' raise an error). A shared `distortion` [noise_field] is automatically

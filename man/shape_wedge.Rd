@@ -51,17 +51,21 @@ For \code{shape_wedges()}, a \link{sketch}.
 \description{
 \code{shape_wedge} is a \link{drawable} defined by a centroid, a radius, and a
 \code{start}/\code{end} angle (in radians): its outline is the centroid, followed by
-\code{n} points along the circular arc from \code{start} to \code{end}. \code{grid}'s own
-polygon closing then draws the final straight edge back from the arc's
-last point to the centroid, giving the familiar pie-slice/wedge shape.
-\code{\link[=curve_arc]{curve_arc()}} is the arc alone, with no centroid vertex or fill.
+\code{n} points along the circular arc from \code{start} to \code{end}.
 
 \code{shape_wedges()} is a vectorized version of \code{\link[=shape_wedge]{shape_wedge()}}: each
-argument may be a vector, recycled against the others via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a \link{sketch} containing one
-\code{shape_wedge()} per recycled row, rather than a single drawable.
+argument may be a vector, recycled against the others. The result is a
+\link{sketch} containing one \code{shape_wedge()} per recycled row, rather than a
+single drawable.
+}
+\details{
+\code{grid}'s own polygon closing then draws the final straight edge back from
+the arc's last point to the centroid, giving the familiar pie-slice/wedge
+shape. \code{\link[=curve_arc]{curve_arc()}} is the arc alone, with no centroid vertex or fill.
+
+Recycling uses \code{purrr::pmap()}'s own vctrs-based rules: any length-1
+element is broadcast to the common length; mismatched lengths greater
+than 1 raise an error.
 }
 \examples{
 draw(shape_wedge(start = 0, end = pi / 2))

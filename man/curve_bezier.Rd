@@ -40,19 +40,20 @@ control point rather than looping back.
 \code{curve_beziers()} is a vectorized version of \code{\link[=curve_bezier]{curve_bezier()}}. Since
 \code{x}/\code{y} are themselves numeric vectors of control points for a single
 curve, \code{curve_beziers()} takes them as a \code{list()} of numeric vectors
-instead -- one vector of control points per curve. Every other
-argument may be a plain vector, recycled against \code{x}/\code{y} via
-\code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a \link{sketch} containing one
-\code{curve_bezier()} per list element/recycled row, rather than a single
-drawable.
+instead -- one vector of control points per curve.
 }
 \details{
 \code{style@fill} has no effect for \code{curve_bezier()} -- see \link{drawable}'s
 \code{geometry} documentation for why \code{"path"} geometries have no interior to
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
+
+Every other argument may be a plain vector, recycled against \code{x}/\code{y}
+via \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a \link{sketch} containing one
+\code{curve_bezier()} per list element/recycled row, rather than a single
+drawable.
 }
 \examples{
 draw(curve_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0)))

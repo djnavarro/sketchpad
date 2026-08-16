@@ -1,15 +1,17 @@
 #' Layer jittered copies of a drawable for a hand-drawn look
 #'
+#' `effect_tremor()` builds a [sketch] of `layers` such copies: each is a
+#' copy of `object` (via [S7::set_props()]) with its `x`/`y` displaced by
+#' smooth, seed-offset simplex noise sampled along the path's own
+#' normalized arc-length.
+#'
 #' No single [drawable] can express a hand-drawn ink/pencil look on its
 #' own -- what reads as hand-drawn is several independently wobbling
 #' copies of the same nominal path layered on top of each other, not one
-#' perfectly smooth line. `effect_tremor()` builds a [sketch] of `layers`
-#' such copies: each is a copy of `object` (via [S7::set_props()]) with
-#' its `x`/`y` displaced by smooth, seed-offset simplex noise sampled
-#' along the path's own normalized arc-length -- the same ad hoc
-#' technique used, during development, to add a wobbling pencil edge on
-#' top of a [shape_stroke()]'s tapered outline, or to layer a plain
-#' [curve_line()] into a shakier-looking line by itself.
+#' perfectly smooth line. This is the same ad hoc technique used, during
+#' development, to add a wobbling pencil edge on top of a
+#' [shape_stroke()]'s tapered outline, or to layer a plain [curve_line()]
+#' into a shakier-looking line by itself.
 #'
 #' Noise is sampled at each control point's own position along arc-length
 #' (`0` to `1`), not at its raw `x`/`y` coordinates, so the jitter's shape

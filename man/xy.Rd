@@ -13,11 +13,13 @@ xy(x = integer(0), y = integer(0))
 }
 \description{
 \code{xy} represents a collection of locations in two-dimensional space as
-parallel \code{x} and \code{y} coordinate vectors. Most \link{drawable} subclasses expose
-their geometry as a computed \code{points} property of class \code{xy};
-\link{shape_raw} is the exception, where the user supplies \code{x}/\code{y} directly.
-Named \code{xy} rather than \code{points} so this exported constructor doesn't mask
-\code{graphics::points()}.
+parallel \code{x} and \code{y} coordinate vectors.
+}
+\details{
+Most \link{drawable} subclasses expose their geometry as a computed \code{points}
+property of class \code{xy}; \link{shape_raw} is the exception, where the user
+supplies \code{x}/\code{y} directly. Named \code{xy} rather than \code{points} so this
+exported constructor doesn't mask \code{graphics::points()}.
 }
 \examples{
 xy(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))

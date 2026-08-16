@@ -34,10 +34,11 @@ validate_arc_args <- function(x, y, radius, start, end, n) {
 #'
 #' `shape_wedge` is a [drawable] defined by a centroid, a radius, and a
 #' `start`/`end` angle (in radians): its outline is the centroid, followed by
-#' `n` points along the circular arc from `start` to `end`. `grid`'s own
-#' polygon closing then draws the final straight edge back from the arc's
-#' last point to the centroid, giving the familiar pie-slice/wedge shape.
-#' [curve_arc()] is the arc alone, with no centroid vertex or fill.
+#' `n` points along the circular arc from `start` to `end`.
+#'
+#' `grid`'s own polygon closing then draws the final straight edge back from
+#' the arc's last point to the centroid, giving the familiar pie-slice/wedge
+#' shape. [curve_arc()] is the arc alone, with no centroid vertex or fill.
 #'
 #' @param x,y Centroid coordinates. Default `0`.
 #' @param radius Radius. Must be non-negative. Default `1`.
@@ -99,11 +100,13 @@ shape_wedge <- S7::new_class(
 #' Multiple pie-slice wedges at once
 #'
 #' `shape_wedges()` is a vectorized version of [shape_wedge()]: each
-#' argument may be a vector, recycled against the others via
-#' `purrr::pmap()`'s own vctrs-based rules (any length-1 element is
-#' broadcast to the common length; mismatched lengths greater than 1
-#' raise an error). The result is a [sketch] containing one
-#' `shape_wedge()` per recycled row, rather than a single drawable.
+#' argument may be a vector, recycled against the others. The result is a
+#' [sketch] containing one `shape_wedge()` per recycled row, rather than a
+#' single drawable.
+#'
+#' Recycling uses `purrr::pmap()`'s own vctrs-based rules: any length-1
+#' element is broadcast to the common length; mismatched lengths greater
+#' than 1 raise an error.
 #'
 #' @rdname shape_wedge
 #' @return For `shape_wedges()`, a [sketch].

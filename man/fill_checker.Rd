@@ -30,15 +30,17 @@ use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 }
 \description{
 \code{fill_checker()} builds a \code{\link[grid:pattern]{grid::pattern()}} fill value that renders a
-two-colour checkerboard. It's the cheapest member of the hatch family to
-build: a checkerboard square has no direction the way a hatch line does
-(compare \code{\link[=fill_hatch]{fill_hatch()}}'s corner-to-corner diagonal, needed specifically
-to tile a \emph{sloped} line seamlessly), so the tile content here is just
-four plain quadrant rectangles -- the same two-colour-grid special case
-\code{\link[=fill_crosshatch]{fill_crosshatch()}} already falls back to when \code{angle} is a multiple of
-90 degrees, pulled out into its own helper.
+two-colour checkerboard.
 }
 \details{
+It's the cheapest member of the hatch family to build: a checkerboard
+square has no direction the way a hatch line does (compare
+\code{\link[=fill_hatch]{fill_hatch()}}'s corner-to-corner diagonal, needed specifically to tile
+a \emph{sloped} line seamlessly), so the tile content here is just four
+plain quadrant rectangles -- the same two-colour-grid special case
+\code{\link[=fill_crosshatch]{fill_crosshatch()}} already falls back to when \code{angle} is a multiple of
+90 degrees, pulled out into its own helper.
+
 As with the other \verb{fill_*()} helpers, \code{\link[grid:pattern]{grid::pattern()}} tiles are sized
 as a fraction of the target polygon's own bounding box rather than a
 fixed physical square, so the checker squares would render as

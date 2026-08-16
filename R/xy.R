@@ -1,11 +1,12 @@
 #' A set of locations in 2D space
 #'
 #' `xy` represents a collection of locations in two-dimensional space as
-#' parallel `x` and `y` coordinate vectors. Most [drawable] subclasses expose
-#' their geometry as a computed `points` property of class `xy`;
-#' [shape_raw] is the exception, where the user supplies `x`/`y` directly.
-#' Named `xy` rather than `points` so this exported constructor doesn't mask
-#' `graphics::points()`.
+#' parallel `x` and `y` coordinate vectors.
+#'
+#' Most [drawable] subclasses expose their geometry as a computed `points`
+#' property of class `xy`; [shape_raw] is the exception, where the user
+#' supplies `x`/`y` directly. Named `xy` rather than `points` so this
+#' exported constructor doesn't mask `graphics::points()`.
 #'
 #' @param x Numeric vector of x coordinates.
 #' @param y Numeric vector of y coordinates.

@@ -23,12 +23,13 @@ Default \code{distortion_x}, with its seed offset by \code{1}.}
 \description{
 \code{trans_warp} displaces each point by simplex/fractal noise sampled at
 the point's own \verb{(x, y)} position (domain warping), giving a wobbly,
-non-rigid distortion rather than an affine map -- unlike \link{trans}
-(translate/rotate/scale/reflect/shear), this can't be represented as a
-single matrix, since the displacement varies smoothly but irregularly
-from point to point.
+non-rigid distortion rather than an affine map.
 }
 \details{
+Unlike \link{trans} (translate/rotate/scale/reflect/shear), this can't be
+represented as a single matrix, since the displacement varies smoothly
+but irregularly from point to point.
+
 The x and y displacements are sampled from two independent
 \link{noise_field}s (\code{distortion_x}/\code{distortion_y}), each rescaled to
 \verb{[-1, 1]} and multiplied by \code{amount}. By default \code{distortion_y} reuses

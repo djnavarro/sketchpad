@@ -39,7 +39,9 @@ smooth_bridge <- function(n, scale = .1, smooth = 0, seed = 1L) {
 #' `noise_bridge` bundles the settings needed to generate a smoothed
 #' Brownian bridge (via the internal `smooth_bridge()` helper): how many
 #' local-averaging `smooth`-ing passes to apply, and which `seed` to draw
-#' from. Unlike [noise_field] (sampled at arbitrary `(x, y)` positions in
+#' from.
+#'
+#' Unlike [noise_field] (sampled at arbitrary `(x, y)` positions in
 #' the plane), a Brownian bridge has no spatial position to sample at --
 #' [noise_sample()]'s method for `noise_bridge` instead takes a point
 #' count `n` and a `scale`, returning a length-`n` displacement vector.
