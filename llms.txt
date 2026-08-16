@@ -77,6 +77,8 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
 - [`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
   [`shape_circles()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)
   : A circle
+- [`shape_combine()`](https://sketchpad.djnavarro.net/reference/shape_combine.md)
+  : Combine several drawables into one multi-sub-path shape
 - [`shape_ellipse()`](https://sketchpad.djnavarro.net/reference/shape_ellipse.md)
   [`shape_ellipses()`](https://sketchpad.djnavarro.net/reference/shape_ellipse.md)
   : An ellipse
@@ -94,6 +96,9 @@ Closed, fillable `drawable`s (`geometry = "polygon"`).
 - [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   [`shape_ribbons()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
   : A tapered ribbon between two points
+- [`shape_star()`](https://sketchpad.djnavarro.net/reference/shape_star.md)
+  [`shape_stars()`](https://sketchpad.djnavarro.net/reference/shape_star.md)
+  : A star
 - [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
   [`shape_strokes()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)
   : A tapered, pressure-modulated stroke along an arbitrary path

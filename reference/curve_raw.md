@@ -24,9 +24,9 @@ are themselves numeric vectors of vertex coordinates for a single path,
 ## Usage
 
 ``` r
-curve_raw(x, y, trans = trans_identity(), ...)
+curve_raw(x, y, id = NULL, trans = trans_identity(), ...)
 
-curve_raws(x, y, trans = trans_identity(), ...)
+curve_raws(x, y, id = NULL, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -36,6 +36,13 @@ curve_raws(x, y, trans = trans_identity(), ...)
   For `curve_raw()`, a numeric vector of x/y coordinates. For
   `curve_raws()`, a [`list()`](https://rdrr.io/r/base/list.html) of such
   vectors instead – one vector of vertices per path.
+
+- id:
+
+  For `curve_raw()`, an integer vector the same length as `x`/`y`, or
+  `NULL` (the default, a single sub-path). For `curve_raws()`, a
+  [`list()`](https://rdrr.io/r/base/list.html) of such vectors (or
+  `NULL`s) instead, one per path.
 
 - trans:
 
@@ -65,6 +72,11 @@ fill. Passing `fill` via `...` is still accepted (it's simply ignored at
 draw time), since
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md) is
 shared across every `geometry`.
+
+`id` optionally groups `x`/`y` into multiple sub-paths (see
+[xy](https://sketchpad.djnavarro.net/reference/xy.md)'s own `id`),
+letting a single `curve_raw()` render as several disjoint strokes
+sharing one [style](https://sketchpad.djnavarro.net/reference/style.md).
 
 Every other argument may be a plain vector, recycled against `x`/`y` via
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
@@ -99,6 +111,13 @@ frozen <- S7::convert(
   curve_raw
 )
 draw(frozen)
+
+
+# id groups x/y into several disjoint strokes sharing one style
+draw(curve_raw(
+  x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
+  id = c(1, 1, 2, 2)
+))
 
 
 draw(curve_raws(

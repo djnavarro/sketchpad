@@ -55,6 +55,7 @@ grid::gpar() when a drawable object is drawn."></head><body>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  rule <span class="op">=</span> <span class="st">"evenodd"</span>,</span>
 <span>  color_alpha <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  fill_alpha <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -113,6 +114,22 @@ to avoid an arbitrarily long spike. Must be at least <code>1</code>. Default <co
 matching <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code>'s own default.</p></dd>
 
 
+<dt id="arg-rule">rule<a class="anchor" aria-label="anchor" href="#arg-rule"></a></dt>
+<dd><p>Fill rule used when a drawable's own <code>points</code> has more than
+one sub-path (see <a href="xy.html">xy</a>'s <code>id</code>), forwarded to <code><a href="https://rdrr.io/r/grid/grid.path.html" class="external-link">grid::pathGrob()</a></code>'s own
+<code>rule</code> argument. One of <code>"evenodd"</code> (default) or <code>"winding"</code>.
+<code>"evenodd"</code> fills a region if it's enclosed by an odd number of
+sub-paths, regardless of each sub-path's own vertex winding direction
+– a sub-path nested inside another becomes a hole purely from
+geometric nesting, with no need to get vertex order right by hand,
+which is why it's the default. <code>"winding"</code> instead fills based on net
+signed winding number, which depends on each sub-path's own direction
+– only useful for constructions that specifically need that
+direction-sensitive behavior. Has no effect on a drawable with only
+one implicit sub-path (every current <code>shape_*()</code>/<code>curve_*()</code>
+constructor), since both rules agree there.</p></dd>
+
+
 <dt id="arg-color-alpha">color_alpha<a class="anchor" aria-label="anchor" href="#arg-color-alpha"></a></dt>
 <dd><p>Stroke opacity, applied to <code>color</code> independently of
 <code>fill_alpha</code>. Must be a number in <code>[0, 1]</code>, where <code>0</code> is fully
@@ -163,6 +180,7 @@ that don't universally apply.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linejoin   : chr "round"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ lineend    : chr "round"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linemitre  : num 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ rule       : chr "evenodd"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ color_alpha: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ fill_alpha : num 1</span>
 <span class="r-in"><span><span class="fu">style</span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="fill_hatch.html">fill_hatch</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -188,6 +206,7 @@ that don't universally apply.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linejoin   : chr "round"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ lineend    : chr "round"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linemitre  : num 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ rule       : chr "evenodd"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ color_alpha: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ fill_alpha : num 1</span>
 <span class="r-in"><span></span></span>

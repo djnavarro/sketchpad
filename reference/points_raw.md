@@ -20,9 +20,9 @@ each).
 ## Usage
 
 ``` r
-points_raw(x, y, trans = trans_identity(), ...)
+points_raw(x, y, id = NULL, trans = trans_identity(), ...)
 
-points_raws(x, y, trans = trans_identity(), ...)
+points_raws(x, y, id = NULL, trans = trans_identity(), ...)
 ```
 
 ## Arguments
@@ -32,6 +32,13 @@ points_raws(x, y, trans = trans_identity(), ...)
   For `points_raw()`, a numeric vector of x/y coordinates. For
   `points_raws()`, a [`list()`](https://rdrr.io/r/base/list.html) of
   such vectors instead – one vector per scatter.
+
+- id:
+
+  For `points_raw()`, an integer vector the same length as `x`/`y`, or
+  `NULL` (the default). For `points_raws()`, a
+  [`list()`](https://rdrr.io/r/base/list.html) of such vectors (or
+  `NULL`s) instead, one per scatter. Inert either way – see Details.
 
 - trans:
 
@@ -61,6 +68,16 @@ For `points_raws()`, a
 `geometry` documentation and `geometry_grob()`'s internal dispatch
 (`R/draw.R`) for why a `"points"` geometry has no line to stroke and no
 interior to fill. Only `style@color` is used, as the marker colour.
+
+`id` (see [xy](https://sketchpad.djnavarro.net/reference/xy.md)'s own
+`id`) is accepted and stored for consistency with
+[`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)/[`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md)
+and to round-trip through
+[`convert()`](https://rconsortium.github.io/S7/reference/convert.html),
+but is otherwise inert here –
+[`grid::pointsGrob()`](https://rdrr.io/r/grid/grid.points.html) has no
+sub-path concept, consistent with `fill` already being inert for
+`"points"` geometry.
 
 Every other argument may be a plain vector, recycled against `x`/`y` via
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own

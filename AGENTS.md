@@ -135,19 +135,23 @@ how the API got here, see
   ))`/`compose_sketch_trans()`maps the same composition over every shape in a`sketch\`
   at once.
 - **`style`** – container for `color`/`fill`/`linewidth`/`linetype`/
-  `linejoin`/`lineend`/`linemitre`/`color_alpha`/`fill_alpha`, forwarded
-  to [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html). `fill` accepts
-  either a plain colour string or the output of a `fill_*()` helper (see
-  “The `fill_*()` texture family” below); default is
-  `fill_solid("black")` (i.e. `"black"`). `linetype` (default `"solid"`,
-  forwarded to `lty`) is not independently re-validated – it accepts
-  anything [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s `lty`
-  does (named types, integer codes, or a custom hex dash string), left
-  to `grid` at draw time. `linejoin` (default `"round"`) is validated as
-  one of `"round"`/`"mitre"`/`"bevel"`; `lineend` (default `"round"`) as
-  one of `"round"`/`"butt"`/`"square"`; `linemitre` (default `10`,
-  matching [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s own
-  default) must be at least `1`. `lineend` only has a visible effect on
+  `linejoin`/`lineend`/`linemitre`/`rule`/`color_alpha`/`fill_alpha`,
+  forwarded to [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)
+  (`rule` alone is forwarded to `geometry_grob()`’s own `pathGrob()`
+  call instead – see
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) below).
+  `fill` accepts either a plain colour string or the output of a
+  `fill_*()` helper (see “The `fill_*()` texture family” below); default
+  is `fill_solid("black")` (i.e. `"black"`). `linetype` (default
+  `"solid"`, forwarded to `lty`) is not independently re-validated – it
+  accepts anything [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s
+  `lty` does (named types, integer codes, or a custom hex dash string),
+  left to `grid` at draw time. `linejoin` (default `"round"`) is
+  validated as one of `"round"`/`"mitre"`/`"bevel"`; `lineend` (default
+  `"round"`) as one of `"round"`/`"butt"`/`"square"`; `linemitre`
+  (default `10`, matching
+  [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html)’s own default) must
+  be at least `1`. `lineend` only has a visible effect on
   `"path"`-geometry drawables (free endpoints); `linemitre` only takes
   effect when `linejoin = "mitre"`, truncating a corner sharper than the
   limit allows into a bevel instead. `color_alpha`/`fill_alpha` (both
@@ -168,9 +172,16 @@ how the API got here, see
   has no defined effect on one – matching this package’s existing
   convention of silent, documented inertness for style properties that
   don’t universally apply (e.g. `fill` itself already has no effect for
-  `"path"`/`"points"`-geometry drawables).
+  `"path"`/`"points"`-geometry drawables). `rule` (default `"evenodd"`,
+  the other option `"winding"`) is
+  [`grid::pathGrob()`](https://rdrr.io/r/grid/grid.path.html)’s own fill
+  rule, used only when a drawable’s `points` has more than one sub-path
+  (see `xy`’s `id` below) – inert for every current
+  `shape_*()`/`curve_*()` constructor, which all produce exactly one
+  implicit sub-path.
 - **`xy`** – a collection of locations in 2D space (`x`/`y` numeric
-  vectors, equal length); not tied to any particular geometric
+  vectors, equal length, plus a parallel `id` integer vector grouping
+  locations into sub-paths); not tied to any particular geometric
   interpretation (polygon vertices, an open path, unconnected points, …)
   – that meaning comes from whichever `drawable` produced it, via its
   `geometry` property. Named `xy` rather than `points` so the exported
@@ -178,7 +189,29 @@ how the API got here, see
   [`graphics::points()`](https://rdrr.io/r/graphics/points.html); every
   `drawable`’s `points` *property* (see below) is still called `points`,
   since a property isn’t a top-level exported name and can’t mask
-  anything.
+  anything. `id` defaults to `rep(1L, length(x))` whenever left `NULL`
+  ([`xy()`](https://sketchpad.djnavarro.net/reference/xy.md)’s own
+  constructor, not a `new_property(default = ...)` spec, fills this in,
+  so it can depend on `length(x)`) – every existing `points` getter
+  across every concrete drawable produces exactly one implicit sub-path
+  this way, with no changes needed to any of them. Locations sharing an
+  `id` are connected into one contour; a different `id` starts a new
+  one, letting a single drawable render as several disjoint shapes
+  sharing one `style` or, combined with `style@rule`, as a shape with a
+  hole (a sub-path nested inside another – see
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) below
+  for the `pathGrob()` mechanics). Every `apply_trans()` method forwards
+  `pts@id` unchanged into the `xy` it returns, since a transform only
+  ever displaces `x`/`y`. This is the data-shape half of “multiple
+  sub-paths and holes per drawable” (see `.agents/PLAN.md`) – no
+  constructor yet exposes a way to *set* a non-trivial `id` when
+  building geometry by hand; that author-facing API is still an open
+  design question – now resolved via an explicit `id` argument on
+  [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)/[`curve_raw()`](https://sketchpad.djnavarro.net/reference/curve_raw.md)/[`points_raw()`](https://sketchpad.djnavarro.net/reference/points_raw.md),
+  plus
+  [`shape_combine()`](https://sketchpad.djnavarro.net/reference/shape_combine.md)
+  as the more convenient, higher-level entry point (see both below and
+  `.agents/HISTORY.md`).
 - **`drawable`** – parent class of every shape. Declares five
   properties: `style` (default
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md)),
@@ -233,7 +266,21 @@ how the API got here, see
   `curve_raw`/`points_raw` are its `"path"`/`"points"`-geometry analogs
   (see below) – together the three form a “raw” family covering all
   three `geometry` values with the same trivial constructor shape. All
-  three are `pathlike`.
+  three are `pathlike`, and all three also take an optional `id`
+  argument (an integer vector the same length as `x`/`y`, default
+  `NULL`, filled in as a single sub-path – see `xy`’s own `id` above) –
+  this is the low-level, author-facing primitive for actually
+  constructing a multi-sub-path/holed shape by hand, resolving what was
+  previously an open design question (see `.agents/HISTORY.md`).
+  `points_raw`’s own `id` is accepted and stored (so it survives a
+  `convert()` round-trip) but otherwise inert, since
+  [`grid::pointsGrob()`](https://rdrr.io/r/grid/grid.points.html) has no
+  sub-path concept.
+  [`shape_combine()`](https://sketchpad.djnavarro.net/reference/shape_combine.md)
+  (see below) is the more convenient, higher-level entry point built on
+  top of `shape_raw`’s own `id` argument, for the common case of
+  combining several already-built drawables rather than computing `id`
+  by hand.
 - **`shape_circle`** – centroid + radius + `n` (point count); `points`
   is `n` evenly-spaced points around the circumference.
 - **`shape_rectangle`** – centroid (`x`/`y`) + `width`/`height`;
@@ -256,6 +303,17 @@ how the API got here, see
   approximation of a curve, so there’s no reason to carry the same
   closing point `shape_circle`’s `seq(0, 2 * pi, ...)` formula
   incidentally produces.
+- **`shape_star`** – centroid + `outer_radius`/`inner_radius` + `n`
+  (number of star points); `points` alternates `n` outer vertices (at
+  `outer_radius`) with `n` inner vertices (at `inner_radius`), evenly
+  spaced by angle (`2 * n` distinct vertices total, no closing repeat,
+  matching `shape_polygon`’s own convention). Structurally closest to
+  `shape_polygon` – same centroid/radius/`n`/no-closing-repeat shape,
+  generalized to two alternating radii instead of one.
+  `inner_radius = 0` collapses every inner vertex onto the centroid (a
+  sharp “asterisk” outline); `inner_radius = outer_radius` degenerates
+  to a regular `2 * n`-gon, identical to
+  `shape_polygon(radius = outer_radius, n = 2 * n)`.
 - **`shape_ellipse`** – like `shape_circle`, but with independent
   `x_radius`/`y_radius` properties instead of a single `radius`;
   `shape_circle` is the special case where both are equal (not
@@ -433,8 +491,9 @@ how the API got here, see
   smoothing/resampling/closing edge. Unlike `curve_line`, places no
   minimum on `length(x)` (matching `shape_raw`’s own leniency), since
   its primary role is as a `convert()` target for “freezing” any
-  `"path"`-geometry drawable (no such `convert()` method exists yet,
-  mirroring `shape_raw`’s).
+  `"path"`-geometry drawable. Its own `id` (see `shape_raw` above) lets
+  it render as several disjoint strokes sharing one style, via
+  `polylineGrob()`’s own `id` support.
 - **`points_raw`** – `shape_raw`’s `"points"`-geometry analog, and the
   first concrete constructor to use `geometry = "points"` (previously
   reserved on the dimensional reading with no constructor exposing it).
@@ -448,6 +507,38 @@ how the API got here, see
   [`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md)’s
   arc-length jitter can meaningfully perturb into a “wobbled scatter”,
   even with no drawn connecting line.
+- **[`shape_combine()`](https://sketchpad.djnavarro.net/reference/shape_combine.md)**
+  – not its own S7 class; a plain function (`R/shape_combine.R`) that
+  merges several already-built polygon-geometry drawables’ own computed
+  `points` into one multi- sub-path `shape_raw`, one sub-path per input
+  (renumbering an input that already has several sub-paths of its own,
+  e.g. the output of an earlier
+  [`shape_combine()`](https://sketchpad.djnavarro.net/reference/shape_combine.md)
+  call, so they stay distinct from every other input’s own). This is the
+  ergonomic, higher-level entry point for the two motivating
+  multi-sub-path use cases – a shape with a hole (one input nested
+  inside another, under
+  [`style()`](https://sketchpad.djnavarro.net/reference/style.md)’s
+  default `rule = "evenodd"`) or several disjoint shapes sharing one
+  style – without computing `id` by hand the way
+  [`shape_raw()`](https://sketchpad.djnavarro.net/reference/shape_raw.md)’s
+  own `id` argument requires. Each input’s own `trans`/noise-based
+  distortion is already baked into its `points` before combining (the
+  same “freeze” semantics `convert()` already has), so the combined
+  shape’s own `trans` is left at the default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md).
+  Takes an explicit `style` argument (a whole
+  [`style()`](https://sketchpad.djnavarro.net/reference/style.md)
+  object, not `...`-forwarded style arguments, since `...` here is
+  variadic over the input drawables themselves) defaulting to the first
+  input’s own `style` – a `drawable` has exactly one `style`, so
+  combining several differently-styled inputs necessarily discards all
+  but one; several independently-styled shapes should use a `sketch`
+  instead. Only accepts `drawable` arguments (not bare `xy` objects) and
+  requires every input’s own `@geometry == "polygon"` – no
+  `curve_*`/`points_*` analog exists yet, since neither has holes to
+  motivate one and each can already build a multi-sub-path result
+  directly via its own `id` argument.
 - **`canvas`** – not a `drawable`; a small value class (parallel to
   `style`, but for a `sketch` as a whole rather than one shape) bundling
   `background` (a `style@fill`-style value: plain colour string or
@@ -503,7 +594,7 @@ how the API got here, see
   background/clip are sketch-level only. Both methods build their grob
   via the internal `geometry_grob()` helper (`R/draw.R`), which switches
   on a drawable’s `geometry` property:
-  [`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html) for
+  [`grid::pathGrob()`](https://rdrr.io/r/grid/grid.path.html) for
   `"polygon"`,
   [`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html) for
   `"path"`,
@@ -515,16 +606,40 @@ how the API got here, see
   `"path"`) but not `"points"`, which has no line to dash, join, cap, or
   mitre – `lineend`/`linemitre` are simply inert for `"polygon"`, which
   has no free endpoint and no mitred corner sharp enough in practice to
-  hit the default limit.
+  hit the default limit. `"polygon"` uses `pathGrob()` rather than the
+  simpler `polygonGrob()` so that a drawable’s own `points@id` (see `xy`
+  above) and `style@rule` are honoured – `points@id` is passed straight
+  through as `pathGrob()`’s own `id` (grouping into sub-paths), `pathId`
+  is left at its default (every sub-path of one drawable is always one
+  combined path/fill region – several independently-styled shapes
+  already means using a `sketch` instead), and `style@rule` is passed
+  through as `pathGrob()`’s own `rule`. With a single sub-path (every
+  current `shape_*()`), this reproduces `polygonGrob()`’s own rendering
+  exactly – confirmed directly, not just by inspection – so this was a
+  rendering-mechanism change only, no visible behavior change for any
+  existing drawable. `pathGrob()` is base `grid` (present since R 3.6,
+  see “Gotchas”), so no new package dependency. `"path"` similarly
+  passes `points@id` through to `polylineGrob()`’s own `id`, letting a
+  `"path"`-geometry drawable render as several disjoint strokes sharing
+  one style; `"points"` has no sub-path concept (no `id` support in
+  `pointsGrob()`), consistent with `fill` already being inert there.
 - **`convert()`** – S7’s own generic (not defined by this package); a
   `method(convert, list(drawable, shape_raw))` “freezes” any drawable’s
-  computed points into a plain `shape_raw`, preserving `style`.
+  computed points into a plain `shape_raw`, preserving `style` and
+  `points@id` (so converting an already multi-sub-path/holed drawable,
+  e.g. the output of
+  [`shape_combine()`](https://sketchpad.djnavarro.net/reference/shape_combine.md),
+  doesn’t silently collapse it back to one sub-path).
+  `method(convert, list(drawable, curve_raw))`/
+  `method(convert, list(drawable, points_raw))` do the same for their
+  own `"path"`/`"points"`-geometry targets.
 
 Every closed (`geometry = "polygon"`) drawable’s constructor shares the
 `shape_*` prefix
 ([`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md),
 [`shape_rectangle()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)/[`shape_square()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md),
 [`shape_polygon()`](https://sketchpad.djnavarro.net/reference/shape_polygon.md),
+[`shape_star()`](https://sketchpad.djnavarro.net/reference/shape_star.md),
 [`shape_ellipse()`](https://sketchpad.djnavarro.net/reference/shape_ellipse.md),
 [`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md),
 [`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
@@ -997,7 +1112,16 @@ to reject a drawable whose `x`/`y` doesn’t hold a genuine, perturbable
 control-point path – e.g. `effect_tremor(shape_ribbon(...))` fails
 directly with a `pathlike`-specific message, since `shape_ribbon`’s
 `x`/`y` is a segment’s start point, not a path, even though the property
-names alone would otherwise look plausible.
+names alone would otherwise look plausible. The same check also rejects
+a multi-sub-path `object` (one with an `id` property – `shape_raw`/
+`curve_raw`/`points_raw` – holding more than one distinct value, e.g.
+the output of
+[`shape_combine()`](https://sketchpad.djnavarro.net/reference/shape_combine.md)):
+both effects compute a single arc-length parametrization across the
+whole of `object@x`/`object@y`, treating it as one continuous path,
+which would bridge a fake segment across each sub-path boundary if the
+sub-paths aren’t actually connected. Per-sub-path jitter/fan is a
+possible future enhancement, not yet implemented.
 `require_props(object, props, context)` checks for any *additional*
 named properties an effect needs beyond the `pathlike` contract itself –
 currently only
@@ -1082,22 +1206,31 @@ masking that raster to the outline’s exact polygon shape via
 masking technique
 [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
 uses for its own radial fade, but built from `object`’s own real
-silhouette rather than a synthetic circle. Grain renders as `color`’s
-opacity fading between `0` and `alpha` at the noise field’s extremes
+silhouette rather than a synthetic circle. The mask itself is built via
+[`grid::pathGrob()`](https://rdrr.io/r/grid/grid.path.html)
+(`id = outline@id`, `rule = "evenodd"` fixed, not read from
+`object@style`) rather than `polygonGrob()`, for the same reason
+`geometry_grob()`’s own `"polygon"` branch uses `pathGrob()` – a
+multi-sub-path outline masks correctly (e.g. leaving a hole unshaded)
+instead of filling in every sub-path solid; identical rendering to
+`polygonGrob()` for the current, always-single-sub-path case. Grain
+renders as `color`’s opacity fading between `0` and `alpha` at the noise
+field’s extremes
 ([`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)’s
 own convention), optionally revealing a solid `background` colour
 underneath instead of true transparency
 ([`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)’s
 own `background` argument). `object@style` plays no role here –
 `effect_grain` draws its own grain raster instead, regardless of what
-`object`’s own `style` says. Since its rendering isn’t a single
-`points`-based grob expressible through `geometry_grob()`’s
-`"polygon"`/`"path"`/`"points"` switch, `effect_grain` is not a
-`drawable` subclass at all – it has its own
+`object`’s own `style` says (this is also why its mask’s fill rule is
+fixed rather than read from `object@style@rule`). Since its rendering
+isn’t a single `points`-based grob expressible through
+`geometry_grob()`’s `"polygon"`/`"path"`/`"points"` switch,
+`effect_grain` is not a `drawable` subclass at all – it has its own
 `S7::method(draw, effect_grain)` (`R/effect_grain.R`, collated right
 after `draw.R` so the `draw` generic already exists to register
 against), built directly from
-[`grid::rasterGrob()`](https://rdrr.io/r/grid/grid.raster.html)/[`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html)/[`grid::as.mask()`](https://rdrr.io/r/grid/as.mask.html)/
+[`grid::rasterGrob()`](https://rdrr.io/r/grid/grid.raster.html)/[`grid::pathGrob()`](https://rdrr.io/r/grid/grid.path.html)/[`grid::as.mask()`](https://rdrr.io/r/grid/as.mask.html)/
 [`grid::gTree()`](https://rdrr.io/r/grid/grid.grob.html) rather than
 reusing `geometry_grob()`. Its masked viewport reuses the same
 `xscale`/`yscale`/`width`/`height` as the shared drawing viewport
@@ -1114,6 +1247,17 @@ forgotten – all discovered because they only manifest once classes move
 from a sourced script into an installed package (see HISTORY.md for the
 full debugging narrative):
 
+- **[`grid::pathGrob()`](https://rdrr.io/r/grid/grid.path.html) (used by
+  `geometry_grob()`’s `"polygon"` branch and `effect_grain`’s own
+  mask-building) needs `R >= 3.6`**, one minor version above this
+  package’s previous `Depends: R (>= 3.5)` – `DESCRIPTION` was bumped
+  accordingly. Confirmed directly (not just by documentation) that a
+  single-sub-path `pathGrob()` call reproduces `polygonGrob()`’s own
+  rendering exactly, and that `rule = "evenodd"` detects a hole from
+  pure sub-path nesting, with no dependence on vertex winding direction
+  – both prototyped standalone before this package’s own
+  `geometry_grob()`/`effect_grain_grob()` were changed to use
+  `pathGrob()`.
 - **S7 classes get namespace-qualified class names once inside a
   package** (`"sketchpad::sketch"`, not `"sketch"`). Any check written
   as `inherits(x, "drawable")` or an S3 method named `` `+.sketch` ``
@@ -1362,11 +1506,11 @@ full debugging narrative):
 - `R/shape_bezier.R`, `R/curve_bezier.R`, `R/curve_line.R`,
   `R/curve_spiral.R`, `R/curve_scribble.R`, `R/shape_raw.R`,
   `R/curve_raw.R`, `R/points_raw.R`, `R/shape_circle.R`,
-  `R/shape_rectangle.R`, `R/shape_polygon.R`, `R/shape_ellipse.R`,
-  `R/shape_wedge.R`, `R/curve_arc.R`, `R/shape_blob.R`,
-  `R/shape_ribbon.R`, `R/shape_twist.R`, `R/curve_twist.R`,
-  `R/shape_stroke.R` – the concrete `drawable` subclasses, one file each
-  (`shape_rectangle.R` also holds the
+  `R/shape_rectangle.R`, `R/shape_polygon.R`, `R/shape_star.R`,
+  `R/shape_ellipse.R`, `R/shape_wedge.R`, `R/curve_arc.R`,
+  `R/shape_blob.R`, `R/shape_ribbon.R`, `R/shape_twist.R`,
+  `R/curve_twist.R`, `R/shape_stroke.R` – the concrete `drawable`
+  subclasses, one file each (`shape_rectangle.R` also holds the
   [`shape_square()`](https://sketchpad.djnavarro.net/reference/shape_rectangle.md)
   wrapper function, rather than giving it its own file, since it’s not a
   separate S7 class). Every closed constructor shares the `shape_*`
@@ -1392,6 +1536,14 @@ full debugging narrative):
   constructor shape. `shape_stroke.R` needs no such sharing either –
   it’s the last concrete `drawable` subclass, collated right after
   `curve_twist.R`.
+- `R/shape_combine.R` –
+  [`shape_combine()`](https://sketchpad.djnavarro.net/reference/shape_combine.md),
+  a plain function (not an S7 class) building a `shape_raw` from several
+  already-built drawables’ own `points` (see “Class hierarchy” above).
+  Collated right after `points_raw.R` (the last of the “raw” family it’s
+  built on top of) – though as an ordinary function, its exact `Collate`
+  position doesn’t actually matter, the same way `vectorize.R`’s
+  doesn’t.
 - `R/shape_strokepath.R` –
   [`shape_strokepath()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md)/[`shape_strokepaths()`](https://sketchpad.djnavarro.net/reference/shape_strokepath.md),
   plain functions (not S7 classes) that build a tapered, noise-modulated
@@ -1485,14 +1637,15 @@ full debugging narrative):
   (utils -\> fill -\> palette -\> noise_field -\> noise_bridge -\> trans
   -\> style -\> xy -\> drawable -\> shape_bezier -\> curve_bezier -\>
   curve_line -\> curve_spiral -\> curve_scribble -\> shape_raw -\>
-  curve_raw -\> points_raw -\> shape_circle -\> shape_rectangle -\>
-  shape_polygon -\> shape_ellipse -\> shape_wedge -\> curve_arc -\>
-  shape_blob -\> shape_ribbon -\> shape_twist -\> curve_twist -\>
-  shape_stroke -\> shape_strokepath -\> canvas -\> sketch -\> format -\>
-  vectorize -\> effects -\> effect_tremor -\> effect_bristle -\> draw
-  -\> effect_grain -\> convert -\> save -\> sketchpad-package). **Any
-  new drawable subclass must be added to `Collate` after `drawable.R`**,
-  or `devtools::load_all()`/`R CMD check` will fail with an “object
+  curve_raw -\> points_raw -\> shape_combine -\> shape_circle -\>
+  shape_rectangle -\> shape_polygon -\> shape_star -\> shape_ellipse -\>
+  shape_wedge -\> curve_arc -\> shape_blob -\> shape_ribbon -\>
+  shape_twist -\> curve_twist -\> shape_stroke -\> shape_strokepath -\>
+  canvas -\> sketch -\> format -\> vectorize -\> effects -\>
+  effect_tremor -\> effect_bristle -\> draw -\> effect_grain -\> convert
+  -\> save -\> sketchpad-package). **Any new drawable subclass must be
+  added to `Collate` after `drawable.R`**, or
+  `devtools::load_all()`/`R CMD check` will fail with an “object
   ‘drawable’ not found” error. Any new class that registers its own
   method on an *existing* generic (as `effect_grain` does for `draw`)
   must instead be collated after that generic’s own defining file.
