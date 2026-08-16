@@ -16,7 +16,7 @@ fill_gradient(
   angle = 45,
   stops = NULL,
   spacing = 1,
-  aspect = 1,
+  aspect = NULL,
   extend = "pad"
 )
 ```
@@ -51,7 +51,11 @@ fill_gradient(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  at [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time
+  – see
+  [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+  own `aspect` docs.
 
 - extend:
 
@@ -70,7 +74,9 @@ use as the `fill` argument to
 ## Details
 
 Like the other `fill_*()` helpers, this needs the target's bounding-box
-aspect ratio (`aspect`) to render true rather than stretched – but the
+aspect ratio (`aspect`, resolved automatically by default – see
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+own `aspect` docs) to render true rather than stretched – but the
 correction is applied differently here. Rather than adjusting the
 gradient's own coordinates (the way
 [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)
@@ -96,6 +102,7 @@ for a repeating pattern of small gradient motifs instead.
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

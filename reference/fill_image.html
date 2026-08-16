@@ -60,7 +60,7 @@ raster – but with the raster supplied, not computed.</p>
 <span>  <span class="va">image</span>,</span>
 <span>  preserve_aspect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  spacing <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  aspect <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  aspect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interpolate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  extend <span class="op">=</span> <span class="st">"repeat"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -91,7 +91,10 @@ shape).</p></dd>
 
 <dt id="arg-aspect">aspect<a class="anchor" aria-label="anchor" href="#arg-aspect"></a></dt>
 <dd><p>Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default <code>1</code> (a square bounding box).</p></dd>
+Must be a positive number, or <code>NULL</code> (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+<code><a href="draw.html">draw()</a></code> time – see the <a href="fill.html">fill</a> class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.</p></dd>
 
 
 <dt id="arg-interpolate">interpolate<a class="anchor" aria-label="anchor" href="#arg-interpolate"></a></dt>
@@ -120,9 +123,11 @@ matrix of colour strings, or a numeric array of <code>0</code>-<code>1</code> RG
 intensities.</p>
 <p>Unlike the other <code>fill_*()</code> helpers, <code>fill_image()</code>'s content has its
 <em>own</em> pixel aspect ratio to account for, on top of the usual
-target-bounding-box correction every helper needs (<code>aspect</code>, corrected
-for exactly as <code><a href="fill_noise.html">fill_noise()</a></code> does – keeping the tile physically
-square). With <code>preserve_aspect = TRUE</code> (the default), the image is
+target-bounding-box correction every helper needs (<code>aspect</code>, defaulting
+to automatic resolution exactly as every other helper – see
+<code><a href="fill_hatch.html">fill_hatch()</a></code>'s own <code>aspect</code> docs – and corrected for exactly as
+<code><a href="fill_noise.html">fill_noise()</a></code> does – keeping the tile physically square). With
+<code>preserve_aspect = TRUE</code> (the default), the image is
 letterboxed to fit that square tile without distorting it: whichever of
 width/height is smaller in the image's own pixel dimensions is shrunk
 to fit, leaving the tile's remaining margin transparent. Set
@@ -132,6 +137,7 @@ instead, matching <code><a href="fill_noise.html">fill_noise()</a></code>'s own 
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other fill helpers:
+<code><a href="fill.html">fill()</a></code>,
 <code><a href="fill_charcoal.html">fill_charcoal()</a></code>,
 <code><a href="fill_checker.html">fill_checker()</a></code>,
 <code><a href="fill_crosshatch.html">fill_crosshatch()</a></code>,

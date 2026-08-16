@@ -20,7 +20,7 @@ fill_stipple(
   color = "black",
   radius = 0.15,
   spacing = 0.3,
-  aspect = 1,
+  aspect = NULL,
   n = 4L,
   seed = 1L,
   extend = "repeat"
@@ -49,7 +49,12 @@ fill_stipple(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  from the real target's own bounding-box aspect ratio at
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time –
+  see the [fill](https://sketchpad.djnavarro.net/reference/fill.md)
+  class. Passing a fixed number instead computes the pattern once,
+  immediately, against that value only.
 
 - n:
 
@@ -81,9 +86,10 @@ a dot has no direction, so there's no analogue of their tile-edge
 for, though: [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html)
 tiles are sized as a fraction of the target polygon's own bounding box,
 so a dot drawn with an `npc`-relative radius renders as an ellipse
-whenever that bounding box isn't square. Pass the bounding box's
-width-to-height ratio as `aspect` to keep dots circular; the default
-`aspect = 1` is only exact for a square bounding box.
+whenever that bounding box isn't square. `aspect` corrects for this
+automatically by default, keeping dots circular (see
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+own `aspect` docs).
 
 ## Known rendering risk with multiple dots
 
@@ -111,6 +117,7 @@ unfamiliar R/`grid`/graphics-device versions.
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

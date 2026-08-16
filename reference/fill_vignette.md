@@ -18,7 +18,7 @@ fill_vignette(
   color = "black",
   background = NA,
   spacing = 1,
-  aspect = 1,
+  aspect = NULL,
   extend = "repeat"
 )
 ```
@@ -47,7 +47,11 @@ fill_vignette(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  at [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time
+  – see
+  [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+  own `aspect` docs.
 
 - extend:
 
@@ -67,7 +71,9 @@ As with
 [`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md),
 the fade shape is kept circular by correcting the *tile* to be
 physically square via `aspect` (the target's bounding-box
-width-to-height ratio), the same technique
+width-to-height ratio, resolved automatically by default – see
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+own `aspect` docs), the same technique
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)
 uses for its dots – once the tile is square, a mask specified inside it
 in plain `"npc"` needs no further correction.
@@ -91,6 +97,7 @@ the alpha variant.
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

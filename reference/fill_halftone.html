@@ -57,7 +57,7 @@ look rather than a uniform stipple.</p>
 <span>  color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  radius <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span><span class="op">)</span>,</span>
 <span>  spacing <span class="op">=</span> <span class="fl">0.3</span>,</span>
-<span>  aspect <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  aspect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">4L</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  extend <span class="op">=</span> <span class="st">"repeat"</span></span>
@@ -89,7 +89,10 @@ box. Must be a positive number. Default <code>0.3</code>.</p></dd>
 
 <dt id="arg-aspect">aspect<a class="anchor" aria-label="anchor" href="#arg-aspect"></a></dt>
 <dd><p>Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default <code>1</code> (a square bounding box).</p></dd>
+Must be a positive number, or <code>NULL</code> (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+<code><a href="draw.html">draw()</a></code> time – see the <a href="fill.html">fill</a> class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -121,16 +124,17 @@ testing, sometimes visibly distorted on this package's development R
 build; see that section for details). There is no known way to avoid
 this while still getting a genuine scattered-dot texture, so <strong>check
 rendered output visually</strong> here too.</p>
-<p>As with <code><a href="fill_stipple.html">fill_stipple()</a></code>, the target's bounding-box aspect ratio needs
-to be passed as <code>aspect</code> to keep the dots circular rather than
-elliptical; the default <code>aspect = 1</code> is only exact for a square
-bounding box. Dot centres are kept at least <code>max(radius)</code> from each
-tile edge, so even the largest possible dot isn't clipped away near a
+<p>As with <code><a href="fill_stipple.html">fill_stipple()</a></code>, <code>aspect</code> corrects for the target's own
+bounding-box aspect ratio automatically by default, keeping the dots
+circular rather than elliptical (see <code><a href="fill_hatch.html">fill_hatch()</a></code>'s own <code>aspect</code>
+docs). Dot centres are kept at least <code>max(radius)</code> from each tile
+edge, so even the largest possible dot isn't clipped away near a
 boundary.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other fill helpers:
+<code><a href="fill.html">fill()</a></code>,
 <code><a href="fill_charcoal.html">fill_charcoal()</a></code>,
 <code><a href="fill_checker.html">fill_checker()</a></code>,
 <code><a href="fill_crosshatch.html">fill_crosshatch()</a></code>,

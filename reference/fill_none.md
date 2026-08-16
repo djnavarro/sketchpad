@@ -19,7 +19,8 @@ fill_none()
 
 ## Value
 
-`NA_character_`.
+A [fill](https://sketchpad.djnavarro.net/reference/fill.md) object
+wrapping `NA_character_`.
 
 ## Details
 
@@ -35,6 +36,7 @@ produce an open/unstroked curve.
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

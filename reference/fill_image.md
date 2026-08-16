@@ -17,7 +17,7 @@ fill_image(
   image,
   preserve_aspect = TRUE,
   spacing = 1,
-  aspect = 1,
+  aspect = NULL,
   interpolate = TRUE,
   extend = "repeat"
 )
@@ -46,7 +46,12 @@ fill_image(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  from the real target's own bounding-box aspect ratio at
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time –
+  see the [fill](https://sketchpad.djnavarro.net/reference/fill.md)
+  class. Passing a fixed number instead computes the pattern once,
+  immediately, against that value only.
 
 - interpolate:
 
@@ -81,8 +86,10 @@ strings, or a numeric array of `0`-`1` RGB/RGBA intensities.
 
 Unlike the other `fill_*()` helpers, `fill_image()`'s content has its
 *own* pixel aspect ratio to account for, on top of the usual
-target-bounding-box correction every helper needs (`aspect`, corrected
-for exactly as
+target-bounding-box correction every helper needs (`aspect`, defaulting
+to automatic resolution exactly as every other helper – see
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+own `aspect` docs – and corrected for exactly as
 [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)
 does – keeping the tile physically square). With
 `preserve_aspect = TRUE` (the default), the image is letterboxed to fit
@@ -96,6 +103,7 @@ own (always-stretched) behaviour.
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

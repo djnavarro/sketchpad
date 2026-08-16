@@ -166,6 +166,8 @@ Textures and patterns for
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md)’s `fill`
 argument, used by 2D shapes.
 
+- [`fill()`](https://sketchpad.djnavarro.net/reference/fill.md) : A
+  resolved or auto-resolving fill value
 - [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md)
   : Charcoal/marker-style noise texture fill
 - [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md)

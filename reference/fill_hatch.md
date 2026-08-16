@@ -15,7 +15,7 @@ fill_hatch(
   color = "black",
   angle = 45,
   spacing = 0.1,
-  aspect = 1,
+  aspect = NULL,
   linewidth = 1,
   extend = "repeat"
 )
@@ -40,7 +40,12 @@ fill_hatch(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  from the real target's own bounding-box aspect ratio at
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time –
+  see the [fill](https://sketchpad.djnavarro.net/reference/fill.md)
+  class. Passing a fixed number instead computes the pattern once,
+  immediately, against that value only.
 
 - linewidth:
 
@@ -65,9 +70,13 @@ sized as a *fraction of the target polygon's own bounding box*, not a
 fixed physical square, so a tile that looks square in that relative
 sense can be a stretched rectangle in absolute terms whenever the
 target's bounding box isn't square itself – which distorts any angle
-baked directly into the pattern content. Pass the target's bounding-box
-aspect ratio (width / height) as `aspect` to correct for this; the
-default `aspect = 1` is only exact for a square bounding box.
+baked directly into the pattern content. This is corrected
+automatically: `aspect` defaults to `NULL`, resolved against the real
+target's own bounding-box aspect ratio (width / height) at
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time (see
+the [fill](https://sketchpad.djnavarro.net/reference/fill.md) class);
+pass a fixed number instead to compute the pattern once, immediately,
+against that value only.
 
 Internally, the hatch line is always drawn as a plain diagonal from one
 tile corner to the opposite corner (or the mirror image, for a
@@ -85,6 +94,7 @@ straight (non-diagonal) line tiles seamlessly at any tile aspect ratio.
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

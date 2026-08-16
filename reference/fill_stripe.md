@@ -12,7 +12,7 @@ fill_stripe(
   color = c("black", "white"),
   angle = 45,
   spacing = 0.2,
-  aspect = 1,
+  aspect = NULL,
   extend = "repeat"
 )
 ```
@@ -37,7 +37,12 @@ fill_stripe(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  from the real target's own bounding-box aspect ratio at
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time –
+  see the [fill](https://sketchpad.djnavarro.net/reference/fill.md)
+  class. Passing a fixed number instead computes the pattern once,
+  immediately, against that value only.
 
 - extend:
 
@@ -72,8 +77,10 @@ repeats *itself* continuously along its own axis – a fundamentally
 different (and for this purpose, simpler) mechanism than tiling a
 rasterised copy.
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) is still used
-around this gradient, but only once, as a single square
-(aspect-corrected) tile spanning the whole target shape, exactly as
+around this gradient, but only once, as a single square (automatically
+aspect-corrected – see
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+own `aspect` docs) tile spanning the whole target shape, exactly as
 [`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md)
 does by default – not to create repetition, which the gradient already
 provides.
@@ -88,6 +95,7 @@ second one.
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

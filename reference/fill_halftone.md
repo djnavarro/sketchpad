@@ -13,7 +13,7 @@ fill_halftone(
   color = "black",
   radius = c(0.05, 0.2),
   spacing = 0.3,
-  aspect = 1,
+  aspect = NULL,
   n = 4L,
   seed = 1L,
   extend = "repeat"
@@ -44,7 +44,12 @@ fill_halftone(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  from the real target's own bounding-box aspect ratio at
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time –
+  see the [fill](https://sketchpad.djnavarro.net/reference/fill.md)
+  class. Passing a fixed number instead computes the pattern once,
+  immediately, against that value only.
 
 - n:
 
@@ -88,15 +93,18 @@ here too.
 
 As with
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),
-the target's bounding-box aspect ratio needs to be passed as `aspect` to
-keep the dots circular rather than elliptical; the default `aspect = 1`
-is only exact for a square bounding box. Dot centres are kept at least
-`max(radius)` from each tile edge, so even the largest possible dot
-isn't clipped away near a boundary.
+`aspect` corrects for the target's own bounding-box aspect ratio
+automatically by default, keeping the dots circular rather than
+elliptical (see
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+own `aspect` docs). Dot centres are kept at least `max(radius)` from
+each tile edge, so even the largest possible dot isn't clipped away near
+a boundary.
 
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

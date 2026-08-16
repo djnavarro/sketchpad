@@ -10,7 +10,7 @@ is drawn.
 ``` r
 style(
   color = "black",
-  fill = "black",
+  fill = fill_solid("black"),
   linewidth = 1,
   linetype = "solid",
   linejoin = "round",
@@ -41,7 +41,9 @@ style(
   [`fill_gradient()`](https://sketchpad.djnavarro.net/reference/fill_gradient.md),
   or
   [`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md).
-  Default `fill_solid("black")` (i.e. `"black"`).
+  A bare colour string/ `GridPattern` is coerced into a
+  [fill](https://sketchpad.djnavarro.net/reference/fill.md) object
+  automatically. Default `fill_solid("black")` (i.e. `"black"`).
 
 - linewidth:
 
@@ -161,7 +163,9 @@ Other core structure:
 style(color = "steelblue", fill = "lightblue", linewidth = 2)
 #> <sketchpad::style>
 #>  @ color      : chr "steelblue"
-#>  @ fill       : chr "lightblue"
+#>  @ fill       : <sketchpad::fill>
+#>  .. @ value  : chr "lightblue"
+#>  .. @ resolve: NULL
 #>  @ linewidth  : num 2
 #>  @ linetype   : chr "solid"
 #>  @ linejoin   : chr "round"
@@ -173,21 +177,23 @@ style(color = "steelblue", fill = "lightblue", linewidth = 2)
 style(fill = fill_hatch(angle = 30))
 #> <sketchpad::style>
 #>  @ color      : chr "black"
-#>  @ fill       :List of 9
-#>  .. $ f     :function ()  
-#>  .. $ x     : 'simpleUnit' num 0.5npc
-#>  ..  ..- attr(*, "unit")= int 0
-#>  .. $ y     : 'simpleUnit' num 0.5npc
-#>  ..  ..- attr(*, "unit")= int 0
-#>  .. $ width : 'simpleUnit' num 0.0866npc
-#>  ..  ..- attr(*, "unit")= int 0
-#>  .. $ height: 'simpleUnit' num 0.05npc
-#>  ..  ..- attr(*, "unit")= int 0
-#>  .. $ hjust : num 0.5
-#>  .. $ vjust : num 0.5
-#>  .. $ extend: chr "repeat"
-#>  .. $ group : logi TRUE
-#>  .. - attr(*, "class")= chr [1:2] "GridTilingPattern" "GridPattern"
+#>  @ fill       : <sketchpad::fill>
+#>  .. @ value  :List of 9
+#>  .. .. $ f     :function ()  
+#>  .. .. $ x     : 'simpleUnit' num 0.5npc
+#>  .. ..  ..- attr(*, "unit")= int 0
+#>  .. .. $ y     : 'simpleUnit' num 0.5npc
+#>  .. ..  ..- attr(*, "unit")= int 0
+#>  .. .. $ width : 'simpleUnit' num 0.0866npc
+#>  .. ..  ..- attr(*, "unit")= int 0
+#>  .. .. $ height: 'simpleUnit' num 0.05npc
+#>  .. ..  ..- attr(*, "unit")= int 0
+#>  .. .. $ hjust : num 0.5
+#>  .. .. $ vjust : num 0.5
+#>  .. .. $ extend: chr "repeat"
+#>  .. .. $ group : logi TRUE
+#>  .. .. - attr(*, "class")= chr [1:2] "GridTilingPattern" "GridPattern"
+#>  .. @ resolve: function (aspect)  
 #>  @ linewidth  : num 1
 #>  @ linetype   : chr "solid"
 #>  @ linejoin   : chr "round"

@@ -26,11 +26,13 @@ fill_solid(color = "black")
 
 ## Value
 
-`color`, unchanged (a single string), after validating it.
+A [fill](https://sketchpad.djnavarro.net/reference/fill.md) object
+wrapping `color`.
 
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),
@@ -52,7 +54,9 @@ Other fill helpers:
 
 ``` r
 fill_solid("steelblue")
-#> [1] "steelblue"
+#> <sketchpad::fill>
+#>  @ value  : chr "steelblue"
+#>  @ resolve: NULL
 draw(shape_circle(fill = fill_solid("tomato")))
 
 

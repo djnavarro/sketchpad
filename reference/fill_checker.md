@@ -11,7 +11,7 @@ arbitrary palette.
 fill_checker(
   color = c("black", "white"),
   spacing = 0.2,
-  aspect = 1,
+  aspect = NULL,
   extend = "repeat"
 )
 ```
@@ -30,7 +30,12 @@ fill_checker(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  from the real target's own bounding-box aspect ratio at
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time –
+  see the [fill](https://sketchpad.djnavarro.net/reference/fill.md)
+  class. Passing a fixed number instead computes the pattern once,
+  immediately, against that value only.
 
 - extend:
 
@@ -83,16 +88,17 @@ As with the other `fill_*()` helpers,
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) tiles are
 sized as a fraction of the target polygon's own bounding box rather than
 a fixed physical square, so the checker squares would render as
-rectangles, not squares, on a non-square bounding box. Pass the target's
-width-to-height ratio as `aspect` to correct for this – the same tile-
-squaring technique
+rectangles, not squares, on a non-square bounding box – the same
+tile-squaring technique
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)
-uses for its dots – so the default `aspect = 1` is only exact for a
-square bounding box.
+uses for its dots. `aspect` resolves this automatically by default (see
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+own `aspect` docs).
 
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),
 [`fill_flow()`](https://sketchpad.djnavarro.net/reference/fill_flow.md),

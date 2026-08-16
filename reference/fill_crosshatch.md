@@ -12,7 +12,7 @@ fill_crosshatch(
   color = "black",
   angle = 45,
   spacing = 0.1,
-  aspect = 1,
+  aspect = NULL,
   linewidth = 1,
   extend = "repeat"
 )
@@ -40,7 +40,12 @@ fill_crosshatch(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  from the real target's own bounding-box aspect ratio at
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time –
+  see the [fill](https://sketchpad.djnavarro.net/reference/fill.md)
+  class. Passing a fixed number instead computes the pattern once,
+  immediately, against that value only.
 
 - linewidth:
 
@@ -84,6 +89,7 @@ line and a vertical line instead (a simple grid).
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_flow()`](https://sketchpad.djnavarro.net/reference/fill_flow.md),

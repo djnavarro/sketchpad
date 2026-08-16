@@ -69,7 +69,7 @@ true transparency.</p>
 <span>  color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  background <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  spacing <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  aspect <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  aspect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  extend <span class="op">=</span> <span class="st">"repeat"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -100,7 +100,9 @@ shape).</p></dd>
 
 <dt id="arg-aspect">aspect<a class="anchor" aria-label="anchor" href="#arg-aspect"></a></dt>
 <dd><p>Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default <code>1</code> (a square bounding box).</p></dd>
+Must be a positive number, or <code>NULL</code> (the default) to resolve it
+automatically at <code><a href="draw.html">draw()</a></code> time – see <code><a href="fill_hatch.html">fill_hatch()</a></code>'s own <code>aspect</code>
+docs.</p></dd>
 
 
 <dt id="arg-extend">extend<a class="anchor" aria-label="anchor" href="#arg-extend"></a></dt>
@@ -116,9 +118,10 @@ use as the <code>fill</code> argument to <code><a href="https://rdrr.io/r/grid/g
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>As with <code><a href="fill_gradient.html">fill_gradient()</a></code>, the fade shape is kept circular by correcting
 the <em>tile</em> to be physically square via <code>aspect</code> (the target's
-bounding-box width-to-height ratio), the same technique <code><a href="fill_stipple.html">fill_stipple()</a></code>
-uses for its dots – once the tile is square, a mask specified inside it
-in plain <code>"npc"</code> needs no further correction.</p>
+bounding-box width-to-height ratio, resolved automatically by default
+– see <code><a href="fill_hatch.html">fill_hatch()</a></code>'s own <code>aspect</code> docs), the same technique
+<code><a href="fill_stipple.html">fill_stipple()</a></code> uses for its dots – once the tile is square, a mask
+specified inside it in plain <code>"npc"</code> needs no further correction.</p>
 <p>A mask must always be built with <code><a href="https://rdrr.io/r/grid/as.mask.html" class="external-link">grid::as.mask()</a></code> and an explicit
 <code>type = "alpha"</code> here, rather than passed as a bare grob (which defaults
 to an alpha mask anyway) – during prototyping, a bare mask grob whose
@@ -134,6 +137,7 @@ explicitness), so <code>fill_vignette()</code> only offers the alpha variant.</p
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other fill helpers:
+<code><a href="fill.html">fill()</a></code>,
 <code><a href="fill_charcoal.html">fill_charcoal()</a></code>,
 <code><a href="fill_checker.html">fill_checker()</a></code>,
 <code><a href="fill_crosshatch.html">fill_crosshatch()</a></code>,

@@ -54,7 +54,7 @@ to an arbitrary palette.</p>
 <span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"white"</span><span class="op">)</span>,</span>
 <span>  angle <span class="op">=</span> <span class="fl">45</span>,</span>
 <span>  spacing <span class="op">=</span> <span class="fl">0.2</span>,</span>
-<span>  aspect <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  aspect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  extend <span class="op">=</span> <span class="st">"repeat"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -80,7 +80,10 @@ the target's bounding box. Must be a positive number. Default <code>0.2</code>.<
 
 <dt id="arg-aspect">aspect<a class="anchor" aria-label="anchor" href="#arg-aspect"></a></dt>
 <dd><p>Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default <code>1</code> (a square bounding box).</p></dd>
+Must be a positive number, or <code>NULL</code> (the default) to resolve it
+automatically from the real target's own bounding-box aspect ratio at
+<code><a href="draw.html">draw()</a></code> time – see the <a href="fill.html">fill</a> class. Passing a fixed number instead
+computes the pattern once, immediately, against that value only.</p></dd>
 
 
 <dt id="arg-extend">extend<a class="anchor" aria-label="anchor" href="#arg-extend"></a></dt>
@@ -109,9 +112,10 @@ colour stops (no smooth transition) and <code>extend = "repeat"</code>, which
 repeats <em>itself</em> continuously along its own axis – a fundamentally
 different (and for this purpose, simpler) mechanism than tiling a
 rasterised copy. <code><a href="https://rdrr.io/r/grid/patterns.html" class="external-link">grid::pattern()</a></code> is still used around this gradient,
-but only once, as a single square (aspect-corrected) tile spanning the
-whole target shape, exactly as <code><a href="fill_gradient.html">fill_gradient()</a></code> does by default – not
-to create repetition, which the gradient already provides.</p>
+but only once, as a single square (automatically aspect-corrected –
+see <code><a href="fill_hatch.html">fill_hatch()</a></code>'s own <code>aspect</code> docs) tile spanning the whole target
+shape, exactly as <code><a href="fill_gradient.html">fill_gradient()</a></code> does by default – not to create
+repetition, which the gradient already provides.</p>
 <p>Each of the <code>n = length(color)</code> colours gets an equal-width band by
 default (<code>1/n</code> of the period); there's no separate argument for unequal
 bands – repeat a colour in <code>color</code> instead (e.g. <code>c("steelblue", "steelblue", "white")</code> gives a 2:1 ratio between the two colours), which
@@ -120,6 +124,7 @@ reuses the same recycling mechanism rather than adding a second one.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other fill helpers:
+<code><a href="fill.html">fill()</a></code>,
 <code><a href="fill_charcoal.html">fill_charcoal()</a></code>,
 <code><a href="fill_checker.html">fill_checker()</a></code>,
 <code><a href="fill_crosshatch.html">fill_crosshatch()</a></code>,

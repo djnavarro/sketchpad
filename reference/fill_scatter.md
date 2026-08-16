@@ -21,7 +21,7 @@ fill_scatter(
   size = 0.2,
   color = NULL,
   spacing = 1,
-  aspect = 1,
+  aspect = NULL,
   seed = 1L,
   extend = "repeat"
 )
@@ -61,7 +61,11 @@ fill_scatter(
 - aspect:
 
   Width-to-height ratio of the target polygon's bounding box. Must be a
-  positive number. Default `1` (a square bounding box).
+  positive number, or `NULL` (the default) to resolve it automatically
+  at [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time
+  – see
+  [`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+  own `aspect` docs.
 
 - seed:
 
@@ -136,6 +140,7 @@ rectangles did:
 ## See also
 
 Other fill helpers:
+[`fill()`](https://sketchpad.djnavarro.net/reference/fill.md),
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md),
 [`fill_checker()`](https://sketchpad.djnavarro.net/reference/fill_checker.md),
 [`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md),

@@ -56,7 +56,7 @@ is a single rectangle filled with a <code><a href="https://rdrr.io/r/grid/patter
 <span>  angle <span class="op">=</span> <span class="fl">45</span>,</span>
 <span>  stops <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  spacing <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  aspect <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  aspect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  extend <span class="op">=</span> <span class="st">"pad"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -92,7 +92,9 @@ shape).</p></dd>
 
 <dt id="arg-aspect">aspect<a class="anchor" aria-label="anchor" href="#arg-aspect"></a></dt>
 <dd><p>Width-to-height ratio of the target polygon's bounding box.
-Must be a positive number. Default <code>1</code> (a square bounding box).</p></dd>
+Must be a positive number, or <code>NULL</code> (the default) to resolve it
+automatically at <code><a href="draw.html">draw()</a></code> time – see <code><a href="fill_hatch.html">fill_hatch()</a></code>'s own <code>aspect</code>
+docs.</p></dd>
 
 
 <dt id="arg-extend">extend<a class="anchor" aria-label="anchor" href="#arg-extend"></a></dt>
@@ -109,8 +111,10 @@ use as the <code>fill</code> argument to <code><a href="https://rdrr.io/r/grid/g
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Like the other <code>fill_*()</code> helpers, this needs the target's bounding-box
-aspect ratio (<code>aspect</code>) to render true rather than stretched – but the
-correction is applied differently here. Rather than adjusting the
+aspect ratio (<code>aspect</code>, resolved automatically by default – see
+<code><a href="fill_hatch.html">fill_hatch()</a></code>'s own <code>aspect</code> docs) to render true rather than
+stretched – but the correction is applied differently here. Rather
+than adjusting the
 gradient's own coordinates (the way <code><a href="fill_hatch.html">fill_hatch()</a></code> adjusts a segment's
 direction), <code>fill_gradient()</code> corrects the <em>tile</em> itself to be physically
 square, exactly as <code><a href="fill_stipple.html">fill_stipple()</a></code> does for its dots: once the tile is
@@ -130,6 +134,7 @@ for a repeating pattern of small gradient motifs instead.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other fill helpers:
+<code><a href="fill.html">fill()</a></code>,
 <code><a href="fill_charcoal.html">fill_charcoal()</a></code>,
 <code><a href="fill_checker.html">fill_checker()</a></code>,
 <code><a href="fill_crosshatch.html">fill_crosshatch()</a></code>,

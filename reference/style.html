@@ -49,7 +49,7 @@ grid::gpar() when a drawable object is drawn."></head><body>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">style</span><span class="op">(</span></span>
 <span>  color <span class="op">=</span> <span class="st">"black"</span>,</span>
-<span>  fill <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  fill <span class="op">=</span> <span class="fu"><a href="fill_solid.html">fill_solid</a></span><span class="op">(</span><span class="st">"black"</span><span class="op">)</span>,</span>
 <span>  linewidth <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  linetype <span class="op">=</span> <span class="st">"solid"</span>,</span>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
@@ -73,8 +73,9 @@ grid::gpar() when a drawable object is drawn."></head><body>
 <dd><p>Fill colour or pattern. Either a plain colour string, or the
 output of a <code>fill_*()</code> helper – <code><a href="fill_solid.html">fill_solid()</a></code>, <code><a href="fill_none.html">fill_none()</a></code>,
 <code><a href="fill_hatch.html">fill_hatch()</a></code>, <code><a href="fill_crosshatch.html">fill_crosshatch()</a></code>, <code><a href="fill_stipple.html">fill_stipple()</a></code>, <code><a href="fill_noise.html">fill_noise()</a></code>,
-<code><a href="fill_gradient.html">fill_gradient()</a></code>, or <code><a href="fill_vignette.html">fill_vignette()</a></code>. Default <code>fill_solid("black")</code>
-(i.e. <code>"black"</code>).</p></dd>
+<code><a href="fill_gradient.html">fill_gradient()</a></code>, or <code><a href="fill_vignette.html">fill_vignette()</a></code>. A bare colour string/
+<code>GridPattern</code> is coerced into a <a href="fill.html">fill</a> object automatically. Default
+<code>fill_solid("black")</code> (i.e. <code>"black"</code>).</p></dd>
 
 
 <dt id="arg-linewidth">linewidth<a class="anchor" aria-label="anchor" href="#arg-linewidth"></a></dt>
@@ -175,7 +176,9 @@ that don't universally apply.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">style</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"steelblue"</span>, fill <span class="op">=</span> <span class="st">"lightblue"</span>, linewidth <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;sketchpad::style&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ color      : chr "steelblue"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  @ fill       : chr "lightblue"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ fill       : &lt;sketchpad::fill&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ value  : chr "lightblue"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ resolve: NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linewidth  : num 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linetype   : chr "solid"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linejoin   : chr "round"</span>
@@ -187,21 +190,23 @@ that don't universally apply.</p></dd>
 <span class="r-in"><span><span class="fu">style</span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="fill_hatch.html">fill_hatch</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;sketchpad::style&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ color      : chr "black"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  @ fill       :List of 9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ f     :function ()  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ x     : 'simpleUnit' num 0.5npc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..- attr(*, "unit")= int 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ y     : 'simpleUnit' num 0.5npc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..- attr(*, "unit")= int 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ width : 'simpleUnit' num 0.0866npc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..- attr(*, "unit")= int 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ height: 'simpleUnit' num 0.05npc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..- attr(*, "unit")= int 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ hjust : num 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ vjust : num 0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ extend: chr "repeat"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ group : logi TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  .. - attr(*, "class")= chr [1:2] "GridTilingPattern" "GridPattern"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ fill       : &lt;sketchpad::fill&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ value  :List of 9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ f     :function ()  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ x     : 'simpleUnit' num 0.5npc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. ..  ..- attr(*, "unit")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ y     : 'simpleUnit' num 0.5npc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. ..  ..- attr(*, "unit")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ width : 'simpleUnit' num 0.0866npc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. ..  ..- attr(*, "unit")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ height: 'simpleUnit' num 0.05npc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. ..  ..- attr(*, "unit")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ hjust : num 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ vjust : num 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ extend: chr "repeat"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. $ group : logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. .. - attr(*, "class")= chr [1:2] "GridTilingPattern" "GridPattern"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ resolve: function (aspect)  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linewidth  : num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linetype   : chr "solid"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  @ linejoin   : chr "round"</span>

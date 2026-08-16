@@ -14,7 +14,7 @@ property (`sketch`'s own `canvas`) rather than a flat list of arguments.
 ## Usage
 
 ``` r
-canvas(background = NA_character_, xlim = NULL, ylim = NULL, clip = FALSE)
+canvas(background = fill_none(), xlim = NULL, ylim = NULL, clip = FALSE)
 ```
 
 ## Arguments
@@ -24,7 +24,10 @@ canvas(background = NA_character_, xlim = NULL, ylim = NULL, clip = FALSE)
   Background fill, drawn beneath every shape in the sketch. Either a
   plain colour string, or the output of a `fill_*()` helper – see
   [`style()`](https://sketchpad.djnavarro.net/reference/style.md)'s
-  `fill` argument for the full family. Default
+  `fill` argument for the full family (a bare colour
+  string/`GridPattern` is coerced into a
+  [fill](https://sketchpad.djnavarro.net/reference/fill.md) object
+  automatically). Default
   [`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md)
   (no background drawn; the page's own background shows through,
   matching
@@ -86,13 +89,17 @@ Other core structure:
 ``` r
 canvas()
 #> <sketchpad::canvas>
-#>  @ background: chr NA
+#>  @ background: <sketchpad::fill>
+#>  .. @ value  : chr NA
+#>  .. @ resolve: NULL
 #>  @ xlim      : NULL
 #>  @ ylim      : NULL
 #>  @ clip      : logi FALSE
 canvas(background = "grey90")
 #> <sketchpad::canvas>
-#>  @ background: chr "grey90"
+#>  @ background: <sketchpad::fill>
+#>  .. @ value  : chr "grey90"
+#>  .. @ resolve: NULL
 #>  @ xlim      : NULL
 #>  @ ylim      : NULL
 #>  @ clip      : logi FALSE
