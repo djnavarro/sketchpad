@@ -2135,3 +2135,71 @@ a matching `@family export helpers` tag were added for all three.
 
 Deferred: a multi-frame/animation export helper (seed sequence +
 `gifski`) remains open -- see `.agents/PLAN.md`.
+
+## `print`/`format` methods for `drawable`/`sketch`
+
+`drawable` and `sketch` previously printed as the default S7 object dump
+(`str()`-based, via S7's built-in `print.S7_object`) -- exhaustive but
+not especially readable, and hiding the one property most relevant at a
+glance (which subclass a given `drawable` is) behind a full property
+listing.
+
+**Scope.** Dedicated `format()`/`print()` methods for both classes,
+registered on base R's own generics via `S7::method(format, drawable) <-
+...`/`S7::method(print, drawable) <- ...` (and the `sketch` analogs) --
+the same external-generic registration pattern `+`/`convert()` already
+use, picked up automatically by the existing `S7::methods_register()`
+call in `.onLoad()` with no further changes needed there. Each `print`
+method is a one-line wrapper (`cat(format(x, ...), sep = "\n");
+invisible(x)`) over its own `format` method, matching base R's own
+`print.default`-calls-`format`-esque convention.
+
+**`format(drawable)`.** Reports the drawable's own (short, non-namespace-
+qualified) class name via `S7::S7_class(x)@name`, then every property
+*besides* the five every `drawable` already shares (`style`/`geometry`/
+`trans`/`pathlike`/`points`) -- so a `shape_circle` shows `x`/`y`/
+`radius`/`n`, a `shape_blob` additionally shows `range`/`distortion`,
+etc., with no per-subclass method needed, since this reads generically
+off `S7::prop_names()`. `points` is deliberately omitted even though
+it's the "real" geometry -- it's a *computed* property that can be
+expensive (noise-based distortion) or long (many points) to print in
+full; `@points` is still directly accessible for anyone who wants it.
+Also reports a short `style` summary (`color`/`fill`/`linewidth` only --
+the properties most relevant at a glance, not every `style` property) and
+`geometry`/`trans`. A property value is formatted by a shared internal
+helper, `format_prop_value()`: a scalar via `format()` directly; a short
+vector (`length <= 4`) as a comma-separated `[...]` list; a longer vector
+truncated to its first three elements plus a `(n total)` count; a nested
+S7 object (e.g. `distortion`'s `noise_field`) as `<class_name>` rather
+than recursing into its own properties (keeps a drawable's own summary
+to a handful of lines regardless of nesting depth); a plain list as
+`<list[n]>` for the same reason. A drawable's `trans` gets its own
+one-word-ish summary via `format_trans_summary()`: an affine `trans` is
+`"identity"` when its matrix is exactly `diag(3)` (compared via
+`all.equal()`, not `identical()`, to tolerate floating-point noise from
+composed transforms), `"affine"` otherwise; a `trans_warp` is `"warp"`;
+a `trans_chain` is `"chain (n steps)"`.
+
+**`format(sketch)`.** Reports the shape count (`"<sketch: n shapes>"`,
+singular/plural handled explicitly), each shape's own class name in
+list order, and a short `canvas` summary (`background`/`clip`, via the
+same `format_prop_value()` helper).
+
+**File placement.** A new `R/format.R`, collated right after
+`sketch.R` (needs `drawable`/`sketch` plus `trans`/`trans_warp`/
+`trans_chain`, all already defined by that point) and before
+`vectorize.R` -- an ordinary-function/external-generic-method file like
+`vectorize.R`/`effects.R`, except unlike those, its `Collate` position
+*does* matter here, since the `method(format, drawable) <- ...`
+assignments run at source time and need `drawable`/`sketch`/`trans`
+already bound.
+
+**Documentation.** Each `method(format, ...)`/`method(print, ...)`
+assignment carries `#' @export`/`#' @noRd` (confirmed, as with the
+existing `+`/`convert()` method assignments, to add no NAMESPACE entry
+at all -- `grep`ing a freshly `document()`-ed `NAMESPACE` for `format`/
+`print`/`+`/`convert` turns up nothing; dispatch works purely through
+`S7::methods_register()` in `.onLoad()`, not the NAMESPACE `S3method()`
+mechanism), with a short roxygen block for source-level readability
+only, no actual `.Rd` page generated. Tests live in
+`tests/testthat/test-format.R`.

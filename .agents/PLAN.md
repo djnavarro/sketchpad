@@ -6,6 +6,32 @@ not a changelog: once an item here is completed, its write-up should
 move to [.agents/HISTORY.md](HISTORY.md) and be removed from this file
 rather than marked "done" in place.
 
+## Release targets
+
+Open items below are triaged into three buckets. Update an item's own
+section heading (or this list) as its target changes; don't duplicate
+the writeup.
+
+**0.1:**
+- Arbitrary angle for `fill_scribble()`
+- S7 class for `fill` objects
+- Arbitrary-function `trans` warps
+- Annulus-segment wedge (`shape_wedge()`/new shape with `inner_radius`)
+- Multiple sub-paths and holes per drawable
+- A `group` class
+
+**0.2:**
+- Multi-frame/animation export helpers (and interactivity/event handling,
+  if ever reconsidered -- see "Explicitly flagged as possibly out of
+  scope")
+- Boolean geometry ops (if ever reconsidered -- see "Explicitly flagged
+  as possibly out of scope")
+
+**Won't implement:**
+- Palette integration with the sibling `palettes` repo -- superseded by
+  `palette_manual()`/`palette_cosine()`, which already vendor/generate
+  palettes directly inside sketchpad with no external dependency needed.
+
 ## Deferred: rest of the `curve_*()` constructor family
 
 `curve_bezier()` (see `.agents/HISTORY.md`) is the first `curve_*()`
@@ -35,7 +61,7 @@ constructor -- previously reserved on the dimensional reading with
 nothing exposing it. No further `curve_*()`/`points_*()` constructor is
 currently planned.
 
-## Deferred: arbitrary angle for `fill_scribble()`
+## Deferred: arbitrary angle for `fill_scribble()` (0.1)
 
 `fill_scribble()` only supports `direction = "horizontal"` or
 `"vertical"` -- see its "Known limitation" docs section and
@@ -47,7 +73,7 @@ segment; no such technique exists in this package yet, and none was
 prototyped successfully. Revisit if a real sketch needs an arbitrary
 angle.
 
-## Deferred: S7 class for `fill` objects
+## Deferred: S7 class for `fill` objects (0.1)
 
 All fifteen `fill_*()` helpers in `R/fill.R` currently return either a
 plain colour string (`fill_solid()`) or whatever `grid::pattern()`
@@ -72,7 +98,7 @@ package's current gaps, not a specific need that came up while building
 something else (contrast with the four items above). Each is a candidate
 to pick up, reject, or refine later -- none are scheduled.
 
-### Additional primitive shapes
+### Additional primitive shapes (0.1)
 
 `star`. (`rectangle`/`square` are now covered by `shape_rectangle()`/
 `shape_square()`; `polygon` is now covered by `shape_polygon()`;
@@ -85,7 +111,7 @@ reasonably natural `inner_radius` extension to `shape_wedge()`'s current
 list -- both are now covered by `curve_line()`/`curve_spiral()`; see
 `.agents/HISTORY.md`.)
 
-### Multiple sub-paths and holes per drawable
+### Multiple sub-paths and holes per drawable (0.1)
 
 Every `drawable` currently renders as exactly one `grid::polygonGrob()`
 per shape. `grid::polygonGrob()` supports multiple disjoint sub-paths via
@@ -104,7 +130,7 @@ still open is the concrete `curve_*()` constructor family and whether
 line styling needs to grow beyond the current single `linewidth` -- dash
 patterns, line caps/joins.)
 
-### Deferred: arbitrary-function `trans` warps
+### Deferred: arbitrary-function `trans` warps (0.1)
 
 The affine `trans` family (`trans_translate()`/`trans_rotate()`/
 `trans_scale()`/`trans_reflect()`/`trans_shear()`/`trans_affine()`) and a
@@ -121,14 +147,14 @@ concrete sketch needs a warp shape `noise_field` domain-warping can't
 express (e.g. a deterministic swirl/pinch/bulge formula, or a warp driven
 by a second drawable's own geometry).
 
-### A `group` class
+### A `group` class (0.1)
 
 A nested collection of drawables sharing one transform and/or style
 override, distinct from `sketch` (which represents the whole canvas of
 independently-styled shapes). Would pair naturally with the transform
 helpers above -- e.g. rotate a `group` as a unit.
 
-### Multi-frame/animation export helpers
+### Multi-frame/animation export helpers (0.2)
 
 `save_png()`/`save_svg()`/`save_pdf()` (see `.agents/HISTORY.md`) now
 cover single-image export -- a thin wrapper opening the right
@@ -139,18 +165,16 @@ generating a seed sequence plus a `gifski`-based animation export.
 Revisit if a concrete sketch needs a multi-frame/animated export rather
 than one-off images.
 
-### `print`/`format` methods
-
-`drawable` and `sketch` currently print as the default S7 object dump;
-dedicated `print`/`format` methods would give more useful console
-feedback.
-
-### Palette integration
+### Palette integration (won't implement)
 
 There's a sibling `palettes` repo (`djnavarro/palettes`) holding reusable
 CSV palettes. sketchpad could depend on or bundle from it rather than
 every series/example inlining its own palette vector (as all four
-`README.Rmd` examples currently do).
+`README.Rmd` examples currently do). Decided against: `palette_manual()`
+already vendors this same source directly into sketchpad
+(`R/sysdata.rda`, see `data-raw/build_manual_palettes.R`), and
+`palette_cosine()` covers the procedural-palette case -- no external
+dependency is needed.
 
 ### Stylized stroke rendering: still open beyond `shape_stroke()`/`sketchy()`/`bristle_stroke()`/`fill_charcoal()`
 
@@ -169,11 +193,12 @@ the existing "Deferred: arbitrary angle for `fill_scribble()`" item
 above; `fill_charcoal()`/`fill_noise()`/`fill_marble()` don't have this
 problem and are the recommended textures for a `shape_stroke()` body.
 
-### Explicitly flagged as possibly out of scope
+### Explicitly flagged as possibly out of scope (0.2 if reconsidered)
 
 Two ideas considered and tentatively set aside rather than silently
 omitted, so they don't get re-proposed without acknowledging the
-tradeoff:
+tradeoff. Neither is scheduled for 0.1; if either is picked up at all,
+target 0.2.
 
 - **Boolean geometry ops** (union/intersection/clip between shapes) --
   heavy geometry-library territory (`sf`/`polyclip`), in tension with

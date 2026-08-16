@@ -627,6 +627,47 @@ Shared argument validation lives in the internal `validate_fill_args()`
 `validate_colors()` (a character vector of at least `min_length`, no `NA`s
 -- see "Colour-vector generalization" above).
 
+### `print()`/`format()` methods
+
+`drawable` and `sketch` each have dedicated `format()`/`print()` methods
+(`R/format.R`), registered on base R's own generics the same way `+`/
+`convert()` already are (`S7::method(format, drawable) <- ...`, etc.) --
+picked up automatically by the existing `S7::methods_register()` call in
+`.onLoad()`, with no further registration needed. Each `print` method is
+a one-line `cat(format(x, ...), sep = "\n"); invisible(x)` wrapper over
+its own `format` method.
+
+`format(drawable)` reports the drawable's own (short) class name via
+`S7::S7_class(x)@name`, then every property besides the five every
+`drawable` already shares (`style`/`geometry`/`trans`/`pathlike`/
+`points`) -- read generically off `S7::prop_names()`, so no per-subclass
+method is needed. `points` itself is deliberately omitted even though
+it's the "real" geometry, since it's a computed property that can be
+expensive (noise-based distortion) or long (many points) to print in
+full -- `@points` is still directly accessible. Also reports a short
+`style` summary (`color`/`fill`/`linewidth` only) and `geometry`/`trans`.
+A property value is rendered by the internal `format_prop_value()`
+helper: a scalar via `format()`; a short vector (`length <= 4`) as a
+comma-separated `[...]` list; a longer vector truncated to its first
+three elements plus a `(n total)` count; a nested S7 object (e.g.
+`distortion`'s `noise_field`) as `<class_name>` rather than recursing
+into its own properties; a plain list as `<list[n]>`. A drawable's
+`trans` gets its own summary via the internal `format_trans_summary()`:
+an affine `trans` is `"identity"` when its matrix is exactly `diag(3)`
+(via `all.equal()`, tolerating floating-point noise from composed
+transforms) or `"affine"` otherwise; a `trans_warp` is `"warp"`; a
+`trans_chain` is `"chain (n steps)"`.
+
+`format(sketch)` reports the shape count (`"<sketch: n shapes>"`,
+singular/plural handled explicitly), each shape's own class name in list
+order, and a short `canvas` summary (`background`/`clip`, via the same
+`format_prop_value()` helper).
+
+As with `+`/`convert()`, each `method(format, ...)`/`method(print, ...)`
+assignment carries `#' @export`/`#' @noRd` for source-level readability
+only -- confirmed to add no `NAMESPACE` entry at all; dispatch works
+purely through `S7::methods_register()` in `.onLoad()`.
+
 ### The `save_*()` export family
 
 `R/save.R` holds three thin wrappers -- `save_png()`, `save_svg()`,
@@ -1063,6 +1104,14 @@ full debugging narrative):
   trans)` (compose a transform onto one drawable or every shape in a
   sketch -- see [trans] above) -- and its `length()`/`` `[[` ``/`` `[` ``
   methods for list-like access to `@shapes`.
+- `R/format.R` -- `format()`/`print()` methods for `drawable` and
+  `sketch` (see "`print()`/`format()` methods" below), plus the internal
+  `format_prop_value()`/`format_trans_summary()` helpers they share.
+  Collated right after `sketch.R`, since its `method(format, drawable)
+  <- ...`/`method(format, sketch) <- ...` assignments run at source time
+  and need `drawable`/`sketch`/`trans`/`trans_warp`/`trans_chain` already
+  bound -- unlike `vectorize.R`/`effects.R` below, this file's `Collate`
+  position *does* matter, for the same reason `effect_grain.R`'s does.
 - `R/vectorize.R` -- the internal `vectorize_shapes()` engine shared by
   every plural `shape_*s()`/`curve_*s()`/`points_raws()` constructor
   (each defined alongside its singular counterpart, in that
@@ -1117,7 +1166,7 @@ full debugging narrative):
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
   curve_twist -> shape_stroke -> shape_strokepath -> canvas -> sketch ->
-  vectorize -> effects
+  format -> vectorize -> effects
   -> effect_tremor -> effect_bristle -> draw -> effect_grain -> convert ->
   save -> sketchpad-package). **Any new drawable
   subclass must be added to
