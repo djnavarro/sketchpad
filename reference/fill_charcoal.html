@@ -3,27 +3,11 @@
 rendering, just different defaults – tuned to read as hand-drawn
 charcoal or marker grain rather than fill_noise()'s more
 general-purpose rasterized field: a lighter base tone, finer/denser
-tiling, and finer noise detail. Found, while prototyping
-shape_stroke()'s interior texture, to be a substantially better fit
-than fill_scribble() for a curved stroke's body – fill_scribble()'s
-fixed horizontal/vertical direction doesn't track a curved path's own
-tangent (see the &quot;Deferred: arbitrary angle for fill_scribble()&quot;
-item in .agents/PLAN.md), producing hatching that visibly cuts across
-the stroke at odd angles wherever the path bends, while
-fill_noise()'s directionless mottling has no orientation to clash
-with the curve."><meta property="og:description" content="fill_charcoal() is a fill_noise() preset – same field, same
+tiling, and finer noise detail."><meta property="og:description" content="fill_charcoal() is a fill_noise() preset – same field, same
 rendering, just different defaults – tuned to read as hand-drawn
 charcoal or marker grain rather than fill_noise()'s more
 general-purpose rasterized field: a lighter base tone, finer/denser
-tiling, and finer noise detail. Found, while prototyping
-shape_stroke()'s interior texture, to be a substantially better fit
-than fill_scribble() for a curved stroke's body – fill_scribble()'s
-fixed horizontal/vertical direction doesn't track a curved path's own
-tangent (see the &quot;Deferred: arbitrary angle for fill_scribble()&quot;
-item in .agents/PLAN.md), producing hatching that visibly cuts across
-the stroke at odd angles wherever the path bends, while
-fill_noise()'s directionless mottling has no orientation to clash
-with the curve."></head><body>
+tiling, and finer noise detail."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -67,15 +51,7 @@ with the curve."></head><body>
 rendering, just different defaults – tuned to read as hand-drawn
 charcoal or marker grain rather than <code><a href="fill_noise.html">fill_noise()</a></code>'s more
 general-purpose rasterized field: a lighter base tone, finer/denser
-tiling, and finer noise detail. Found, while prototyping
-<code><a href="shape_stroke.html">shape_stroke()</a></code>'s interior texture, to be a substantially better fit
-than <code><a href="fill_scribble.html">fill_scribble()</a></code> for a curved stroke's body – <code><a href="fill_scribble.html">fill_scribble()</a></code>'s
-fixed horizontal/vertical direction doesn't track a curved path's own
-tangent (see the "Deferred: arbitrary angle for <code><a href="fill_scribble.html">fill_scribble()</a></code>"
-item in <code>.agents/PLAN.md</code>), producing hatching that visibly cuts across
-the stroke at odd angles wherever the path bends, while
-<code><a href="fill_noise.html">fill_noise()</a></code>'s directionless mottling has no orientation to clash
-with the curve.</p>
+tiling, and finer noise detail.</p>
     </div>
 
     <div class="section level2">
@@ -148,6 +124,17 @@ positive integer. Default <code>3L</code> (one more layer of detail than
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A pattern object as returned by <code><a href="https://rdrr.io/r/grid/patterns.html" class="external-link">grid::pattern()</a></code>, suitable for
 use as the <code>fill</code> argument to <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">grid::gpar()</a></code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Found, while prototyping <code><a href="shape_stroke.html">shape_stroke()</a></code>'s interior texture, to be a
+substantially better fit than <code><a href="fill_scribble.html">fill_scribble()</a></code> for a curved stroke's
+body – <code><a href="fill_scribble.html">fill_scribble()</a></code>'s fixed horizontal/vertical direction doesn't
+track a curved path's own tangent (see the "Deferred: arbitrary angle
+for <code><a href="fill_scribble.html">fill_scribble()</a></code>" item in <code>.agents/PLAN.md</code>), producing hatching
+that visibly cuts across the stroke at odd angles wherever the path
+bends, while <code><a href="fill_noise.html">fill_noise()</a></code>'s directionless mottling has no orientation
+to clash with the curve.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

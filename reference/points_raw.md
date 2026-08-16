@@ -15,14 +15,7 @@ scatter, `points_raws()` takes them as a
 [`list()`](https://rdrr.io/r/base/list.html) of numeric vectors instead
 – one vector per scatter – which is most useful for giving several
 distinct scatters different `style` arguments (e.g. a different `color`
-each). Every other argument may be a plain vector, recycled against
-`x`/`y` via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `points_raw()` per list element/recycled row, rather than
-a single drawable.
+each).
 
 ## Usage
 
@@ -68,6 +61,14 @@ For `points_raws()`, a
 `geometry` documentation and `geometry_grob()`'s internal dispatch
 (`R/draw.R`) for why a `"points"` geometry has no line to stroke and no
 interior to fill. Only `style@color` is used, as the marker colour.
+
+Every other argument may be a plain vector, recycled against `x`/`y` via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `points_raw()` per list element/recycled row, rather than
+a single drawable.
 
 ## Examples
 

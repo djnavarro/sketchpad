@@ -10,13 +10,7 @@ according to Perlin/simplex noise generated with ambient.
 `shape_blobs()` is a vectorized version of `shape_blob()`: each argument
 may be a vector, recycled against the others via
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). A shared
-`distortion`
-[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
-is automatically recycled across every blob; pass a
-[`list()`](https://rdrr.io/r/base/list.html) of several different
-`noise_field`s instead to vary it per blob. The result is a
+vctrs-based rules. The result is a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
 one `shape_blob()` per recycled row, rather than a single drawable.
 
@@ -90,6 +84,15 @@ A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
 
 For `shape_blobs()`, a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
+## Details
+
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. A shared `distortion`
+[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
+is automatically recycled across every blob; pass a
+[`list()`](https://rdrr.io/r/base/list.html) of several different
+`noise_field`s instead to vary it per blob.
 
 ## See also
 

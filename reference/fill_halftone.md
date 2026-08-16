@@ -4,22 +4,7 @@
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)'s
 other variant: instead of scattering dots of one fixed size, each dot's
 radius is drawn uniformly at random from `radius`, giving a mottled
-halftone-print look rather than a uniform stipple. Like
-[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)
-(and unlike
-[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)),
-it scatters plain
-[`grid::circleGrob()`](https://rdrr.io/r/grid/grid.circle.html)s, so
-it's immune to the *polygon*-specific rendering problems documented at
-[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)
-– but it shares
-[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)'s
-own, separate "Known rendering risk with multiple dots" (repeated tiles
-containing several `circleGrob`s were, in testing, sometimes visibly
-distorted on this package's development R build; see that section for
-details). There is no known way to avoid this while still getting a
-genuine scattered-dot texture, so **check rendered output visually**
-here too.
+halftone-print look rather than a uniform stipple.
 
 ## Usage
 
@@ -80,6 +65,23 @@ use as the `fill` argument to
 [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html).
 
 ## Details
+
+Like
+[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)
+(and unlike
+[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)),
+it scatters plain
+[`grid::circleGrob()`](https://rdrr.io/r/grid/grid.circle.html)s, so
+it's immune to the *polygon*-specific rendering problems documented at
+[`fill_scatter()`](https://sketchpad.djnavarro.net/reference/fill_scatter.md)
+– but it shares
+[`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md)'s
+own, separate "Known rendering risk with multiple dots" (repeated tiles
+containing several `circleGrob`s were, in testing, sometimes visibly
+distorted on this package's development R build; see that section for
+details). There is no known way to avoid this while still getting a
+genuine scattered-dot texture, so **check rendered output visually**
+here too.
 
 As with
 [`fill_stipple()`](https://sketchpad.djnavarro.net/reference/fill_stipple.md),

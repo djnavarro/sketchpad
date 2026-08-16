@@ -7,29 +7,12 @@ path alone, with no ribbon width: an open
 polyline between `(x, y)` and `(xend, yend)`, displaced away from a
 straight line by a
 [noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md),
-giving a wandering, twisted appearance. Where
-[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
-also modulates a filled ribbon's width along this same kind of path (via
-a separate `distortion`
-[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)),
-`curve_twist()` has no width or fill at all – just the displaced
-backbone itself, rendered as an open
-[`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html)
-(`geometry = "path"`). Shares its path computation with
-[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
-via the internal `twisted_path_points()` helper (`R/shape_twist.R`)
-rather than duplicating it.
+giving a wandering, twisted appearance.
 
 `curve_twists()` is a vectorized version of `curve_twist()`: each
 argument may be a vector, recycled against the others via
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). A shared
-`path_distortion`
-[noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md)
-is automatically recycled across every path; pass a
-[`list()`](https://rdrr.io/r/base/list.html) of several different
-`noise_bridge`s instead to vary it per path. The result is a
+vctrs-based rules. The result is a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
 one `curve_twist()` per recycled row, rather than a single drawable.
 
@@ -110,6 +93,19 @@ For `curve_twists()`, a
 
 ## Details
 
+Where
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+also modulates a filled ribbon's width along this same kind of path (via
+a separate `distortion`
+[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)),
+`curve_twist()` has no width or fill at all – just the displaced
+backbone itself, rendered as an open
+[`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html)
+(`geometry = "path"`). Shares its path computation with
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)
+via the internal `twisted_path_points()` helper (`R/shape_twist.R`)
+rather than duplicating it.
+
 `style@fill` has no effect for `curve_twist()` – see
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)'s
 `geometry` documentation for why `"path"` geometries have no interior to
@@ -117,6 +113,13 @@ fill. Passing `fill` via `...` is still accepted (it's simply ignored at
 draw time), since
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md) is
 shared across every `geometry`.
+
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. A shared `path_distortion`
+[noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md)
+is automatically recycled across every path; pass a
+[`list()`](https://rdrr.io/r/base/list.html) of several different
+`noise_bridge`s instead to vary it per path.
 
 ## See also
 

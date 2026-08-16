@@ -8,13 +8,9 @@ computed as evenly spaced points around the circumference, generalizing
 (which is a `shape_ellipse` with equal radii in both directions).
 
 `shape_ellipses()` is a vectorized version of `shape_ellipse()`: each
-argument may be a vector, recycled against the others via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `shape_ellipse()` per recycled row, rather than a single
-drawable.
+argument may be a vector, recycled against the others. The result is a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
+one `shape_ellipse()` per recycled row, rather than a single drawable.
 
 ## Usage
 
@@ -72,6 +68,13 @@ A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
 
 For `shape_ellipses()`, a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
+## Details
+
+Recycling uses
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules: any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error.
 
 ## See also
 

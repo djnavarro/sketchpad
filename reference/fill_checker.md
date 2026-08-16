@@ -2,16 +2,7 @@
 
 `fill_checker()` builds a
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) fill value
-that renders a two-colour checkerboard. It's the cheapest member of the
-hatch family to build: a checkerboard square has no direction the way a
-hatch line does (compare
-[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
-corner-to-corner diagonal, needed specifically to tile a *sloped* line
-seamlessly), so the tile content here is just four plain quadrant
-rectangles – the same two-colour-grid special case
-[`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)
-already falls back to when `angle` is a multiple of 90 degrees, pulled
-out into its own helper.
+that renders a two-colour checkerboard.
 
 ## Usage
 
@@ -54,6 +45,16 @@ use as the `fill` argument to
 [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html).
 
 ## Details
+
+It's the cheapest member of the hatch family to build: a checkerboard
+square has no direction the way a hatch line does (compare
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+corner-to-corner diagonal, needed specifically to tile a *sloped* line
+seamlessly), so the tile content here is just four plain quadrant
+rectangles – the same two-colour-grid special case
+[`fill_crosshatch()`](https://sketchpad.djnavarro.net/reference/fill_crosshatch.md)
+already falls back to when `angle` is a multiple of 90 degrees, pulled
+out into its own helper.
 
 As with the other `fill_*()` helpers,
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) tiles are

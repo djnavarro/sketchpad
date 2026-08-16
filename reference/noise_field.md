@@ -7,17 +7,6 @@ noise function and fractal combinator to use
 `noise`/`fractal` arguments), how coarse or fine the field is
 (`frequency`), how many octaves of detail to layer (`octaves`), and
 which `seed` to draw from.
-[`noise_sample()`](https://sketchpad.djnavarro.net/reference/noise_sample.md)
-evaluates a `noise_field` at a set of positions and rescales the result
-into a target range – the operation shared by
-[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)'s
-radius perturbation and
-[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)'s
-width modulation, factored out here so it isn't duplicated across those
-three constructors, and so the noise/fractal functions themselves are
-configurable rather than hardcoded to
-[`ambient::gen_simplex()`](https://ambient.data-imaginist.com/reference/noise_simplex.html)/
-[`ambient::fbm()`](https://ambient.data-imaginist.com/reference/fbm.html).
 
 ## Usage
 
@@ -65,6 +54,20 @@ noise_field(
 - seed:
 
   Integer seed for the noise field. Default `1L`.
+
+## Details
+
+[`noise_sample()`](https://sketchpad.djnavarro.net/reference/noise_sample.md)
+evaluates a `noise_field` at a set of positions and rescales the result
+into a target range – the operation shared by
+[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md)'s
+radius perturbation and
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/
+[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)'s
+width modulation, factored out here so it isn't duplicated across those
+three constructors, and so the noise/fractal functions themselves are
+configurable rather than hardcoded to
+[`ambient::gen_simplex()`](https://ambient.data-imaginist.com/reference/noise_simplex.html)/[`ambient::fbm()`](https://ambient.data-imaginist.com/reference/fbm.html).
 
 ## See also
 

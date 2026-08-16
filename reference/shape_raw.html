@@ -6,24 +6,14 @@ It is most often produced by convert()ing a more complex drawable
 shape_raws() is a vectorized version of shape_raw(). Since x/y
 are themselves numeric vectors of vertex coordinates for a single
 polygon, shape_raws() takes them as a list() of numeric vectors
-instead – one vector of vertices per shape. Every other argument may
-be a plain vector, recycled against x/y via purrr::pmap()'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result
-is a sketch containing one shape_raw() per list element/recycled
-row, rather than a single drawable."><meta property="og:description" content="shape_raw is the simplest drawable: the user supplies x and y
+instead – one vector of vertices per shape."><meta property="og:description" content="shape_raw is the simplest drawable: the user supplies x and y
 coordinates directly, and points is computed trivially from them.
 It is most often produced by convert()ing a more complex drawable
 (e.g. a shape_blob or shape_twist) down to its raw vertices.
 shape_raws() is a vectorized version of shape_raw(). Since x/y
 are themselves numeric vectors of vertex coordinates for a single
 polygon, shape_raws() takes them as a list() of numeric vectors
-instead – one vector of vertices per shape. Every other argument may
-be a plain vector, recycled against x/y via purrr::pmap()'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result
-is a sketch containing one shape_raw() per list element/recycled
-row, rather than a single drawable."></head><body>
+instead – one vector of vertices per shape."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -70,12 +60,7 @@ It is most often produced by <code><a href="https://rconsortium.github.io/S7/ref
 <p><code>shape_raws()</code> is a vectorized version of <code>shape_raw()</code>. Since <code>x</code>/<code>y</code>
 are themselves numeric vectors of vertex coordinates for a single
 polygon, <code>shape_raws()</code> takes them as a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of numeric vectors
-instead – one vector of vertices per shape. Every other argument may
-be a plain vector, recycled against <code>x</code>/<code>y</code> via <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result
-is a <a href="sketch.html">sketch</a> containing one <code>shape_raw()</code> per list element/recycled
-row, rather than a single drawable.</p>
+instead – one vector of vertices per shape.</p>
     </div>
 
     <div class="section level2">
@@ -108,6 +93,15 @@ Default <code><a href="trans_identity.html">trans_identity()</a></code> (no tran
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="drawable.html">drawable</a>.</p>
 <p>For <code>shape_raws()</code>, a <a href="sketch.html">sketch</a>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Every other argument may be a plain vector, recycled against <code>x</code>/<code>y</code>
+via <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a <a href="sketch.html">sketch</a> containing one
+<code>shape_raw()</code> per list element/recycled row, rather than a single
+drawable.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

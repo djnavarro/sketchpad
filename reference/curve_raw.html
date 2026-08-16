@@ -11,12 +11,7 @@ drawable's computed points, the same role shape_raw plays for
 curve_raws() is a vectorized version of curve_raw(). Since x/y
 are themselves numeric vectors of vertex coordinates for a single
 path, curve_raws() takes them as a list() of numeric vectors
-instead – one vector of vertices per path. Every other argument may
-be a plain vector, recycled against x/y via purrr::pmap()'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result
-is a sketch containing one curve_raw() per list element/recycled
-row, rather than a single drawable."><meta property="og:description" content="curve_raw is shape_raw's &quot;path&quot;-geometry analog: the user supplies
+instead – one vector of vertices per path."><meta property="og:description" content="curve_raw is shape_raw's &quot;path&quot;-geometry analog: the user supplies
 x/y coordinates directly, connected by straight segments in the
 order given, with no smoothing, resampling, or implicit closing edge.
 Unlike curve_line() (which requires at least two control points, since
@@ -28,12 +23,7 @@ drawable's computed points, the same role shape_raw plays for
 curve_raws() is a vectorized version of curve_raw(). Since x/y
 are themselves numeric vectors of vertex coordinates for a single
 path, curve_raws() takes them as a list() of numeric vectors
-instead – one vector of vertices per path. Every other argument may
-be a plain vector, recycled against x/y via purrr::pmap()'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result
-is a sketch containing one curve_raw() per list element/recycled
-row, rather than a single drawable."></head><body>
+instead – one vector of vertices per path."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -85,12 +75,7 @@ drawable's computed points, the same role <a href="shape_raw.html">shape_raw</a>
 <p><code>curve_raws()</code> is a vectorized version of <code>curve_raw()</code>. Since <code>x</code>/<code>y</code>
 are themselves numeric vectors of vertex coordinates for a single
 path, <code>curve_raws()</code> takes them as a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of numeric vectors
-instead – one vector of vertices per path. Every other argument may
-be a plain vector, recycled against <code>x</code>/<code>y</code> via <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result
-is a <a href="sketch.html">sketch</a> containing one <code>curve_raw()</code> per list element/recycled
-row, rather than a single drawable.</p>
+instead – one vector of vertices per path.</p>
     </div>
 
     <div class="section level2">
@@ -130,6 +115,12 @@ Default <code><a href="trans_identity.html">trans_identity()</a></code> (no tran
 <code>geometry</code> documentation for why <code>"path"</code> geometries have no interior to
 fill. Passing <code>fill</code> via <code>...</code> is still accepted (it's simply ignored at
 draw time), since <code><a href="style.html">style()</a></code> is shared across every <code>geometry</code>.</p>
+<p>Every other argument may be a plain vector, recycled against <code>x</code>/<code>y</code>
+via <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a <a href="sketch.html">sketch</a> containing one
+<code>curve_raw()</code> per list element/recycled row, rather than a single
+drawable.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

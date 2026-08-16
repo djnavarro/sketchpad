@@ -4,21 +4,12 @@
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
 defined by a centroid and a radius; its vertices are `n` evenly spaced
 points around the circumference, giving a regular n-gon (e.g. `n = 3` a
-triangle, `n = 6` a hexagon). Unlike
-[`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)/[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
-`points` does not repeat its first vertex at the end – there are exactly
-`n` distinct vertices, since
-[`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html) closes
-the path itself and a polygon has no approximation error to hide.
+triangle, `n = 6` a hexagon).
 
 `shape_polygons()` is a vectorized version of `shape_polygon()`: each
-argument may be a vector, recycled against the others via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `shape_polygon()` per recycled row, rather than a single
-drawable.
+argument may be a vector, recycled against the others. The result is a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
+one `shape_polygon()` per recycled row, rather than a single drawable.
 
 ## Usage
 
@@ -60,6 +51,20 @@ A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
 
 For `shape_polygons()`, a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
+## Details
+
+Unlike
+[`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)/[`shape_blob()`](https://sketchpad.djnavarro.net/reference/shape_blob.md),
+`points` does not repeat its first vertex at the end – there are exactly
+`n` distinct vertices, since
+[`grid::polygonGrob()`](https://rdrr.io/r/grid/grid.polygon.html) closes
+the path itself and a polygon has no approximation error to hide.
+
+Recycling uses
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules: any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error.
 
 ## See also
 

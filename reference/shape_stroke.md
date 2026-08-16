@@ -3,38 +3,17 @@
 `shape_stroke` is a
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
 polygon that follows an arbitrary open path through `(x, y)` control
-points (resampled to `n` evenly arc-length-spaced points, unlike
-[`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md)'s
-exact control-point vertices), offset into a ribbon whose width tapers
-to zero at both ends and varies along its length according to a
+points, offset into a ribbon whose width tapers to zero at both ends and
+varies along its length according to a
 [noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
 – intended as a "pressure" curve, giving the outline an ink/brush-stroke
-look rather than a constant-width line. It generalizes
-[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
-from a single straight segment to any path, at the cost of computing a
-true per-point unit normal (via the internal `stroke_normals()` helper)
-rather than
-[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)'s
-shared single offset direction – necessary once the path can genuinely
-curve, not just wander slightly off straight.
+look rather than a constant-width line.
 
 `shape_strokes()` is a vectorized version of `shape_stroke()`. Since
 `x`/`y` are themselves numeric vectors of control points for a single
 stroke, `shape_strokes()` takes them as a
 [`list()`](https://rdrr.io/r/base/list.html) of numeric vectors instead
-– one vector of control points per stroke. Every other argument may be a
-plain vector, recycled against `x`/`y` via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). A shared
-`distortion`
-[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
-is automatically recycled across every stroke; pass a
-[`list()`](https://rdrr.io/r/base/list.html) of several different
-`noise_field`s instead to vary it per stroke. The result is a
-[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
-one `shape_stroke()` per list element/recycled row, rather than a single
-drawable.
+– one vector of control points per stroke.
 
 ## Usage
 
@@ -106,6 +85,17 @@ For `shape_strokes()`, a
 
 ## Details
 
+The path is resampled to `n` evenly arc-length-spaced points (unlike
+[`curve_line()`](https://sketchpad.djnavarro.net/reference/curve_line.md)'s
+exact control-point vertices). This generalizes
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)
+from a single straight segment to any path, at the cost of computing a
+true per-point unit normal (via the internal `stroke_normals()` helper)
+rather than
+[`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)/[`shape_twist()`](https://sketchpad.djnavarro.net/reference/shape_twist.md)'s
+shared single offset direction – necessary once the path can genuinely
+curve, not just wander slightly off straight.
+
 Unlike
 [`shape_ribbon()`](https://sketchpad.djnavarro.net/reference/shape_ribbon.md)'s
 own taper (which peaks at `0.5`, an undocumented quirk of its
@@ -121,6 +111,19 @@ own no-smoothing convention. A `shape_stroke()` built from only a few
 widely-spaced control points will still have visibly angular corners;
 supply a denser `x`/`y` (e.g. points already sampled from some smooth
 function) for a smoothly curving stroke.
+
+Every other argument may be a plain vector, recycled against `x`/`y` via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). A shared
+`distortion`
+[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
+is automatically recycled across every stroke; pass a
+[`list()`](https://rdrr.io/r/base/list.html) of several different
+`noise_field`s instead to vary it per stroke. The result is a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
+one `shape_stroke()` per list element/recycled row, rather than a single
+drawable.
 
 ## See also
 

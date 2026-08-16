@@ -12,12 +12,7 @@ via the ordinary
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)/`geometry_grob()`
 path, but by compositing a rasterised paper-grain texture and masking it
 to the outline's exact polygon shape via
-[`grid::as.mask()`](https://rdrr.io/r/grid/as.mask.html) – the same
-masking technique
-[`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
-already uses for its own radial fade, but applied to `object`'s own real
-(possibly concave, tapering-to-a-point) silhouette rather than a
-synthetic circle drawn purely to build the mask.
+[`grid::as.mask()`](https://rdrr.io/r/grid/as.mask.html).
 
 ## Usage
 
@@ -82,6 +77,12 @@ effect_grain(
 An `effect_grain` object.
 
 ## Details
+
+This is the same masking technique
+[`fill_vignette()`](https://sketchpad.djnavarro.net/reference/fill_vignette.md)
+already uses for its own radial fade, but applied to `object`'s own real
+(possibly concave, tapering-to-a-point) silhouette rather than a
+synthetic circle drawn purely to build the mask.
 
 This is a different effect than filling `object` with
 [`fill_charcoal()`](https://sketchpad.djnavarro.net/reference/fill_charcoal.md)/[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)

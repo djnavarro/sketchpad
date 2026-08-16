@@ -14,14 +14,7 @@ down to its raw vertices.
 are themselves numeric vectors of vertex coordinates for a single
 polygon, `shape_raws()` takes them as a
 [`list()`](https://rdrr.io/r/base/list.html) of numeric vectors instead
-– one vector of vertices per shape. Every other argument may be a plain
-vector, recycled against `x`/`y` via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `shape_raw()` per list element/recycled row, rather than
-a single drawable.
+– one vector of vertices per shape.
 
 ## Usage
 
@@ -57,6 +50,16 @@ A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
 
 For `shape_raws()`, a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
+## Details
+
+Every other argument may be a plain vector, recycled against `x`/`y` via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `shape_raw()` per list element/recycled row, rather than
+a single drawable.
 
 ## See also
 

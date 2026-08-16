@@ -1,14 +1,7 @@
 # A set of locations in 2D space
 
 `xy` represents a collection of locations in two-dimensional space as
-parallel `x` and `y` coordinate vectors. Most
-[drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
-subclasses expose their geometry as a computed `points` property of
-class `xy`;
-[shape_raw](https://sketchpad.djnavarro.net/reference/shape_raw.md) is
-the exception, where the user supplies `x`/`y` directly. Named `xy`
-rather than `points` so this exported constructor doesn't mask
-[`graphics::points()`](https://rdrr.io/r/graphics/points.html).
+parallel `x` and `y` coordinate vectors.
 
 ## Usage
 
@@ -25,6 +18,16 @@ xy(x = integer(0), y = integer(0))
 - y:
 
   Numeric vector of y coordinates.
+
+## Details
+
+Most [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
+subclasses expose their geometry as a computed `points` property of
+class `xy`;
+[shape_raw](https://sketchpad.djnavarro.net/reference/shape_raw.md) is
+the exception, where the user supplies `x`/`y` directly. Named `xy`
+rather than `points` so this exported constructor doesn't mask
+[`graphics::points()`](https://rdrr.io/r/graphics/points.html).
 
 ## See also
 

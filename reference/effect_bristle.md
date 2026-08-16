@@ -3,14 +3,7 @@
 `effect_bristle()` builds a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md) of
 `n_bristles` copies of a template drawable, fanned out perpendicular to
-its own backbone path – like
-[`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md),
-no single drawable can express this by itself, since a dry-brush look
-comes from several independently-frayed, independently wobbling strands
-laid side by side, not one stroke. Each bristle is a copy of `object`
-(via
-[`S7::set_props()`](https://rconsortium.github.io/S7/reference/props.html))
-that:
+its own backbone path.
 
 ## Usage
 
@@ -88,6 +81,15 @@ A [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
 containing `n_bristles` drawables.
 
 ## Details
+
+Like
+[`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md),
+no single drawable can express this by itself, since a dry-brush look
+comes from several independently-frayed, independently wobbling strands
+laid side by side, not one stroke. Each bristle is a copy of `object`
+(via
+[`S7::set_props()`](https://rconsortium.github.io/S7/reference/props.html))
+that:
 
 - is offset from the backbone by a fixed perpendicular distance (via the
   same per-point unit normal

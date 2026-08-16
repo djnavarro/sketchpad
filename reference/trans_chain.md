@@ -17,11 +17,7 @@ a [trans](https://sketchpad.djnavarro.net/reference/trans.md) or
 applied in sequence – `steps[[1]]` first, `steps[[length(steps)]]` last
 – exactly like chained `+` calls on a
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md) would
-suggest. Two consecutive
-[trans](https://sketchpad.djnavarro.net/reference/trans.md) (affine)
-steps are *not* automatically collapsed into one matrix when they're
-already part of a chain (only a bare `trans + trans` collapses); this
-only costs a little efficiency, not correctness.
+suggest.
 
 ## Usage
 
@@ -36,6 +32,14 @@ trans_chain(steps = list())
   A list of
   [trans](https://sketchpad.djnavarro.net/reference/trans.md)/[trans_warp](https://sketchpad.djnavarro.net/reference/trans_warp.md)/`trans_chain`
   objects.
+
+## Details
+
+Two consecutive
+[trans](https://sketchpad.djnavarro.net/reference/trans.md) (affine)
+steps are *not* automatically collapsed into one matrix when they're
+already part of a chain (only a bare `trans + trans` collapses); this
+only costs a little efficiency, not correctness.
 
 ## See also
 

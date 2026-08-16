@@ -4,23 +4,13 @@
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md) whose
 path connects an arbitrary number of control points `(x, y)` with
 straight segments, in order. With two control points this is a single
-line segment; with more, an open polyline. Unlike
-[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)/[`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
-the control points are not smoothed or resampled – `points` is exactly
-`(x, y)`, so there is no `n` argument.
+line segment; with more, an open polyline.
 
 `curve_lines()` is a vectorized version of `curve_line()`. Since `x`/`y`
 are themselves numeric vectors of control points for a single polyline,
 `curve_lines()` takes them as a
 [`list()`](https://rdrr.io/r/base/list.html) of numeric vectors instead
-– one vector of control points per polyline. Every other argument may be
-a plain vector, recycled against `x`/`y` via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `curve_line()` per list element/recycled row, rather than
-a single drawable.
+– one vector of control points per polyline.
 
 ## Usage
 
@@ -60,6 +50,11 @@ For `curve_lines()`, a
 
 ## Details
 
+Unlike
+[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md)/[`shape_bezier()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md),
+the control points are not smoothed or resampled – `points` is exactly
+`(x, y)`, so there is no `n` argument.
+
 `style@fill` has no effect for `curve_line()` – see
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)'s
 `geometry` documentation for why `"path"` geometries have no interior to
@@ -67,6 +62,14 @@ fill. Passing `fill` via `...` is still accepted (it's simply ignored at
 draw time), since
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md) is
 shared across every `geometry`.
+
+Every other argument may be a plain vector, recycled against `x`/`y` via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `curve_line()` per list element/recycled row, rather than
+a single drawable.
 
 ## See also
 

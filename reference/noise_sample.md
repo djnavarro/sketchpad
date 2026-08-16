@@ -1,16 +1,7 @@
 # Sample a noise object
 
 `noise_sample()` evaluates a noise object at a set of positions and
-returns the (typically rescaled) sampled values. It is an S7 generic
-dispatching on `field`; each concrete noise class implements its own
-method, since what "a position" means differs by class – a
-[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
-is sampled at arbitrary `(x, y)` coordinates in the plane, matching
-[`ambient::fracture()`](https://ambient.data-imaginist.com/reference/fracture.html)'s
-own interface, while a
-[noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md)
-instead samples by point count alone, with no `(x, y)` positions
-involved.
+returns the (typically rescaled) sampled values.
 
 ## Usage
 
@@ -32,6 +23,19 @@ noise_sample(field, ...)
 ## Value
 
 A numeric vector.
+
+## Details
+
+It is an S7 generic dispatching on `field`; each concrete noise class
+implements its own method, since what "a position" means differs by
+class – a
+[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
+is sampled at arbitrary `(x, y)` coordinates in the plane, matching
+[`ambient::fracture()`](https://ambient.data-imaginist.com/reference/fracture.html)'s
+own interface, while a
+[noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md)
+instead samples by point count alone, with no `(x, y)` positions
+involved.
 
 ## See also
 

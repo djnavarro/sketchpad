@@ -6,19 +6,7 @@ preset – same field, same rendering, just different defaults – tuned to
 read as hand-drawn charcoal or marker grain rather than
 [`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)'s
 more general-purpose rasterized field: a lighter base tone, finer/denser
-tiling, and finer noise detail. Found, while prototyping
-[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)'s
-interior texture, to be a substantially better fit than
-[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)
-for a curved stroke's body –
-[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)'s
-fixed horizontal/vertical direction doesn't track a curved path's own
-tangent (see the "Deferred: arbitrary angle for
-[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)"
-item in `.agents/PLAN.md`), producing hatching that visibly cuts across
-the stroke at odd angles wherever the path bends, while
-[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)'s
-directionless mottling has no orientation to clash with the curve.
+tiling, and finer noise detail.
 
 ## Usage
 
@@ -100,6 +88,22 @@ A pattern object as returned by
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html), suitable for
 use as the `fill` argument to
 [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html).
+
+## Details
+
+Found, while prototyping
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)'s
+interior texture, to be a substantially better fit than
+[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)
+for a curved stroke's body –
+[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)'s
+fixed horizontal/vertical direction doesn't track a curved path's own
+tangent (see the "Deferred: arbitrary angle for
+[`fill_scribble()`](https://sketchpad.djnavarro.net/reference/fill_scribble.md)"
+item in `.agents/PLAN.md`), producing hatching that visibly cuts across
+the stroke at odd angles wherever the path bends, while
+[`fill_noise()`](https://sketchpad.djnavarro.net/reference/fill_noise.md)'s
+directionless mottling has no orientation to clash with the curve.
 
 ## See also
 

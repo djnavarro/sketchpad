@@ -4,20 +4,12 @@
 [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
 defined by a centroid, a radius, and a `start`/`end` angle (in radians):
 its outline is the centroid, followed by `n` points along the circular
-arc from `start` to `end`. `grid`'s own polygon closing then draws the
-final straight edge back from the arc's last point to the centroid,
-giving the familiar pie-slice/wedge shape.
-[`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md)
-is the arc alone, with no centroid vertex or fill.
+arc from `start` to `end`.
 
 `shape_wedges()` is a vectorized version of `shape_wedge()`: each
-argument may be a vector, recycled against the others via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `shape_wedge()` per recycled row, rather than a single
-drawable.
+argument may be a vector, recycled against the others. The result is a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
+one `shape_wedge()` per recycled row, rather than a single drawable.
 
 ## Usage
 
@@ -82,6 +74,19 @@ A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
 
 For `shape_wedges()`, a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
+## Details
+
+`grid`'s own polygon closing then draws the final straight edge back
+from the arc's last point to the centroid, giving the familiar
+pie-slice/wedge shape.
+[`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md)
+is the arc alone, with no centroid vertex or fill.
+
+Recycling uses
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules: any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error.
 
 ## See also
 

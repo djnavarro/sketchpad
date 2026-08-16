@@ -5,12 +5,7 @@
 outline follows a Bezier curve defined by an arbitrary number of control
 points (`x`, `y`). With two control points this is a straight line; with
 four, a cubic Bezier of the kind used to build ribbons and other flowing
-shapes. Since
-[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) renders
-every `"polygon"`-geometry `drawable`'s `points` as a closed polygon,
-the curve is implicitly closed from its last control point back to its
-first – for an open Bezier curve/path instead, see
-[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md).
+shapes.
 
 `shape_beziers()` is a vectorized version of `shape_bezier()`. Since
 `x`/`y` are themselves numeric vectors of control points for a single
@@ -19,14 +14,7 @@ curve, `shape_beziers()` takes them as a
 – one vector of control points per shape – rather than a bare vector
 (which
 [`shape_circles()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)-style
-constructors use for a plain per-shape scalar). Every other argument may
-be a plain vector, recycled against `x`/`y` via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `shape_bezier()` per list element/recycled row, rather
-than a single drawable.
+constructors use for a plain per-shape scalar).
 
 ## Usage
 
@@ -67,6 +55,22 @@ A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
 
 For `shape_beziers()`, a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
+## Details
+
+Since [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)
+renders every `"polygon"`-geometry `drawable`'s `points` as a closed
+polygon, the curve is implicitly closed from its last control point back
+to its first – for an open Bezier curve/path instead, see
+[`curve_bezier()`](https://sketchpad.djnavarro.net/reference/curve_bezier.md).
+
+Every other argument may be a plain vector, recycled against `x`/`y` via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `shape_bezier()` per list element/recycled row, rather
+than a single drawable.
 
 ## See also
 

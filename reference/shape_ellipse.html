@@ -4,20 +4,16 @@ radii; its vertices are computed as evenly spaced points around the
 circumference, generalizing shape_circle() (which is a shape_ellipse
 with equal radii in both directions).
 shape_ellipses() is a vectorized version of shape_ellipse(): each
-argument may be a vector, recycled against the others via
-purrr::pmap()'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a sketch containing one
-shape_ellipse() per recycled row, rather than a single drawable."><meta property="og:description" content="shape_ellipse is a drawable defined by a centroid and independent x/y
+argument may be a vector, recycled against the others. The result is a
+sketch containing one shape_ellipse() per recycled row, rather than
+a single drawable."><meta property="og:description" content="shape_ellipse is a drawable defined by a centroid and independent x/y
 radii; its vertices are computed as evenly spaced points around the
 circumference, generalizing shape_circle() (which is a shape_ellipse
 with equal radii in both directions).
 shape_ellipses() is a vectorized version of shape_ellipse(): each
-argument may be a vector, recycled against the others via
-purrr::pmap()'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a sketch containing one
-shape_ellipse() per recycled row, rather than a single drawable."></head><body>
+argument may be a vector, recycled against the others. The result is a
+sketch containing one shape_ellipse() per recycled row, rather than
+a single drawable."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -62,11 +58,9 @@ radii; its vertices are computed as evenly spaced points around the
 circumference, generalizing <code><a href="shape_circle.html">shape_circle()</a></code> (which is a <code>shape_ellipse</code>
 with equal radii in both directions).</p>
 <p><code>shape_ellipses()</code> is a vectorized version of <code>shape_ellipse()</code>: each
-argument may be a vector, recycled against the others via
-<code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). The result is a <a href="sketch.html">sketch</a> containing one
-<code>shape_ellipse()</code> per recycled row, rather than a single drawable.</p>
+argument may be a vector, recycled against the others. The result is a
+<a href="sketch.html">sketch</a> containing one <code>shape_ellipse()</code> per recycled row, rather than
+a single drawable.</p>
     </div>
 
     <div class="section level2">
@@ -122,6 +116,12 @@ Default <code><a href="trans_identity.html">trans_identity()</a></code> (no tran
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="drawable.html">drawable</a>.</p>
 <p>For <code>shape_ellipses()</code>, a <a href="sketch.html">sketch</a>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Recycling uses <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules: any length-1
+element is broadcast to the common length; mismatched lengths greater
+than 1 raise an error.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

@@ -8,15 +8,7 @@ line, giving the polygon a wandering, twisted appearance.
 `shape_twists()` is a vectorized version of `shape_twist()`: each
 argument may be a vector, recycled against the others via
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). A shared
-`path_distortion`/`distortion` is automatically recycled across every
-twist; pass a [`list()`](https://rdrr.io/r/base/list.html) of several
-different
-[noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md)/[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
-objects instead to vary either per twist – as in `README.Rmd`'s "Twists"
-example, which gives every twist the same `path_distortion` this way.
-The result is a
+vctrs-based rules. The result is a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
 one `shape_twist()` per recycled row, rather than a single drawable.
 
@@ -100,6 +92,17 @@ A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
 
 For `shape_twists()`, a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
+## Details
+
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. A shared
+`path_distortion`/`distortion` is automatically recycled across every
+twist; pass a [`list()`](https://rdrr.io/r/base/list.html) of several
+different
+[noise_bridge](https://sketchpad.djnavarro.net/reference/noise_bridge.md)/[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
+objects instead to vary either per twist – as in `README.Rmd`'s "Twists"
+example, which gives every twist the same `path_distortion` this way.
 
 ## See also
 

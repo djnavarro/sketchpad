@@ -6,13 +6,9 @@ defined by a centroid and a radius; its vertices are computed as evenly
 spaced points around the circumference.
 
 `shape_circles()` is a vectorized version of `shape_circle()`: each
-argument may be a vector, recycled against the others via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `shape_circle()` per recycled row, rather than a single
-drawable.
+argument may be a vector, recycled against the others. The result is a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
+one `shape_circle()` per recycled row, rather than a single drawable.
 
 ## Usage
 
@@ -61,6 +57,13 @@ A [drawable](https://sketchpad.djnavarro.net/reference/drawable.md).
 
 For `shape_circles()`, a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md).
+
+## Details
+
+Recycling uses
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules: any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error.
 
 ## See also
 

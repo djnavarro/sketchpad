@@ -3,15 +3,7 @@
 `fill_crosshatch()` builds a
 [`grid::pattern()`](https://rdrr.io/r/grid/patterns.html) fill value
 that renders two mirror-symmetric hatch lines, at `angle` and `-angle`,
-forming an "X" inside each tile. It shares
-[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
-tile-shape technique: both lines are drawn as the two corner-to-corner
-diagonals of a single rectangular tile (rather than at an arbitrary
-baked-in slope), so both tile seamlessly under `extend = "repeat"`, and
-the tile's `width`/`height` ratio – not the diagonals' own coordinates –
-determines the rendered angle. See
-[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
-details for why this matters.
+forming an "X" inside each tile.
 
 ## Usage
 
@@ -64,6 +56,16 @@ use as the `fill` argument to
 [`grid::gpar()`](https://rdrr.io/r/grid/gpar.html).
 
 ## Details
+
+It shares
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+tile-shape technique: both lines are drawn as the two corner-to-corner
+diagonals of a single rectangular tile (rather than at an arbitrary
+baked-in slope), so both tile seamlessly under `extend = "repeat"`, and
+the tile's `width`/`height` ratio – not the diagonals' own coordinates –
+determines the rendered angle. See
+[`fill_hatch()`](https://sketchpad.djnavarro.net/reference/fill_hatch.md)'s
+details for why this matters.
 
 Because both lines share one tile shape, they are only *perpendicular*
 when `angle = 45` (the classic crosshatch look); for other angles the

@@ -19,14 +19,7 @@ plays for `"polygon"`-geometry drawables.
 are themselves numeric vectors of vertex coordinates for a single path,
 `curve_raws()` takes them as a
 [`list()`](https://rdrr.io/r/base/list.html) of numeric vectors instead
-– one vector of vertices per path. Every other argument may be a plain
-vector, recycled against `x`/`y` via
-[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). The result is
-a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing one `curve_raw()` per list element/recycled row, rather than
-a single drawable.
+– one vector of vertices per path.
 
 ## Usage
 
@@ -72,6 +65,14 @@ fill. Passing `fill` via `...` is still accepted (it's simply ignored at
 draw time), since
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md) is
 shared across every `geometry`.
+
+Every other argument may be a plain vector, recycled against `x`/`y` via
+[`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
+vctrs-based rules (any length-1 element is broadcast to the common
+length; mismatched lengths greater than 1 raise an error). The result is
+a [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
+containing one `curve_raw()` per list element/recycled row, rather than
+a single drawable.
 
 ## See also
 

@@ -3,30 +3,12 @@
 `shape_ribbonpath()` builds a tapered, noise-modulated ribbon (like
 [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md))
 whose backbone follows an arbitrary `curve_*()` drawable's own computed
-points, rather than raw `x`/`y` control points. It is a thin wrapper:
-`path@points` is extracted and fed straight into
-[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
-so the object it returns is literally a `shape_stroke` –
-`shape_ribbonpath()` exists only to save the caller from writing
-`shape_stroke(x = path@points@x, y = path@points@y, ...)` by hand, and
-to make the "ribbon around a curve" use case discoverable under its own
-name.
+points, rather than raw `x`/`y` control points.
 
 `shape_ribbonpaths()` is a vectorized version of `shape_ribbonpath()`:
 each argument may be a vector, recycled against the others via
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
-vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). Unlike the
-`x`/`y`-list-column constructors (e.g.
-[`shape_beziers()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)),
-`path` is a single
-[drawable](https://sketchpad.djnavarro.net/reference/drawable.md) object
-per ribbon, not a numeric vector, so a single shared `path` recycles
-automatically across every ribbon (the same way a shared `distortion`
-[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
-already does); pass a [`list()`](https://rdrr.io/r/base/list.html) of
-several different `curve_*()` objects instead to vary the backbone per
-ribbon. The result is a
+vctrs-based rules. The result is a
 [sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
 one `shape_ribbonpath()` per recycled row, rather than a single
 drawable.
@@ -109,6 +91,14 @@ For `shape_ribbonpaths()`, a
 
 ## Details
 
+It is a thin wrapper: `path@points` is extracted and fed straight into
+[`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md),
+so the object it returns is literally a `shape_stroke` –
+`shape_ribbonpath()` exists only to save the caller from writing
+`shape_stroke(x = path@points@x, y = path@points@y, ...)` by hand, and
+to make the "ribbon around a curve" use case discoverable under its own
+name.
+
 Because the result is a `shape_stroke`, its width offset uses a true
 per-point unit normal
 ([`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)'s
@@ -128,6 +118,19 @@ to end point) for the whole ribbon, and its taper formula peaked at
 [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)'s
 true per-point normals and its taper formula (which peaks at `1`, so
 `width` is exactly the maximum rendered width).
+
+Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. Unlike the `x`/`y`-list-column
+constructors (e.g.
+[`shape_beziers()`](https://sketchpad.djnavarro.net/reference/shape_bezier.md)),
+`path` is a single
+[drawable](https://sketchpad.djnavarro.net/reference/drawable.md) object
+per ribbon, not a numeric vector, so a single shared `path` recycles
+automatically across every ribbon (the same way a shared `distortion`
+[noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)
+already does); pass a [`list()`](https://rdrr.io/r/base/list.html) of
+several different `curve_*()` objects instead to vary the backbone per
+ribbon.
 
 ## See also
 

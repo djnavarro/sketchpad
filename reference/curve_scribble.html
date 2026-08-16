@@ -11,10 +11,7 @@ curve_scribbles() is a vectorized version of curve_scribble():
 each argument may be a vector, recycled against the others via
 purrr::pmap()'s own vctrs-based rules (any length-1 element is
 broadcast to the common length; mismatched lengths greater than 1
-raise an error). Varying seed per curve is usually what makes
-several scribbles look distinct from each other. The result is a
-sketch containing one curve_scribble() per recycled row, rather
-than a single drawable."><meta property="og:description" content="curve_scribble is a drawable whose path is a single random wandering
+raise an error)."><meta property="og:description" content="curve_scribble is a drawable whose path is a single random wandering
 line – a random finite sum of sine harmonics – built from the same
 internal scribble_lines() generator that fill_scribble() uses to
 texture a tile's interior, but scaled here into an arbitrary bounding box
@@ -26,10 +23,7 @@ curve_scribbles() is a vectorized version of curve_scribble():
 each argument may be a vector, recycled against the others via
 purrr::pmap()'s own vctrs-based rules (any length-1 element is
 broadcast to the common length; mismatched lengths greater than 1
-raise an error). Varying seed per curve is usually what makes
-several scribbles look distinct from each other. The result is a
-sketch containing one curve_scribble() per recycled row, rather
-than a single drawable."></head><body>
+raise an error)."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -81,10 +75,7 @@ standalone open curve.</p>
 each argument may be a vector, recycled against the others via
 <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules (any length-1 element is
 broadcast to the common length; mismatched lengths greater than 1
-raise an error). Varying <code>seed</code> per curve is usually what makes
-several scribbles look distinct from each other. The result is a
-<a href="sketch.html">sketch</a> containing one <code>curve_scribble()</code> per recycled row, rather
-than a single drawable.</p>
+raise an error).</p>
     </div>
 
     <div class="section level2">
@@ -187,6 +178,9 @@ bottom-to-top instead.</p>
 <code>geometry</code> documentation for why <code>"path"</code> geometries have no interior to
 fill. Passing <code>fill</code> via <code>...</code> is still accepted (it's simply ignored at
 draw time), since <code><a href="style.html">style()</a></code> is shared across every <code>geometry</code>.</p>
+<p>Varying <code>seed</code> per curve is usually what makes several scribbles look
+distinct from each other. The result is a <a href="sketch.html">sketch</a> containing one
+<code>curve_scribble()</code> per recycled row, rather than a single drawable.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

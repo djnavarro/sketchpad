@@ -17,11 +17,7 @@ scatters several such lines across a repeating tile as a texture,
 argument may be a vector, recycled against the others via
 [`purrr::pmap()`](https://purrr.tidyverse.org/reference/pmap.html)'s own
 vctrs-based rules (any length-1 element is broadcast to the common
-length; mismatched lengths greater than 1 raise an error). Varying
-`seed` per curve is usually what makes several scribbles look distinct
-from each other. The result is a
-[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
-one `curve_scribble()` per recycled row, rather than a single drawable.
+length; mismatched lengths greater than 1 raise an error).
 
 ## Usage
 
@@ -130,6 +126,11 @@ fill. Passing `fill` via `...` is still accepted (it's simply ignored at
 draw time), since
 [`style()`](https://sketchpad.djnavarro.net/reference/style.md) is
 shared across every `geometry`.
+
+Varying `seed` per curve is usually what makes several scribbles look
+distinct from each other. The result is a
+[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) containing
+one `curve_scribble()` per recycled row, rather than a single drawable.
 
 ## See also
 

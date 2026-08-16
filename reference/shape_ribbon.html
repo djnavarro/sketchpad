@@ -4,22 +4,14 @@ between (x, y) and (xend, yend), with a width that tapers at both
 ends and varies along its length according to simplex noise.
 shape_ribbons() is a vectorized version of shape_ribbon(): each
 argument may be a vector, recycled against the others via
-purrr::pmap()'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). A shared distortion noise_field is automatically
-recycled across every ribbon; pass a list() of several different
-noise_fields instead to vary it per ribbon. The result is a
+purrr::pmap()'s own vctrs-based rules. The result is a
 sketch containing one shape_ribbon() per recycled row, rather
 than a single drawable."><meta property="og:description" content="shape_ribbon is a drawable polygon that follows a straight line
 between (x, y) and (xend, yend), with a width that tapers at both
 ends and varies along its length according to simplex noise.
 shape_ribbons() is a vectorized version of shape_ribbon(): each
 argument may be a vector, recycled against the others via
-purrr::pmap()'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). A shared distortion noise_field is automatically
-recycled across every ribbon; pass a list() of several different
-noise_fields instead to vary it per ribbon. The result is a
+purrr::pmap()'s own vctrs-based rules. The result is a
 sketch containing one shape_ribbon() per recycled row, rather
 than a single drawable."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -66,11 +58,7 @@ between <code>(x, y)</code> and <code>(xend, yend)</code>, with a width that tap
 ends and varies along its length according to simplex noise.</p>
 <p><code>shape_ribbons()</code> is a vectorized version of <code>shape_ribbon()</code>: each
 argument may be a vector, recycled against the others via
-<code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules (any length-1 element is
-broadcast to the common length; mismatched lengths greater than 1
-raise an error). A shared <code>distortion</code> <a href="noise_field.html">noise_field</a> is automatically
-recycled across every ribbon; pass a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of several different
-<code>noise_field</code>s instead to vary it per ribbon. The result is a
+<code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules. The result is a
 <a href="sketch.html">sketch</a> containing one <code>shape_ribbon()</code> per recycled row, rather
 than a single drawable.</p>
     </div>
@@ -140,6 +128,14 @@ Default <code><a href="trans_identity.html">trans_identity()</a></code> (no tran
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="drawable.html">drawable</a>.</p>
 <p>For <code>shape_ribbons()</code>, a <a href="sketch.html">sketch</a>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Any length-1 element is broadcast to the common length; mismatched
+lengths greater than 1 raise an error. A shared <code>distortion</code>
+<a href="noise_field.html">noise_field</a> is automatically recycled across every ribbon; pass a
+<code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of several different <code>noise_field</code>s instead to vary it per
+ribbon.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

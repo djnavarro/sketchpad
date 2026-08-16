@@ -10,12 +10,7 @@ x/y are themselves numeric vectors of point coordinates for a
 single scatter, points_raws() takes them as a list() of numeric
 vectors instead – one vector per scatter – which is most useful for
 giving several distinct scatters different style arguments (e.g. a
-different color each). Every other argument may be a plain vector,
-recycled against x/y via purrr::pmap()'s own vctrs-based rules
-(any length-1 element is broadcast to the common length; mismatched
-lengths greater than 1 raise an error). The result is a sketch
-containing one points_raw() per list element/recycled row, rather
-than a single drawable."><meta property="og:description" content="points_raw is shape_raw's &quot;points&quot;-geometry analog, and the first
+different color each)."><meta property="og:description" content="points_raw is shape_raw's &quot;points&quot;-geometry analog, and the first
 concrete constructor to use geometry = &quot;points&quot; (previously reserved
 on the dimensional reading &quot;points&quot;(0D)/&quot;path&quot;(1D)/&quot;polygon&quot;(2D),
 but with no constructor exposing it – see .agents/PLAN.md). The user
@@ -26,12 +21,7 @@ x/y are themselves numeric vectors of point coordinates for a
 single scatter, points_raws() takes them as a list() of numeric
 vectors instead – one vector per scatter – which is most useful for
 giving several distinct scatters different style arguments (e.g. a
-different color each). Every other argument may be a plain vector,
-recycled against x/y via purrr::pmap()'s own vctrs-based rules
-(any length-1 element is broadcast to the common length; mismatched
-lengths greater than 1 raise an error). The result is a sketch
-containing one points_raw() per list element/recycled row, rather
-than a single drawable."></head><body>
+different color each)."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -82,12 +72,7 @@ rather than a connected outline or path.</p>
 single scatter, <code>points_raws()</code> takes them as a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of numeric
 vectors instead – one vector per scatter – which is most useful for
 giving several distinct scatters different <code>style</code> arguments (e.g. a
-different <code>color</code> each). Every other argument may be a plain vector,
-recycled against <code>x</code>/<code>y</code> via <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules
-(any length-1 element is broadcast to the common length; mismatched
-lengths greater than 1 raise an error). The result is a <a href="sketch.html">sketch</a>
-containing one <code>points_raw()</code> per list element/recycled row, rather
-than a single drawable.</p>
+different <code>color</code> each).</p>
     </div>
 
     <div class="section level2">
@@ -129,6 +114,12 @@ per scatter.</p></dd>
 <code>geometry_grob()</code>'s internal dispatch (<code>R/draw.R</code>) for why a <code>"points"</code>
 geometry has no line to stroke and no interior to fill. Only <code>style@color</code>
 is used, as the marker colour.</p>
+<p>Every other argument may be a plain vector, recycled against <code>x</code>/<code>y</code>
+via <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap()</a></code>'s own vctrs-based rules (any length-1 element is
+broadcast to the common length; mismatched lengths greater than 1
+raise an error). The result is a <a href="sketch.html">sketch</a> containing one
+<code>points_raw()</code> per list element/recycled row, rather than a single
+drawable.</p>
     </div>
 
     <div class="section level2">

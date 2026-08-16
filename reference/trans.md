@@ -10,13 +10,7 @@ matrix. It is not usually constructed directly – use
 [`trans_shear()`](https://sketchpad.djnavarro.net/reference/trans_shear.md),
 or the general-purpose
 [`trans_affine()`](https://sketchpad.djnavarro.net/reference/trans_affine.md)
-instead. Every
-[drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
-carries a `trans` property (default
-[`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md))
-that's applied to its computed `points` as the very last step – see
-[drawable](https://sketchpad.djnavarro.net/reference/drawable.md)'s
-`trans` documentation.
+instead.
 
 ## Usage
 
@@ -32,6 +26,13 @@ trans(matrix = integer(0))
   must be `c(0, 0, 1)`).
 
 ## Details
+
+Every [drawable](https://sketchpad.djnavarro.net/reference/drawable.md)
+carries a `trans` property (default
+[`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md))
+that's applied to its computed `points` as the very last step – see
+[drawable](https://sketchpad.djnavarro.net/reference/drawable.md)'s
+`trans` documentation.
 
 Two `trans` objects combine with `+`: `t1 + t2` produces a new `trans`
 whose effect is "apply `t1` first, then `t2`" – see

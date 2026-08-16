@@ -2,11 +2,7 @@
 
 `trans_warp` displaces each point by simplex/fractal noise sampled at
 the point's own `(x, y)` position (domain warping), giving a wobbly,
-non-rigid distortion rather than an affine map – unlike
-[trans](https://sketchpad.djnavarro.net/reference/trans.md)
-(translate/rotate/scale/reflect/shear), this can't be represented as a
-single matrix, since the displacement varies smoothly but irregularly
-from point to point.
+non-rigid distortion rather than an affine map.
 
 ## Usage
 
@@ -39,6 +35,11 @@ trans_warp(
   offset by `1`.
 
 ## Details
+
+Unlike [trans](https://sketchpad.djnavarro.net/reference/trans.md)
+(translate/rotate/scale/reflect/shear), this can't be represented as a
+single matrix, since the displacement varies smoothly but irregularly
+from point to point.
 
 The x and y displacements are sampled from two independent
 [noise_field](https://sketchpad.djnavarro.net/reference/noise_field.md)s
