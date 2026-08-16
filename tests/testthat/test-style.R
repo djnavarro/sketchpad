@@ -119,3 +119,36 @@ test_that("style() rejects an invalid rule", {
   expect_error(style(rule = "nonzero"), "rule")
   expect_error(style(rule = c("evenodd", "winding")), "rule")
 })
+
+test_that("style()'s color defaults to \"black\"", {
+  expect_identical(style()@color, "black")
+})
+
+test_that("style() accepts a named colour, hex string, or NA", {
+  expect_identical(style(color = "steelblue")@color, "steelblue")
+  expect_identical(style(color = "#112233")@color, "#112233")
+  expect_identical(style(color = "#11223380")@color, "#11223380")
+  expect_identical(style(color = NA_character_)@color, NA_character_)
+})
+
+test_that("style() rejects an invalid colour", {
+  expect_error(style(color = "notacolor"), "color")
+})
+
+test_that("style() rejects a non-scalar color", {
+  expect_error(style(color = c("red", "blue")), "color")
+})
+
+test_that("style()'s linewidth defaults to 1", {
+  expect_identical(style()@linewidth, 1)
+})
+
+test_that("style() rejects a negative or non-scalar linewidth", {
+  expect_error(style(linewidth = -1), "linewidth")
+  expect_error(style(linewidth = c(1, 2)), "linewidth")
+})
+
+test_that("style() accepts a zero or positive linewidth", {
+  expect_identical(style(linewidth = 0)@linewidth, 0)
+  expect_identical(style(linewidth = 2)@linewidth, 2)
+})

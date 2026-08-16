@@ -18,7 +18,11 @@ style(
 )
 }
 \arguments{
-\item{color}{Stroke colour. Default \code{"black"}.}
+\item{color}{Stroke colour: a single colour string recognised by
+\code{\link[grDevices:col2rgb]{grDevices::col2rgb()}} (a name, \code{"#RRGGBB"}/\code{"#RRGGBBAA"} hex string,
+...), or \code{NA} for a fully transparent stroke. Validated at
+construction time, rather than only surfacing as a \link{grid} error once
+\code{\link[=draw]{draw()}} is called. Default \code{"black"}.}
 
 \item{fill}{Fill colour or pattern. Either a plain colour string, or the
 output of a \verb{fill_*()} helper -- \code{\link[=fill_solid]{fill_solid()}}, \code{\link[=fill_none]{fill_none()}},

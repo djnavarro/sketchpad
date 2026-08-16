@@ -330,6 +330,7 @@ S7::method(draw, group) <- function(object, xlim = NULL, ylim = NULL, ...) {
   # drop object's own @trans/@style here
   shapes <- resolve_group(object)
 
+  require_shapes_for_limits(shapes, xlim, ylim, "group")
   if (is.null(xlim)) {
     xlim <- c(
       min(purrr::map_dbl(shapes, \(s) min(s@points@x))),
@@ -354,6 +355,6 @@ S7::method(draw, group) <- function(object, xlim = NULL, ylim = NULL, ...) {
 
   grid::grid.newpage()
   for (s in shapes) {
-    grid::grid.draw(geometry_grob(s@points, s@style, s@geometry, vp))
+    grid::grid.draw(geometry_grob(s@points, s@style, s@geometry, vp, bbox_aspect(s)))
   }
 }

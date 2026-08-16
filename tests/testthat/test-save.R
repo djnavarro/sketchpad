@@ -85,3 +85,17 @@ test_that("save_png() rejects a non-positive dpi", {
   file <- withr::local_tempfile(fileext = ".png")
   expect_error(save_png(shape_circle(), file, dpi = 0), "dpi")
 })
+
+test_that("save_*() reject a filename in a nonexistent directory", {
+  file <- file.path(withr::local_tempdir(), "nonexistent_subdir", "x.png")
+  n_devices_before <- length(grDevices::dev.list())
+  expect_error(save_png(shape_circle(), file), "directory")
+  # the check happens before any device is opened, so nothing is left behind
+  expect_identical(length(grDevices::dev.list()), n_devices_before)
+})
+
+test_that("save_*() accept a bare filename with no directory component", {
+  withr::local_dir(withr::local_tempdir())
+  expect_no_error(save_png(shape_circle(), "x.png"))
+  expect_true(file.exists("x.png"))
+})

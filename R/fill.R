@@ -71,6 +71,12 @@ fill_solid <- function(color = "black") {
   if (!is.character(color) || length(color) != 1) {
     rlang::abort("color must be a single string")
   }
+  # is_valid_color() (R/style.R) treats NA as valid -- a fully transparent
+  # grid::gpar() colour, the same convention fill_none() relies on when it
+  # calls fill_solid(NA_character_) directly
+  if (!is_valid_color(color)) {
+    rlang::abort(paste0('color must be a valid colour string or NA, not "', color, '"'))
+  }
   fill(value = color)
 }
 
@@ -136,7 +142,22 @@ validate_fill_args <- function(angle, spacing, aspect) {
 #' Internal helper shared by every `fill_*()` constructor accepting a colour
 #' vector (as opposed to always requiring a single colour) -- checks that
 #' `colors` is a character vector of at least `min_length` with no `NA`
-#' entries.
+#' entries, and that every entry is actually a colour [grDevices::col2rgb()]
+#' recognises (a name, `"#RRGGBB"`/`"#RRGGBBAA"` hex string, ...) -- an
+#' unrecognised entry (e.g. a typo) previously constructed successfully and
+#' only surfaced as a raw `grDevices`/`grid` error once the fill was
+#' actually resolved/drawn, the same gap `style()`'s own `color` validator
+#' closed for a drawable's stroke colour (see `is_valid_color()`,
+#' `R/style.R`). Unlike `style()`'s `color`, `NA` is never valid here --
+#' every current `fill_*()` caller of this helper always requires a real
+#' colour, with `fill_none()`'s own `NA_character_` built directly via
+#' `fill_solid()` instead, bypassing this helper entirely.
+#'
+#' `col2rgb()` is called once on the whole vector rather than element by
+#' element, since it already reports which specific entry is invalid in its
+#' own error message (e.g. `"invalid color name 'bogus'"`) -- that message
+#' is reused directly rather than re-implementing colour-string parsing
+#' here.
 #'
 #' @param colors The argument to validate.
 #' @param arg_name The argument's name, used in the error message.
@@ -149,6 +170,16 @@ validate_colors <- function(colors, arg_name, min_length = 1) {
     } else {
       rlang::abort(paste0(arg_name, " must be a character vector of at least length ", min_length))
     }
+  }
+  invalid <- tryCatch(
+    {
+      grDevices::col2rgb(colors)
+      NULL
+    },
+    error = function(e) conditionMessage(e)
+  )
+  if (!is.null(invalid)) {
+    rlang::abort(paste0(arg_name, " must contain only valid colours (", invalid, ")"))
   }
 }
 
@@ -242,6 +273,7 @@ fill_hatch <- function(color = "black",
                        extend = "repeat") {
   build <- function(aspect) {
   validate_fill_args(angle, spacing, aspect)
+  validate_colors(color, "color")
   if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
     rlang::abort("linewidth must be a single positive number")
   }
@@ -1878,9 +1910,7 @@ fill_gradient <- function(color = c("white", "black"),
   type <- match.arg(type)
   build <- function(aspect) {
   validate_fill_args(NULL, spacing, aspect)
-  if (!is.character(color) || length(color) < 2) {
-    rlang::abort("color must be a character vector of at least length 2")
-  }
+  validate_colors(color, "color", min_length = 2)
   if (!is.null(stops) && (!is.numeric(stops) || length(stops) != length(color))) {
     rlang::abort("stops must be NULL, or a numeric vector the same length as color")
   }

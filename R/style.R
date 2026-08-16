@@ -59,12 +59,42 @@ as_fill <- function(x) {
   fill(value = x)
 }
 
+#' Check whether a string is a valid colour for `grid`/`graphics`
+#'
+#' Internal helper backing `style`'s own validator: `NA` (a valid, fully
+#' transparent [grid::gpar()] colour -- the same convention [fill_none()]
+#' relies on for its own `NA_character_` value) is treated as valid
+#' without calling [grDevices::col2rgb()] at all, since `col2rgb(NA)`
+#' does not error but silently returns opaque white, which would be the
+#' wrong answer here. Any other string is checked by actually calling
+#' `col2rgb()` and catching the error it raises for an unrecognised name
+#' or malformed hex string, rather than re-implementing colour-string
+#' parsing here. `R/fill.R`'s own `validate_colors()` (shared by every
+#' `fill_*()` helper's colour-vector argument) checks real colour validity
+#' the same way, but inline against a whole vector at once rather than via
+#' this scalar helper, since `NA` is never a valid entry there -- see its
+#' own docs.
+#'
+#' @param x A single string.
+#' @return `TRUE`/`FALSE`.
+#' @noRd
+is_valid_color <- function(x) {
+  if (is.na(x)) {
+    return(TRUE)
+  }
+  !inherits(tryCatch(grDevices::col2rgb(x), error = function(e) e), "error")
+}
+
 #' Graphical style for a drawable object
 #'
 #' `style` is a container for the graphical properties passed to
 #' [grid::gpar()] when a [drawable] object is drawn.
 #'
-#' @param color Stroke colour. Default `"black"`.
+#' @param color Stroke colour: a single colour string recognised by
+#'   [grDevices::col2rgb()] (a name, `"#RRGGBB"`/`"#RRGGBBAA"` hex string,
+#'   ...), or `NA` for a fully transparent stroke. Validated at
+#'   construction time, rather than only surfacing as a [grid] error once
+#'   [draw()] is called. Default `"black"`.
 #' @param fill Fill colour or pattern. Either a plain colour string, or the
 #'   output of a `fill_*()` helper -- [fill_solid()], [fill_none()],
 #'   [fill_hatch()], [fill_crosshatch()], [fill_stipple()], [fill_noise()],
@@ -205,6 +235,14 @@ style <- S7::new_class(
     )
   },
   validator = function(self) {
+    if (length(self@color) != 1) {
+      return("color must be a single string")
+    }
+    if (!is_valid_color(self@color)) {
+      return(paste0(
+        'color must be a valid colour string or NA, not "', self@color, '"'
+      ))
+    }
     if (length(self@rule) != 1) {
       return("rule must be a single string")
     }
@@ -225,6 +263,12 @@ style <- S7::new_class(
     }
     if (!self@lineend %in% c("round", "butt", "square")) {
       return('lineend must be one of "round", "butt", or "square"')
+    }
+    if (length(self@linewidth) != 1) {
+      return("linewidth must be a single number")
+    }
+    if (self@linewidth < 0) {
+      return("linewidth must be a non-negative number")
     }
     if (length(self@linemitre) != 1) {
       return("linemitre must be a single number")

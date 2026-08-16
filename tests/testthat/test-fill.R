@@ -1,3 +1,9 @@
+test_that("validate_colors() rejects a colour string col2rgb() doesn't recognise", {
+  expect_error(validate_colors("notacolor", "color"), "color")
+  expect_error(validate_colors(c("red", "notacolor"), "color"), "color")
+  expect_error(validate_colors(c("red", "blue"), "color"), NA)
+})
+
 test_that("fill_solid() wraps its color argument in a fill object", {
   expect_identical(fv(fill_solid()), "black")
   expect_identical(fv(fill_solid("red")), "red")
@@ -9,6 +15,9 @@ test_that("fill_solid() validates its argument", {
   expect_error(fill_solid(1), "color")
   expect_error(fill_solid(c("red", "blue")), "color")
   expect_error(fill_solid(NA_character_), NA) # NA is a valid (transparent) colour
+  expect_error(fill_solid("notacolor"), "color")
+  expect_error(fill_solid("red"), NA)
+  expect_error(fill_solid("#112233"), NA)
 })
 
 test_that("fill_none() wraps a transparent (NA) colour in a fill object", {
@@ -42,6 +51,9 @@ test_that("fill_hatch() validates its arguments", {
   expect_error(fill_hatch(angle = c(1, 2)), "angle")
   expect_error(fill_hatch(linewidth = 0), "linewidth")
   expect_error(fill_hatch(linewidth = -1), "linewidth")
+  expect_error(fill_hatch(color = "notacolor"), "color")
+  expect_error(fill_hatch(color = 1), "color")
+  expect_error(fill_hatch(color = NA_character_), "color")
 })
 
 test_that("fill_hatch() handles axis-aligned angles without error", {
@@ -675,6 +687,8 @@ test_that("fill_gradient() validates its arguments", {
   expect_error(fill_gradient(aspect = -1), "aspect")
   expect_error(fill_gradient(color = "black"), "color")
   expect_error(fill_gradient(color = 1), "color")
+  expect_error(fill_gradient(color = c("red", "notacolor")), "color")
+  expect_error(fill_gradient(color = c("red", NA)), "color")
   expect_error(fill_gradient(stops = 0.5), "stops")
   expect_error(fill_gradient(angle = c(1, 2)), "angle")
   expect_error(fill_gradient(type = "diagonal"))

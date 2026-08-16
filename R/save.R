@@ -15,6 +15,20 @@ validate_save_args <- function(object, filename, width, height) {
   if (!is.character(filename) || length(filename) != 1 || is.na(filename)) {
     rlang::abort("`filename` must be a single string.")
   }
+  # dirname(filename) is "." for a bare filename with no directory
+  # component at all, which dir.exists() always finds -- so this only
+  # fires for a genuinely missing directory, not every relative path.
+  # Catching this here, before any grDevices::png()/svg()/pdf() call
+  # opens a device, gives a clear error naming the actual missing
+  # directory instead of grDevices's own generic (and, for some
+  # devices, only a warning-turned-partial-failure) "cannot open file"
+  # message.
+  if (!dir.exists(dirname(filename))) {
+    rlang::abort(paste0(
+      "Can't write to `", filename, "`: directory `", dirname(filename),
+      "` does not exist."
+    ))
+  }
   if (!is.numeric(width) || length(width) != 1 || width <= 0) {
     rlang::abort("`width` must be a single positive number.")
   }

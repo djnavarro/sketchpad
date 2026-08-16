@@ -2729,3 +2729,103 @@ an `angle` there would just be an ordinary rotation with no such
 caveat needed, better done today by the caller composing a
 `trans_rotate()` onto the returned drawable instead of duplicating that
 rotation logic inside the constructor.
+
+## Post-0.1 stress test: four latent bugs, all fixed
+
+With the 0.1 milestones done, a deliberate stress-testing pass (hammering
+every constructor's argument validation, edge-case geometry, empty
+containers, and error paths, rather than adding new features) turned up
+four real gaps, all fixed in the same pass.
+
+**`draw(group)` crashed on any aspect-resolving fill.** `geometry_grob()`
+takes five arguments (`points, sty, geometry, vp, aspect`); `draw(sketch)`
+and `draw(drawable)` (`R/draw.R`) both pass `aspect` correctly via
+`bbox_aspect()`, but `draw(group)`'s own loop (`R/group.R`) called it with
+only four, omitting `aspect` entirely. `aspect` has no default, so this
+only failed once something actually forced its evaluation --
+`resolve_fill()` only touches `aspect` when the fill in question actually
+has a `resolve` function (see the `fill` class/automatic `aspect`
+resolution section in `AGENTS.md`), so a plain colour fill never triggered
+it. Every existing `group` example in the docs used a solid fill, which is
+exactly why this went uncaught until an aspect-taking fill
+(`fill_hatch()`, `fill_noise()`, ...) was tried on a standalone group
+rather than one nested inside a `sketch`. One-line fix: pass
+`bbox_aspect(s)` through, matching the other two `draw()` methods.
+
+**`style(linewidth = ...)` had no validator check at all**, unlike every
+other non-negative numeric property (`radius`, `width`, `range`,
+`fill_alpha`, `linemitre`, ...). A negative `linewidth` constructed
+successfully and only failed later, opaquely, once `draw()` reached
+`grid`'s own `"'lwd' must be non-negative and finite"` error. Fixed by
+adding the same `length != 1`/`< 0` checks `style`'s other numeric
+properties already have.
+
+**Drawing an empty `sketch()`/`group()` silently computed an `Inf`/`-Inf`
+axis range.** Both `draw(sketch)` and `draw(group)` fall back to
+`min()`/`max()` over every shape's own points when `xlim`/`ylim` aren't
+otherwise supplied; called on an empty `shapes` list, this produces only
+a cryptic base R warning (`"no non-missing arguments to min; returning
+Inf"`) and then proceeds to try to draw with a nonsensical range, rather
+than a clear error. Fixed with a shared internal helper,
+`require_shapes_for_limits(shapes, xlim, ylim, context)` (`R/draw.R`,
+called from both `draw()` methods), that aborts with a clear message --
+but only when the missing limit would actually need to be inferred from
+`shapes`: an empty sketch/group with an explicit `xlim`/`ylim` (via
+`draw()`'s own arguments, or, for a sketch, `canvas()`) still draws fine,
+since an otherwise-empty canvas with just a background colour is a
+legitimate thing to draw.
+
+**`style(color = ...)` and every `fill_*()` helper's own `color`
+argument accepted any string, valid colour or not**, only failing once
+`grid` itself tried to resolve it at draw time (`"invalid color name
+'...'"`). Fixed in two parts:
+
+- `style`'s validator gained a real check, via a new internal
+  `is_valid_color()` helper (`R/style.R`): `NA` is treated as valid
+  without calling `grDevices::col2rgb()` at all (`col2rgb(NA)` doesn't
+  error -- it silently returns opaque white, the wrong answer for
+  detecting `NA`'s own transparent-colour convention), and any other
+  string is checked by actually calling `col2rgb()` and catching its own
+  error. Also caught and fixed an unrelated latent gap on the same
+  property while there: `color` previously had no length check either, so
+  `style(color = c("red", "blue"))` constructed without error.
+- `R/fill.R`'s own `validate_colors()` (already shared by most `fill_*()`
+  helpers' colour-vector arguments) gained the same real-colour check,
+  calling `col2rgb()` once on the whole vector and bubbling its own
+  precise message (e.g. `"invalid color name 'bogus'"`) into a wrapped
+  one naming the argument -- reusing `col2rgb()`'s own error text rather
+  than re-implementing colour-string parsing, the same choice
+  `is_valid_color()` made. This closed the gap for every helper that
+  already called `validate_colors()`, and while auditing which ones
+  didn't, two more gaps turned up and were closed the same way:
+  `fill_hatch()` had *no* colour validation whatsoever (not even a type/
+  length check), and `fill_gradient()` had only an ad hoc inline length
+  check with no `NA`/real-colour check -- both now call
+  `validate_colors()` directly instead. `fill_solid()` keeps its own
+  bespoke check (it must still accept `NA`, since `fill_none()` calls
+  `fill_solid(NA_character_)` directly) but now reuses `is_valid_color()`
+  for the same NA-aware real-colour check rather than skipping it
+  entirely.
+
+A fifth softer issue found in the same pass -- `save_png()`/`save_svg()`/
+`save_pdf()` writing to a nonexistent directory -- was fixed separately
+afterward; see below. Left as a documented, lower-priority rough edge,
+not fixed in this pass: `shape_circle(x = Inf)`/a `curve_line()` control
+point of `NA` still fail at draw time with `grid`'s own generic
+`"invalid 'xscale' in viewport"` rather than a validation error naming
+the actual problem, since catching every Inf/NaN/NA coordinate at every
+constructor would be a much larger, separate effort.
+
+## `save_*()` fails fast on a nonexistent target directory
+
+`save_png()`/`save_svg()`/`save_pdf()` (`R/save.R`) previously let
+`grDevices::png()`/`svg()`/`pdf()` discover a missing directory
+themselves, surfacing only that device's own raw `"could not open
+file"` error -- and, depending on the device, potentially after
+already opening (and then needing to close) a partially-created file
+handle. `validate_save_args()` now checks `dir.exists(dirname(filename))`
+before any device opens, aborting with a clear message naming the
+missing directory. `dirname()` returns `"."` for a bare filename with no
+directory component at all, which `dir.exists()` always finds, so this
+only fires for a genuinely missing directory -- a bare `"x.png"` (written
+to the working directory) still works unchanged.

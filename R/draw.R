@@ -149,6 +149,35 @@ geometry_grob <- function(points, sty, geometry, vp, aspect) {
   )
 }
 
+#' Error out on an empty shapes list rather than silently drawing `Inf`
+#'
+#' Internal helper shared by `draw(sketch)` and `draw(group)` (`R/group.R`):
+#' an empty `shapes` list has no points to infer a missing `xlim`/`ylim`
+#' from, and letting `min()`/`max()` run on an empty numeric vector
+#' silently produces an `Inf`/`-Inf` "range" with only a cryptic base R
+#' warning (`"no non-missing arguments to min; returning Inf"`) rather
+#' than a real error -- this raises a clear one instead. Only fires when
+#' the missing limit would actually need to be inferred from `shapes`;
+#' an explicit `xlim`/`ylim` argument (or, for a sketch, one already set
+#' on its own `canvas`) makes an empty `shapes` list fine to draw, e.g.
+#' an otherwise-empty canvas with just a background colour.
+#'
+#' @param shapes A list of (already-flattened) [drawable] objects.
+#' @param xlim,ylim Axis limits already resolved from `draw()`'s own
+#'   argument and, for a sketch, its `canvas` -- `NULL` if still unset.
+#' @param context A short noun phrase naming the object being drawn (e.g.
+#'   `"sketch"`/`"group"`), used in the error message.
+#' @noRd
+require_shapes_for_limits <- function(shapes, xlim, ylim, context) {
+  if (length(shapes) == 0 && (is.null(xlim) || is.null(ylim))) {
+    rlang::abort(paste0(
+      "Can't draw an empty ", context, " (no shapes to infer xlim/ylim ",
+      "from). Add at least one shape, or supply both `xlim` and `ylim` ",
+      "explicitly."
+    ))
+  }
+}
+
 #' @export
 #' @noRd
 S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
@@ -188,6 +217,7 @@ S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
   # NULL, so this falls through to the pre-canvas() default behavior)
   if (is.null(xlim)) xlim <- object@canvas@xlim
   if (is.null(ylim)) ylim <- object@canvas@ylim
+  require_shapes_for_limits(shapes, xlim, ylim, "sketch")
   if (is.null(xlim)) {
     xlim <- c(
       min(purrr::map_dbl(shapes, \(s) min(s@points@x))),
