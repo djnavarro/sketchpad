@@ -41,7 +41,8 @@ test_that("draw() renders an effect_grain() without error", {
   local_null_device()
   t <- seq(0, 4, length.out = 30)
   expect_no_error(draw(effect_grain(
-    shape_stroke(x = t, y = sin(t), width = 0.3), resolution = 16L
+    shape_stroke(x = t, y = sin(t), width = 0.3),
+    resolution = 16L
   )))
 })
 

@@ -87,4 +87,3 @@ shape_raws <- function(x, y, trans = trans_identity(), ...) {
     list(...)
   ))
 }
-

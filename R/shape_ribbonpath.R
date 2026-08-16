@@ -90,11 +90,11 @@ validate_ribbonpath_path <- function(path) {
 #' @family 2D shapes
 #' @export
 shape_ribbonpath <- function(path,
-                              width = 0.2,
-                              n = 100L,
-                              distortion = noise_field(),
-                              trans = trans_identity(),
-                              ...) {
+                             width = 0.2,
+                             n = 100L,
+                             distortion = noise_field(),
+                             trans = trans_identity(),
+                             ...) {
   validate_ribbonpath_path(path)
   pts <- path@points
   shape_stroke(
@@ -139,11 +139,11 @@ shape_ribbonpath <- function(path,
 #' @family 2D shapes
 #' @export
 shape_ribbonpaths <- function(path,
-                               width = 0.2,
-                               n = 100L,
-                               distortion = noise_field(),
-                               trans = trans_identity(),
-                               ...) {
+                              width = 0.2,
+                              n = 100L,
+                              distortion = noise_field(),
+                              trans = trans_identity(),
+                              ...) {
   vectorize_shapes(shape_ribbonpath, c(
     list(path = path, width = width, n = n, distortion = distortion, trans = trans),
     list(...)

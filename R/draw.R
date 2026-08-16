@@ -44,7 +44,9 @@ draw <- S7::new_generic("draw", dispatch_args = "object")
 #' @return A single colour string.
 #' @noRd
 apply_alpha <- function(color, alpha) {
-  if (alpha == 1) return(color)
+  if (alpha == 1) {
+    return(color)
+  }
   grDevices::adjustcolor(color, alpha.f = alpha)
 }
 
@@ -77,8 +79,7 @@ geometry_grob <- function(points, sty, geometry, vp) {
   } else {
     sty@fill
   }
-  switch(
-    geometry,
+  switch(geometry,
     polygon = grid::polygonGrob(
       x = points@x,
       y = points@y,
@@ -122,7 +123,6 @@ geometry_grob <- function(points, sty, geometry, vp) {
 #' @export
 #' @noRd
 S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
-
   # plotting area is a single viewport with equal-axis scaling
   if (is.null(xlim)) xlim <- range(object@points@x)
   if (is.null(ylim)) ylim <- range(object@points@y)
@@ -146,7 +146,6 @@ S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
 #' @export
 #' @noRd
 S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
-
   # axis limits: an explicit draw() argument wins, then the sketch's own
   # canvas, then the shapes' own point ranges (canvas's xlim/ylim default to
   # NULL, so this falls through to the pre-canvas() default behavior)

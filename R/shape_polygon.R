@@ -31,10 +31,10 @@ shape_polygon <- S7::new_class(
   name = "shape_polygon",
   parent = drawable,
   properties = list(
-    x      = S7::class_numeric,
-    y      = S7::class_numeric,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
     radius = S7::class_numeric,
-    n      = S7::class_integer,
+    n = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
@@ -47,12 +47,24 @@ shape_polygon <- S7::new_class(
     )
   ),
   validator = function(self) {
-    if (length(self@x) != 1) return("x must be length 1")
-    if (length(self@y) != 1) return("y must be length 1")
-    if (length(self@radius) != 1) return("radius must be length 1")
-    if (length(self@n) != 1) return("n must be length 1")
-    if (self@radius < 0) return("radius must be a non-negative number")
-    if (self@n < 3L) return("n must be an integer of at least 3")
+    if (length(self@x) != 1) {
+      return("x must be length 1")
+    }
+    if (length(self@y) != 1) {
+      return("y must be length 1")
+    }
+    if (length(self@radius) != 1) {
+      return("radius must be length 1")
+    }
+    if (length(self@n) != 1) {
+      return("n must be length 1")
+    }
+    if (self@radius < 0) {
+      return("radius must be a non-negative number")
+    }
+    if (self@n < 3L) {
+      return("n must be an integer of at least 3")
+    }
   },
   constructor = function(x = 0, y = 0, radius = 1, n = 6L, trans = trans_identity(), ...) {
     S7::new_object(

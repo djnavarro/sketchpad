@@ -59,15 +59,15 @@ curve_scribble <- S7::new_class(
   name = "curve_scribble",
   parent = drawable,
   properties = list(
-    x           = S7::class_numeric,
-    y           = S7::class_numeric,
-    width       = S7::class_numeric,
-    height      = S7::class_numeric,
-    direction   = S7::class_character,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
+    width = S7::class_numeric,
+    height = S7::class_numeric,
+    direction = S7::class_character,
     n_harmonics = S7::class_integer,
-    amplitude   = S7::class_numeric,
-    n           = S7::class_integer,
-    seed        = S7::class_integer,
+    amplitude = S7::class_numeric,
+    n = S7::class_integer,
+    seed = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
@@ -94,23 +94,49 @@ curve_scribble <- S7::new_class(
     )
   ),
   validator = function(self) {
-    if (length(self@x) != 1) return("x must be length 1")
-    if (length(self@y) != 1) return("y must be length 1")
-    if (length(self@width) != 1) return("width must be length 1")
-    if (length(self@height) != 1) return("height must be length 1")
-    if (self@width <= 0) return("width must be a positive number")
-    if (self@height <= 0) return("height must be a positive number")
+    if (length(self@x) != 1) {
+      return("x must be length 1")
+    }
+    if (length(self@y) != 1) {
+      return("y must be length 1")
+    }
+    if (length(self@width) != 1) {
+      return("width must be length 1")
+    }
+    if (length(self@height) != 1) {
+      return("height must be length 1")
+    }
+    if (self@width <= 0) {
+      return("width must be a positive number")
+    }
+    if (self@height <= 0) {
+      return("height must be a positive number")
+    }
     if (length(self@direction) != 1 ||
-          !self@direction %in% c("horizontal", "vertical")) {
+      !self@direction %in% c("horizontal", "vertical")) {
       return('direction must be one of "horizontal" or "vertical"')
     }
-    if (length(self@n_harmonics) != 1) return("n_harmonics must be length 1")
-    if (self@n_harmonics < 1L) return("n_harmonics must be a positive integer")
-    if (length(self@amplitude) != 1) return("amplitude must be length 1")
-    if (self@amplitude < 0) return("amplitude must be a non-negative number")
-    if (length(self@n) != 1) return("n must be length 1")
-    if (self@n < 2L) return("n must be an integer of at least 2")
-    if (length(self@seed) != 1) return("seed must be length 1")
+    if (length(self@n_harmonics) != 1) {
+      return("n_harmonics must be length 1")
+    }
+    if (self@n_harmonics < 1L) {
+      return("n_harmonics must be a positive integer")
+    }
+    if (length(self@amplitude) != 1) {
+      return("amplitude must be length 1")
+    }
+    if (self@amplitude < 0) {
+      return("amplitude must be a non-negative number")
+    }
+    if (length(self@n) != 1) {
+      return("n must be length 1")
+    }
+    if (self@n < 2L) {
+      return("n must be an integer of at least 2")
+    }
+    if (length(self@seed) != 1) {
+      return("seed must be length 1")
+    }
   },
   constructor = function(x = 0,
                          y = 0,
@@ -163,20 +189,22 @@ curve_scribble <- S7::new_class(
 #' @family 1D curves
 #' @export
 curve_scribbles <- function(x = 0,
-                             y = 0,
-                             width = 1,
-                             height = 1,
-                             direction = "horizontal",
-                             n_harmonics = 3L,
-                             amplitude = 0.35,
-                             n = 200L,
-                             seed = 1L,
-                             trans = trans_identity(),
-                             ...) {
+                            y = 0,
+                            width = 1,
+                            height = 1,
+                            direction = "horizontal",
+                            n_harmonics = 3L,
+                            amplitude = 0.35,
+                            n = 200L,
+                            seed = 1L,
+                            trans = trans_identity(),
+                            ...) {
   vectorize_shapes(curve_scribble, c(
-    list(x = x, y = y, width = width, height = height, direction = direction,
-         n_harmonics = n_harmonics, amplitude = amplitude, n = n, seed = seed,
-         trans = trans),
+    list(
+      x = x, y = y, width = width, height = height, direction = direction,
+      n_harmonics = n_harmonics, amplitude = amplitude, n = n, seed = seed,
+      trans = trans
+    ),
     list(...)
   ))
 }

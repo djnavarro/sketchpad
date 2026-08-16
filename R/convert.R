@@ -74,4 +74,3 @@ method(convert, list(drawable, points_raw)) <- function(from, to, ...) {
   out@style <- from@style
   out
 }
-

@@ -23,8 +23,8 @@ mat_scale <- function(sx, sy) {
 mat_rotate <- function(angle) {
   matrix(c(
     cos(angle), -sin(angle), 0,
-    sin(angle),  cos(angle), 0,
-    0,           0,          1
+    sin(angle), cos(angle), 0,
+    0, 0, 1
   ), nrow = 3, byrow = TRUE)
 }
 
@@ -88,7 +88,9 @@ trans <- S7::new_class(
     matrix = S7::class_numeric
   ),
   validator = function(self) {
-    if (!is.matrix(self@matrix)) return("matrix must be a matrix")
+    if (!is.matrix(self@matrix)) {
+      return("matrix must be a matrix")
+    }
     if (!identical(dim(self@matrix), c(3L, 3L))) {
       return("matrix must be a 3x3 matrix")
     }
@@ -149,8 +151,12 @@ trans_warp <- S7::new_class(
     distortion_y = noise_field
   ),
   validator = function(self) {
-    if (length(self@amount) != 1) return("amount must be length 1")
-    if (self@amount < 0) return("amount must be a non-negative number")
+    if (length(self@amount) != 1) {
+      return("amount must be length 1")
+    }
+    if (self@amount < 0) {
+      return("amount must be a non-negative number")
+    }
   },
   constructor = function(amount = 0.1,
                          distortion_x = noise_field(),
@@ -201,7 +207,9 @@ trans_chain <- S7::new_class(
       \(s) S7::S7_inherits(s, trans) || S7::S7_inherits(s, trans_warp) || S7::S7_inherits(s, trans_chain),
       logical(1)
     )
-    if (!all(ok)) return("steps must be a list of trans/trans_warp/trans_chain objects")
+    if (!all(ok)) {
+      return("steps must be a list of trans/trans_warp/trans_chain objects")
+    }
   }
 )
 
@@ -295,7 +303,9 @@ apply_trans <- S7::new_generic("apply_trans", dispatch_args = "object")
 #' @noRd
 method(apply_trans, trans) <- function(object, pts) {
   n <- length(pts@x)
-  if (n == 0) return(xy(x = numeric(0), y = numeric(0)))
+  if (n == 0) {
+    return(xy(x = numeric(0), y = numeric(0)))
+  }
   homogeneous <- rbind(pts@x, pts@y, rep(1, n))
   out <- object@matrix %*% homogeneous
   xy(x = out[1, ], y = out[2, ])
@@ -304,7 +314,9 @@ method(apply_trans, trans) <- function(object, pts) {
 #' @noRd
 method(apply_trans, trans_warp) <- function(object, pts) {
   n <- length(pts@x)
-  if (n == 0) return(xy(x = numeric(0), y = numeric(0)))
+  if (n == 0) {
+    return(xy(x = numeric(0), y = numeric(0)))
+  }
   dx <- noise_sample(object@distortion_x, x = pts@x, y = pts@y, to = c(-1, 1)) * object@amount
   dy <- noise_sample(object@distortion_y, x = pts@x, y = pts@y, to = c(-1, 1)) * object@amount
   xy(x = pts@x + dx, y = pts@y + dy)

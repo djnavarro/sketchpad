@@ -86,9 +86,15 @@ noise_bridge <- S7::new_class(
     )
   },
   validator = function(self) {
-    if (length(self@smooth) != 1) return("smooth must be length 1")
-    if (length(self@seed) != 1) return("seed must be length 1")
-    if (self@smooth < 0) return("smooth must be a non-negative number")
+    if (length(self@smooth) != 1) {
+      return("smooth must be length 1")
+    }
+    if (length(self@seed) != 1) {
+      return("seed must be length 1")
+    }
+    if (self@smooth < 0) {
+      return("smooth must be a non-negative number")
+    }
   }
 )
 

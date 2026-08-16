@@ -77,11 +77,11 @@
 effect_grain <- S7::new_class(
   name = "effect_grain",
   properties = list(
-    object     = drawable,
-    grain      = noise_field,
+    object = drawable,
+    grain = noise_field,
     resolution = S7::class_integer,
-    color      = S7::class_character,
-    alpha      = S7::class_numeric,
+    color = S7::class_character,
+    alpha = S7::class_numeric,
     background = S7::class_character,
     outline = S7::new_property(
       class = xy,
@@ -95,11 +95,15 @@ effect_grain <- S7::new_class(
     if (length(self@resolution) != 1 || self@resolution < 2L) {
       return("resolution must be an integer of at least 2")
     }
-    if (length(self@color) != 1) return("color must be a single string")
+    if (length(self@color) != 1) {
+      return("color must be a single string")
+    }
     if (length(self@alpha) != 1 || self@alpha <= 0 || self@alpha > 1) {
       return("alpha must be a single number in (0, 1]")
     }
-    if (length(self@background) != 1) return("background must be a single string, or NA")
+    if (length(self@background) != 1) {
+      return("background must be a single string, or NA")
+    }
   },
   constructor = function(object,
                          grain = noise_field(frequency = 15, octaves = 2L, seed = 2L),
@@ -168,8 +172,8 @@ effect_grain_grob <- function(object, outline, vp) {
   # silhouette rather than a rectangular/circular tile
   masked_vp <- grid::viewport(
     xscale = vp$xscale, yscale = vp$yscale,
-    width  = vp$width, height = vp$height,
-    mask   = grid::as.mask(mask_grob, type = "alpha")
+    width = vp$width, height = vp$height,
+    mask = grid::as.mask(mask_grob, type = "alpha")
   )
 
   content <- list(raster_grob)

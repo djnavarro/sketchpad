@@ -73,14 +73,14 @@ shape_twist <- S7::new_class(
   name = "shape_twist",
   parent = drawable,
   properties = list(
-    x          = S7::class_numeric,
-    y          = S7::class_numeric,
-    xend       = S7::class_numeric,
-    yend       = S7::class_numeric,
-    width           = S7::class_numeric,
-    n               = S7::class_integer,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
+    xend = S7::class_numeric,
+    yend = S7::class_numeric,
+    width = S7::class_numeric,
+    n = S7::class_integer,
     path_distortion = noise_bridge,
-    distortion      = noise_field,
+    distortion = noise_field,
     path = S7::new_property(
       class = xy,
       getter = function(self) {
@@ -133,14 +133,30 @@ shape_twist <- S7::new_class(
     )
   },
   validator = function(self) {
-    if (length(self@x) != 1) return("x must be length 1")
-    if (length(self@y) != 1) return("y must be length 1")
-    if (length(self@xend) != 1) return("xend must be length 1")
-    if (length(self@yend) != 1) return("yend must be length 1")
-    if (length(self@width) != 1) return("width must be length 1")
-    if (length(self@n) != 1) return("n must be length 1")
-    if (self@width < 0) return("width must be a non-negative number")
-    if (self@n < 1L) return("n must be a positive integer")
+    if (length(self@x) != 1) {
+      return("x must be length 1")
+    }
+    if (length(self@y) != 1) {
+      return("y must be length 1")
+    }
+    if (length(self@xend) != 1) {
+      return("xend must be length 1")
+    }
+    if (length(self@yend) != 1) {
+      return("yend must be length 1")
+    }
+    if (length(self@width) != 1) {
+      return("width must be length 1")
+    }
+    if (length(self@n) != 1) {
+      return("n must be length 1")
+    }
+    if (self@width < 0) {
+      return("width must be a non-negative number")
+    }
+    if (self@n < 1L) {
+      return("n must be a positive integer")
+    }
   }
 )
 
@@ -176,19 +192,20 @@ shape_twist <- S7::new_class(
 #' @family 2D shapes
 #' @export
 shape_twists <- function(x = 0,
-                          y = 0,
-                          xend = 1,
-                          yend = 1,
-                          width = 0.2,
-                          n = 100L,
-                          path_distortion = noise_bridge(),
-                          distortion = noise_field(),
-                          trans = trans_identity(),
-                          ...) {
+                         y = 0,
+                         xend = 1,
+                         yend = 1,
+                         width = 0.2,
+                         n = 100L,
+                         path_distortion = noise_bridge(),
+                         distortion = noise_field(),
+                         trans = trans_identity(),
+                         ...) {
   vectorize_shapes(shape_twist, c(
-    list(x = x, y = y, xend = xend, yend = yend, width = width, n = n,
-         path_distortion = path_distortion, distortion = distortion, trans = trans),
+    list(
+      x = x, y = y, xend = xend, yend = yend, width = width, n = n,
+      path_distortion = path_distortion, distortion = distortion, trans = trans
+    ),
     list(...)
   ))
 }
-

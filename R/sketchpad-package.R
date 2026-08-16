@@ -18,4 +18,3 @@ NULL
 # way that R CMD check misattributes to this package; this silences the
 # resulting (spurious) "no visible binding" NOTE.
 utils::globalVariables("properties")
-

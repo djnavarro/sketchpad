@@ -32,9 +32,9 @@ shape_rectangle <- S7::new_class(
   name = "shape_rectangle",
   parent = drawable,
   properties = list(
-    x      = S7::class_numeric,
-    y      = S7::class_numeric,
-    width  = S7::class_numeric,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
+    width = S7::class_numeric,
     height = S7::class_numeric,
     points = S7::new_property(
       class = xy,
@@ -49,12 +49,24 @@ shape_rectangle <- S7::new_class(
     )
   ),
   validator = function(self) {
-    if (length(self@x) != 1) return("x must be length 1")
-    if (length(self@y) != 1) return("y must be length 1")
-    if (length(self@width) != 1) return("width must be length 1")
-    if (length(self@height) != 1) return("height must be length 1")
-    if (self@width < 0) return("width must be a non-negative number")
-    if (self@height < 0) return("height must be a non-negative number")
+    if (length(self@x) != 1) {
+      return("x must be length 1")
+    }
+    if (length(self@y) != 1) {
+      return("y must be length 1")
+    }
+    if (length(self@width) != 1) {
+      return("width must be length 1")
+    }
+    if (length(self@height) != 1) {
+      return("height must be length 1")
+    }
+    if (self@width < 0) {
+      return("width must be a non-negative number")
+    }
+    if (self@height < 0) {
+      return("height must be a non-negative number")
+    }
   },
   constructor = function(x = 0, y = 0, width = 1, height = 1, trans = trans_identity(), ...) {
     S7::new_object(

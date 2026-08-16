@@ -54,12 +54,12 @@ curve_twist <- S7::new_class(
   name = "curve_twist",
   parent = drawable,
   properties = list(
-    x               = S7::class_numeric,
-    y               = S7::class_numeric,
-    xend            = S7::class_numeric,
-    yend            = S7::class_numeric,
-    scale           = S7::class_numeric,
-    n               = S7::class_integer,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
+    xend = S7::class_numeric,
+    yend = S7::class_numeric,
+    scale = S7::class_numeric,
+    n = S7::class_integer,
     path_distortion = noise_bridge,
     points = S7::new_property(
       class = xy,
@@ -93,14 +93,30 @@ curve_twist <- S7::new_class(
     )
   },
   validator = function(self) {
-    if (length(self@x) != 1) return("x must be length 1")
-    if (length(self@y) != 1) return("y must be length 1")
-    if (length(self@xend) != 1) return("xend must be length 1")
-    if (length(self@yend) != 1) return("yend must be length 1")
-    if (length(self@scale) != 1) return("scale must be length 1")
-    if (length(self@n) != 1) return("n must be length 1")
-    if (self@scale < 0) return("scale must be a non-negative number")
-    if (self@n < 1L) return("n must be a positive integer")
+    if (length(self@x) != 1) {
+      return("x must be length 1")
+    }
+    if (length(self@y) != 1) {
+      return("y must be length 1")
+    }
+    if (length(self@xend) != 1) {
+      return("xend must be length 1")
+    }
+    if (length(self@yend) != 1) {
+      return("yend must be length 1")
+    }
+    if (length(self@scale) != 1) {
+      return("scale must be length 1")
+    }
+    if (length(self@n) != 1) {
+      return("n must be length 1")
+    }
+    if (self@scale < 0) {
+      return("scale must be a non-negative number")
+    }
+    if (self@n < 1L) {
+      return("n must be a positive integer")
+    }
   }
 )
 
@@ -133,17 +149,19 @@ curve_twist <- S7::new_class(
 #' @family 1D curves
 #' @export
 curve_twists <- function(x = 0,
-                          y = 0,
-                          xend = 1,
-                          yend = 1,
-                          scale = 0.2,
-                          n = 100L,
-                          path_distortion = noise_bridge(),
-                          trans = trans_identity(),
-                          ...) {
+                         y = 0,
+                         xend = 1,
+                         yend = 1,
+                         scale = 0.2,
+                         n = 100L,
+                         path_distortion = noise_bridge(),
+                         trans = trans_identity(),
+                         ...) {
   vectorize_shapes(curve_twist, c(
-    list(x = x, y = y, xend = xend, yend = yend, scale = scale, n = n,
-         path_distortion = path_distortion, trans = trans),
+    list(
+      x = x, y = y, xend = xend, yend = yend, scale = scale, n = n,
+      path_distortion = path_distortion, trans = trans
+    ),
     list(...)
   ))
 }

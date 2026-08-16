@@ -16,4 +16,3 @@ test_that("bezier validates control point lengths", {
   expect_error(shape_bezier(x = c(0, 1), y = c(0, 1, 2)))
   expect_error(shape_bezier(x = 0, y = 0))
 })
-

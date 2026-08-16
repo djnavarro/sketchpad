@@ -105,7 +105,9 @@ drawable <- S7::new_class(
     )
   ),
   validator = function(self) {
-    if (length(self@geometry) != 1) return("geometry must be a single string")
+    if (length(self@geometry) != 1) {
+      return("geometry must be a single string")
+    }
     if (!self@geometry %in% c("polygon", "path", "points")) {
       return('geometry must be one of "polygon", "path", or "points"')
     }
@@ -123,4 +125,3 @@ drawable <- S7::new_class(
     )
   }
 )
-

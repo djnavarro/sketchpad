@@ -178,11 +178,11 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' @family fill helpers
 #' @export
 fill_hatch <- function(color = "black",
-                        angle = 45,
-                        spacing = 0.1,
-                        aspect = 1,
-                        linewidth = 1,
-                        extend = "repeat") {
+                       angle = 45,
+                       spacing = 0.1,
+                       aspect = 1,
+                       linewidth = 1,
+                       extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
   if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
     rlang::abort("linewidth must be a single positive number")
@@ -277,11 +277,11 @@ fill_hatch <- function(color = "black",
 #' @family fill helpers
 #' @export
 fill_crosshatch <- function(color = "black",
-                             angle = 45,
-                             spacing = 0.1,
-                             aspect = 1,
-                             linewidth = 1,
-                             extend = "repeat") {
+                            angle = 45,
+                            spacing = 0.1,
+                            aspect = 1,
+                            linewidth = 1,
+                            extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
@@ -391,9 +391,9 @@ fill_crosshatch <- function(color = "black",
 #' @family fill helpers
 #' @export
 fill_checker <- function(color = c("black", "white"),
-                          spacing = 0.2,
-                          aspect = 1,
-                          extend = "repeat") {
+                         spacing = 0.2,
+                         aspect = 1,
+                         extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color", min_length = 2)
 
@@ -483,12 +483,12 @@ fill_checker <- function(color = c("black", "white"),
 #' @family fill helpers
 #' @export
 fill_stipple <- function(color = "black",
-                          radius = 0.15,
-                          spacing = 0.3,
-                          aspect = 1,
-                          n = 4L,
-                          seed = 1L,
-                          extend = "repeat") {
+                         radius = 0.15,
+                         spacing = 0.3,
+                         aspect = 1,
+                         n = 4L,
+                         seed = 1L,
+                         extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(radius) || length(radius) != 1 || radius <= 0) {
@@ -625,13 +625,13 @@ fill_stipple <- function(color = "black",
 #' @family fill helpers
 #' @export
 fill_scatter <- function(unit = shape_circle(radius = 1),
-                          n = 6L,
-                          size = 0.2,
-                          color = NULL,
-                          spacing = 1,
-                          aspect = 1,
-                          seed = 1L,
-                          extend = "repeat") {
+                         n = 6L,
+                         size = 0.2,
+                         color = NULL,
+                         spacing = 1,
+                         aspect = 1,
+                         seed = 1L,
+                         extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   if (!S7::S7_inherits(unit, drawable)) {
     rlang::abort("unit must be a drawable")
@@ -738,12 +738,12 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
 #' @family fill helpers
 #' @export
 fill_halftone <- function(color = "black",
-                           radius = c(0.05, 0.2),
-                           spacing = 0.3,
-                           aspect = 1,
-                           n = 4L,
-                           seed = 1L,
-                           extend = "repeat") {
+                          radius = c(0.05, 0.2),
+                          spacing = 0.3,
+                          aspect = 1,
+                          n = 4L,
+                          seed = 1L,
+                          extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(radius) || length(radius) != 2 || any(radius <= 0)) {
@@ -919,31 +919,31 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #' @family fill helpers
 #' @export
 fill_scribble <- function(color = "black",
-                           direction = c("horizontal", "vertical"),
-                           n_lines = 5L,
-                           n_harmonics = 3L,
-                           amplitude = 0.35,
-                           resolution = 200L,
-                           linewidth = 1,
-                           spacing = 0.25,
-                           aspect = 1,
-                           seed = 1L,
-                           extend = "repeat") {
+                          direction = c("horizontal", "vertical"),
+                          n_lines = 5L,
+                          n_harmonics = 3L,
+                          amplitude = 0.35,
+                          resolution = 200L,
+                          linewidth = 1,
+                          spacing = 0.25,
+                          aspect = 1,
+                          seed = 1L,
+                          extend = "repeat") {
   direction <- match.arg(direction)
   validate_fill_args(NULL, spacing, aspect)
   if (!is.numeric(n_lines) || length(n_lines) != 1 ||
-        n_lines < 1 || n_lines != round(n_lines)) {
+    n_lines < 1 || n_lines != round(n_lines)) {
     rlang::abort("n_lines must be a single positive integer")
   }
   if (!is.numeric(n_harmonics) || length(n_harmonics) != 1 ||
-        n_harmonics < 1 || n_harmonics != round(n_harmonics)) {
+    n_harmonics < 1 || n_harmonics != round(n_harmonics)) {
     rlang::abort("n_harmonics must be a single positive integer")
   }
   if (!is.numeric(amplitude) || length(amplitude) != 1 || amplitude < 0) {
     rlang::abort("amplitude must be a single non-negative number")
   }
   if (!is.numeric(resolution) || length(resolution) != 1 ||
-        resolution < 2 || resolution != round(resolution)) {
+    resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
   }
   validate_colors(color, "color")
@@ -1135,18 +1135,18 @@ noise_to_pixels <- function(value01, color, alpha) {
 #' @family fill helpers
 #' @export
 fill_noise <- function(color = "black",
-                        spacing = 0.5,
-                        aspect = 1,
-                        resolution = 32L,
-                        alpha = 1,
-                        frequency = 1,
-                        octaves = 2L,
-                        seed = 1L,
-                        extend = "repeat") {
+                       spacing = 0.5,
+                       aspect = 1,
+                       resolution = 32L,
+                       alpha = 1,
+                       frequency = 1,
+                       octaves = 2L,
+                       seed = 1L,
+                       extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(resolution) || length(resolution) != 1 ||
-        resolution < 2 || resolution != round(resolution)) {
+    resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
   }
   if (!is.numeric(alpha) || length(alpha) != 1 || alpha <= 0 || alpha > 1) {
@@ -1156,7 +1156,7 @@ fill_noise <- function(color = "black",
     rlang::abort("frequency must be a single non-negative number")
   }
   if (!is.numeric(octaves) || length(octaves) != 1 ||
-        octaves < 1 || octaves != round(octaves)) {
+    octaves < 1 || octaves != round(octaves)) {
     rlang::abort("octaves must be a single positive integer")
   }
   if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
@@ -1176,7 +1176,8 @@ fill_noise <- function(color = "black",
     nrow = resolution, ncol = resolution
   )
   raster <- grid::rasterGrob(
-    pixels, width = 1, height = 1,
+    pixels,
+    width = 1, height = 1,
     default.units = "npc", interpolate = TRUE
   )
 
@@ -1243,23 +1244,23 @@ fill_noise <- function(color = "black",
 #' @family fill helpers
 #' @export
 fill_marble <- function(color = c("white", "black"),
-                         spacing = 0.5,
-                         aspect = 1,
-                         resolution = 32L,
-                         stripes = 3L,
-                         warp = 4,
-                         frequency = 1,
-                         octaves = 3L,
-                         seed = 1L,
-                         extend = "repeat") {
+                        spacing = 0.5,
+                        aspect = 1,
+                        resolution = 32L,
+                        stripes = 3L,
+                        warp = 4,
+                        frequency = 1,
+                        octaves = 3L,
+                        seed = 1L,
+                        extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color", min_length = 2)
   if (!is.numeric(resolution) || length(resolution) != 1 ||
-        resolution < 2 || resolution != round(resolution)) {
+    resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
   }
   if (!is.numeric(stripes) || length(stripes) != 1 ||
-        stripes < 1 || stripes != round(stripes)) {
+    stripes < 1 || stripes != round(stripes)) {
     rlang::abort("stripes must be a single positive integer")
   }
   if (!is.numeric(warp) || length(warp) != 1 || warp < 0) {
@@ -1269,7 +1270,7 @@ fill_marble <- function(color = c("white", "black"),
     rlang::abort("frequency must be a single non-negative number")
   }
   if (!is.numeric(octaves) || length(octaves) != 1 ||
-        octaves < 1 || octaves != round(octaves)) {
+    octaves < 1 || octaves != round(octaves)) {
     rlang::abort("octaves must be a single positive integer")
   }
   if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
@@ -1293,7 +1294,8 @@ fill_marble <- function(color = c("white", "black"),
     nrow = resolution, ncol = resolution
   )
   raster <- grid::rasterGrob(
-    pixels, width = 1, height = 1,
+    pixels,
+    width = 1, height = 1,
     default.units = "npc", interpolate = TRUE
   )
 
@@ -1356,21 +1358,21 @@ fill_marble <- function(color = c("white", "black"),
 #' @family fill helpers
 #' @export
 fill_flow <- function(color = "black",
-                       spacing = 0.5,
-                       aspect = 1,
-                       resolution = 32L,
-                       alpha = 1,
-                       warp = 2,
-                       warp_frequency = 1,
-                       warp_octaves = 1L,
-                       frequency = 1,
-                       octaves = 2L,
-                       seed = 1L,
-                       extend = "repeat") {
+                      spacing = 0.5,
+                      aspect = 1,
+                      resolution = 32L,
+                      alpha = 1,
+                      warp = 2,
+                      warp_frequency = 1,
+                      warp_octaves = 1L,
+                      frequency = 1,
+                      octaves = 2L,
+                      seed = 1L,
+                      extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (!is.numeric(resolution) || length(resolution) != 1 ||
-        resolution < 2 || resolution != round(resolution)) {
+    resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
   }
   if (!is.numeric(alpha) || length(alpha) != 1 || alpha <= 0 || alpha > 1) {
@@ -1383,14 +1385,14 @@ fill_flow <- function(color = "black",
     rlang::abort("warp_frequency must be a single non-negative number")
   }
   if (!is.numeric(warp_octaves) || length(warp_octaves) != 1 ||
-        warp_octaves < 1 || warp_octaves != round(warp_octaves)) {
+    warp_octaves < 1 || warp_octaves != round(warp_octaves)) {
     rlang::abort("warp_octaves must be a single positive integer")
   }
   if (!is.numeric(frequency) || length(frequency) != 1 || frequency < 0) {
     rlang::abort("frequency must be a single non-negative number")
   }
   if (!is.numeric(octaves) || length(octaves) != 1 ||
-        octaves < 1 || octaves != round(octaves)) {
+    octaves < 1 || octaves != round(octaves)) {
     rlang::abort("octaves must be a single positive integer")
   }
   if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
@@ -1417,7 +1419,8 @@ fill_flow <- function(color = "black",
     nrow = resolution, ncol = resolution
   )
   raster <- grid::rasterGrob(
-    pixels, width = 1, height = 1,
+    pixels,
+    width = 1, height = 1,
     default.units = "npc", interpolate = TRUE
   )
 
@@ -1475,14 +1478,14 @@ fill_flow <- function(color = "black",
 #' @family fill helpers
 #' @export
 fill_charcoal <- function(color = "gray15",
-                           spacing = 0.25,
-                           aspect = 1,
-                           resolution = 32L,
-                           alpha = 1,
-                           frequency = 4,
-                           octaves = 3L,
-                           seed = 1L,
-                           extend = "repeat") {
+                          spacing = 0.25,
+                          aspect = 1,
+                          resolution = 32L,
+                          alpha = 1,
+                          frequency = 4,
+                          octaves = 3L,
+                          seed = 1L,
+                          extend = "repeat") {
   fill_noise(
     color = color, spacing = spacing, aspect = aspect, resolution = resolution,
     alpha = alpha, frequency = frequency, octaves = octaves, seed = seed,
@@ -1547,11 +1550,11 @@ fill_charcoal <- function(color = "gray15",
 #' @family fill helpers
 #' @export
 fill_image <- function(image,
-                        preserve_aspect = TRUE,
-                        spacing = 1,
-                        aspect = 1,
-                        interpolate = TRUE,
-                        extend = "repeat") {
+                       preserve_aspect = TRUE,
+                       spacing = 1,
+                       aspect = 1,
+                       interpolate = TRUE,
+                       extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   if (!is.matrix(image) && !is.array(image) && !inherits(image, "raster")) {
     rlang::abort(
@@ -1597,7 +1600,8 @@ fill_image <- function(image,
   }
 
   content <- grid::rasterGrob(
-    img_raster, x = 0.5, y = 0.5, width = w, height = h,
+    img_raster,
+    x = 0.5, y = 0.5, width = w, height = h,
     default.units = "npc", interpolate = interpolate
   )
 
@@ -1665,12 +1669,12 @@ fill_image <- function(image,
 #' @family fill helpers
 #' @export
 fill_gradient <- function(color = c("white", "black"),
-                           type = c("linear", "radial"),
-                           angle = 45,
-                           stops = NULL,
-                           spacing = 1,
-                           aspect = 1,
-                           extend = "pad") {
+                          type = c("linear", "radial"),
+                          angle = 45,
+                          stops = NULL,
+                          spacing = 1,
+                          aspect = 1,
+                          extend = "pad") {
   type <- match.arg(type)
   validate_fill_args(NULL, spacing, aspect)
   if (!is.character(color) || length(color) < 2) {
@@ -1773,10 +1777,10 @@ fill_gradient <- function(color = c("white", "black"),
 #' @family fill helpers
 #' @export
 fill_vignette <- function(color = "black",
-                           background = NA,
-                           spacing = 1,
-                           aspect = 1,
-                           extend = "repeat") {
+                          background = NA,
+                          spacing = 1,
+                          aspect = 1,
+                          extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
   validate_colors(color, "color")
   if (length(background) != 1 || !(is.na(background) || is.character(background))) {
@@ -1878,10 +1882,10 @@ fill_vignette <- function(color = "black",
 #' @family fill helpers
 #' @export
 fill_stripe <- function(color = c("black", "white"),
-                         angle = 45,
-                         spacing = 0.2,
-                         aspect = 1,
-                         extend = "repeat") {
+                        angle = 45,
+                        spacing = 0.2,
+                        aspect = 1,
+                        extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
   validate_colors(color, "color", min_length = 2)
 

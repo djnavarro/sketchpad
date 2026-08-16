@@ -44,8 +44,12 @@ curve_line <- S7::new_class(
     )
   ),
   validator = function(self) {
-    if (length(self@x) != length(self@y)) return("x and y must be the same length")
-    if (length(self@x) < 2) return("at least two control points are required")
+    if (length(self@x) != length(self@y)) {
+      return("x and y must be the same length")
+    }
+    if (length(self@x) < 2) {
+      return("at least two control points are required")
+    }
   },
   constructor = function(x, y, trans = trans_identity(), ...) {
     S7::new_object(

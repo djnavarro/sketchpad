@@ -30,10 +30,18 @@ bernstein <- function(beta, t = seq(0, 1, .01)) {
 #' @return An error message string, or `NULL` if valid.
 #' @noRd
 validate_bezier_args <- function(x, y, n) {
-  if (length(x) != length(y)) return("x and y must be the same length")
-  if (length(x) < 2) return("at least two control points are required")
-  if (length(n) != 1) return("n must be length 1")
-  if (n < 1L) return("n must be a positive integer")
+  if (length(x) != length(y)) {
+    return("x and y must be the same length")
+  }
+  if (length(x) < 2) {
+    return("at least two control points are required")
+  }
+  if (length(n) != 1) {
+    return("n must be length 1")
+  }
+  if (n < 1L) {
+    return("n must be a positive integer")
+  }
   NULL
 }
 
@@ -149,4 +157,3 @@ shape_beziers <- function(x, y, n = 100L, trans = trans_identity(), ...) {
     list(...)
   ))
 }
-

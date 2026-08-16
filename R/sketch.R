@@ -154,4 +154,3 @@ method(`[`, sketch) <- function(x, i) {
   x@shapes <- x@shapes[i]
   x
 }
-

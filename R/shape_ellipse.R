@@ -28,11 +28,11 @@ shape_ellipse <- S7::new_class(
   name = "shape_ellipse",
   parent = drawable,
   properties = list(
-    x        = S7::class_numeric,
-    y        = S7::class_numeric,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
     x_radius = S7::class_numeric,
     y_radius = S7::class_numeric,
-    n        = S7::class_integer,
+    n = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
@@ -45,14 +45,30 @@ shape_ellipse <- S7::new_class(
     )
   ),
   validator = function(self) {
-    if (length(self@x) != 1) return("x must be length 1")
-    if (length(self@y) != 1) return("y must be length 1")
-    if (length(self@x_radius) != 1) return("x_radius must be length 1")
-    if (length(self@y_radius) != 1) return("y_radius must be length 1")
-    if (length(self@n) != 1) return("n must be length 1")
-    if (self@x_radius < 0) return("x_radius must be a non-negative number")
-    if (self@y_radius < 0) return("y_radius must be a non-negative number")
-    if (self@n < 1L) return("n must be a positive integer")
+    if (length(self@x) != 1) {
+      return("x must be length 1")
+    }
+    if (length(self@y) != 1) {
+      return("y must be length 1")
+    }
+    if (length(self@x_radius) != 1) {
+      return("x_radius must be length 1")
+    }
+    if (length(self@y_radius) != 1) {
+      return("y_radius must be length 1")
+    }
+    if (length(self@n) != 1) {
+      return("n must be length 1")
+    }
+    if (self@x_radius < 0) {
+      return("x_radius must be a non-negative number")
+    }
+    if (self@y_radius < 0) {
+      return("y_radius must be a non-negative number")
+    }
+    if (self@n < 1L) {
+      return("n must be a positive integer")
+    }
   },
   constructor = function(x = 0, y = 0, x_radius = 1, y_radius = 1, n = 100L,
                          trans = trans_identity(), ...) {
@@ -92,7 +108,7 @@ shape_ellipse <- S7::new_class(
 #' @family 2D shapes
 #' @export
 shape_ellipses <- function(x = 0, y = 0, x_radius = 1, y_radius = 1, n = 100L,
-                            trans = trans_identity(), ...) {
+                           trans = trans_identity(), ...) {
   vectorize_shapes(shape_ellipse, c(
     list(x = x, y = y, x_radius = x_radius, y_radius = y_radius, n = n, trans = trans),
     list(...)

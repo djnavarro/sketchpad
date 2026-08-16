@@ -33,12 +33,12 @@ curve_arc <- S7::new_class(
   name = "curve_arc",
   parent = drawable,
   properties = list(
-    x      = S7::class_numeric,
-    y      = S7::class_numeric,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
     radius = S7::class_numeric,
-    start  = S7::class_numeric,
-    end    = S7::class_numeric,
-    n      = S7::class_integer,
+    start = S7::class_numeric,
+    end = S7::class_numeric,
+    n = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
@@ -90,7 +90,7 @@ curve_arc <- S7::new_class(
 #' @family 1D curves
 #' @export
 curve_arcs <- function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L,
-                        trans = trans_identity(), ...) {
+                       trans = trans_identity(), ...) {
   vectorize_shapes(curve_arc, c(
     list(x = x, y = y, radius = radius, start = start, end = end, n = n, trans = trans),
     list(...)

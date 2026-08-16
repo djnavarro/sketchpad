@@ -39,12 +39,12 @@ curve_spiral <- S7::new_class(
   name = "curve_spiral",
   parent = drawable,
   properties = list(
-    x            = S7::class_numeric,
-    y            = S7::class_numeric,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
     radius_start = S7::class_numeric,
-    radius_end   = S7::class_numeric,
-    turns        = S7::class_numeric,
-    n            = S7::class_integer,
+    radius_end = S7::class_numeric,
+    turns = S7::class_numeric,
+    n = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
@@ -58,16 +58,36 @@ curve_spiral <- S7::new_class(
     )
   ),
   validator = function(self) {
-    if (length(self@x) != 1) return("x must be length 1")
-    if (length(self@y) != 1) return("y must be length 1")
-    if (length(self@radius_start) != 1) return("radius_start must be length 1")
-    if (length(self@radius_end) != 1) return("radius_end must be length 1")
-    if (length(self@turns) != 1) return("turns must be length 1")
-    if (length(self@n) != 1) return("n must be length 1")
-    if (self@radius_start < 0) return("radius_start must be a non-negative number")
-    if (self@radius_end < 0) return("radius_end must be a non-negative number")
-    if (self@turns <= 0) return("turns must be a positive number")
-    if (self@n < 1L) return("n must be a positive integer")
+    if (length(self@x) != 1) {
+      return("x must be length 1")
+    }
+    if (length(self@y) != 1) {
+      return("y must be length 1")
+    }
+    if (length(self@radius_start) != 1) {
+      return("radius_start must be length 1")
+    }
+    if (length(self@radius_end) != 1) {
+      return("radius_end must be length 1")
+    }
+    if (length(self@turns) != 1) {
+      return("turns must be length 1")
+    }
+    if (length(self@n) != 1) {
+      return("n must be length 1")
+    }
+    if (self@radius_start < 0) {
+      return("radius_start must be a non-negative number")
+    }
+    if (self@radius_end < 0) {
+      return("radius_end must be a non-negative number")
+    }
+    if (self@turns <= 0) {
+      return("turns must be a positive number")
+    }
+    if (self@n < 1L) {
+      return("n must be a positive integer")
+    }
   },
   constructor = function(x = 0,
                          y = 0,
@@ -114,16 +134,18 @@ curve_spiral <- S7::new_class(
 #' @family 1D curves
 #' @export
 curve_spirals <- function(x = 0,
-                           y = 0,
-                           radius_start = 0,
-                           radius_end = 1,
-                           turns = 3,
-                           n = 200L,
-                           trans = trans_identity(),
-                           ...) {
+                          y = 0,
+                          radius_start = 0,
+                          radius_end = 1,
+                          turns = 3,
+                          n = 200L,
+                          trans = trans_identity(),
+                          ...) {
   vectorize_shapes(curve_spiral, c(
-    list(x = x, y = y, radius_start = radius_start, radius_end = radius_end,
-         turns = turns, n = n, trans = trans),
+    list(
+      x = x, y = y, radius_start = radius_start, radius_end = radius_end,
+      turns = turns, n = n, trans = trans
+    ),
     list(...)
   ))
 }

@@ -92,4 +92,3 @@ test_that("convert to curve_raw/points_raw doesn't require from to already have 
   expect_identical(convert(cc, curve_raw)@geometry, "path")
   expect_identical(convert(cc, points_raw)@geometry, "points")
 })
-

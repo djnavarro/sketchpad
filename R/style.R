@@ -86,36 +86,50 @@ fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern")
 style <- S7::new_class(
   name = "style",
   properties = list(
-    color       = S7::new_property(S7::class_character, default = "black"),
-    fill        = S7::new_property(fill_class, default = fill_solid("black")),
-    linewidth   = S7::new_property(S7::class_numeric, default = 1),
-    linetype    = S7::new_property(
+    color = S7::new_property(S7::class_character, default = "black"),
+    fill = S7::new_property(fill_class, default = fill_solid("black")),
+    linewidth = S7::new_property(S7::class_numeric, default = 1),
+    linetype = S7::new_property(
       S7::new_union(S7::class_character, S7::class_numeric),
       default = "solid"
     ),
-    linejoin    = S7::new_property(S7::class_character, default = "round"),
-    lineend     = S7::new_property(S7::class_character, default = "round"),
-    linemitre   = S7::new_property(S7::class_numeric, default = 10),
+    linejoin = S7::new_property(S7::class_character, default = "round"),
+    lineend = S7::new_property(S7::class_character, default = "round"),
+    linemitre = S7::new_property(S7::class_numeric, default = 10),
     color_alpha = S7::new_property(S7::class_numeric, default = 1),
-    fill_alpha  = S7::new_property(S7::class_numeric, default = 1)
+    fill_alpha = S7::new_property(S7::class_numeric, default = 1)
   ),
   validator = function(self) {
-    if (length(self@linetype) != 1) return("linetype must be a single value")
-    if (length(self@linejoin) != 1) return("linejoin must be a single string")
+    if (length(self@linetype) != 1) {
+      return("linetype must be a single value")
+    }
+    if (length(self@linejoin) != 1) {
+      return("linejoin must be a single string")
+    }
     if (!self@linejoin %in% c("round", "mitre", "bevel")) {
       return('linejoin must be one of "round", "mitre", or "bevel"')
     }
-    if (length(self@lineend) != 1) return("lineend must be a single string")
+    if (length(self@lineend) != 1) {
+      return("lineend must be a single string")
+    }
     if (!self@lineend %in% c("round", "butt", "square")) {
       return('lineend must be one of "round", "butt", or "square"')
     }
-    if (length(self@linemitre) != 1) return("linemitre must be a single number")
-    if (self@linemitre < 1) return("linemitre must be at least 1")
-    if (length(self@color_alpha) != 1) return("color_alpha must be a single number")
+    if (length(self@linemitre) != 1) {
+      return("linemitre must be a single number")
+    }
+    if (self@linemitre < 1) {
+      return("linemitre must be at least 1")
+    }
+    if (length(self@color_alpha) != 1) {
+      return("color_alpha must be a single number")
+    }
     if (self@color_alpha < 0 || self@color_alpha > 1) {
       return("color_alpha must be between 0 and 1")
     }
-    if (length(self@fill_alpha) != 1) return("fill_alpha must be a single number")
+    if (length(self@fill_alpha) != 1) {
+      return("fill_alpha must be a single number")
+    }
     if (self@fill_alpha < 0 || self@fill_alpha > 1) {
       return("fill_alpha must be between 0 and 1")
     }

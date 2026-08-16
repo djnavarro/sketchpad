@@ -131,10 +131,10 @@ shape_stroke <- S7::new_class(
   name = "shape_stroke",
   parent = drawable,
   properties = list(
-    x          = S7::class_numeric,
-    y          = S7::class_numeric,
-    width      = S7::class_numeric,
-    n          = S7::class_integer,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
+    width = S7::class_numeric,
+    n = S7::class_integer,
     distortion = noise_field,
     points = S7::new_property(
       class = xy,
@@ -153,12 +153,24 @@ shape_stroke <- S7::new_class(
     )
   ),
   validator = function(self) {
-    if (length(self@x) != length(self@y)) return("x and y must be the same length")
-    if (length(self@x) < 2) return("at least two control points are required")
-    if (length(self@width) != 1) return("width must be length 1")
-    if (length(self@n) != 1) return("n must be length 1")
-    if (self@width < 0) return("width must be a non-negative number")
-    if (self@n < 2L) return("n must be an integer of at least 2")
+    if (length(self@x) != length(self@y)) {
+      return("x and y must be the same length")
+    }
+    if (length(self@x) < 2) {
+      return("at least two control points are required")
+    }
+    if (length(self@width) != 1) {
+      return("width must be length 1")
+    }
+    if (length(self@n) != 1) {
+      return("n must be length 1")
+    }
+    if (self@width < 0) {
+      return("width must be a non-negative number")
+    }
+    if (self@n < 2L) {
+      return("n must be an integer of at least 2")
+    }
   },
   constructor = function(x,
                          y,

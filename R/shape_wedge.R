@@ -20,14 +20,30 @@ arc_points <- function(x, y, radius, start, end, n) {
 #'
 #' @noRd
 validate_arc_args <- function(x, y, radius, start, end, n) {
-  if (length(x) != 1) return("x must be length 1")
-  if (length(y) != 1) return("y must be length 1")
-  if (length(radius) != 1) return("radius must be length 1")
-  if (length(start) != 1) return("start must be length 1")
-  if (length(end) != 1) return("end must be length 1")
-  if (length(n) != 1) return("n must be length 1")
-  if (radius < 0) return("radius must be a non-negative number")
-  if (n < 2L) return("n must be an integer of at least 2")
+  if (length(x) != 1) {
+    return("x must be length 1")
+  }
+  if (length(y) != 1) {
+    return("y must be length 1")
+  }
+  if (length(radius) != 1) {
+    return("radius must be length 1")
+  }
+  if (length(start) != 1) {
+    return("start must be length 1")
+  }
+  if (length(end) != 1) {
+    return("end must be length 1")
+  }
+  if (length(n) != 1) {
+    return("n must be length 1")
+  }
+  if (radius < 0) {
+    return("radius must be a non-negative number")
+  }
+  if (n < 2L) {
+    return("n must be an integer of at least 2")
+  }
 }
 
 #' A pie-slice wedge
@@ -65,12 +81,12 @@ shape_wedge <- S7::new_class(
   name = "shape_wedge",
   parent = drawable,
   properties = list(
-    x      = S7::class_numeric,
-    y      = S7::class_numeric,
+    x = S7::class_numeric,
+    y = S7::class_numeric,
     radius = S7::class_numeric,
-    start  = S7::class_numeric,
-    end    = S7::class_numeric,
-    n      = S7::class_integer,
+    start = S7::class_numeric,
+    end = S7::class_numeric,
+    n = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
@@ -125,7 +141,7 @@ shape_wedge <- S7::new_class(
 #' @family 2D shapes
 #' @export
 shape_wedges <- function(x = 0, y = 0, radius = 1, start = 0, end = pi / 2, n = 100L,
-                          trans = trans_identity(), ...) {
+                         trans = trans_identity(), ...) {
   vectorize_shapes(shape_wedge, c(
     list(x = x, y = y, radius = radius, start = start, end = end, n = n, trans = trans),
     list(...)

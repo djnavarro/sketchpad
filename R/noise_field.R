@@ -65,11 +65,21 @@ noise_field <- S7::new_class(
     )
   },
   validator = function(self) {
-    if (length(self@frequency) != 1) return("frequency must be length 1")
-    if (length(self@octaves) != 1) return("octaves must be length 1")
-    if (length(self@seed) != 1) return("seed must be length 1")
-    if (self@frequency < 0) return("frequency must be a non-negative number")
-    if (self@octaves < 1L) return("octaves must be a positive integer")
+    if (length(self@frequency) != 1) {
+      return("frequency must be length 1")
+    }
+    if (length(self@octaves) != 1) {
+      return("octaves must be length 1")
+    }
+    if (length(self@seed) != 1) {
+      return("seed must be length 1")
+    }
+    if (self@frequency < 0) {
+      return("frequency must be a non-negative number")
+    }
+    if (self@octaves < 1L) {
+      return("octaves must be a positive integer")
+    }
   }
 )
 

@@ -54,7 +54,8 @@ test_that("effect_bristle() fans bristles at different perpendicular offsets", {
 
 test_that("effect_bristle() scales object's own width per bristle", {
   sk <- effect_bristle(
-    shape_stroke(x = c(0, 1, 2), y = c(0, 1, 0), width = 0.1), n_bristles = 5L
+    shape_stroke(x = c(0, 1, 2), y = c(0, 1, 0), width = 0.1),
+    n_bristles = 5L
   )
   widths <- purrr::map_dbl(1:5, \(i) sk[[i]]@width)
   expect_true(length(unique(round(widths, 6))) > 1)
