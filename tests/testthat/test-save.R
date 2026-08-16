@@ -8,6 +8,27 @@ test_that("save_png() writes a non-empty file", {
 
 test_that("save_svg() writes a non-empty file", {
   file <- withr::local_tempfile(fileext = ".svg")
+
+  # capabilities("cairo") reports whether R was *built* with cairo
+  # support, not whether the cairo shared library's own runtime
+  # dependencies actually resolve -- on some macOS CI runners (missing
+  # XQuartz/X11), grDevices::svg() fails to dlopen cairo even though
+  # capabilities("cairo") still reports TRUE. Probe the real device
+  # directly instead of trusting that flag.
+  probe <- withr::local_tempfile(fileext = ".svg")
+  svg_works <- withCallingHandlers(
+    tryCatch(
+      {
+        grDevices::svg(probe)
+        grDevices::dev.off()
+        file.exists(probe) && file.size(probe) > 0
+      },
+      error = function(e) FALSE
+    ),
+    warning = function(w) invokeRestart("muffleWarning")
+  )
+  skip_if_not(svg_works, "svg() device unavailable in this environment (likely missing cairo/X11 support)")
+
   save_svg(shape_circle(radius = 1), file)
   expect_true(file.exists(file))
   expect_gt(file.size(file), 0)
