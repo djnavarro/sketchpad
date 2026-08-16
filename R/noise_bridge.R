@@ -57,17 +57,17 @@ smooth_bridge <- function(n, scale = .1, smooth = 0, seed = 1L) {
 #' @param seed Integer seed. Default `1L`.
 #'
 #' @examples
-#' noise_bridge(smooth = 5L, seed = 4821L)
+#' noise_bridge(smooth = 5L, seed = 4821)
 #'
 #' # more smoothing passes give a gentler bridge; embedding it in
 #' # shape_twist()'s path_distortion makes the effect easy to see
 #' draw(shape_twist(
 #'   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-#'   path_distortion = noise_bridge(smooth = 0L, seed = 7734L)
+#'   path_distortion = noise_bridge(smooth = 0L, seed = 7734)
 #' ))
 #' draw(shape_twist(
 #'   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-#'   path_distortion = noise_bridge(smooth = 20L, seed = 7734L)
+#'   path_distortion = noise_bridge(smooth = 20L, seed = 7734)
 #' ))
 #'
 #' @family noise helpers
@@ -82,7 +82,7 @@ noise_bridge <- S7::new_class(
     S7::new_object(
       S7::S7_object(),
       smooth = smooth,
-      seed = seed
+      seed = as_integerish(seed, "seed")
     )
   },
   validator = function(self) {

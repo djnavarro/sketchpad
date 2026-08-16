@@ -22,7 +22,7 @@
 #' # ribbon's length, giving a more textured/organic edge
 #' draw(shape_ribbon(
 #'   x = 0, y = 0, xend = 1, yend = 1, width = 0.3,
-#'   distortion = noise_field(frequency = 8, seed = 99L)
+#'   distortion = noise_field(frequency = 8, seed = 99)
 #' ))
 #'
 #' draw(shape_ribbon(
@@ -78,7 +78,7 @@ shape_ribbon <- S7::new_class(
       xend = xend,
       yend = yend,
       width = width,
-      n = n,
+      n = as_integerish(n, "n"),
       distortion = distortion,
       style = style(...)
     )

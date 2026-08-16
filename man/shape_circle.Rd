@@ -49,7 +49,7 @@ than 1 raise an error.
 }
 \examples{
 draw(shape_circle(radius = 1))
-draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6L, color = "darkred"))
+draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6, color = "darkred"))
 draw(shape_circle(radius = 1, fill = "steelblue", color = NA_character_))
 draw(shape_circle(radius = 1, fill = fill_hatch(angle = 30)))
 

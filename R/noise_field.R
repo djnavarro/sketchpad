@@ -28,7 +28,7 @@
 #' @param seed Integer seed for the noise field. Default `1L`.
 #'
 #' @examples
-#' noise_field(frequency = 2, octaves = 3L, seed = 4821L)
+#' noise_field(frequency = 2, octaves = 3, seed = 4821)
 #'
 #' # a noise_field's effect is easiest to see through a drawable that
 #' # samples it -- lower frequency gives broad, gentle undulation, higher
@@ -36,19 +36,19 @@
 #' draw(shape_blob(
 #'   radius = 1,
 #'   range = 0.4,
-#'   distortion = noise_field(frequency = 0.5, seed = 4821L)
+#'   distortion = noise_field(frequency = 0.5, seed = 4821)
 #' ))
 #' draw(shape_blob(
 #'   radius = 1,
 #'   range = 0.4,
-#'   distortion = noise_field(frequency = 6, seed = 4821L)
+#'   distortion = noise_field(frequency = 6, seed = 4821)
 #' ))
 #'
 #' # more octaves layer finer detail on top of the base frequency
 #' draw(shape_blob(
 #'   radius = 1,
 #'   range = 0.4,
-#'   distortion = noise_field(octaves = 6L, seed = 4821L)
+#'   distortion = noise_field(octaves = 6, seed = 4821)
 #' ))
 #'
 #' @family noise helpers
@@ -72,8 +72,8 @@ noise_field <- S7::new_class(
       noise = noise,
       fractal = fractal,
       frequency = frequency,
-      octaves = octaves,
-      seed = seed
+      octaves = as_integerish(octaves, "octaves"),
+      seed = as_integerish(seed, "seed")
     )
   },
   validator = function(self) {
@@ -113,16 +113,16 @@ noise_field <- S7::new_class(
 #' @return A numeric vector.
 #'
 #' @examples
-#' noise_sample(noise_field(seed = 4821L), x = 1:5, y = 1:5, to = c(0, 1))
+#' noise_sample(noise_field(seed = 4821), x = 1:5, y = 1:5, to = c(0, 1))
 #'
 #' # noise_bridge()'s method samples by point count instead of position
-#' noise_sample(noise_bridge(seed = 4821L), n = 5, scale = 1)
+#' noise_sample(noise_bridge(seed = 4821), n = 5, scale = 1)
 #'
 #' # sampled values can drive a drawable's own geometry, e.g. shape_blob()'s
 #' # radius perturbation (see its `points` getter)
 #' angle <- seq(0, 2 * pi, length.out = 12)
 #' noise_sample(
-#'   noise_field(seed = 4821L),
+#'   noise_field(seed = 4821),
 #'   x = cos(angle),
 #'   y = sin(angle),
 #'   to = c(0.8, 1.2)

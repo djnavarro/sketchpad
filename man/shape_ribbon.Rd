@@ -76,7 +76,7 @@ draw(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1, width = 0.3))
 # ribbon's length, giving a more textured/organic edge
 draw(shape_ribbon(
   x = 0, y = 0, xend = 1, yend = 1, width = 0.3,
-  distortion = noise_field(frequency = 8, seed = 99L)
+  distortion = noise_field(frequency = 8, seed = 99)
 ))
 
 draw(shape_ribbon(

@@ -65,7 +65,7 @@ draw(points_raw(
 # own outline (only style-related properties survive the round trip)
 draw(points_raw(x = runif(200), y = runif(200)))
 draw(S7::convert(
-  shape_blob(radius = 1, distortion = noise_field(seed = 42L)),
+  shape_blob(radius = 1, distortion = noise_field(seed = 42)),
   points_raw
 ))
 

@@ -16,7 +16,7 @@
 #'
 #' # any polygon can be "frozen" to a shape_raw by converting it
 #' frozen <- S7::convert(
-#'   shape_blob(radius = 1, distortion = noise_field(seed = 5150L)),
+#'   shape_blob(radius = 1, distortion = noise_field(seed = 5150)),
 #'   shape_raw
 #' )
 #' draw(frozen)

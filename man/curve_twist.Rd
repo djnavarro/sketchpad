@@ -89,20 +89,20 @@ path.
 \examples{
 draw(curve_twist(
   x = 0, y = 0, xend = 1, yend = 0,
-  path_distortion = noise_bridge(seed = 7734L)
+  path_distortion = noise_bridge(seed = 7734)
 ))
 
 # a larger scale wanders further from the straight line between the
 # endpoints
 draw(curve_twist(
   x = 0, y = 0, xend = 1, yend = 0, scale = 0.6,
-  path_distortion = noise_bridge(seed = 7734L)
+  path_distortion = noise_bridge(seed = 7734)
 ))
 
 # curve_twist() is shape_twist()'s backbone alone, with no ribbon width
 draw(shape_twist(
   x = 0, y = 0, xend = 1, yend = 0,
-  path_distortion = noise_bridge(seed = 7734L)
+  path_distortion = noise_bridge(seed = 7734)
 ))
 
 draw(curve_twists(x = 1:3, y = 0, xend = 2:4, yend = 1))
@@ -111,9 +111,9 @@ draw(curve_twists(x = 1:3, y = 0, xend = 2:4, yend = 1))
 draw(curve_twists(
   x = 0, y = 0, xend = 3, yend = 0,
   path_distortion = list(
-    noise_bridge(seed = 1L),
-    noise_bridge(seed = 2L),
-    noise_bridge(seed = 3L)
+    noise_bridge(seed = 1),
+    noise_bridge(seed = 2),
+    noise_bridge(seed = 3)
   )
 ))
 

@@ -81,7 +81,7 @@ validate_strokepath_path <- function(path) {
 #'     y = 0,
 #'     xend = 1,
 #'     yend = 0,
-#'     path_distortion = noise_bridge(seed = 7734L)
+#'     path_distortion = noise_bridge(seed = 7734)
 #'   ),
 #'   width = 0.15
 #' ))

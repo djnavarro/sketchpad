@@ -59,7 +59,7 @@ curve_bezier <- S7::new_class(
       drawable(geometry = "path", trans = trans, pathlike = TRUE),
       x = x,
       y = y,
-      n = n,
+      n = as_integerish(n, "n"),
       style = style(...)
     )
   }

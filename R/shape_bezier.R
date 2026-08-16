@@ -114,7 +114,7 @@ shape_bezier <- S7::new_class(
       drawable(trans = trans, pathlike = TRUE),
       x = x,
       y = y,
-      n = n,
+      n = as_integerish(n, "n"),
       style = style(...)
     )
   }

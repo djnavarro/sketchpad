@@ -47,7 +47,7 @@ functions themselves are configurable rather than hardcoded to
 \code{\link[ambient:gen_simplex]{ambient::gen_simplex()}}/\code{\link[ambient:fbm]{ambient::fbm()}}.
 }
 \examples{
-noise_field(frequency = 2, octaves = 3L, seed = 4821L)
+noise_field(frequency = 2, octaves = 3, seed = 4821)
 
 # a noise_field's effect is easiest to see through a drawable that
 # samples it -- lower frequency gives broad, gentle undulation, higher
@@ -55,19 +55,19 @@ noise_field(frequency = 2, octaves = 3L, seed = 4821L)
 draw(shape_blob(
   radius = 1,
   range = 0.4,
-  distortion = noise_field(frequency = 0.5, seed = 4821L)
+  distortion = noise_field(frequency = 0.5, seed = 4821)
 ))
 draw(shape_blob(
   radius = 1,
   range = 0.4,
-  distortion = noise_field(frequency = 6, seed = 4821L)
+  distortion = noise_field(frequency = 6, seed = 4821)
 ))
 
 # more octaves layer finer detail on top of the base frequency
 draw(shape_blob(
   radius = 1,
   range = 0.4,
-  distortion = noise_field(octaves = 6L, seed = 4821L)
+  distortion = noise_field(octaves = 6, seed = 4821)
 ))
 
 }

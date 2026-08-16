@@ -64,7 +64,7 @@ fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern")
 #'
 #' # linejoin/linemitre are most visible on a thick-stroked shape with a
 #' # sharp vertex
-#' star <- shape_polygon(n = 5L, radius = 1, fill = "white")
+#' star <- shape_polygon(n = 5, radius = 1, fill = "white")
 #' draw(shape_stroke(
 #'   x = star@points@x, y = star@points@y, width = 0.25,
 #'   linejoin = "mitre", linemitre = 1.5

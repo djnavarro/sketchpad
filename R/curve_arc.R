@@ -61,7 +61,7 @@ curve_arc <- S7::new_class(
       radius = radius,
       start = start,
       end = end,
-      n = n,
+      n = as_integerish(n, "n"),
       style = style(...)
     )
   }

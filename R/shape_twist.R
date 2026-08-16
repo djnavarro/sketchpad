@@ -53,18 +53,18 @@ twisted_path_points <- function(x, y, xend, yend, n, width, path_distortion) {
 #' @examples
 #' draw(shape_twist(
 #'   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-#'   path_distortion = noise_bridge(seed = 7734L)
+#'   path_distortion = noise_bridge(seed = 7734)
 #' ))
 #'
 #' # more smoothing passes make the Brownian bridge wander more gently;
 #' # fewer passes leave it jumpier
 #' draw(shape_twist(
 #'   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-#'   path_distortion = noise_bridge(smooth = 20L, seed = 7734L)
+#'   path_distortion = noise_bridge(smooth = 20L, seed = 7734)
 #' ))
 #' draw(shape_twist(
 #'   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-#'   path_distortion = noise_bridge(smooth = 0L, seed = 7734L)
+#'   path_distortion = noise_bridge(smooth = 0L, seed = 7734)
 #' ))
 #'
 #' @family 2D shapes
@@ -126,7 +126,7 @@ shape_twist <- S7::new_class(
       xend = xend,
       yend = yend,
       width = width,
-      n = n,
+      n = as_integerish(n, "n"),
       path_distortion = path_distortion,
       distortion = distortion,
       style = style(...)
@@ -186,7 +186,7 @@ shape_twist <- S7::new_class(
 #' # resemblance, as in README.Rmd's "Twists" example
 #' draw(shape_twists(
 #'   x = 0, y = 1:5, xend = 3, yend = 1:5, width = 0.15,
-#'   path_distortion = noise_bridge(seed = 2020L)
+#'   path_distortion = noise_bridge(seed = 2020)
 #' ))
 #'
 #' @family 2D shapes

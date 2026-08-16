@@ -106,7 +106,7 @@ curve_spiral <- S7::new_class(
       radius_start = radius_start,
       radius_end = radius_end,
       turns = turns,
-      n = n,
+      n = as_integerish(n, "n"),
       style = style(...)
     )
   }

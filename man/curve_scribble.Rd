@@ -103,16 +103,16 @@ distinct from each other. The result is a \link{sketch} containing one
 \code{curve_scribble()} per recycled row, rather than a single drawable.
 }
 \examples{
-draw(curve_scribble(width = 2, height = 0.5, seed = 5591L))
+draw(curve_scribble(width = 2, height = 0.5, seed = 5591))
 
 # more harmonics and higher amplitude give a more agitated wiggle
 draw(curve_scribble(
-  width = 2, height = 0.5, n_harmonics = 8L, amplitude = 0.6, seed = 5591L
+  width = 2, height = 0.5, n_harmonics = 8, amplitude = 0.6, seed = 5591
 ))
 
 # direction = "vertical" runs the curve bottom-to-top instead
 draw(curve_scribble(
-  width = 0.5, height = 2, direction = "vertical", seed = 5591L
+  width = 0.5, height = 2, direction = "vertical", seed = 5591
 ))
 
 draw(curve_scribbles(x = 1:3, width = 0.8, height = 0.5, seed = 1:3))

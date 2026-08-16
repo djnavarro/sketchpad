@@ -75,7 +75,7 @@
 #'
 #' # a coarser grain field (lower frequency) reads less like paper texture
 #' # and more like a mottled brushstroke
-#' draw(effect_grain(template, grain = noise_field(frequency = 3, seed = 2L)))
+#' draw(effect_grain(template, grain = noise_field(frequency = 3, seed = 2)))
 #'
 #' @family effects
 #' @export
@@ -120,7 +120,7 @@ effect_grain <- S7::new_class(
       S7::S7_object(),
       object = object,
       grain = grain,
-      resolution = as.integer(resolution),
+      resolution = as_integerish(resolution, "resolution"),
       color = color,
       alpha = alpha,
       background = background

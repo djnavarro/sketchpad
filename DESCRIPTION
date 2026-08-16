@@ -29,7 +29,8 @@ Suggests:
 Config/testthat/edition: 3
 Remotes: 
     djnavarro/waeponwifestre
-Collate: 'fill.R'
+Collate: 'utils.R'
+    'fill.R'
     'palette.R'
     'noise_field.R'
     'noise_bridge.R'

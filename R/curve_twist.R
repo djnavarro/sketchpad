@@ -35,20 +35,20 @@
 #' @examples
 #' draw(curve_twist(
 #'   x = 0, y = 0, xend = 1, yend = 0,
-#'   path_distortion = noise_bridge(seed = 7734L)
+#'   path_distortion = noise_bridge(seed = 7734)
 #' ))
 #'
 #' # a larger scale wanders further from the straight line between the
 #' # endpoints
 #' draw(curve_twist(
 #'   x = 0, y = 0, xend = 1, yend = 0, scale = 0.6,
-#'   path_distortion = noise_bridge(seed = 7734L)
+#'   path_distortion = noise_bridge(seed = 7734)
 #' ))
 #'
 #' # curve_twist() is shape_twist()'s backbone alone, with no ribbon width
 #' draw(shape_twist(
 #'   x = 0, y = 0, xend = 1, yend = 0,
-#'   path_distortion = noise_bridge(seed = 7734L)
+#'   path_distortion = noise_bridge(seed = 7734)
 #' ))
 #'
 #' @family 1D curves
@@ -90,7 +90,7 @@ curve_twist <- S7::new_class(
       xend = xend,
       yend = yend,
       scale = scale,
-      n = n,
+      n = as_integerish(n, "n"),
       path_distortion = path_distortion,
       style = style(...)
     )
@@ -147,9 +147,9 @@ curve_twist <- S7::new_class(
 #' draw(curve_twists(
 #'   x = 0, y = 0, xend = 3, yend = 0,
 #'   path_distortion = list(
-#'     noise_bridge(seed = 1L),
-#'     noise_bridge(seed = 2L),
-#'     noise_bridge(seed = 3L)
+#'     noise_bridge(seed = 1),
+#'     noise_bridge(seed = 2),
+#'     noise_bridge(seed = 3)
 #'   )
 #' ))
 #'
