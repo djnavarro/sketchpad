@@ -30,7 +30,7 @@ pak::pak("djnavarro/sketchpad")
 library(sketchpad)
 
 palette <- c(
-  "#e50000", "#ff8d00", "#ffee00", 
+  "#e50000", "#ff8d00", "#ffee00",
   "#028121", "#004cff", "#770088"
 )
 draw(shape_blobs(
