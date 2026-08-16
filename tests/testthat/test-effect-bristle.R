@@ -85,3 +85,11 @@ test_that("draw() renders an effect_bristle() sketch without error", {
   sk <- effect_bristle(shape_stroke(x = c(0, 1, 2), y = c(0, 1, 0), width = 0.05))
   expect_no_error(draw(sk))
 })
+
+test_that("effect_bristle() rejects a multi-sub-path drawable", {
+  multi <- shape_combine(
+    shape_stroke(x = c(0, 1), y = c(0, 1), width = 0.1),
+    shape_stroke(x = c(5, 6), y = c(0, 1), width = 0.1)
+  )
+  expect_error(effect_bristle(multi), "multi-sub-path")
+})

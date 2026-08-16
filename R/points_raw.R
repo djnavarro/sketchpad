@@ -14,7 +14,16 @@
 #' geometry has no line to stroke and no interior to fill. Only `style@color`
 #' is used, as the marker colour.
 #'
+#' `id` (see [xy]'s own `id`) is accepted and stored for consistency with
+#' [shape_raw()]/[curve_raw()] and to round-trip through [convert()], but
+#' is otherwise inert here -- `grid::pointsGrob()` has no sub-path
+#' concept, consistent with `fill` already being inert for `"points"`
+#' geometry.
+#'
 #' @param x,y Numeric vectors of x/y coordinates.
+#' @param id Integer (or integerish numeric) vector the same length as
+#'   `x`/`y`. Default `NULL` (see Details for why this has no visible
+#'   effect).
 #' @param trans A [trans] object applied to the computed points. Default
 #'   [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
@@ -49,23 +58,29 @@ points_raw <- S7::new_class(
   properties = list(
     x = S7::class_numeric,
     y = S7::class_numeric,
+    id = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
-        apply_trans(self@trans, xy(x = self@x, y = self@y))
+        apply_trans(self@trans, xy(x = self@x, y = self@y, id = self@id))
       }
     )
   ),
   validator = function(self) {
     if (length(self@x) != length(self@y)) {
-      "x and y must be the same length"
+      return("x and y must be the same length")
+    }
+    if (length(self@id) != length(self@x)) {
+      return("id must be the same length as x and y")
     }
   },
-  constructor = function(x, y, trans = trans_identity(), ...) {
+  constructor = function(x, y, id = NULL, trans = trans_identity(), ...) {
+    id <- if (is.null(id)) rep(1L, length(x)) else as_integerish(id, "id")
     S7::new_object(
       drawable(geometry = "points", trans = trans, pathlike = TRUE),
       x = x,
       y = y,
+      id = id,
       style = style(...)
     )
   }
@@ -91,6 +106,10 @@ points_raw <- S7::new_class(
 #' @param x,y For `points_raw()`, a numeric vector of x/y coordinates. For
 #'   `points_raws()`, a `list()` of such vectors instead -- one vector
 #'   per scatter.
+#' @param id For `points_raw()`, an integer vector the same length as
+#'   `x`/`y`, or `NULL` (the default). For `points_raws()`, a `list()` of
+#'   such vectors (or `NULL`s) instead, one per scatter. Inert either way
+#'   -- see Details.
 #' @return For `points_raws()`, a [sketch].
 #'
 #' @examples
@@ -102,9 +121,10 @@ points_raw <- S7::new_class(
 #'
 #' @family 0D points
 #' @export
-points_raws <- function(x, y, trans = trans_identity(), ...) {
-  vectorize_shapes(points_raw, c(
-    list(x = x, y = y, trans = trans),
-    list(...)
-  ))
+points_raws <- function(x, y, id = NULL, trans = trans_identity(), ...) {
+  args <- list(x = x, y = y, trans = trans)
+  if (!is.null(id)) {
+    args$id <- id
+  }
+  vectorize_shapes(points_raw, c(args, list(...)))
 }

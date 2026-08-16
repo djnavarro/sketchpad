@@ -2,9 +2,9 @@
 #'
 #' Extracts the computed `points` of any [drawable] object (e.g. a
 #' [shape_blob], [shape_ribbon], or [shape_twist]) and returns them as a
-#' plain [shape_raw], preserving the original [style]. Useful for
-#' "freezing" a noise-generated outline so it no longer recomputes on
-#' access.
+#' plain [shape_raw], preserving the original [style] and `points@id`
+#' (sub-path membership -- see [xy]'s own `id`). Useful for "freezing" a
+#' noise-generated outline so it no longer recomputes on access.
 #'
 #' This always targets `"polygon"`-geometry ([shape_raw]), regardless of
 #' `from`'s own `geometry` -- converting an open/`"path"`-geometry
@@ -22,7 +22,7 @@
 #' @export
 #' @noRd
 method(convert, list(drawable, shape_raw)) <- function(from, to, ...) {
-  out <- shape_raw(x = from@points@x, y = from@points@y)
+  out <- shape_raw(x = from@points@x, y = from@points@y, id = from@points@id)
   out@style <- from@style
   out
 }
@@ -47,7 +47,7 @@ method(convert, list(drawable, shape_raw)) <- function(from, to, ...) {
 #' @export
 #' @noRd
 method(convert, list(drawable, curve_raw)) <- function(from, to, ...) {
-  out <- curve_raw(x = from@points@x, y = from@points@y)
+  out <- curve_raw(x = from@points@x, y = from@points@y, id = from@points@id)
   out@style <- from@style
   out
 }
@@ -70,7 +70,7 @@ method(convert, list(drawable, curve_raw)) <- function(from, to, ...) {
 #' @export
 #' @noRd
 method(convert, list(drawable, points_raw)) <- function(from, to, ...) {
-  out <- points_raw(x = from@points@x, y = from@points@y)
+  out <- points_raw(x = from@points@x, y = from@points@y, id = from@points@id)
   out@style <- from@style
   out
 }

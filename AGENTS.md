@@ -188,7 +188,10 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   sub-paths and holes per drawable" (see `.agents/PLAN.md`) -- no
   constructor yet exposes a way to *set* a non-trivial `id` when
   building geometry by hand; that author-facing API is still an open
-  design question.
+  design question -- now resolved via an explicit `id` argument on
+  `shape_raw()`/`curve_raw()`/`points_raw()`, plus `shape_combine()` as
+  the more convenient, higher-level entry point (see both below and
+  `.agents/HISTORY.md`).
 - **`drawable`** -- parent class of every shape. Declares five
   properties: `style` (default `style()`), `geometry` (a validated string,
   one of `"polygon"`/`"path"`/`"points"`, default `"polygon"` -- tells
@@ -231,7 +234,18 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `curve_raw`/`points_raw` are its `"path"`/`"points"`-geometry analogs
   (see below) -- together the three form a "raw" family covering all
   three `geometry` values with the same trivial constructor shape. All
-  three are `pathlike`.
+  three are `pathlike`, and all three also take an optional `id` argument
+  (an integer vector the same length as `x`/`y`, default `NULL`,
+  filled in as a single sub-path -- see `xy`'s own `id` above) -- this is
+  the low-level, author-facing primitive for actually constructing a
+  multi-sub-path/holed shape by hand, resolving what was previously an
+  open design question (see `.agents/HISTORY.md`). `points_raw`'s own
+  `id` is accepted and stored (so it survives a `convert()` round-trip)
+  but otherwise inert, since `grid::pointsGrob()` has no sub-path
+  concept. `shape_combine()` (see below) is the more convenient,
+  higher-level entry point built on top of `shape_raw`'s own `id`
+  argument, for the common case of combining several already-built
+  drawables rather than computing `id` by hand.
 - **`shape_circle`** -- centroid + radius + `n` (point count); `points`
   is `n` evenly-spaced points around the circumference.
 - **`shape_rectangle`** -- centroid (`x`/`y`) + `width`/`height`;
@@ -417,8 +431,9 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   smoothing/resampling/closing edge. Unlike `curve_line`, places no
   minimum on `length(x)` (matching `shape_raw`'s own leniency), since its
   primary role is as a `convert()` target for "freezing" any
-  `"path"`-geometry drawable (no such `convert()` method exists yet,
-  mirroring `shape_raw`'s).
+  `"path"`-geometry drawable. Its own `id` (see `shape_raw` above) lets
+  it render as several disjoint strokes sharing one style, via
+  `polylineGrob()`'s own `id` support.
 - **`points_raw`** -- `shape_raw`'s `"points"`-geometry analog, and the
   first concrete constructor to use `geometry = "points"` (previously
   reserved on the dimensional reading with no constructor exposing it).
@@ -430,6 +445,31 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   caller-ordered coordinate vector that `effect_tremor()`'s arc-length jitter
   can meaningfully perturb into a "wobbled scatter", even with no drawn
   connecting line.
+- **`shape_combine()`** -- not its own S7 class; a plain function
+  (`R/shape_combine.R`) that merges several already-built
+  polygon-geometry drawables' own computed `points` into one multi-
+  sub-path `shape_raw`, one sub-path per input (renumbering an input
+  that already has several sub-paths of its own, e.g. the output of an
+  earlier `shape_combine()` call, so they stay distinct from every other
+  input's own). This is the ergonomic, higher-level entry point for the
+  two motivating multi-sub-path use cases -- a shape with a hole (one
+  input nested inside another, under `style()`'s default `rule =
+  "evenodd"`) or several disjoint shapes sharing one style -- without
+  computing `id` by hand the way `shape_raw()`'s own `id` argument
+  requires. Each input's own `trans`/noise-based distortion is already
+  baked into its `points` before combining (the same "freeze" semantics
+  `convert()` already has), so the combined shape's own `trans` is left
+  at the default `trans_identity()`. Takes an explicit `style` argument
+  (a whole `style()` object, not `...`-forwarded style arguments, since
+  `...` here is variadic over the input drawables themselves) defaulting
+  to the first input's own `style` -- a `drawable` has exactly one
+  `style`, so combining several differently-styled inputs necessarily
+  discards all but one; several independently-styled shapes should use
+  a `sketch` instead. Only accepts `drawable` arguments (not bare `xy`
+  objects) and requires every input's own `@geometry == "polygon"` --
+  no `curve_*`/`points_*` analog exists yet, since neither has holes to
+  motivate one and each can already build a multi-sub-path result
+  directly via its own `id` argument.
 - **`canvas`** -- not a `drawable`; a small value class (parallel to
   `style`, but for a `sketch` as a whole rather than one shape) bundling
   `background` (a `style@fill`-style value: plain colour string or
@@ -500,7 +540,12 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `pointsGrob()`), consistent with `fill` already being inert there.
 - **`convert()`** -- S7's own generic (not defined by this package); a
   `method(convert, list(drawable, shape_raw))` "freezes" any drawable's
-  computed points into a plain `shape_raw`, preserving `style`.
+  computed points into a plain `shape_raw`, preserving `style` and
+  `points@id` (so converting an already multi-sub-path/holed drawable,
+  e.g. the output of `shape_combine()`, doesn't silently collapse it
+  back to one sub-path). `method(convert, list(drawable, curve_raw))`/
+  `method(convert, list(drawable, points_raw))` do the same for their
+  own `"path"`/`"points"`-geometry targets.
 
 Every closed (`geometry = "polygon"`) drawable's constructor shares the
 `shape_*` prefix (`shape_circle()`, `shape_rectangle()`/`shape_square()`,
@@ -838,7 +883,15 @@ drawable whose `x`/`y` doesn't hold a genuine, perturbable control-point
 path -- e.g. `effect_tremor(shape_ribbon(...))` fails directly with a
 `pathlike`-specific message, since `shape_ribbon`'s `x`/`y` is a
 segment's start point, not a path, even though the property names alone
-would otherwise look plausible. `require_props(object, props, context)`
+would otherwise look plausible. The same check also rejects a
+multi-sub-path `object` (one with an `id` property -- `shape_raw`/
+`curve_raw`/`points_raw` -- holding more than one distinct value, e.g.
+the output of `shape_combine()`): both effects compute a single
+arc-length parametrization across the whole of `object@x`/`object@y`,
+treating it as one continuous path, which would bridge a fake segment
+across each sub-path boundary if the sub-paths aren't actually
+connected. Per-sub-path jitter/fan is a possible future enhancement, not
+yet implemented. `require_props(object, props, context)`
 checks for any *additional* named properties an effect needs beyond the
 `pathlike` contract itself -- currently only `effect_bristle()`'s
 `width` check, since `width` isn't part of what `pathlike` guarantees
@@ -1185,6 +1238,12 @@ full debugging narrative):
   three form a parallel "raw" family with the same trivial constructor
   shape. `shape_stroke.R` needs no such sharing either -- it's the last
   concrete `drawable` subclass, collated right after `curve_twist.R`.
+- `R/shape_combine.R` -- `shape_combine()`, a plain function (not an S7
+  class) building a `shape_raw` from several already-built drawables'
+  own `points` (see "Class hierarchy" above). Collated right after
+  `points_raw.R` (the last of the "raw" family it's built on top of) --
+  though as an ordinary function, its exact `Collate` position doesn't
+  actually matter, the same way `vectorize.R`'s doesn't.
 - `R/shape_strokepath.R` -- `shape_strokepath()`/`shape_strokepaths()`,
   plain functions (not S7 classes) that build a tapered, noise-modulated
   ribbon by feeding an arbitrary `curve_*()` drawable's own computed
@@ -1261,6 +1320,7 @@ full debugging narrative):
   -> drawable
   -> shape_bezier -> curve_bezier -> curve_line ->
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
+  -> shape_combine
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_star ->
   shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->

@@ -5,14 +5,19 @@
 \alias{curve_raws}
 \title{An open path defined directly by its vertices}
 \usage{
-curve_raw(x, y, trans = trans_identity(), ...)
+curve_raw(x, y, id = NULL, trans = trans_identity(), ...)
 
-curve_raws(x, y, trans = trans_identity(), ...)
+curve_raws(x, y, id = NULL, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{For \code{curve_raw()}, a numeric vector of x/y coordinates. For
 \code{curve_raws()}, a \code{list()} of such vectors instead -- one vector of
 vertices per path.}
+
+\item{id}{For \code{curve_raw()}, an integer vector the same length as
+\code{x}/\code{y}, or \code{NULL} (the default, a single sub-path). For
+\code{curve_raws()}, a \code{list()} of such vectors (or \code{NULL}s) instead, one
+per path.}
 
 \item{trans}{A \link{trans} object applied to the curve's computed points.
 Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
@@ -46,6 +51,10 @@ instead -- one vector of vertices per path.
 fill. Passing \code{fill} via \code{...} is still accepted (it's simply ignored at
 draw time), since \code{style()} is shared across every \code{geometry}.
 
+\code{id} optionally groups \code{x}/\code{y} into multiple sub-paths (see \link{xy}'s own
+\code{id}), letting a single \code{curve_raw()} render as several disjoint
+strokes sharing one \link{style}.
+
 Every other argument may be a plain vector, recycled against \code{x}/\code{y}
 via \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
 broadcast to the common length; mismatched lengths greater than 1
@@ -65,6 +74,12 @@ frozen <- S7::convert(
   curve_raw
 )
 draw(frozen)
+
+# id groups x/y into several disjoint strokes sharing one style
+draw(curve_raw(
+  x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
+  id = c(1, 1, 2, 2)
+))
 
 draw(curve_raws(
   x = list(c(0, 1, 2), c(2, 3, 4)),

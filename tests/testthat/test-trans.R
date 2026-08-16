@@ -328,3 +328,16 @@ test_that("apply_trans() on an empty point set returns an empty id too", {
   expect_identical(apply_trans(trans_translate(1, 0), pts)@id, integer(0))
   expect_identical(apply_trans(trans_warp(amount = 0.1), pts)@id, integer(0))
 })
+
+test_that("convert() forwards a drawable's own points@id into its shape_raw/curve_raw/points_raw target", {
+  combined <- shape_combine(shape_circle(radius = 2, n = 6L), shape_circle(radius = 1, n = 6L))
+
+  as_shape_raw <- S7::convert(combined, shape_raw)
+  expect_identical(as_shape_raw@points@id, combined@points@id)
+
+  as_curve_raw <- S7::convert(combined, curve_raw)
+  expect_identical(as_curve_raw@points@id, combined@points@id)
+
+  as_points_raw <- S7::convert(combined, points_raw)
+  expect_identical(as_points_raw@points@id, combined@points@id)
+})

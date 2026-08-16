@@ -2431,3 +2431,78 @@ forward `from@points@id` -- there's no constructor argument on
 the author-facing multi-subpath API is still an open design question
 (see `.agents/PLAN.md`). No concrete drawable's own `points` getter
 needed any changes at all, by construction (see "Data model" above).
+
+## Implemented the author-facing API for multi-subpath/holed geometry
+
+Closes out the "multiple sub-paths and holes per drawable" 0.1 item --
+see the previous `HISTORY.md` entry for the rendering-mechanism half
+(`xy@id`/`style@rule`/`pathGrob()`) this builds on.
+
+**Decision.** Two candidate authoring APIs were on the table: an
+explicit `id =` argument alongside flat `x`/`y` on `shape_raw()`/
+`curve_raw()`/`points_raw()`, versus overloading their `x`/`y` into a
+nested `list()`-of-subpaths. The `list()` option was rejected -- it
+would give the exact same input shape (a `list()` of numeric vectors) a
+different meaning at the singular constructor level than it already has
+at the *plural* level (`shape_raws()`'s own `list()` of `x`/`y` means
+"one whole shape per element", not "several sub-paths within one
+shape"). Went with the explicit `id =` argument instead, plus a
+dedicated combinator (`shape_combine()`) as the more ergonomic
+higher-level entry point for the motivating "ring with a hole"/"several
+disjoint shapes sharing one style" cases specifically -- both were
+implemented, not just one.
+
+**Low-level primitive.** `shape_raw()`/`curve_raw()`/`points_raw()`
+(and their plural forms) all gained an `id` argument (integer, same
+length as `x`/`y`, default `NULL` -- filled in as a single sub-path,
+identical to `xy()`'s own default). Each stores it as a proper property
+(mirroring `xy`'s own) and forwards it into the `xy()` its `points`
+getter constructs. `points_raw()`'s own `id` is accepted and stored (so
+it survives a `convert()` round-trip) but is otherwise inert, since
+`grid::pointsGrob()` has no sub-path concept -- documented explicitly,
+the same convention `fill` already follows there. The plural forms
+(`shape_raws()`/`curve_raws()`/`points_raws()`) take `id` as an optional
+`list()` of vectors (or `NULL`s), one per shape, mirroring `x`/`y`'s own
+list-of-vectors convention -- implemented by only including `id` in the
+args forwarded to `vectorize_shapes()` when the caller actually supplies
+it (`if (!is.null(id)) args$id <- id`), rather than always including a
+possibly-`NULL` `id`: `purrr::pmap()` would otherwise try to recycle a
+length-0 `NULL` against the other, non-empty arguments and error, since
+`is.vector(NULL)` is `TRUE` in R (so `vectorize_shapes()`'s own
+"wrap a non-vector in a length-1 list" rule doesn't catch it).
+
+**Combinator.** `shape_combine(..., style = NULL)` (`R/shape_combine.R`,
+a plain function, not an S7 class -- the same shape as
+`shape_strokepath()`) takes two or more polygon-geometry drawables,
+concatenates each one's own already-computed `points` (`trans`/noise
+distortion baked in, the same "freeze" semantics `convert()` already
+has) into one `shape_raw`, and renumbers each input's own sub-path `id`s
+(via `match(id, unique(id))`, so an input that's already itself a
+multi-sub-path `shape_combine()` output keeps all of its own sub-paths,
+not just one) with a running offset so every input's sub-paths stay
+distinct. `style` defaults to the first input's own `style`, since a
+`drawable` has exactly one -- overridable with an explicit `style()`
+object (not `...`-forwarded style arguments, since `...` here is
+variadic over the input drawables themselves). Validates every input is
+a `drawable` with `@geometry == "polygon"`, and requires at least two
+inputs. Whether a nested sub-path renders as a hole or a second solid
+region is purely a function of geometric nesting plus `style@rule` --
+confirmed directly (draw()-rendered a ring-with-hole and a disjoint
+extra shape sharing one style, both from `shape_combine()` output) --
+not anything `shape_combine()` itself decides. No `curve_*`/`points_*`
+analog was added -- neither geometry has holes to motivate one, and
+each can already build a multi-sub-path result directly via its own
+`id` argument.
+
+**Consequences elsewhere.** `convert()`'s three methods now forward
+`from@points@id` into their target's own `id` argument, so converting an
+already multi-sub-path drawable (e.g. `shape_combine()`'s own output)
+doesn't silently collapse it back to one sub-path. `require_pathlike()`
+(`R/effects.R`, shared by `effect_tremor()`/`effect_bristle()`) gained a
+second check rejecting a multi-sub-path `object` (`length(unique(id)) >
+1`) with a clear, effect-specific message -- both effects compute a
+single arc-length parametrization across the whole of `object@x`/
+`object@y`, treating it as one continuous path; a multi-sub-path
+object's sub-paths aren't actually connected, so that arc-length would
+bridge a fake segment across each sub-path boundary. A per-sub-path
+jitter/fan is a possible future enhancement, not implemented here.

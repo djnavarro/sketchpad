@@ -112,6 +112,7 @@ draw(shape_blobs(
 Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_circle]{shape_circle()}},
+\code{\link[=shape_combine]{shape_combine()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
 \code{\link[=shape_raw]{shape_raw()}},

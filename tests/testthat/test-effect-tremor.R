@@ -69,3 +69,13 @@ test_that("draw() renders an effect_tremor() sketch without error", {
   sk <- effect_tremor(curve_line(x = c(0, 1, 2), y = c(0, 1, 0)))
   expect_no_error(draw(sk))
 })
+
+test_that("effect_tremor() rejects a multi-sub-path drawable", {
+  multi <- shape_combine(shape_circle(), shape_circle(x = 5))
+  expect_error(effect_tremor(multi), "multi-sub-path")
+})
+
+test_that("effect_tremor() still works on a shape_raw()/curve_raw() with an explicit single-value id", {
+  sr <- shape_raw(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1), id = c(1, 1, 1, 1))
+  expect_no_error(effect_tremor(sr, layers = 1L))
+})

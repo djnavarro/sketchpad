@@ -15,11 +15,11 @@ the writeup.
 **0.1:**
 - Arbitrary angle for `fill_scribble()`
 - S7 class for `fill` objects
-- Multiple sub-paths and holes per drawable
 - A `group` class
 
-(`star`, the last outstanding "additional primitive shapes" item, is now
-done -- see `.agents/HISTORY.md`.)
+(`star`, the last outstanding "additional primitive shapes" item, and
+"Multiple sub-paths and holes per drawable" are now done -- see
+`.agents/HISTORY.md`.)
 
 **0.2:**
 - Multi-frame/animation export helpers (and interactivity/event handling,
@@ -99,29 +99,6 @@ package's current gaps, not a specific need that came up while building
 something else (contrast with the four items above). Each is a candidate
 to pick up, reject, or refine later -- none are scheduled.
 
-### Multiple sub-paths and holes per drawable (0.1)
-
-**Rendering mechanism implemented (2026-08-16); author-facing API still
-open** -- see `.agents/HISTORY.md` for the implemented design
-(`xy@id`/`style@rule`/`pathGrob()`-based rendering).
-
-Still open: the concrete author-facing API for actually producing
-non-trivial multi-subpath geometry (every current constructor still
-only ever produces one implicit sub-path, so nothing yet exercises this
-beyond the underlying rendering mechanism itself). The low-level
-primitive would be an explicit `id =` argument alongside flat `x`/`y`
-on `shape_raw()`/`curve_raw()`/`points_raw()`, but overloading their
-`x`/`y` into a nested `list()`-of-subpaths (the way `shape_raws()`'s
-*plural* form already uses `list()` to mean "one whole shape per
-element") would give the same input shape a different meaning at the
-singular level -- confusing. A dedicated combinator (e.g. stitching two
-independently built drawables' own `points` into one holed/multi-subpath
-`xy`) may be the more ergonomic entry point for the motivating "ring
-with a hole" case specifically. `convert()`'s three methods
-(`R/convert.R`) also still need to forward `from@points@id` into their
-target's own `id` once `shape_raw()`/`curve_raw()`/`points_raw()` gain
-one -- not done yet, since there's no constructor argument to forward it
-into. Revisit this item once the authoring API is settled.
 
 ### Open/unstroked curve support
 

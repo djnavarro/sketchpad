@@ -15,7 +15,14 @@
 #' fill. Passing `fill` via `...` is still accepted (it's simply ignored at
 #' draw time), since `style()` is shared across every `geometry`.
 #'
+#' `id` optionally groups `x`/`y` into multiple sub-paths (see [xy]'s own
+#' `id`), letting a single `curve_raw()` render as several disjoint
+#' strokes sharing one [style].
+#'
 #' @param x,y Numeric vectors of x/y coordinates.
+#' @param id Integer (or integerish numeric) vector the same length as
+#'   `x`/`y`, grouping locations into sub-paths -- see [xy]'s own `id`.
+#'   Default `NULL` (a single sub-path).
 #' @param trans A [trans] object applied to the curve's computed points.
 #'   Default [trans_identity()] (no transform).
 #' @param ... Arguments passed to [style()].
@@ -34,6 +41,12 @@
 #' )
 #' draw(frozen)
 #'
+#' # id groups x/y into several disjoint strokes sharing one style
+#' draw(curve_raw(
+#'   x = c(0, 1, 2, 3), y = c(0, 1, 0, 1),
+#'   id = c(1, 1, 2, 2)
+#' ))
+#'
 #' @family 1D curves
 #' @export
 curve_raw <- S7::new_class(
@@ -42,23 +55,29 @@ curve_raw <- S7::new_class(
   properties = list(
     x = S7::class_numeric,
     y = S7::class_numeric,
+    id = S7::class_integer,
     points = S7::new_property(
       class = xy,
       getter = function(self) {
-        apply_trans(self@trans, xy(x = self@x, y = self@y))
+        apply_trans(self@trans, xy(x = self@x, y = self@y, id = self@id))
       }
     )
   ),
   validator = function(self) {
     if (length(self@x) != length(self@y)) {
-      "x and y must be the same length"
+      return("x and y must be the same length")
+    }
+    if (length(self@id) != length(self@x)) {
+      return("id must be the same length as x and y")
     }
   },
-  constructor = function(x, y, trans = trans_identity(), ...) {
+  constructor = function(x, y, id = NULL, trans = trans_identity(), ...) {
+    id <- if (is.null(id)) rep(1L, length(x)) else as_integerish(id, "id")
     S7::new_object(
       drawable(geometry = "path", trans = trans, pathlike = TRUE),
       x = x,
       y = y,
+      id = id,
       style = style(...)
     )
   }
@@ -82,6 +101,10 @@ curve_raw <- S7::new_class(
 #' @param x,y For `curve_raw()`, a numeric vector of x/y coordinates. For
 #'   `curve_raws()`, a `list()` of such vectors instead -- one vector of
 #'   vertices per path.
+#' @param id For `curve_raw()`, an integer vector the same length as
+#'   `x`/`y`, or `NULL` (the default, a single sub-path). For
+#'   `curve_raws()`, a `list()` of such vectors (or `NULL`s) instead, one
+#'   per path.
 #' @return For `curve_raws()`, a [sketch].
 #'
 #' @examples
@@ -92,9 +115,10 @@ curve_raw <- S7::new_class(
 #'
 #' @family 1D curves
 #' @export
-curve_raws <- function(x, y, trans = trans_identity(), ...) {
-  vectorize_shapes(curve_raw, c(
-    list(x = x, y = y, trans = trans),
-    list(...)
-  ))
+curve_raws <- function(x, y, id = NULL, trans = trans_identity(), ...) {
+  args <- list(x = x, y = y, trans = trans)
+  if (!is.null(id)) {
+    args$id <- id
+  }
+  vectorize_shapes(curve_raw, c(args, list(...)))
 }

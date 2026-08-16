@@ -5,14 +5,19 @@
 \alias{points_raws}
 \title{A scatter of points defined directly by their coordinates}
 \usage{
-points_raw(x, y, trans = trans_identity(), ...)
+points_raw(x, y, id = NULL, trans = trans_identity(), ...)
 
-points_raws(x, y, trans = trans_identity(), ...)
+points_raws(x, y, id = NULL, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{For \code{points_raw()}, a numeric vector of x/y coordinates. For
 \code{points_raws()}, a \code{list()} of such vectors instead -- one vector
 per scatter.}
+
+\item{id}{For \code{points_raw()}, an integer vector the same length as
+\code{x}/\code{y}, or \code{NULL} (the default). For \code{points_raws()}, a \code{list()} of
+such vectors (or \code{NULL}s) instead, one per scatter. Inert either way
+-- see Details.}
 
 \item{trans}{A \link{trans} object applied to the computed points. Default
 \code{\link[=trans_identity]{trans_identity()}} (no transform).}
@@ -46,6 +51,12 @@ different \code{color} each).
 \code{geometry_grob()}'s internal dispatch (\code{R/draw.R}) for why a \code{"points"}
 geometry has no line to stroke and no interior to fill. Only \code{style@color}
 is used, as the marker colour.
+
+\code{id} (see \link{xy}'s own \code{id}) is accepted and stored for consistency with
+\code{\link[=shape_raw]{shape_raw()}}/\code{\link[=curve_raw]{curve_raw()}} and to round-trip through \code{\link[S7:convert]{convert()}}, but
+is otherwise inert here -- \code{grid::pointsGrob()} has no sub-path
+concept, consistent with \code{fill} already being inert for \code{"points"}
+geometry.
 
 Every other argument may be a plain vector, recycled against \code{x}/\code{y}
 via \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is

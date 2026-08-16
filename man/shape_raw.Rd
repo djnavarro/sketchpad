@@ -5,14 +5,19 @@
 \alias{shape_raws}
 \title{A polygon defined directly by its vertices}
 \usage{
-shape_raw(x, y, trans = trans_identity(), ...)
+shape_raw(x, y, id = NULL, trans = trans_identity(), ...)
 
-shape_raws(x, y, trans = trans_identity(), ...)
+shape_raws(x, y, id = NULL, trans = trans_identity(), ...)
 }
 \arguments{
 \item{x, y}{For \code{shape_raw()}, a numeric vector of x/y coordinates. For
 \code{shape_raws()}, a \code{list()} of such vectors instead -- one vector of
 vertices per shape.}
+
+\item{id}{For \code{shape_raw()}, an integer vector the same length as
+\code{x}/\code{y}, or \code{NULL} (the default, a single sub-path). For
+\code{shape_raws()}, a \code{list()} of such vectors (or \code{NULL}s) instead, one
+per shape.}
 
 \item{trans}{A \link{trans} object applied to the shape's computed points.
 Default \code{\link[=trans_identity]{trans_identity()}} (no transform).}
@@ -36,6 +41,12 @@ polygon, \code{shape_raws()} takes them as a \code{list()} of numeric vectors
 instead -- one vector of vertices per shape.
 }
 \details{
+\code{id} optionally groups \code{x}/\code{y} into multiple sub-paths (see \link{xy}'s own
+\code{id}) -- several disjoint polygons sharing one \link{style}, or, combined
+with \code{\link[=style]{style()}}'s \code{rule}, a shape with a hole. \code{\link[=shape_combine]{shape_combine()}} is a
+more convenient way to build this from several already-built
+drawables' own points, rather than computing \code{id} by hand.
+
 Every other argument may be a plain vector, recycled against \code{x}/\code{y}
 via \code{purrr::pmap()}'s own vctrs-based rules (any length-1 element is
 broadcast to the common length; mismatched lengths greater than 1
@@ -58,6 +69,16 @@ draw(shape_raw(
   fill = "goldenrod", color = "black", linewidth = 2
 ))
 
+# id groups x/y into sub-paths -- here, a ring with a hole (a smaller
+# sub-path nested inside a larger one, under style()'s default
+# rule = "evenodd")
+draw(shape_raw(
+  x = c(0, 0, 4, 4, 1, 1, 3, 3),
+  y = c(0, 4, 4, 0, 1, 3, 3, 1),
+  id = c(1, 1, 1, 1, 2, 2, 2, 2),
+  fill = "steelblue"
+))
+
 draw(shape_raws(
   x = list(c(0, 1, 1, 0), c(2, 3, 3, 2)),
   y = list(c(0, 0, 1, 1), c(0, 0, 1, 1))
@@ -69,6 +90,7 @@ Other 2D shapes:
 \code{\link[=shape_bezier]{shape_bezier()}},
 \code{\link[=shape_blob]{shape_blob()}},
 \code{\link[=shape_circle]{shape_circle()}},
+\code{\link[=shape_combine]{shape_combine()}},
 \code{\link[=shape_ellipse]{shape_ellipse()}},
 \code{\link[=shape_polygon]{shape_polygon()}},
 \code{\link[=shape_rectangle]{shape_rectangle()}},

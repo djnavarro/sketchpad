@@ -29,7 +29,7 @@ require_props <- function(object, props, context) {
   invisible(NULL)
 }
 
-#' Require that a drawable is pathlike
+#' Require that a drawable is pathlike, and has a single sub-path
 #'
 #' Internal helper shared by [effect_tremor()]/[effect_bristle()]: both
 #' need an `object` whose `x`/`y` properties hold a genuine, perturbable,
@@ -37,6 +37,16 @@ require_props <- function(object, props, context) {
 #' (see its docs) -- rather than merely having properties *named* `x`/`y`
 #' with a different meaning (e.g. a shape's centroid, or one endpoint of
 #' a fixed two-point segment).
+#'
+#' Also rejects a multi-sub-path `object` (i.e. one with an `id` property
+#' -- [shape_raw()]/[curve_raw()]/[points_raw()] -- holding more than one
+#' distinct value, e.g. the output of [shape_combine()]). Both effects
+#' compute a single arc-length parametrization across the whole of
+#' `object@x`/`object@y`, treating it as one continuous path; a
+#' multi-sub-path object's sub-paths aren't actually connected, so that
+#' arc-length would bridge a fake segment across each sub-path boundary.
+#' Supporting a per-sub-path jitter/fan is a possible future enhancement,
+#' not yet implemented.
 #'
 #' @param object The object to check.
 #' @param context A short string identifying the calling function, used
@@ -53,6 +63,15 @@ require_pathlike <- function(object, context) {
       "shape_stroke()) -- an object with a genuine control-point path, ",
       "not merely x/y properties that mean something else (e.g. a ",
       "shape's centroid)"
+    ))
+  }
+  if ("id" %in% S7::prop_names(object) && length(unique(object@id)) > 1) {
+    rlang::abort(paste0(
+      context, " does not support a multi-sub-path drawable (an object ",
+      "with more than one distinct value in its own `id`, e.g. the ",
+      "output of shape_combine()) -- its x/y sub-paths aren't actually ",
+      "connected, so a single arc-length jitter/fan across all of them ",
+      "isn't meaningful"
     ))
   }
   invisible(NULL)
