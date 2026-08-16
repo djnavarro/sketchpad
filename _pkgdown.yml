@@ -31,16 +31,14 @@ reference:
   desc: >
     Unconnected marker `drawable`s (`geometry = "points"`).
   contents:
-  - starts_with("points_raw")
+  - starts_with("points_")
 
 - title: Noise tools
   desc: >
     Scalar noise fields used to distort a shape's points, used by
     `shape_blob()`/`shape_ribbon()`/`shape_twist()`.
   contents:
-  - noise_field
-  - noise_bridge
-  - noise_sample
+  - starts_with("noise_")
 
 - title: Fill tools
   desc: >
@@ -54,7 +52,8 @@ reference:
     Transformations applied to a `drawable`'s computed `points`,
     used by every `drawable`'s `trans` property.
   contents:
-  - starts_with("trans")
+  - trans
+  - starts_with("trans_")
 
 - title: Effects tools
   desc: >
