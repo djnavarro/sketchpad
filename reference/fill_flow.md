@@ -170,6 +170,8 @@ draw(shape_circle(fill = fill_flow(warp = 6, seed = 9350L)))
 
 
 # two or more colours blend across the field, as in fill_noise()
-draw(shape_circle(fill = fill_flow(color = c("steelblue", "white", "tomato"), seed = 9350L)))
+draw(shape_circle(
+  fill = fill_flow(color = c("steelblue", "white", "tomato"), seed = 9350L)
+))
 
 ```

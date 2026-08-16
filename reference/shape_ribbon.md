@@ -134,6 +134,12 @@ draw(shape_ribbons(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.3))
 
 # a fan of ribbons radiating from the origin
 angle <- seq(0, 2 * pi, length.out = 13)[-13]
-draw(shape_ribbons(x = 0, y = 0, xend = cos(angle), yend = sin(angle), width = 0.1))
+draw(shape_ribbons(
+  x = 0,
+  y = 0,
+  xend = cos(angle),
+  yend = sin(angle),
+  width = 0.1
+))
 
 ```

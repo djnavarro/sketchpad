@@ -112,7 +112,9 @@ draw(shape_circle(fill = fill_stripe(angle = 30)))
 
 
 # repeating a colour biases the band widths, rather than a separate argument
-draw(shape_circle(fill = fill_stripe(color = c("steelblue", "steelblue", "white"))))
+draw(shape_circle(
+  fill = fill_stripe(color = c("steelblue", "steelblue", "white"))
+))
 
 
 # narrower spacing gives more, thinner stripes
@@ -120,6 +122,8 @@ draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
 
 
 # three or more colours repeat through the same period
-draw(shape_circle(fill = fill_stripe(color = c("steelblue", "white", "tomato"), angle = 30)))
+draw(shape_circle(
+  fill = fill_stripe(color = c("steelblue", "white", "tomato"), angle = 30)
+))
 
 ```

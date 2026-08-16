@@ -55,7 +55,8 @@ s <- sketch() + shape_circle(radius = 1) + shape_circle(x = 2, radius = 0.5)
 draw(s)
 
 
-s2 <- sketch(canvas = canvas(background = "grey95")) + shape_circle(radius = 1)
+s2 <- sketch(canvas = canvas(background = "grey95")) +
+  shape_circle(radius = 1)
 draw(s2)
 
 

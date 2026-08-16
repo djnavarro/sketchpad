@@ -117,14 +117,24 @@ Other fill helpers:
 ## Examples
 
 ``` r
-draw(shape_circle(fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)))
+draw(shape_circle(
+  fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)
+))
 
 
 # a wider radius range gives more size contrast between dots
-draw(shape_circle(fill = fill_halftone(radius = c(0.02, 0.22), n = 6L, seed = 3187L)))
+draw(shape_circle(
+  fill = fill_halftone(radius = c(0.02, 0.22), n = 6L, seed = 3187L)
+))
 
 
 # a colour vector is recycled across the dots, as in fill_stipple()
-draw(shape_circle(fill = fill_halftone(color = c("steelblue", "tomato"), n = 8L, seed = 3187L)))
+draw(shape_circle(
+  fill = fill_halftone(
+    color = c("steelblue", "tomato"),
+    n = 8L,
+    seed = 3187L
+  )
+))
 
 ```

@@ -89,11 +89,16 @@ draw(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)))
 
 # a thick, square-capped line reads very differently from a thin,
 # round-capped one
-draw(curve_line(x = c(0, 1, 2), y = c(0, 1, 0), linewidth = 12, lineend = "square"))
+draw(curve_line(
+  x = c(0, 1, 2), y = c(0, 1, 0), linewidth = 12, lineend = "square"
+))
 
 
 # layer several jittered copies for a hand-drawn look
-draw(effect_tremor(curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)), layers = 5L))
+draw(effect_tremor(
+  curve_line(x = c(0, 1, 1, 2), y = c(0, 1, 0, 1)),
+  layers = 5L
+))
 
 
 draw(curve_lines(

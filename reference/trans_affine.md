@@ -42,7 +42,8 @@ trans_affine(matrix(c(2, 0, 0, 0, 3, 0, 0, 0, 1), nrow = 3, byrow = TRUE))
 
 # the 2x3 form omits the trivial homogeneous third row
 draw(shape_square(
-  side = 1, trans = trans_affine(matrix(c(2, 0, 0, 0, 3, 0), nrow = 2, byrow = TRUE))
+  side = 1,
+  trans = trans_affine(matrix(c(2, 0, 0, 0, 3, 0), nrow = 2, byrow = TRUE))
 ))
 
 ```

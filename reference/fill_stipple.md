@@ -135,10 +135,14 @@ draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
 
 
 # more, smaller dots per tile give a denser stipple
-draw(shape_circle(fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)))
+draw(shape_circle(
+  fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)
+))
 
 
 # a colour vector is recycled across the dots
-draw(shape_circle(fill = fill_stipple(color = c("steelblue", "tomato"), n = 8L, seed = 2091L)))
+draw(shape_circle(
+  fill = fill_stipple(color = c("steelblue", "tomato"), n = 8L, seed = 2091L)
+))
 
 ```

@@ -140,7 +140,10 @@ drawable.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># useful for "freezing" a wandering path's own computed points</span></span></span>
 <span class="r-in"><span><span class="va">frozen</span> <span class="op">&lt;-</span> <span class="fu">S7</span><span class="fu">::</span><span class="fu"><a href="https://rconsortium.github.io/S7/reference/convert.html" class="external-link">convert</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="curve_twist.html">curve_twist</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">0</span>, xend <span class="op">=</span> <span class="fl">1</span>, yend <span class="op">=</span> <span class="fl">0</span>, path_distortion <span class="op">=</span> <span class="fu"><a href="noise_bridge.html">noise_bridge</a></span><span class="op">(</span>seed <span class="op">=</span> <span class="fl">99L</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="curve_twist.html">curve_twist</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">0</span>, xend <span class="op">=</span> <span class="fl">1</span>, yend <span class="op">=</span> <span class="fl">0</span>,</span></span>
+<span class="r-in"><span>    path_distortion <span class="op">=</span> <span class="fu"><a href="noise_bridge.html">noise_bridge</a></span><span class="op">(</span>seed <span class="op">=</span> <span class="fl">99L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
 <span class="r-in"><span>  <span class="va">curve_raw</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">frozen</span><span class="op">)</span></span></span>

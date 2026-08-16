@@ -129,13 +129,25 @@ functions themselves are configurable rather than hardcoded to
 <span class="r-in"><span><span class="co"># a noise_field's effect is easiest to see through a drawable that</span></span></span>
 <span class="r-in"><span><span class="co"># samples it -- lower frequency gives broad, gentle undulation, higher</span></span></span>
 <span class="r-in"><span><span class="co"># frequency a bumpier, more textured one</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_blob.html">shape_blob</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">1</span>, range <span class="op">=</span> <span class="fl">0.4</span>, distortion <span class="op">=</span> <span class="fu">noise_field</span><span class="op">(</span>frequency <span class="op">=</span> <span class="fl">0.5</span>, seed <span class="op">=</span> <span class="fl">4821L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_blob.html">shape_blob</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  radius <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  range <span class="op">=</span> <span class="fl">0.4</span>,</span></span>
+<span class="r-in"><span>  distortion <span class="op">=</span> <span class="fu">noise_field</span><span class="op">(</span>frequency <span class="op">=</span> <span class="fl">0.5</span>, seed <span class="op">=</span> <span class="fl">4821L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="noise_field-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_blob.html">shape_blob</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">1</span>, range <span class="op">=</span> <span class="fl">0.4</span>, distortion <span class="op">=</span> <span class="fu">noise_field</span><span class="op">(</span>frequency <span class="op">=</span> <span class="fl">6</span>, seed <span class="op">=</span> <span class="fl">4821L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_blob.html">shape_blob</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  radius <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  range <span class="op">=</span> <span class="fl">0.4</span>,</span></span>
+<span class="r-in"><span>  distortion <span class="op">=</span> <span class="fu">noise_field</span><span class="op">(</span>frequency <span class="op">=</span> <span class="fl">6</span>, seed <span class="op">=</span> <span class="fl">4821L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="noise_field-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># more octaves layer finer detail on top of the base frequency</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_blob.html">shape_blob</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">1</span>, range <span class="op">=</span> <span class="fl">0.4</span>, distortion <span class="op">=</span> <span class="fu">noise_field</span><span class="op">(</span>octaves <span class="op">=</span> <span class="fl">6L</span>, seed <span class="op">=</span> <span class="fl">4821L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="shape_blob.html">shape_blob</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  radius <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  range <span class="op">=</span> <span class="fl">0.4</span>,</span></span>
+<span class="r-in"><span>  distortion <span class="op">=</span> <span class="fu">noise_field</span><span class="op">(</span>octaves <span class="op">=</span> <span class="fl">6L</span>, seed <span class="op">=</span> <span class="fl">4821L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="noise_field-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

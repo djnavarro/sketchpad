@@ -161,7 +161,12 @@ mottled ink stroke instead of a sparse one.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># a non-NA background reveals a solid colour underneath the grain,</span></span></span>
 <span class="r-in"><span><span class="co"># instead of true transparency</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu">effect_grain</span><span class="op">(</span><span class="va">template</span>, color <span class="op">=</span> <span class="st">"gray5"</span>, alpha <span class="op">=</span> <span class="fl">0.85</span>, background <span class="op">=</span> <span class="st">"gray30"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="fu">effect_grain</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">template</span>,</span></span>
+<span class="r-in"><span>  color <span class="op">=</span> <span class="st">"gray5"</span>,</span></span>
+<span class="r-in"><span>  alpha <span class="op">=</span> <span class="fl">0.85</span>,</span></span>
+<span class="r-in"><span>  background <span class="op">=</span> <span class="st">"gray30"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="effect_grain-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># a coarser grain field (lower frequency) reads less like paper texture</span></span></span>

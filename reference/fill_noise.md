@@ -151,14 +151,20 @@ draw(shape_circle(fill = fill_noise(seed = 8843L)))
 
 
 # higher frequency/octaves give finer-grained texture
-draw(shape_circle(fill = fill_noise(frequency = 4, octaves = 4L, seed = 8843L)))
+draw(shape_circle(
+  fill = fill_noise(frequency = 4, octaves = 4L, seed = 8843L)
+))
 
 
 # a lower alpha lets the shape's own outline/background show through more
-draw(shape_circle(fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)))
+draw(shape_circle(
+  fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)
+))
 
 
 # two or more colours blend across the field instead of fading to transparent
-draw(shape_circle(fill = fill_noise(color = c("steelblue", "white", "tomato"), seed = 8843L)))
+draw(shape_circle(
+  fill = fill_noise(color = c("steelblue", "white", "tomato"), seed = 8843L)
+))
 
 ```

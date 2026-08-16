@@ -56,7 +56,12 @@ noise_sample(noise_bridge(seed = 4821L), n = 5, scale = 1)
 # sampled values can drive a drawable's own geometry, e.g. shape_blob()'s
 # radius perturbation (see its `points` getter)
 angle <- seq(0, 2 * pi, length.out = 12)
-noise_sample(noise_field(seed = 4821L), x = cos(angle), y = sin(angle), to = c(0.8, 1.2))
+noise_sample(
+  noise_field(seed = 4821L),
+  x = cos(angle),
+  y = sin(angle),
+  to = c(0.8, 1.2)
+)
 #>  [1] 1.0063778 1.1991745 0.8000000 1.1827139 0.9059486 0.9042259 0.8505269
 #>  [8] 1.2000000 0.8686386 1.1469722 0.9474587 1.0063778
 ```
