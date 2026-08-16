@@ -14,9 +14,9 @@ trans_chain(steps = list())
 collapse into a single \link{trans} matrix -- e.g. a \link{trans_warp} with
 another \link{trans_warp}, or a \link{trans_warp} mixed with a \link{trans}. It is not
 usually constructed directly; it holds an ordered list of \code{steps}
-(each a \link{trans} or \link{trans_warp}), applied in sequence -- \code{steps[[1]]}
-first, \code{steps[[length(steps)]]} last -- exactly like chained \code{+} calls
-on a \link{drawable} would suggest.
+(each a \link{trans}, \link{trans_warp}, or \link{trans_fn}), applied in sequence --
+\code{steps[[1]]} first, \code{steps[[length(steps)]]} last -- exactly like
+chained \code{+} calls on a \link{drawable} would suggest.
 }
 \details{
 Two consecutive \link{trans} (affine) steps are \emph{not} automatically
@@ -36,6 +36,7 @@ draw(shape_rectangle(width = 1.5, height = 0.6, trans = chained))
 Other transform helpers:
 \code{\link[=trans]{trans()}},
 \code{\link[=trans_affine]{trans_affine()}},
+\code{\link[=trans_fn]{trans_fn()}},
 \code{\link[=trans_identity]{trans_identity()}},
 \code{\link[=trans_reflect]{trans_reflect()}},
 \code{\link[=trans_rotate]{trans_rotate()}},

@@ -15,8 +15,6 @@ the writeup.
 **0.1:**
 - Arbitrary angle for `fill_scribble()`
 - S7 class for `fill` objects
-- Arbitrary-function `trans` warps
-- Annulus-segment wedge (`shape_wedge()`/new shape with `inner_radius`)
 - Multiple sub-paths and holes per drawable
 - A `group` class
 
@@ -127,23 +125,6 @@ of sub-paths), not a new `geometry` value.
 still open is the concrete `curve_*()` constructor family and whether
 line styling needs to grow beyond the current single `linewidth` -- dash
 patterns, line caps/joins.)
-
-### Deferred: arbitrary-function `trans` warps (0.1)
-
-The affine `trans` family (`trans_translate()`/`trans_rotate()`/
-`trans_scale()`/`trans_reflect()`/`trans_shear()`/`trans_affine()`) and a
-first non-rigid deformation, `trans_warp()` (noise-based domain warping,
-built on the existing `noise_field`/`noise_sample()` machinery), are both
-done -- see `.agents/HISTORY.md`. `trans`/`trans_warp`/`trans_chain` all
-compose with `+` and attach to any `drawable`/`sketch` via `trans = ` or
-`+`.
-
-Still open: a fully general `trans_warp()`-like escape hatch taking an
-arbitrary caller-supplied displacement function (`function(x, y) list(x =
-..., y = ...)`) rather than only a `noise_field`-driven one. Revisit if a
-concrete sketch needs a warp shape `noise_field` domain-warping can't
-express (e.g. a deterministic swirl/pinch/bulge formula, or a warp driven
-by a second drawable's own geometry).
 
 ### A `group` class (0.1)
 

@@ -33,6 +33,10 @@ test_that("format(drawable) reports a non-identity trans", {
 
   chained <- shape_rectangle(width = 1, height = 1, trans = trans_rotate(pi / 6) + trans_warp())
   expect_true(any(grepl("trans: chain \\(2 steps\\)", format(chained))))
+
+  identity_fn <- function(x, y) list(x = x, y = y)
+  fn_trans <- shape_rectangle(width = 1, height = 1, trans = trans_fn(identity_fn))
+  expect_true(any(grepl("trans: fn", format(fn_trans))))
 })
 
 test_that("print(drawable) prints format(drawable)'s lines and returns its input invisibly", {

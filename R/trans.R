@@ -65,8 +65,10 @@ mat_about <- function(m, about_x, about_y) {
 #' whose effect is "apply `t1` first, then `t2`" -- see [trans_translate()]'s
 #' Details for the composition order convention and a worked example.
 #' Composing a `trans` with a [trans_warp] (a non-rigid, noise-based
-#' deformation that can't be represented as a matrix) instead produces a
-#' [trans_chain] -- see there.
+#' deformation) or a [trans_fn] (a non-rigid deformation from an
+#' arbitrary caller-supplied function) -- neither of which can be
+#' represented as a matrix -- instead produces a [trans_chain] -- see
+#' there.
 #'
 #' @param matrix A 3x3 numeric matrix in homogeneous coordinates (i.e. its
 #'   third row must be `c(0, 0, 1)`).
@@ -125,8 +127,11 @@ trans <- S7::new_class(
 #'
 #' Like [trans], a `trans_warp` is attached to a [drawable] via its
 #' `trans` property/argument, and composes with `+` -- combining it with
-#' another `trans_warp` or a [trans] produces a [trans_chain], since a
-#' non-rigid warp can't collapse into a single matrix.
+#' another `trans_warp`, a [trans_fn], or a [trans] produces a
+#' [trans_chain], since a non-rigid warp can't collapse into a single
+#' matrix. See [trans_fn()] for a general-purpose escape hatch taking an
+#' arbitrary caller-supplied displacement function, rather than only a
+#' [noise_field]-driven one.
 #'
 #' @param amount Displacement amplitude. Must be non-negative. Default
 #'   `0.1`.
@@ -175,15 +180,82 @@ trans_warp <- S7::new_class(
   }
 )
 
+#' An arbitrary-function, non-rigid deformation
+#'
+#' `trans_fn` is the general-purpose escape hatch for a non-rigid
+#' deformation not covered by [trans_warp()]'s noise-driven domain
+#' warping: it wraps a caller-supplied displacement function directly,
+#' the same relationship [trans_affine()] has to the rigid `trans_*()`
+#' family.
+#'
+#' `fn` is called as `fn(x, y)`, where `x`/`y` are a [drawable]'s own
+#' computed points (already flattened to plain numeric vectors, not an
+#' [xy] object), and must return a `list(x = ..., y = ...)` of the same
+#' length -- checked at draw/apply time (not at construction), since
+#' `fn`'s own behavior can't be verified without calling it. This makes
+#' `trans_fn` strictly more general than [trans_warp()]: any noise-based
+#' warp could be expressed as a `trans_fn` closing over a [noise_field],
+#' but also deterministic formulas (a swirl, pinch, or bulge) or a warp
+#' driven by something [noise_field] can't express at all, e.g. a second
+#' drawable's own geometry captured in `fn`'s enclosing environment.
+#'
+#' Like [trans_warp], this can't be represented as a single matrix, so
+#' composing it with a [trans] or another non-rigid deformation with `+`
+#' produces a [trans_chain] rather than collapsing.
+#'
+#' @param fn A function taking two numeric vectors (`x`, `y`) and
+#'   returning a `list(x = ..., y = ...)` of the same length.
+#'
+#' @examples
+#' # a deterministic swirl: rotate each point by an angle that grows with
+#' # its own distance from the origin. A shape centred at the origin
+#' # (e.g. a plain shape_circle()) is rotationally symmetric about it, so
+#' # every point shares the same distance and the swirl just rotates the
+#' # whole shape rigidly -- offsetting the shape away from the origin
+#' # gives points at varying distances instead, showing the effect
+#' swirl <- function(x, y) {
+#'   r <- sqrt(x^2 + y^2)
+#'   theta <- atan2(y, x) + r * 1.5
+#'   list(x = r * cos(theta), y = r * sin(theta))
+#' }
+#' draw(shape_circle(x = 1, radius = 0.4, n = 200, trans = trans_fn(swirl)))
+#'
+#' # a bulge: points near the origin are pushed outward more than points
+#' # far from it. Offsetting the shape away from the origin (for the same
+#' # reason as the swirl example above) means one side sits closer to the
+#' # origin than the other, so the bulge dents that side outward more
+#' bulge <- function(x, y) {
+#'   r <- sqrt(x^2 + y^2)
+#'   scale_factor <- 1 + 0.6 * exp(-4 * r^2)
+#'   list(x = x * scale_factor, y = y * scale_factor)
+#' }
+#' draw(shape_circle(x = 0.8, radius = 0.5, n = 200, trans = trans_fn(bulge)))
+#'
+#' # combining a trans_fn with a trans (or a trans_warp) produces a
+#' # trans_chain, applied in the order given by +
+#' draw(shape_circle(
+#'   x = 0.8, radius = 0.5, n = 200,
+#'   trans = trans_fn(bulge) + trans_rotate(pi / 6)
+#' ))
+#'
+#' @family transform helpers
+#' @export
+trans_fn <- S7::new_class(
+  name = "trans_fn",
+  properties = list(
+    fn = S7::class_function
+  )
+)
+
 #' A sequence of composed transforms
 #'
 #' `trans_chain` is what `+` produces when combining transforms that can't
 #' collapse into a single [trans] matrix -- e.g. a [trans_warp] with
 #' another [trans_warp], or a [trans_warp] mixed with a [trans]. It is not
 #' usually constructed directly; it holds an ordered list of `steps`
-#' (each a [trans] or [trans_warp]), applied in sequence -- `steps[[1]]`
-#' first, `steps[[length(steps)]]` last -- exactly like chained `+` calls
-#' on a [drawable] would suggest.
+#' (each a [trans], [trans_warp], or [trans_fn]), applied in sequence --
+#' `steps[[1]]` first, `steps[[length(steps)]]` last -- exactly like
+#' chained `+` calls on a [drawable] would suggest.
 #'
 #' Two consecutive [trans] (affine) steps are *not* automatically
 #' collapsed into one matrix when they're already part of a chain (only a
@@ -209,11 +281,14 @@ trans_chain <- S7::new_class(
   validator = function(self) {
     ok <- vapply(
       self@steps,
-      \(s) S7::S7_inherits(s, trans) || S7::S7_inherits(s, trans_warp) || S7::S7_inherits(s, trans_chain),
+      \(s) {
+        S7::S7_inherits(s, trans) || S7::S7_inherits(s, trans_warp) ||
+          S7::S7_inherits(s, trans_fn) || S7::S7_inherits(s, trans_chain)
+      },
       logical(1)
     )
     if (!all(ok)) {
-      return("steps must be a list of trans/trans_warp/trans_chain objects")
+      return("steps must be a list of trans/trans_warp/trans_fn/trans_chain objects")
     }
   }
 )
@@ -234,11 +309,12 @@ trans_steps <- function(x) {
 #' Combine two trans-like objects
 #'
 #' Internal helper backing every `+` method between [trans]/[trans_warp]/
-#' [trans_chain] objects: two plain [trans] (affine) objects collapse into
-#' a single [trans] via matrix multiplication (unchanged from `trans`'s
-#' original behavior); any combination involving a [trans_warp] or
-#' [trans_chain] instead builds/extends a [trans_chain], since a non-rigid
-#' warp has no matrix representation to fold into.
+#' [trans_fn]/[trans_chain] objects: two plain [trans] (affine) objects
+#' collapse into a single [trans] via matrix multiplication (unchanged
+#' from `trans`'s original behavior); any combination involving a
+#' [trans_warp], [trans_fn], or [trans_chain] instead builds/extends a
+#' [trans_chain], since a non-rigid warp has no matrix representation to
+#' fold into.
 #'
 #' @param e1,e2 A [trans]/[trans_warp]/[trans_chain].
 #' @return A [trans] or [trans_chain].
@@ -286,9 +362,37 @@ method(`+`, list(trans_chain, trans_warp)) <- function(e1, e2) combine_trans(e1,
 #' @noRd
 method(`+`, list(trans_chain, trans_chain)) <- function(e1, e2) combine_trans(e1, e2)
 
+#' @export
+#' @noRd
+method(`+`, list(trans, trans_fn)) <- function(e1, e2) combine_trans(e1, e2)
+
+#' @export
+#' @noRd
+method(`+`, list(trans_fn, trans)) <- function(e1, e2) combine_trans(e1, e2)
+
+#' @export
+#' @noRd
+method(`+`, list(trans_fn, trans_warp)) <- function(e1, e2) combine_trans(e1, e2)
+
+#' @export
+#' @noRd
+method(`+`, list(trans_warp, trans_fn)) <- function(e1, e2) combine_trans(e1, e2)
+
+#' @export
+#' @noRd
+method(`+`, list(trans_fn, trans_fn)) <- function(e1, e2) combine_trans(e1, e2)
+
+#' @export
+#' @noRd
+method(`+`, list(trans_fn, trans_chain)) <- function(e1, e2) combine_trans(e1, e2)
+
+#' @export
+#' @noRd
+method(`+`, list(trans_chain, trans_fn)) <- function(e1, e2) combine_trans(e1, e2)
+
 #' Union of every trans-like class, for property typing only
 #' @noRd
-trans_any <- S7::new_union(trans, trans_warp, trans_chain)
+trans_any <- S7::new_union(trans, trans_warp, trans_fn, trans_chain)
 
 #' Apply a transform to a set of points
 #'
@@ -296,10 +400,10 @@ trans_any <- S7::new_union(trans, trans_warp, trans_chain)
 #' an [xy] object's coordinates through its `trans` property. Dispatches
 #' on `object`'s class only (like [noise_sample()] dispatches on `field`
 #' alone): [trans] multiplies through its homogeneous matrix,
-#' [trans_warp] displaces points by noise, and [trans_chain] applies its
-#' `steps` in order.
+#' [trans_warp] displaces points by noise, [trans_fn] calls its own `fn`
+#' directly, and [trans_chain] applies its `steps` in order.
 #'
-#' @param object A [trans]/[trans_warp]/[trans_chain].
+#' @param object A [trans]/[trans_warp]/[trans_fn]/[trans_chain].
 #' @param pts A [xy].
 #' @return A [xy].
 #' @noRd
@@ -325,6 +429,22 @@ method(apply_trans, trans_warp) <- function(object, pts) {
   dx <- noise_sample(object@distortion_x, x = pts@x, y = pts@y, to = c(-1, 1)) * object@amount
   dy <- noise_sample(object@distortion_y, x = pts@x, y = pts@y, to = c(-1, 1)) * object@amount
   xy(x = pts@x + dx, y = pts@y + dy)
+}
+
+#' @noRd
+method(apply_trans, trans_fn) <- function(object, pts) {
+  n <- length(pts@x)
+  if (n == 0) {
+    return(xy(x = numeric(0), y = numeric(0)))
+  }
+  out <- object@fn(pts@x, pts@y)
+  if (!is.list(out) || !all(c("x", "y") %in% names(out))) {
+    rlang::abort("trans_fn's fn must return a list with named x/y elements")
+  }
+  if (length(out$x) != n || length(out$y) != n) {
+    rlang::abort("trans_fn's fn must return x/y vectors the same length as its input")
+  }
+  xy(x = out$x, y = out$y)
 }
 
 #' @noRd

@@ -210,6 +210,95 @@ test_that("sketch + trans_warp transforms every shape", {
   expect_equal(moved@shapes[[2]]@points, (shape_square(side = 1) + w)@points)
 })
 
+test_that("trans_fn() applies its own fn directly", {
+  pts <- xy(x = c(0, 1, 2), y = c(0, -1, 3))
+  double_it <- function(x, y) list(x = 2 * x, y = 2 * y)
+  out <- apply_trans(trans_fn(double_it), pts)
+  expect_equal(out@x, 2 * pts@x)
+  expect_equal(out@y, 2 * pts@y)
+})
+
+test_that("trans_fn() handles an empty point set without calling fn", {
+  called <- FALSE
+  fn <- function(x, y) {
+    called <<- TRUE
+    list(x = x, y = y)
+  }
+  out <- apply_trans(trans_fn(fn), xy(x = numeric(0), y = numeric(0)))
+  expect_equal(out@x, numeric(0))
+  expect_equal(out@y, numeric(0))
+  expect_false(called)
+})
+
+test_that("trans_fn() errors if fn's return value is missing x/y", {
+  pts <- xy(x = c(0, 1), y = c(0, 1))
+  expect_error(apply_trans(trans_fn(function(x, y) list(x = x)), pts), "x/y")
+  expect_error(apply_trans(trans_fn(function(x, y) x + y), pts), "x/y")
+})
+
+test_that("trans_fn() errors if fn's return value has the wrong length", {
+  pts <- xy(x = c(0, 1, 2), y = c(0, 1, 2))
+  bad_fn <- function(x, y) list(x = x[1], y = y[1])
+  expect_error(apply_trans(trans_fn(bad_fn), pts), "same length")
+})
+
+test_that("trans_fn threads through a drawable via trans = and +", {
+  swirl <- function(x, y) {
+    r <- sqrt(x^2 + y^2)
+    theta <- atan2(y, x) + r
+    list(x = r * cos(theta), y = r * sin(theta))
+  }
+  circ_base <- shape_circle(x = 1, radius = 0.4, n = 20L)
+  circ_via_arg <- shape_circle(x = 1, radius = 0.4, n = 20L, trans = trans_fn(swirl))
+  circ_via_plus <- shape_circle(x = 1, radius = 0.4, n = 20L) + trans_fn(swirl)
+
+  expect_equal(circ_via_arg@points, circ_via_plus@points)
+  expect_false(isTRUE(all.equal(circ_via_arg@points@x, circ_base@points@x)))
+})
+
+test_that("sketch + trans_fn transforms every shape", {
+  double_it <- function(x, y) list(x = 2 * x, y = 2 * y)
+  f <- trans_fn(double_it)
+  s <- sketch() + shape_circle(radius = 1, n = 10L) + shape_square(side = 1)
+  moved <- s + f
+
+  expect_equal(moved@shapes[[1]]@points, (shape_circle(radius = 1, n = 10L) + f)@points)
+  expect_equal(moved@shapes[[2]]@points, (shape_square(side = 1) + f)@points)
+})
+
+test_that("trans_fn composes with trans/trans_warp/trans_fn into a trans_chain", {
+  identity_fn <- function(x, y) list(x = x, y = y)
+  f <- trans_fn(identity_fn)
+  t <- trans_translate(1, 0)
+  w <- trans_warp(amount = 0.1, distortion_x = noise_field(seed = 4L))
+
+  expect_true(S7::S7_inherits(f + t, trans_chain))
+  expect_true(S7::S7_inherits(t + f, trans_chain))
+  expect_true(S7::S7_inherits(f + w, trans_chain))
+  expect_true(S7::S7_inherits(w + f, trans_chain))
+  expect_true(S7::S7_inherits(f + f, trans_chain))
+
+  chained <- t + f
+  pts <- xy(x = c(0, 1), y = c(0, 1))
+  expect_equal(apply_trans(chained, pts), apply_trans(f, apply_trans(t, pts)))
+})
+
+test_that("trans_warp + trans_fn + trans flattens into one trans_chain", {
+  identity_fn <- function(x, y) list(x = x, y = y)
+  w <- trans_warp(amount = 0.1, distortion_x = noise_field(seed = 1L))
+  f <- trans_fn(identity_fn)
+  t <- trans_rotate(pi / 4)
+  chained <- w + f + t
+  expect_true(S7::S7_inherits(chained, trans_chain))
+  expect_length(chained@steps, 3)
+})
+
+test_that("trans_chain's steps validator accepts trans_fn objects", {
+  identity_fn <- function(x, y) list(x = x, y = y)
+  expect_no_error(trans_chain(steps = list(trans_fn(identity_fn), trans_translate(1, 0))))
+  expect_error(trans_chain(steps = list("not a trans")), "trans_fn")
+})
+
 test_that("convert() bakes in a drawable's transform", {
   circ <- shape_circle(radius = 1, n = 8L, trans = trans_translate(2, 0))
   frozen <- S7::convert(circ, shape_raw)

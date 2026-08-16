@@ -40,8 +40,11 @@ full \link{noise_field} objects -- the same convention
 
 Like \link{trans}, a \code{trans_warp} is attached to a \link{drawable} via its
 \code{trans} property/argument, and composes with \code{+} -- combining it with
-another \code{trans_warp} or a \link{trans} produces a \link{trans_chain}, since a
-non-rigid warp can't collapse into a single matrix.
+another \code{trans_warp}, a \link{trans_fn}, or a \link{trans} produces a
+\link{trans_chain}, since a non-rigid warp can't collapse into a single
+matrix. See \code{\link[=trans_fn]{trans_fn()}} for a general-purpose escape hatch taking an
+arbitrary caller-supplied displacement function, rather than only a
+\link{noise_field}-driven one.
 }
 \examples{
 draw(shape_circle(radius = 1, n = 200, trans = trans_warp(amount = 0.15)))
@@ -60,6 +63,7 @@ Other transform helpers:
 \code{\link[=trans]{trans()}},
 \code{\link[=trans_affine]{trans_affine()}},
 \code{\link[=trans_chain]{trans_chain()}},
+\code{\link[=trans_fn]{trans_fn()}},
 \code{\link[=trans_identity]{trans_identity()}},
 \code{\link[=trans_reflect]{trans_reflect()}},
 \code{\link[=trans_rotate]{trans_rotate()}},

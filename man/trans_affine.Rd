@@ -31,6 +31,7 @@ draw(shape_square(
 Other transform helpers:
 \code{\link[=trans]{trans()}},
 \code{\link[=trans_chain]{trans_chain()}},
+\code{\link[=trans_fn]{trans_fn()}},
 \code{\link[=trans_identity]{trans_identity()}},
 \code{\link[=trans_reflect]{trans_reflect()}},
 \code{\link[=trans_rotate]{trans_rotate()}},

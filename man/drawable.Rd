@@ -14,7 +14,8 @@ Not exposed as a constructor argument by any concrete drawable --
 each \verb{shape_*()}/\verb{curve_*()}/\code{points_raw()} constructor fixes one
 value internally instead (see details).}
 
-\item{trans}{A \link{trans}/\link{trans_warp}/\link{trans_chain} object. See details.}
+\item{trans}{A \link{trans}/\link{trans_warp}/\link{trans_fn}/\link{trans_chain} object.
+See details.}
 
 \item{pathlike}{A single \code{TRUE}/\code{FALSE} (default \code{FALSE}). Not exposed
 as a constructor argument by any concrete drawable -- each fixes its
@@ -41,7 +42,9 @@ interior to fill.
 \code{trans} is a \link{trans} (an affine map: \code{\link[=trans_translate]{trans_translate()}},
 \code{\link[=trans_rotate]{trans_rotate()}}, \code{\link[=trans_scale]{trans_scale()}}, \code{\link[=trans_reflect]{trans_reflect()}}, \code{\link[=trans_shear]{trans_shear()}},
 \code{\link[=trans_affine]{trans_affine()}}), a \link{trans_warp} (a non-rigid, noise-based
-deformation), or a \link{trans_chain} combining several via \code{+}, applied to
+deformation), a \link{trans_fn} (a non-rigid deformation from an arbitrary
+caller-supplied displacement function), or a \link{trans_chain} combining
+several via \code{+}, applied to
 a drawable's computed \code{points} as the very last step -- after any
 shape-specific geometry (and, for \code{\link[=shape_blob]{shape_blob()}}/\code{\link[=shape_ribbon]{shape_ribbon()}}/
 \code{\link[=shape_twist]{shape_twist()}}, any noise-based distortion) has already been computed.

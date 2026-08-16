@@ -2255,3 +2255,69 @@ Tests added to `tests/testthat/test-wedge.R`: the `inner_radius = 0`
 pie-slice-outline equivalence, the reversed-inner-arc geometry, both
 validator boundaries, the complete-annulus case, and `shape_wedges()`'s
 own vectorization of `inner_radius`.
+
+## Arbitrary-function `trans` warp: `trans_fn()`
+
+The affine `trans` family and `trans_warp()` (noise-based domain
+warping) left one gap noted in `.agents/PLAN.md`: a fully general
+escape hatch taking an arbitrary caller-supplied displacement function
+rather than only a `noise_field`-driven one -- for a deterministic
+formula (swirl/pinch/bulge) or a warp driven by something a
+`noise_field` can't express at all (e.g. a second drawable's own
+geometry).
+
+**Design.** `trans_fn` is a new S7 class (`R/trans.R`, right after
+`trans_warp`, before `trans_chain`) with a single property, `fn` (typed
+`S7::class_function`, no validator beyond that -- `fn`'s actual
+behavior can't be verified without calling it). `apply_trans(trans_fn,
+pts)` calls `object@fn(pts@x, pts@y)` directly (plain numeric vectors,
+not an `xy` object -- keeps the function signature simple for a caller
+to write) and validates the *result* at that point: it must be a list
+with named `x`/`y` elements, each the same length as the input, or
+`apply_trans()` errors immediately with a specific message
+(`"trans_fn's fn must return a list with named x/y elements"` /
+`"...must return x/y vectors the same length as its input"`). This
+mirrors `trans_warp`'s own `apply_trans()` method structurally (both
+early-return on an empty point set without calling anything), but
+`trans_fn` takes no `amount`/other scaling properties the way
+`noise_field`/`noise_bridge`-backed classes do -- `fn` alone fully
+determines the deformation, since the function itself can incorporate
+any amplitude scaling it wants.
+
+**Composition.** Slotted into every place the existing three
+`trans`/`trans_warp`/`trans_chain` classes already interoperate,
+bringing the total ordered-pair `+` registrations from nine to sixteen
+(four classes squared): `trans_chain`'s own `steps` validator now also
+accepts `trans_fn`; `trans_any` (the property-typing union) gained
+`trans_fn`; `combine_trans()`/`trans_steps()` needed no changes at all,
+since both already operate generically on "is this a plain `trans` or
+not" rather than enumerating classes by name -- any combination
+involving `trans_fn` falls through to the existing "build/extend a
+`trans_chain`" branch for free. `R/sketch.R`'s `compose_drawable_trans()`/
+`compose_sketch_trans()` helpers needed two new `method(\`+\`, list(...))`
+registrations each (`drawable`/`sketch` paired with `trans_fn`), mirroring
+the existing `trans_warp` registrations exactly.
+
+**Example fix during review.** The first draft's `trans_fn()` examples
+used a plain `shape_circle()`/`shape_square()` centred at the origin for
+the swirl/bulge demos -- both are rotationally symmetric about the
+origin (every point the same distance away), so a warp that's purely a
+function of distance-from-origin only rotates/scales the whole shape
+rigidly, showing no visible non-rigid effect at all. Fixed by centring
+the demo shape *away* from the origin instead (`shape_circle(x = 0.8,
+radius = 0.5, ...)`for both examples) -- since points on an off-centre
+circle vary in their own distance from the origin, the warp now visibly
+distorts the outline (confirmed visually: the swirl example renders a
+clearly bent, non-circular shape; the bulge example dents one side of
+the circle outward). Worth remembering for any future warp-style
+example: a shape centred at the transform's own reference point (here,
+the origin) is a poor demo for a warp defined in terms of distance from
+that point.
+
+**Documentation/tests.** `format_trans_summary()` (`R/format.R`) gained
+a `trans_fn` branch (reported as `"fn"`). Tests added to
+`tests/testthat/test-trans.R`: direct `apply_trans()` behavior, the
+empty-point-set no-call-at-all case, both malformed-return-value error
+messages, threading through a drawable via `trans =`/`+`, `sketch + trans_fn`,
+composition into a `trans_chain` with every other trans-like class (both
+orders), and `trans_chain`'s validator accepting `trans_fn` in `steps`.

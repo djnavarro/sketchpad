@@ -36,13 +36,14 @@ format_prop_value <- function(value) {
 
 #' Summarize a drawable's own `trans` property for `format(drawable)`
 #'
-#' `trans`/`trans_warp`/`trans_chain` each get a one-word (or short)
-#' summary rather than printing their own properties in full -- an affine
-#' [trans] is reported as `"identity"` when its matrix is exactly the 3x3
-#' identity (`drawable`'s own default), or `"affine"` otherwise; a
-#' [trans_warp] as `"warp"`; a [trans_chain] as `"chain (n steps)"`.
+#' `trans`/`trans_warp`/`trans_fn`/`trans_chain` each get a one-word (or
+#' short) summary rather than printing their own properties in full -- an
+#' affine [trans] is reported as `"identity"` when its matrix is exactly
+#' the 3x3 identity (`drawable`'s own default), or `"affine"` otherwise;
+#' a [trans_warp] as `"warp"`; a [trans_fn] as `"fn"`; a [trans_chain] as
+#' `"chain (n steps)"`.
 #'
-#' @param x A [trans]/[trans_warp]/[trans_chain] object.
+#' @param x A [trans]/[trans_warp]/[trans_fn]/[trans_chain] object.
 #' @return A single string.
 #' @noRd
 format_trans_summary <- function(x) {
@@ -50,6 +51,8 @@ format_trans_summary <- function(x) {
     if (isTRUE(all.equal(unname(x@matrix), diag(3)))) "identity" else "affine"
   } else if (S7::S7_inherits(x, trans_warp)) {
     "warp"
+  } else if (S7::S7_inherits(x, trans_fn)) {
+    "fn"
   } else if (S7::S7_inherits(x, trans_chain)) {
     paste0("chain (", length(x@steps), " steps)")
   } else {

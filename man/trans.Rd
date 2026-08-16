@@ -26,8 +26,10 @@ Two \code{trans} objects combine with \code{+}: \code{t1 + t2} produces a new \c
 whose effect is "apply \code{t1} first, then \code{t2}" -- see \code{\link[=trans_translate]{trans_translate()}}'s
 Details for the composition order convention and a worked example.
 Composing a \code{trans} with a \link{trans_warp} (a non-rigid, noise-based
-deformation that can't be represented as a matrix) instead produces a
-\link{trans_chain} -- see there.
+deformation) or a \link{trans_fn} (a non-rigid deformation from an
+arbitrary caller-supplied function) -- neither of which can be
+represented as a matrix -- instead produces a \link{trans_chain} -- see
+there.
 }
 \examples{
 trans_identity()
@@ -48,6 +50,7 @@ draw(sketch() + original + (original + trans_rotate(pi / 6)))
 Other transform helpers:
 \code{\link[=trans_affine]{trans_affine()}},
 \code{\link[=trans_chain]{trans_chain()}},
+\code{\link[=trans_fn]{trans_fn()}},
 \code{\link[=trans_identity]{trans_identity()}},
 \code{\link[=trans_reflect]{trans_reflect()}},
 \code{\link[=trans_rotate]{trans_rotate()}},

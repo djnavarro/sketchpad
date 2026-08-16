@@ -18,7 +18,9 @@
 #' `trans` is a [trans] (an affine map: [trans_translate()],
 #' [trans_rotate()], [trans_scale()], [trans_reflect()], [trans_shear()],
 #' [trans_affine()]), a [trans_warp] (a non-rigid, noise-based
-#' deformation), or a [trans_chain] combining several via `+`, applied to
+#' deformation), a [trans_fn] (a non-rigid deformation from an arbitrary
+#' caller-supplied displacement function), or a [trans_chain] combining
+#' several via `+`, applied to
 #' a drawable's computed `points` as the very last step -- after any
 #' shape-specific geometry (and, for [shape_blob()]/[shape_ribbon()]/
 #' [shape_twist()], any noise-based distortion) has already been computed.
@@ -57,7 +59,8 @@
 #'   Not exposed as a constructor argument by any concrete drawable --
 #'   each `shape_*()`/`curve_*()`/`points_raw()` constructor fixes one
 #'   value internally instead (see details).
-#' @param trans A [trans]/[trans_warp]/[trans_chain] object. See details.
+#' @param trans A [trans]/[trans_warp]/[trans_fn]/[trans_chain] object.
+#'   See details.
 #' @param pathlike A single `TRUE`/`FALSE` (default `FALSE`). Not exposed
 #'   as a constructor argument by any concrete drawable -- each fixes its
 #'   own value internally, the same convention `geometry` follows. See

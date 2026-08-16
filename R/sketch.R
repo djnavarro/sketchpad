@@ -78,7 +78,7 @@ method(`+`, list(sketch, drawable)) <- function(e1, e2) {
 #' registration below.
 #'
 #' @param e1 A [drawable].
-#' @param e2 A [trans]/[trans_warp]/[trans_chain].
+#' @param e2 A [trans]/[trans_warp]/[trans_fn]/[trans_chain].
 #' @return A copy of `e1` with `@trans` composed.
 #' @noRd
 compose_drawable_trans <- function(e1, e2) {
@@ -92,7 +92,7 @@ compose_drawable_trans <- function(e1, e2) {
 #' registration below.
 #'
 #' @param e1 A [sketch].
-#' @param e2 A [trans]/[trans_warp]/[trans_chain].
+#' @param e2 A [trans]/[trans_warp]/[trans_fn]/[trans_chain].
 #' @return A copy of `e1` with the transform composed onto every shape.
 #' @noRd
 compose_sketch_trans <- function(e1, e2) {
@@ -105,7 +105,8 @@ compose_sketch_trans <- function(e1, e2) {
 #' `drawable + trans` returns a copy of `drawable` with `trans` composed
 #' onto its existing `@trans` (`self@trans <- self@trans + trans`), as a
 #' fluent alternative to passing `trans = ` at construction time. Also
-#' works with a [trans_warp] or [trans_chain] in place of `trans`.
+#' works with a [trans_warp], [trans_fn], or [trans_chain] in place of
+#' `trans`.
 #'
 #' @param e1 A [drawable].
 #' @param e2 A [trans].
@@ -119,13 +120,17 @@ method(`+`, list(drawable, trans_warp)) <- function(e1, e2) compose_drawable_tra
 
 #' @export
 #' @noRd
+method(`+`, list(drawable, trans_fn)) <- function(e1, e2) compose_drawable_trans(e1, e2)
+
+#' @export
+#' @noRd
 method(`+`, list(drawable, trans_chain)) <- function(e1, e2) compose_drawable_trans(e1, e2)
 
 #' Apply a transform to every shape in a sketch with `+`
 #'
 #' `sketch + trans` composes `trans` onto every shape's own `@trans`,
 #' transforming the whole composition at once. Also works with a
-#' [trans_warp] or [trans_chain] in place of `trans`.
+#' [trans_warp], [trans_fn], or [trans_chain] in place of `trans`.
 #'
 #' @param e1 A [sketch].
 #' @param e2 A [trans].
@@ -136,6 +141,10 @@ method(`+`, list(sketch, trans)) <- function(e1, e2) compose_sketch_trans(e1, e2
 #' @export
 #' @noRd
 method(`+`, list(sketch, trans_warp)) <- function(e1, e2) compose_sketch_trans(e1, e2)
+
+#' @export
+#' @noRd
+method(`+`, list(sketch, trans_fn)) <- function(e1, e2) compose_sketch_trans(e1, e2)
 
 #' @export
 #' @noRd

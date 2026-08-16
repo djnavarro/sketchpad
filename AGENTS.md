@@ -75,27 +75,43 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   independent axes. The class doubles as its own constructor (like
   `noise_field`/`noise_bridge`, and unlike the `trans_*()` affine family,
   which are separate wrapper functions sharing the single `trans` class).
+- **`trans_fn`** -- also not a `drawable`; the general-purpose escape
+  hatch for a non-rigid deformation, wrapping a caller-supplied
+  displacement function directly (`R/trans.R`) -- the same relationship
+  `trans_affine()` has to the rigid `trans_*()` family. Its single `fn`
+  property is called as `fn(x, y)` (plain numeric vectors, not an `xy`
+  object) and must return a `list(x = ..., y = ...)` of the same length
+  -- checked at apply time inside `apply_trans()`, not at construction,
+  since `fn`'s own behavior can't be verified without calling it. Unlike
+  `noise_field`/`noise_bridge`/`trans_warp`, it takes no other
+  properties -- `fn` alone fully determines the deformation, so there's
+  no separate `amount` to scale it (the function can incorporate that
+  itself). Strictly more general than `trans_warp`: any noise-based warp
+  could be expressed as a `trans_fn` closing over a `noise_field`, but so
+  can a deterministic formula (swirl/pinch/bulge) or a warp driven by
+  something a `noise_field` can't express at all, e.g. a second
+  drawable's own geometry captured in `fn`'s enclosing environment.
 - **`trans_chain`** -- also not a `drawable`; an ordered list of `steps`
-  (each a `trans`/`trans_warp`/`trans_chain`), applied in sequence. This
-  is what `+` produces when composing two transforms that can't collapse
-  into a single affine matrix -- e.g. a `trans_warp` combined with
-  another `trans_warp` or with a `trans`. Not usually constructed
-  directly.
-- Every `trans`/`trans_warp`/`trans_chain` combination composes with `+`,
-  via the internal `combine_trans()` helper backing nine
-  `method(\`+\`, list(...))` registrations (one per ordered pair of the
-  three classes): two plain `trans` (affine) objects still collapse into
-  a single `trans` via matrix multiplication (`t1 + t2` means "apply
-  `t1`'s effect first, then `t2`'s"; `(t1 + t2)@matrix` is `t2@matrix %*%
-  t1@matrix`, since points are homogeneous column vectors transformed as
-  `matrix %*% point` -- documented and tested explicitly in
-  `trans_translate()`'s docs, since composition order is an easy thing to
-  get backwards); any combination involving a `trans_warp`/`trans_chain`
-  instead builds/extends a `trans_chain` (via the internal
-  `trans_steps()` helper, which flattens an existing chain's own `steps`
-  rather than nesting chains). Every `drawable` carries a `trans`
-  property (default `trans_identity()`, typed as the internal
-  `trans_any` union of all three classes -- the same
+  (each a `trans`/`trans_warp`/`trans_fn`/`trans_chain`), applied in
+  sequence. This is what `+` produces when composing two transforms that
+  can't collapse into a single affine matrix -- e.g. a `trans_warp`
+  combined with another `trans_warp` or with a `trans`. Not usually
+  constructed directly.
+- Every `trans`/`trans_warp`/`trans_fn`/`trans_chain` combination
+  composes with `+`, via the internal `combine_trans()` helper backing
+  sixteen `method(\`+\`, list(...))` registrations (one per ordered pair
+  of the four classes): two plain `trans` (affine) objects still collapse
+  into a single `trans` via matrix multiplication (`t1 + t2` means
+  "apply `t1`'s effect first, then `t2`'s"; `(t1 + t2)@matrix` is
+  `t2@matrix %*% t1@matrix`, since points are homogeneous column vectors
+  transformed as `matrix %*% point` -- documented and tested explicitly
+  in `trans_translate()`'s docs, since composition order is an easy
+  thing to get backwards); any combination involving a `trans_warp`/
+  `trans_fn`/`trans_chain` instead builds/extends a `trans_chain` (via
+  the internal `trans_steps()` helper, which flattens an existing
+  chain's own `steps` rather than nesting chains). Every `drawable`
+  carries a `trans` property (default `trans_identity()`, typed as the
+  internal `trans_any` union of all four classes -- the same
   `S7::new_union()`-as-property-class pattern `style@fill`'s
   `fill_class` already uses), applied via the internal `apply_trans()`
   S7 generic (dispatching on the transform's own class alone, the same
@@ -112,8 +128,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `compose_drawable_trans()` helper) returns a copy of a drawable with
   `@trans` composed, and the analogous `method(\`+\`, list(sketch,
   <trans-like>))`/`compose_sketch_trans()` maps the same composition over
-  every shape in a `sketch` at once. Arbitrary-function warps (rather
-  than noise-driven ones) remain out of scope -- see `.agents/PLAN.md`.
+  every shape in a `sketch` at once.
 - **`style`** -- container for `color`/`fill`/`linewidth`/`linetype`/
   `linejoin`/`lineend`/`linemitre`/`color_alpha`/`fill_alpha`, forwarded
   to `grid::gpar()`. `fill` accepts either a plain colour string or the
