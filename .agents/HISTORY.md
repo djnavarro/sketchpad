@@ -2353,3 +2353,81 @@ kite/bowtie-like closed shape, not a degenerate one, unlike a 2-sided
 No separate `rotation` argument was added -- consistent with
 `shape_polygon()`, reorientation composes via `trans_rotate()` instead of
 a bespoke per-shape angle parameter.
+
+## Implemented `xy@id`/`style@rule`/`pathGrob()` rendering (multiple sub-paths and holes, rendering mechanism only)
+
+The rendering-mechanism half of the "multiple sub-paths and holes per
+drawable" 0.1 item (see `.agents/PLAN.md` for what's still open: the
+author-facing API for actually producing non-trivial multi-subpath
+geometry).
+
+**Prototyping first.** Before touching this package's own code, verified
+directly (three side-by-side `grid::grid.path()` calls) that: (1) a
+single-`id` `pathGrob()` call reproduces `polygonGrob()`'s own rendering
+exactly; (2) two disjoint sub-paths under `rule = "evenodd"` render as
+two independent fills; (3) two *nested* sub-paths with the *same*
+winding direction under `rule = "evenodd"` still punch a genuine hole --
+confirming evenodd's hole detection depends only on geometric nesting,
+not on getting vertex winding order right by hand. This last point is
+what makes the feature usable for noise-perturbed/generative outlines,
+where controlling winding direction isn't realistic, and is why
+`"evenodd"` (not `"winding"`) was chosen as `style@rule`'s default.
+
+**Data model.** `xy` (`R/xy.R`) gained a third property, `id` (integer,
+parallel to `x`/`y`), and a custom `constructor` (previously
+auto-generated, since `x`/`y` had no defaults needing computation) that
+fills `id` in as `rep(1L, length(x))` whenever left `NULL` -- the
+default. This is why the change needed almost no changes to any
+concrete drawable's own `points` getter: every one of them already
+calls `xy(x = ..., y = ...)` with no `id` argument, and continues to get
+exactly the same single-implicit-sub-path result as before.
+
+**Style.** `style()` (`R/style.R`) gained a `rule` property
+(`"evenodd"`/`"winding"`, default `"evenodd"`, validated the same way
+`linejoin`/`lineend` already are), inert for every current drawable
+(single sub-path) and forwarded to `geometry_grob()`'s own `pathGrob()`
+call.
+
+**Rendering.** `geometry_grob()`'s (`R/draw.R`) `"polygon"` branch
+switched from `grid::polygonGrob()` to `grid::pathGrob(id = points@id,
+rule = sty@rule, ...)` -- `pathId` is left at its default (`NULL`), so
+every sub-path of one drawable always combines into a single rendered
+path/fill region; several *independently*-styled shapes already means
+using a `sketch`, not multiple `pathId`s within one drawable. The
+`"path"` branch also gained `id = points@id`, passed straight through
+to `grid::polylineGrob()`'s own already-existing `id` support -- a free
+extension letting a `"path"`-geometry drawable render as several
+disjoint strokes sharing one style, once something actually produces a
+multi-sub-path `curve_*()`. `"points"` geometry was left unchanged --
+`grid::pointsGrob()` has no `id` concept, consistent with `fill`
+already being inert there.
+
+**`apply_trans()`.** All four methods (`R/trans.R`: `trans`,
+`trans_warp`, `trans_fn`, `trans_chain`) previously constructed a bare
+`xy(x = ..., y = ...)`, silently dropping `id`. Fixed by forwarding
+`pts@id` through into each returned `xy()` (the empty-input early-return
+branches were left as `xy(x = numeric(0), y = numeric(0))`, since `id`
+defaults to `integer(0)` there automatically, matching an empty `pts@id`
+anyway).
+
+**`effect_grain`.** `effect_grain_grob()`'s (`R/effect_grain.R`)
+mask-building grob switched from `polygonGrob()` to `pathGrob(id =
+outline@id, rule = "evenodd")` -- the rule is fixed rather than read
+from `object@style@rule`, since `effect_grain` already documents that
+`object@style` plays no role in its own rendering at all. Without this,
+a (currently hypothetical, since no constructor produces one yet) holed
+source shape would mask as if solid, losing the hole.
+
+**Version bump.** `grid::pathGrob()` is base `grid`, not a new package
+dependency, but has existed only since R 3.6 (2019) -- confirmed via
+`rdocumentation.org`'s own version history and ggplot2's `geom_polygon()`
+docs ("From R 3.6 and onwards it is possible to draw polygons with
+holes"). `DESCRIPTION`'s `Depends` was bumped from `R (>= 3.5)` to
+`R (>= 3.6)` accordingly.
+
+**Not touched.** `convert()`'s three methods (`R/convert.R`) still don't
+forward `from@points@id` -- there's no constructor argument on
+`shape_raw()`/`curve_raw()`/`points_raw()` to forward it into yet, since
+the author-facing multi-subpath API is still an open design question
+(see `.agents/PLAN.md`). No concrete drawable's own `points` getter
+needed any changes at all, by construction (see "Data model" above).

@@ -72,4 +72,4 @@ Collate: 'utils.R'
     'save.R'
     'sketchpad-package.R'
 Depends: 
-    R (>= 3.5)
+    R (>= 3.6)

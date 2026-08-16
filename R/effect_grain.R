@@ -167,8 +167,12 @@ effect_grain_grob <- function(object, outline, vp) {
     default.units = "native", interpolate = TRUE
   )
 
-  mask_grob <- grid::polygonGrob(
-    x = outline@x, y = outline@y,
+  # built via pathGrob() (rather than polygonGrob()) so a multi-sub-path
+  # outline (see xy's own `id`) masks correctly, e.g. leaving a hole
+  # unshaded rather than filling it in; a single-sub-path outline (every
+  # current polygon-geometry drawable) renders identically either way
+  mask_grob <- grid::pathGrob(
+    x = outline@x, y = outline@y, id = outline@id, rule = "evenodd",
     default.units = "native",
     gp = grid::gpar(fill = "black", col = NA)
   )

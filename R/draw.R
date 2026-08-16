@@ -68,6 +68,22 @@ apply_alpha <- function(color, alpha) {
 #' `apply_alpha()`/`adjustcolor()` has no defined effect on one (see
 #' [style()]'s `fill_alpha` docs).
 #'
+#' `"polygon"` is built via [grid::pathGrob()] rather than
+#' [grid::polygonGrob()], passing `points@id` as `pathGrob()`'s own `id`
+#' (grouping `points` into sub-paths) and `sty@rule` as its `rule`. With a
+#' single sub-path (`points@id` all one value, true of every current
+#' `shape_*()` constructor), `pathGrob()` reproduces `polygonGrob()`'s
+#' rendering exactly -- this is a rendering-mechanism change only, not a
+#' visible behavior change for any existing drawable. `pathId` is left at
+#' its default (`NULL`), so every sub-path of one drawable is always
+#' combined into a single rendered path/fill region -- a drawable that
+#' wants several independently-styled shapes already uses a [sketch]
+#' instead. `"path"` similarly passes `points@id` to
+#' [grid::polylineGrob()]'s own `id`, letting a `"path"`-geometry drawable
+#' render as several disjoint strokes sharing one style; `"points"` has no
+#' sub-path concept (no `id` support in [grid::pointsGrob()]), consistent
+#' with `fill` already being inert for both non-`"polygon"` geometries.
+#'
 #' @param points A [xy].
 #' @param sty A [style].
 #' @param geometry One of `"polygon"`, `"path"`, or `"points"`.
@@ -80,9 +96,11 @@ geometry_grob <- function(points, sty, geometry, vp) {
     sty@fill
   }
   switch(geometry,
-    polygon = grid::polygonGrob(
+    polygon = grid::pathGrob(
       x = points@x,
       y = points@y,
+      id = points@id,
+      rule = sty@rule,
       gp = grid::gpar(
         col       = apply_alpha(sty@color, sty@color_alpha),
         fill      = fill,
@@ -98,6 +116,7 @@ geometry_grob <- function(points, sty, geometry, vp) {
     path = grid::polylineGrob(
       x = points@x,
       y = points@y,
+      id = points@id,
       gp = grid::gpar(
         col       = apply_alpha(sty@color, sty@color_alpha),
         lwd       = sty@linewidth,

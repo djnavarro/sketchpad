@@ -4,25 +4,46 @@
 \alias{xy}
 \title{A set of locations in 2D space}
 \usage{
-xy(x = integer(0), y = integer(0))
+xy(x, y, id = NULL)
 }
 \arguments{
 \item{x}{Numeric vector of x coordinates.}
 
 \item{y}{Numeric vector of y coordinates.}
+
+\item{id}{Integer (or integerish numeric) vector the same length as
+\code{x}/\code{y}, grouping locations into sub-paths. Default \code{NULL}, filled in
+as \code{rep(1L, length(x))} (a single sub-path).}
 }
 \description{
 \code{xy} represents a collection of locations in two-dimensional space as
-parallel \code{x} and \code{y} coordinate vectors.
+parallel \code{x}/\code{y} coordinate vectors, plus a parallel \code{id} vector grouping
+those locations into sub-paths.
 }
 \details{
 Most \link{drawable} subclasses expose their geometry as a computed \code{points}
 property of class \code{xy}; \link{shape_raw} is the exception, where the user
 supplies \code{x}/\code{y} directly. Named \code{xy} rather than \code{points} so this
 exported constructor doesn't mask \code{graphics::points()}.
+
+\code{id} marks which sub-path/contour each \code{x}/\code{y} location belongs to --
+locations sharing the same \code{id} are connected into one contour; a
+different \code{id} starts a new one. Every existing single-contour drawable
+has exactly one implicit sub-path, so \code{id} defaults to \code{rep(1L, length(x))} whenever left \code{NULL} (the default), meaning no drawable's own
+\code{points} getter needs to pass \code{id} explicitly to keep its current,
+single-contour behavior. Multiple sub-paths let a single \link{drawable}
+render as several disjoint shapes sharing one \link{style} (e.g. two separate
+blobs), or -- combined with \code{\link[=style]{style()}}'s \code{rule} -- as a shape with a hole
+(a sub-path nested inside another). No constructor currently exposes a
+way to \emph{set} a non-trivial \code{id} when building geometry by hand; this is
+the underlying data-shape change alone, not yet paired with an
+author-facing API (see \code{.agents/PLAN.md}).
 }
 \examples{
 xy(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))
+
+# two sub-paths: a pair of disjoint 4-point contours sharing one xy object
+xy(x = c(0, 1, 1, 0, 2, 3, 3, 2), y = c(0, 0, 1, 1, 0, 0, 1, 1), id = rep(1:2, each = 4))
 
 }
 \seealso{

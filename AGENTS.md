@@ -130,8 +130,10 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   <trans-like>))`/`compose_sketch_trans()` maps the same composition over
   every shape in a `sketch` at once.
 - **`style`** -- container for `color`/`fill`/`linewidth`/`linetype`/
-  `linejoin`/`lineend`/`linemitre`/`color_alpha`/`fill_alpha`, forwarded
-  to `grid::gpar()`. `fill` accepts either a plain colour string or the
+  `linejoin`/`lineend`/`linemitre`/`rule`/`color_alpha`/`fill_alpha`,
+  forwarded to `grid::gpar()` (`rule` alone is forwarded to
+  `geometry_grob()`'s own `pathGrob()` call instead -- see `draw()`
+  below). `fill` accepts either a plain colour string or the
   output of a `fill_*()` helper (see "The `fill_*()` texture family"
   below); default is `fill_solid("black")` (i.e. `"black"`). `linetype`
   (default `"solid"`, forwarded to `lty`) is not independently
@@ -157,15 +159,36 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   effect on one -- matching this package's existing convention of
   silent, documented inertness for style properties that don't
   universally apply (e.g. `fill` itself already has no effect for
-  `"path"`/`"points"`-geometry drawables).
+  `"path"`/`"points"`-geometry drawables). `rule` (default `"evenodd"`,
+  the other option `"winding"`) is `grid::pathGrob()`'s own fill rule,
+  used only when a drawable's `points` has more than one sub-path (see
+  `xy`'s `id` below) -- inert for every current `shape_*()`/`curve_*()`
+  constructor, which all produce exactly one implicit sub-path.
 - **`xy`** -- a collection of locations in 2D space (`x`/`y` numeric
-  vectors, equal length); not tied to any particular geometric
+  vectors, equal length, plus a parallel `id` integer vector grouping
+  locations into sub-paths); not tied to any particular geometric
   interpretation (polygon vertices, an open path, unconnected points, ...)
   -- that meaning comes from whichever `drawable` produced it, via its
   `geometry` property. Named `xy` rather than `points` so the exported
   constructor doesn't mask `graphics::points()`; every `drawable`'s
   `points` *property* (see below) is still called `points`, since a
   property isn't a top-level exported name and can't mask anything.
+  `id` defaults to `rep(1L, length(x))` whenever left `NULL` (`xy()`'s
+  own constructor, not a `new_property(default = ...)` spec, fills this
+  in, so it can depend on `length(x)`) -- every existing `points` getter
+  across every concrete drawable produces exactly one implicit sub-path
+  this way, with no changes needed to any of them. Locations sharing an
+  `id` are connected into one contour; a different `id` starts a new
+  one, letting a single drawable render as several disjoint shapes
+  sharing one `style` or, combined with `style@rule`, as a shape with a
+  hole (a sub-path nested inside another -- see `draw()` below for the
+  `pathGrob()` mechanics). Every `apply_trans()` method forwards
+  `pts@id` unchanged into the `xy` it returns, since a transform only
+  ever displaces `x`/`y`. This is the data-shape half of "multiple
+  sub-paths and holes per drawable" (see `.agents/PLAN.md`) -- no
+  constructor yet exposes a way to *set* a non-trivial `id` when
+  building geometry by hand; that author-facing API is still an open
+  design question.
 - **`drawable`** -- parent class of every shape. Declares five
   properties: `style` (default `style()`), `geometry` (a validated string,
   one of `"polygon"`/`"path"`/`"points"`, default `"polygon"` -- tells
@@ -449,7 +472,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `object@canvas@clip`. `draw(drawable)` (the single-shape method) has no
   `canvas` concept -- background/clip are sketch-level only. Both methods
   build their grob via the internal `geometry_grob()` helper (`R/draw.R`),
-  which switches on a drawable's `geometry` property: `grid::polygonGrob()`
+  which switches on a drawable's `geometry` property: `grid::pathGrob()`
   for `"polygon"`, `grid::polylineGrob()` for `"path"`, `grid::pointsGrob()`
   for `"points"` -- `style@fill` is omitted from `gpar()` for the latter
   two, since only a closed polygon has an interior to fill.
@@ -458,7 +481,23 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   `"path"`) but not `"points"`, which has no line to dash, join, cap, or
   mitre -- `lineend`/`linemitre` are simply inert for `"polygon"`, which
   has no free endpoint and no mitred corner sharp enough in practice to
-  hit the default limit.
+  hit the default limit. `"polygon"` uses `pathGrob()` rather than the
+  simpler `polygonGrob()` so that a drawable's own `points@id` (see `xy`
+  above) and `style@rule` are honoured -- `points@id` is passed straight
+  through as `pathGrob()`'s own `id` (grouping into sub-paths), `pathId`
+  is left at its default (every sub-path of one drawable is always one
+  combined path/fill region -- several independently-styled shapes
+  already means using a `sketch` instead), and `style@rule` is passed
+  through as `pathGrob()`'s own `rule`. With a single sub-path (every
+  current `shape_*()`), this reproduces `polygonGrob()`'s own rendering
+  exactly -- confirmed directly, not just by inspection -- so this was a
+  rendering-mechanism change only, no visible behavior change for any
+  existing drawable. `pathGrob()` is base `grid` (present since R 3.6,
+  see "Gotchas"), so no new package dependency. `"path"` similarly
+  passes `points@id` through to `polylineGrob()`'s own `id`, letting a
+  `"path"`-geometry drawable render as several disjoint strokes sharing
+  one style; `"points"` has no sub-path concept (no `id` support in
+  `pointsGrob()`), consistent with `fill` already being inert there.
 - **`convert()`** -- S7's own generic (not defined by this package); a
   `method(convert, list(drawable, shape_raw))` "freezes" any drawable's
   computed points into a plain `shape_raw`, preserving `style`.
@@ -860,18 +899,26 @@ shape rather than a `grid::pattern()` tile -- and masking that raster to
 the outline's exact polygon shape via `grid::as.mask()`, the same
 masking technique `fill_vignette()` uses for its own radial fade, but
 built from `object`'s own real silhouette rather than a synthetic
-circle. Grain renders as `color`'s opacity fading between `0` and
-`alpha` at the noise field's extremes (`fill_noise()`'s own convention),
-optionally revealing a solid `background` colour underneath instead of
-true transparency (`fill_vignette()`'s own `background` argument).
-`object@style` plays no role here -- `effect_grain` draws its own grain
-raster instead, regardless of what `object`'s own `style` says. Since
-its rendering isn't a single `points`-based grob expressible through
-`geometry_grob()`'s `"polygon"`/`"path"`/`"points"` switch, `effect_grain`
-is not a `drawable` subclass at all -- it has its own `S7::method(draw,
+circle. The mask itself is built via `grid::pathGrob()` (`id =
+outline@id`, `rule = "evenodd"` fixed, not read from `object@style`)
+rather than `polygonGrob()`, for the same reason `geometry_grob()`'s own
+`"polygon"` branch uses `pathGrob()` -- a multi-sub-path outline masks
+correctly (e.g. leaving a hole unshaded) instead of filling in every
+sub-path solid; identical rendering to `polygonGrob()` for the current,
+always-single-sub-path case. Grain renders as `color`'s opacity fading
+between `0` and `alpha` at the noise field's extremes (`fill_noise()`'s
+own convention), optionally revealing a solid `background` colour
+underneath instead of true transparency (`fill_vignette()`'s own
+`background` argument). `object@style` plays no role here -- `effect_grain`
+draws its own grain raster instead, regardless of what `object`'s own
+`style` says (this is also why its mask's fill rule is fixed rather than
+read from `object@style@rule`). Since its rendering isn't a single
+`points`-based grob expressible through `geometry_grob()`'s
+`"polygon"`/`"path"`/`"points"` switch, `effect_grain` is not a
+`drawable` subclass at all -- it has its own `S7::method(draw,
 effect_grain)` (`R/effect_grain.R`, collated right after `draw.R` so the
 `draw` generic already exists to register against), built directly from
-`grid::rasterGrob()`/`grid::polygonGrob()`/`grid::as.mask()`/
+`grid::rasterGrob()`/`grid::pathGrob()`/`grid::as.mask()`/
 `grid::gTree()` rather than reusing `geometry_grob()`.
 Its masked viewport reuses the same `xscale`/`yscale`/`width`/`height`
 as the shared drawing viewport `draw()` already built for it (read back
@@ -886,6 +933,16 @@ forgotten -- all discovered because they only manifest once classes move
 from a sourced script into an installed package (see HISTORY.md for the
 full debugging narrative):
 
+- **`grid::pathGrob()` (used by `geometry_grob()`'s `"polygon"` branch
+  and `effect_grain`'s own mask-building) needs `R >= 3.6`**, one minor
+  version above this package's previous `Depends: R (>= 3.5)` --
+  `DESCRIPTION` was bumped accordingly. Confirmed directly (not just by
+  documentation) that a single-sub-path `pathGrob()` call reproduces
+  `polygonGrob()`'s own rendering exactly, and that `rule = "evenodd"`
+  detects a hole from pure sub-path nesting, with no dependence on
+  vertex winding direction -- both prototyped standalone before this
+  package's own `geometry_grob()`/`effect_grain_grob()` were changed to
+  use `pathGrob()`.
 - **S7 classes get namespace-qualified class names once inside a
   package** (`"sketchpad::sketch"`, not `"sketch"`). Any check written
   as `inherits(x, "drawable")` or an S3 method named `` `+.sketch` ``

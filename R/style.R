@@ -44,6 +44,19 @@ fill_class <- S7::new_union(S7::class_character, S7::new_S3_class("GridPattern")
 #'   couple `color_alpha` and `fill_alpha` together. If `color` already
 #'   has its own alpha channel (e.g. an `"#RRGGBBAA"` hex string),
 #'   `color_alpha` multiplies through it rather than overriding it.
+#' @param rule Fill rule used when a drawable's own `points` has more than
+#'   one sub-path (see [xy]'s `id`), forwarded to [grid::pathGrob()]'s own
+#'   `rule` argument. One of `"evenodd"` (default) or `"winding"`.
+#'   `"evenodd"` fills a region if it's enclosed by an odd number of
+#'   sub-paths, regardless of each sub-path's own vertex winding direction
+#'   -- a sub-path nested inside another becomes a hole purely from
+#'   geometric nesting, with no need to get vertex order right by hand,
+#'   which is why it's the default. `"winding"` instead fills based on net
+#'   signed winding number, which depends on each sub-path's own direction
+#'   -- only useful for constructions that specifically need that
+#'   direction-sensitive behavior. Has no effect on a drawable with only
+#'   one implicit sub-path (every current `shape_*()`/`curve_*()`
+#'   constructor), since both rules agree there.
 #' @param fill_alpha Fill opacity, applied to `fill` independently of
 #'   `color_alpha`, via the same [grDevices::adjustcolor()] mechanism as
 #'   `color_alpha`. Must be a number in `[0, 1]`. Default `1`. Only has an
@@ -96,10 +109,17 @@ style <- S7::new_class(
     linejoin = S7::new_property(S7::class_character, default = "round"),
     lineend = S7::new_property(S7::class_character, default = "round"),
     linemitre = S7::new_property(S7::class_numeric, default = 10),
+    rule = S7::new_property(S7::class_character, default = "evenodd"),
     color_alpha = S7::new_property(S7::class_numeric, default = 1),
     fill_alpha = S7::new_property(S7::class_numeric, default = 1)
   ),
   validator = function(self) {
+    if (length(self@rule) != 1) {
+      return("rule must be a single string")
+    }
+    if (!self@rule %in% c("evenodd", "winding")) {
+      return('rule must be one of "evenodd" or "winding"')
+    }
     if (length(self@linetype) != 1) {
       return("linetype must be a single value")
     }

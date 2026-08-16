@@ -12,6 +12,7 @@ style(
   linejoin = "round",
   lineend = "round",
   linemitre = 10,
+  rule = "evenodd",
   color_alpha = 1,
   fill_alpha = 1
 )
@@ -51,6 +52,20 @@ Only takes effect when \code{linejoin = "mitre"}: at a vertex sharper than
 this limit allows, the mitred corner is truncated to a bevel instead,
 to avoid an arbitrarily long spike. Must be at least \code{1}. Default \code{10},
 matching \code{\link[grid:gpar]{grid::gpar()}}'s own default.}
+
+\item{rule}{Fill rule used when a drawable's own \code{points} has more than
+one sub-path (see \link{xy}'s \code{id}), forwarded to \code{\link[grid:pathGrob]{grid::pathGrob()}}'s own
+\code{rule} argument. One of \code{"evenodd"} (default) or \code{"winding"}.
+\code{"evenodd"} fills a region if it's enclosed by an odd number of
+sub-paths, regardless of each sub-path's own vertex winding direction
+-- a sub-path nested inside another becomes a hole purely from
+geometric nesting, with no need to get vertex order right by hand,
+which is why it's the default. \code{"winding"} instead fills based on net
+signed winding number, which depends on each sub-path's own direction
+-- only useful for constructions that specifically need that
+direction-sensitive behavior. Has no effect on a drawable with only
+one implicit sub-path (every current \verb{shape_*()}/\verb{curve_*()}
+constructor), since both rules agree there.}
 
 \item{color_alpha}{Stroke opacity, applied to \code{color} independently of
 \code{fill_alpha}. Must be a number in \verb{[0, 1]}, where \code{0} is fully

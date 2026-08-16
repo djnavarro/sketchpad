@@ -308,3 +308,23 @@ test_that("convert() bakes in a drawable's transform", {
   # since the transform has already been baked into x/y
   expect_equal(frozen@trans@matrix, trans_identity()@matrix)
 })
+
+test_that("apply_trans() forwards id unchanged for trans/trans_warp/trans_fn/trans_chain", {
+  pts <- xy(x = c(0, 1, 2, 3), y = c(0, 1, 2, 3), id = c(1L, 1L, 2L, 2L))
+
+  expect_identical(apply_trans(trans_translate(1, 0), pts)@id, pts@id)
+  expect_identical(
+    apply_trans(trans_warp(amount = 0.1, distortion_x = noise_field(seed = 4L)), pts)@id,
+    pts@id
+  )
+  expect_identical(apply_trans(trans_fn(function(x, y) list(x = x, y = y)), pts)@id, pts@id)
+
+  chained <- trans_translate(1, 0) + trans_warp(amount = 0.1, distortion_x = noise_field(seed = 4L))
+  expect_identical(apply_trans(chained, pts)@id, pts@id)
+})
+
+test_that("apply_trans() on an empty point set returns an empty id too", {
+  pts <- xy(x = numeric(0), y = numeric(0))
+  expect_identical(apply_trans(trans_translate(1, 0), pts)@id, integer(0))
+  expect_identical(apply_trans(trans_warp(amount = 0.1), pts)@id, integer(0))
+})

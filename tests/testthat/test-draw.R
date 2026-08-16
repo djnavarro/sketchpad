@@ -77,3 +77,50 @@ test_that("fill_alpha is silently inert on a pattern fill", {
   local_null_device()
   expect_no_error(draw(shape_circle(fill = fill_hatch(), fill_alpha = 0.3)))
 })
+
+test_that("geometry_grob()'s \"polygon\" branch builds a pathGrob", {
+  g <- geometry_grob(shape_circle(n = 8L)@points, style(), "polygon", grid::viewport())
+  expect_s3_class(g, "pathgrob")
+})
+
+test_that("geometry_grob() forwards points@id/style@rule to pathGrob()", {
+  pts <- xy(
+    x = c(0, 0, 1, 1, 0.25, 0.25, 0.75, 0.75),
+    y = c(0, 1, 1, 0, 0.25, 0.75, 0.75, 0.25),
+    id = rep(1:2, each = 4)
+  )
+  g <- geometry_grob(pts, style(rule = "winding"), "polygon", grid::viewport())
+  expect_s3_class(g, "pathgrob")
+  expect_identical(g$id, pts@id)
+  expect_identical(g$rule, "winding")
+})
+
+test_that("draw() renders a multi-sub-path polygon (disjoint shapes and a hole) without error", {
+  local_null_device()
+  disjoint <- xy(
+    x = c(0, 0, 1, 1, 2, 2, 3, 3),
+    y = c(0, 1, 1, 0, 0, 1, 1, 0),
+    id = rep(1:2, each = 4)
+  )
+  holed <- xy(
+    x = c(0, 0, 4, 4, 1, 1, 3, 3),
+    y = c(0, 4, 4, 0, 1, 3, 3, 1),
+    id = rep(1:2, each = 4)
+  )
+  expect_no_error(grid::grid.draw(geometry_grob(disjoint, style(), "polygon", grid::viewport())))
+  expect_no_error(grid::grid.draw(geometry_grob(holed, style(), "polygon", grid::viewport())))
+})
+
+test_that("a single implicit sub-path's pathGrob() output matches a plain polygonGrob()", {
+  pts <- shape_polygon(n = 6L)@points
+  path <- geometry_grob(pts, style(), "polygon", grid::viewport())
+  expect_identical(path$x, grid::unit(pts@x, "native"))
+  expect_identical(path$y, grid::unit(pts@y, "native"))
+  expect_identical(path$id, pts@id)
+})
+
+test_that("geometry_grob()'s \"path\" branch forwards points@id to polylineGrob()", {
+  pts <- xy(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), id = c(1L, 1L, 2L, 2L))
+  g <- geometry_grob(pts, style(), "path", grid::viewport())
+  expect_identical(g$id, pts@id)
+})

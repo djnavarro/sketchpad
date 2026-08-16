@@ -100,3 +100,17 @@ test_that("style() rejects a non-scalar color_alpha or fill_alpha", {
   expect_error(style(color_alpha = c(0, 1)), "color_alpha")
   expect_error(style(fill_alpha = c(0, 1)), "fill_alpha")
 })
+
+test_that("style()'s rule defaults to \"evenodd\"", {
+  expect_identical(style()@rule, "evenodd")
+})
+
+test_that("style() accepts \"evenodd\" or \"winding\" for rule", {
+  expect_identical(style(rule = "evenodd")@rule, "evenodd")
+  expect_identical(style(rule = "winding")@rule, "winding")
+})
+
+test_that("style() rejects an invalid rule", {
+  expect_error(style(rule = "nonzero"), "rule")
+  expect_error(style(rule = c("evenodd", "winding")), "rule")
+})

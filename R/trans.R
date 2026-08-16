@@ -401,7 +401,9 @@ trans_any <- S7::new_union(trans, trans_warp, trans_fn, trans_chain)
 #' on `object`'s class only (like [noise_sample()] dispatches on `field`
 #' alone): [trans] multiplies through its homogeneous matrix,
 #' [trans_warp] displaces points by noise, [trans_fn] calls its own `fn`
-#' directly, and [trans_chain] applies its `steps` in order.
+#' directly, and [trans_chain] applies its `steps` in order. Every method
+#' forwards `pts@id` unchanged into the [xy] it returns -- a transform only
+#' displaces `x`/`y`, never a point's own sub-path membership.
 #'
 #' @param object A [trans]/[trans_warp]/[trans_fn]/[trans_chain].
 #' @param pts A [xy].
@@ -417,7 +419,7 @@ method(apply_trans, trans) <- function(object, pts) {
   }
   homogeneous <- rbind(pts@x, pts@y, rep(1, n))
   out <- object@matrix %*% homogeneous
-  xy(x = out[1, ], y = out[2, ])
+  xy(x = out[1, ], y = out[2, ], id = pts@id)
 }
 
 #' @noRd
@@ -428,7 +430,7 @@ method(apply_trans, trans_warp) <- function(object, pts) {
   }
   dx <- noise_sample(object@distortion_x, x = pts@x, y = pts@y, to = c(-1, 1)) * object@amount
   dy <- noise_sample(object@distortion_y, x = pts@x, y = pts@y, to = c(-1, 1)) * object@amount
-  xy(x = pts@x + dx, y = pts@y + dy)
+  xy(x = pts@x + dx, y = pts@y + dy, id = pts@id)
 }
 
 #' @noRd
@@ -444,7 +446,7 @@ method(apply_trans, trans_fn) <- function(object, pts) {
   if (length(out$x) != n || length(out$y) != n) {
     rlang::abort("trans_fn's fn must return x/y vectors the same length as its input")
   }
-  xy(x = out$x, y = out$y)
+  xy(x = out$x, y = out$y, id = pts@id)
 }
 
 #' @noRd
