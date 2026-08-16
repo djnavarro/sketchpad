@@ -624,6 +624,28 @@ Shared argument validation lives in the internal `validate_fill_args()`
 `validate_colors()` (a character vector of at least `min_length`, no `NA`s
 -- see "Colour-vector generalization" above).
 
+### The `save_*()` export family
+
+`R/save.R` holds three thin wrappers -- `save_png()`, `save_svg()`,
+`save_pdf()` -- each opening the matching `grDevices` device
+(`grDevices::png()`/`svg()`/`pdf()`), calling `draw(object, ...)`
+(forwarding `...` for `xlim`/`ylim`), and always closing the device
+afterward via `on.exit(grDevices::dev.off())` registered *before*
+`draw()` runs, so the device is closed even if `draw()` itself errors.
+All three take an `object` (`drawable` or `sketch`), `filename`,
+`width`/`height` (always inches, including for `save_png()`, so a
+single shared `validate_save_args()` check is meaningful across every
+format), and `bg` (device page colour, default `"white"`, independent
+of and composable with any `canvas()` background a `sketch` already
+carries). `save_png()` alone also takes `dpi` (default `300`, converted
+to pixels via `png()`'s own `units = "in", res = dpi`), since the two
+vector formats have no equivalent notion of resolution. `save_svg()`/
+`save_pdf()` document under `save_png()`'s own topic via `@rdname`, the
+same merged-topic pattern the plural `shape_*s()` constructors use (see
+above) -- each subsequent block has no title text of its own, the same
+minimal-block shape `shape_square()`'s own `@rdname`-merged block
+already uses.
+
 ### The `palette_*()` colour-vector family
 
 `R/palette.R` holds two functions, unrelated to any `drawable`/S7 class:
@@ -1059,6 +1081,13 @@ full debugging narrative):
   `effect_bristle.R`, this file's `Collate` position *does* matter, for
   that reason.
 - `R/convert.R` -- the `convert(drawable, shape_raw)` method.
+- `R/save.R` -- `save_png()`/`save_svg()`/`save_pdf()`, plain functions
+  (not S7 classes) that open the matching `grDevices` device, call
+  `draw()`, and always close the device afterward (see "The `save_*()`
+  export family" below). Collated right after `convert.R`, since it
+  calls `draw()` directly -- though as ordinary functions, its exact
+  `Collate` position doesn't actually matter, the same way
+  `vectorize.R`'s doesn't.
 - `R/sketchpad-package.R` -- package-level doc, `#' @import S7`, the
   `.onLoad()` calling `S7::methods_register()`, and the
   `globalVariables("properties")` workaround.
@@ -1072,7 +1101,7 @@ full debugging narrative):
   curve_twist -> shape_stroke -> shape_ribbonpath -> canvas -> sketch ->
   vectorize -> effects
   -> effect_tremor -> effect_bristle -> draw -> effect_grain -> convert ->
-  sketchpad-package). **Any new drawable
+  save -> sketchpad-package). **Any new drawable
   subclass must be added to
   `Collate` after `drawable.R`**, or `devtools::load_all()`/`R CMD check`
   will fail with an "object 'drawable' not found" error. Any new class
@@ -1114,9 +1143,10 @@ full debugging narrative):
   every `fill_*()` constructor; `@family noise helpers` for `noise_field`/
   `noise_bridge`/`noise_sample`; `@family transform helpers` for `trans`/
   every `trans_*()` constructor; `@family palette helpers` for
-  `palette_manual()`/`palette_cosine()`. **Any new drawable, fill helper,
-  noise helper, transform helper, or palette helper needs the matching
-  `@family` tag added alongside its `@export`.**
+  `palette_manual()`/`palette_cosine()`; `@family export helpers` for
+  `save_png()`/`save_svg()`/`save_pdf()`. **Any new drawable, fill helper,
+  noise helper, transform helper, palette helper, or export helper needs
+  the matching `@family` tag added alongside its `@export`.**
 
 ## Development workflow
 

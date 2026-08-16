@@ -128,13 +128,16 @@ override, distinct from `sketch` (which represents the whole canvas of
 independently-styled shapes). Would pair naturally with the transform
 helpers above -- e.g. rotate a `group` as a unit.
 
-### Save-to-file and multi-frame/animation export helpers
+### Multi-frame/animation export helpers
 
-No `save_png()`/`save_svg()`-style convenience -- currently the caller
-wraps `draw()` in `png()`/`dev.off()` by hand, as `example_04.R`'s
-original 50-seed export loop (in the `sketches` repo) had to. A thin
-wrapper generating a seed sequence plus a `gifski`-based animation export
-would mirror that same example's use case.
+`save_png()`/`save_svg()`/`save_pdf()` (see `.agents/HISTORY.md`) now
+cover single-image export -- a thin wrapper opening the right
+`grDevices` device, calling `draw()`, and always closing the device
+afterward. Still open: something to mirror `example_04.R`'s original
+50-seed export loop (in the `sketches` repo) -- a thin wrapper
+generating a seed sequence plus a `gifski`-based animation export.
+Revisit if a concrete sketch needs a multi-frame/animated export rather
+than one-off images.
 
 ### `print`/`format` methods
 

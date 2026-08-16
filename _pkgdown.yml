@@ -70,3 +70,9 @@ reference:
   contents:
   - starts_with("palette_")
 
+- title: Export tools
+  desc: >
+    Save a `drawable` or `sketch` directly to an image file.
+  contents:
+  - starts_with("save_")
+

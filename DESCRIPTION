@@ -66,6 +66,7 @@ Collate: 'fill.R'
     'draw.R'
     'effect_grain.R'
     'convert.R'
+    'save.R'
     'sketchpad-package.R'
 Depends: 
     R (>= 3.5)

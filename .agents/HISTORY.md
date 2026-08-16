@@ -2093,3 +2093,45 @@ Updated every affected function's roxygen docs (`@param`, prose,
 `@examples`) and `tests/testthat/test-fill.R`'s argument names and
 expected-error regexes to match. Package checks cleanly (0 errors/
 warnings/notes) after the change.
+
+## Save-to-file helpers: `save_png()`/`save_svg()`/`save_pdf()`
+
+Added `R/save.R`, three thin wrappers around a `drawable`/`sketch` +
+`grDevices` device + `draw()`, so the caller no longer has to open/close
+a device by hand around `draw()` themselves. All three share one
+internal `validate_save_args()` helper (`object`/`filename`/`width`/
+`height` checks); `save_png()` additionally validates its own `dpi`
+argument, since the vector formats (`svg`/`pdf`) have no equivalent.
+Each function opens its device, registers `on.exit(grDevices::dev.off())`
+*before* calling `draw()`, then calls `draw(object, ...)` (forwarding
+`...` for `xlim`/`ylim`) and returns `filename` invisibly -- so the
+device is always closed, even if `draw()` itself errors (e.g. an
+invalid `geometry`), matching `local_null_device()`'s existing
+open/`withr::defer()`-close pattern in `tests/testthat/test-draw.R`.
+
+**Units.** `width`/`height` are always inches, for every format,
+including `save_png()` -- rather than exposing `units`/giving `save_png()`
+a native-pixel option, since `svg()`/`pdf()` only support inches and a
+consistent unit across all three keeps the shared `validate_save_args()`
+check meaningful for every caller. `save_png()`'s `dpi` (default `300`)
+converts that inches size to pixels via `grDevices::png()`'s own
+`units = "in", res = dpi`.
+
+**`bg`.** All three forward a `bg` argument (default `"white"`) straight
+to their underlying device -- the device's own page colour, independent
+of and composable with any `canvas()` `background` a `sketch` already
+carries (documented explicitly on `save_png()`'s shared topic, since the
+two are easy to conflate).
+
+**Documentation.** `save_svg()`/`save_pdf()` document under `save_png()`'s
+own topic via `@rdname`, the same merged-topic pattern the plural
+`shape_*s()` constructors already use (see `shape_rectangle()`'s own
+`@rdname`-merge with `shape_square()`/`shape_rectangles()`/
+`shape_squares()`) -- each subsequent block is just `@rdname`/`@export`
+with no title text of its own, confirmed to roxygen2-document cleanly
+the same way `shape_square()`'s own minimal block already does. A new
+pkgdown reference category, "Export tools" (`starts_with("save_")`), and
+a matching `@family export helpers` tag were added for all three.
+
+Deferred: a multi-frame/animation export helper (seed sequence +
+`gifski`) remains open -- see `.agents/PLAN.md`.
