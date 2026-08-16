@@ -124,7 +124,7 @@ Other 2D shapes:
 ``` r
 draw(shape_twist(
   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-  path_distortion = noise_bridge(seed = 7734L)
+  path_distortion = noise_bridge(seed = 7734)
 ))
 
 
@@ -132,12 +132,12 @@ draw(shape_twist(
 # fewer passes leave it jumpier
 draw(shape_twist(
   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-  path_distortion = noise_bridge(smooth = 20L, seed = 7734L)
+  path_distortion = noise_bridge(smooth = 20L, seed = 7734)
 ))
 
 draw(shape_twist(
   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-  path_distortion = noise_bridge(smooth = 0L, seed = 7734L)
+  path_distortion = noise_bridge(smooth = 0L, seed = 7734)
 ))
 
 
@@ -148,7 +148,7 @@ draw(shape_twists(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.2))
 # resemblance, as in README.Rmd's "Twists" example
 draw(shape_twists(
   x = 0, y = 1:5, xend = 3, yend = 1:5, width = 0.15,
-  path_distortion = noise_bridge(seed = 2020L)
+  path_distortion = noise_bridge(seed = 2020)
 ))
 
 ```

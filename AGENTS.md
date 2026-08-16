@@ -1231,8 +1231,27 @@ full debugging narrative):
 
 ## Structure
 
-- `R/fill.R` – the `fill_*()` texture family, loaded first: no
-  compile-time dependency on any other class, but `style.R` needs
+- `R/utils.R` – the internal `as_integerish(x, arg_name)` helper, loaded
+  first: no dependency on any other file. Coerces a whole-number
+  `double` (or genuine `integer`) into a true `integer`, erroring on
+  anything fractional/non-numeric/`NA`. Called from every constructor
+  with an
+  [`S7::class_integer`](https://rconsortium.github.io/S7/reference/base_classes.html)
+  property (`n`, `seed`, `octaves`, `n_harmonics`, `resolution`, …) on
+  that argument before its own
+  [`S7::new_object()`](https://rconsortium.github.io/S7/reference/new_class.html)
+  call, so a caller can write `shape_circle(n = 12)`/
+  `noise_field(seed = 4821)` as readily as `n = 12L`/`seed = 4821L` –
+  [`S7::class_integer`](https://rconsortium.github.io/S7/reference/base_classes.html)
+  itself rejects a plain `double` outright, even a whole number, so
+  without this coercion every such constructor would demand an
+  `L`-suffixed literal. As an ordinary function (not an S7 class), its
+  exact `Collate` position doesn’t actually matter, the same way
+  `vectorize.R`’s doesn’t – placed first purely because so much else
+  calls it.
+- `R/fill.R` – the `fill_*()` texture family, collated right after
+  `utils.R`: no compile-time dependency on any other class, but
+  `style.R` needs
   [`fill_solid()`](https://sketchpad.djnavarro.net/reference/fill_solid.md)
   to exist for its own property default.
 - `R/palette.R` – the `palette_*()` colour-vector family
@@ -1371,16 +1390,16 @@ full debugging narrative):
   [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html),
   and the `globalVariables("properties")` workaround.
 - `DESCRIPTION`’s `Collate` field pins the load order above explicitly
-  (fill -\> palette -\> noise_field -\> noise_bridge -\> trans -\> style
-  -\> xy -\> drawable -\> shape_bezier -\> curve_bezier -\> curve_line
-  -\> curve_spiral -\> curve_scribble -\> shape_raw -\> curve_raw -\>
-  points_raw -\> shape_circle -\> shape_rectangle -\> shape_polygon -\>
-  shape_ellipse -\> shape_wedge -\> curve_arc -\> shape_blob -\>
-  shape_ribbon -\> shape_twist -\> curve_twist -\> shape_stroke -\>
-  shape_strokepath -\> canvas -\> sketch -\> vectorize -\> effects -\>
-  effect_tremor -\> effect_bristle -\> draw -\> effect_grain -\> convert
-  -\> save -\> sketchpad-package). **Any new drawable subclass must be
-  added to `Collate` after `drawable.R`**, or
+  (utils -\> fill -\> palette -\> noise_field -\> noise_bridge -\> trans
+  -\> style -\> xy -\> drawable -\> shape_bezier -\> curve_bezier -\>
+  curve_line -\> curve_spiral -\> curve_scribble -\> shape_raw -\>
+  curve_raw -\> points_raw -\> shape_circle -\> shape_rectangle -\>
+  shape_polygon -\> shape_ellipse -\> shape_wedge -\> curve_arc -\>
+  shape_blob -\> shape_ribbon -\> shape_twist -\> curve_twist -\>
+  shape_stroke -\> shape_strokepath -\> canvas -\> sketch -\> vectorize
+  -\> effects -\> effect_tremor -\> effect_bristle -\> draw -\>
+  effect_grain -\> convert -\> save -\> sketchpad-package). **Any new
+  drawable subclass must be added to `Collate` after `drawable.R`**, or
   `devtools::load_all()`/`R CMD check` will fail with an “object
   ‘drawable’ not found” error. Any new class that registers its own
   method on an *existing* generic (as `effect_grain` does for `draw`)
@@ -1412,6 +1431,20 @@ full debugging narrative):
   argument (`radius`, `width`, `range`, `frequency`) gets a `< 0` check;
   every positive-integer argument (`n`, `octaves`) gets a `< 1L` check.
   Keep new drawables consistent with this.
+- Every constructor argument backing an
+  [`S7::class_integer`](https://rconsortium.github.io/S7/reference/base_classes.html)
+  property (`n`, `seed`, `octaves`, `n_harmonics`, `resolution`) is
+  passed through `as_integerish(x, "x")` (`R/utils.R`) in the
+  constructor body, before the
+  [`S7::new_object()`](https://rconsortium.github.io/S7/reference/new_class.html)
+  call that actually assigns it – e.g. `n = as_integerish(n, "n")`. This
+  lets a caller pass a plain whole number (`n = 12`) rather than being
+  forced to write `n = 12L`, since
+  [`S7::class_integer`](https://rconsortium.github.io/S7/reference/base_classes.html)
+  itself would otherwise reject any `double` outright, whole number or
+  not. **Any new
+  [`S7::class_integer`](https://rconsortium.github.io/S7/reference/base_classes.html)
+  property needs the same treatment** in its constructor.
 - Every exported function’s roxygen block carries an `@family` tag
   matching the pkgdown reference category it belongs to (see
   `_pkgdown.yml`), so its `.Rd` page’s “See Also” section cross-links

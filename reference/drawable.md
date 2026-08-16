@@ -141,7 +141,7 @@ S7::S7_inherits(circ, drawable)
 
 # geometry controls which grob draw() builds: a closed outline, an open
 # stroke, or unconnected markers
-draw(shape_circle(radius = 1, n = 8L))
+draw(shape_circle(radius = 1, n = 8))
 
 draw(curve_line(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), linewidth = 3))
 

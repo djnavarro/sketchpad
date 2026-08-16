@@ -101,7 +101,7 @@ draw(shape_ellipse(
   y = 1,
   x_radius = 0.5,
   y_radius = 1,
-  n = 6L,
+  n = 6,
   color = "darkred"
 ))
 

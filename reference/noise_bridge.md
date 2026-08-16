@@ -50,7 +50,7 @@ Other noise helpers:
 ## Examples
 
 ``` r
-noise_bridge(smooth = 5L, seed = 4821L)
+noise_bridge(smooth = 5L, seed = 4821)
 #> <sketchpad::noise_bridge>
 #>  @ smooth: int 5
 #>  @ seed  : int 4821
@@ -59,12 +59,12 @@ noise_bridge(smooth = 5L, seed = 4821L)
 # shape_twist()'s path_distortion makes the effect easy to see
 draw(shape_twist(
   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-  path_distortion = noise_bridge(smooth = 0L, seed = 7734L)
+  path_distortion = noise_bridge(smooth = 0L, seed = 7734)
 ))
 
 draw(shape_twist(
   x = 0, y = 0, xend = 1, yend = 0, width = 0.2,
-  path_distortion = noise_bridge(smooth = 20L, seed = 7734L)
+  path_distortion = noise_bridge(smooth = 20L, seed = 7734)
 ))
 
 ```

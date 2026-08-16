@@ -78,7 +78,7 @@ Other noise helpers:
 ## Examples
 
 ``` r
-noise_field(frequency = 2, octaves = 3L, seed = 4821L)
+noise_field(frequency = 2, octaves = 3, seed = 4821)
 #> <sketchpad::noise_field>
 #>  @ noise    : function (x, y = NULL, z = NULL, t = NULL, frequency = 1, seed = NULL, 
 #>     ...)  
@@ -93,13 +93,13 @@ noise_field(frequency = 2, octaves = 3L, seed = 4821L)
 draw(shape_blob(
   radius = 1,
   range = 0.4,
-  distortion = noise_field(frequency = 0.5, seed = 4821L)
+  distortion = noise_field(frequency = 0.5, seed = 4821)
 ))
 
 draw(shape_blob(
   radius = 1,
   range = 0.4,
-  distortion = noise_field(frequency = 6, seed = 4821L)
+  distortion = noise_field(frequency = 6, seed = 4821)
 ))
 
 
@@ -107,7 +107,7 @@ draw(shape_blob(
 draw(shape_blob(
   radius = 1,
   range = 0.4,
-  distortion = noise_field(octaves = 6L, seed = 4821L)
+  distortion = noise_field(octaves = 6, seed = 4821)
 ))
 
 ```

@@ -145,6 +145,6 @@ draw(effect_grain(
 
 # a coarser grain field (lower frequency) reads less like paper texture
 # and more like a mottled brushstroke
-draw(effect_grain(template, grain = noise_field(frequency = 3, seed = 2L)))
+draw(effect_grain(template, grain = noise_field(frequency = 3, seed = 2)))
 
 ```

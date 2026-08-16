@@ -85,7 +85,7 @@ Other 2D shapes:
 ``` r
 draw(shape_circle(radius = 1))
 
-draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6L, color = "darkred"))
+draw(shape_circle(x = 1, y = 1, radius = 0.5, n = 6, color = "darkred"))
 
 draw(shape_circle(radius = 1, fill = "steelblue", color = NA_character_))
 

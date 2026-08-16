@@ -78,15 +78,15 @@ Other transform helpers:
 ## Examples
 
 ``` r
-draw(shape_circle(radius = 1, n = 200L, trans = trans_warp(amount = 0.15)))
+draw(shape_circle(radius = 1, n = 200, trans = trans_warp(amount = 0.15)))
 
 
 # a smaller amount gives a subtler wobble; distortion_x's own frequency
 # controls how quickly the warp varies across space
-draw(shape_circle(radius = 1, n = 200L, trans = trans_warp(amount = 0.03)))
+draw(shape_circle(radius = 1, n = 200, trans = trans_warp(amount = 0.03)))
 
 draw(shape_circle(
-  radius = 1, n = 200L,
+  radius = 1, n = 200,
   trans = trans_warp(amount = 0.1, distortion_x = noise_field(frequency = 4))
 ))
 

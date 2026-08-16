@@ -147,7 +147,7 @@ draw(shape_stroke(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), width = 0.3))
 
 draw(shape_stroke(
   x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), width = 0.3,
-  distortion = noise_field(frequency = 3, seed = 7734L)
+  distortion = noise_field(frequency = 3, seed = 7734)
 ))
 
 
