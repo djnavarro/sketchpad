@@ -511,17 +511,25 @@ outline, since every `drawable` currently draws a closed
 `grid::polygonGrob()` -- see "Deferred: open/stroked curve support" in
 `.agents/PLAN.md`),
 `fill_hatch()`/`fill_crosshatch()` (diagonal hatching, sharing a
-tile-shape technique -- see below), `fill_checker()` (a two-colour
-checkerboard), `fill_stripe()` (solid alternating bands via a
-self-repeating hard-stop `grid::linearGradient()`, not tile repetition),
+tile-shape technique -- see below; `fill_crosshatch()`'s `color` accepts a
+vector recycled across its two lines), `fill_checker()` (a checkerboard
+generalized from two colours to an `n x n` grid, `n = length(colors)`),
+`fill_stripe()` (equal-width alternating bands, one per `colors` entry,
+via a self-repeating hard-stop `grid::linearGradient()`, not tile
+repetition -- repeat a colour in `colors` to bias band widths, rather than
+a separate width argument),
 `fill_stipple()`/`fill_scatter()`/`fill_halftone()` (scattered dots /
 arbitrary drawables / randomised-radius dots, all seeded via
 `withr::with_seed()` like `shape_blob()`'s noise -- see "Known rendering risk"
-in `fill_stipple()`'s docs), `fill_scribble()` (wandering lines built from
-random integer-frequency sine harmonics via the internal
+in `fill_stipple()`'s docs; `fill_stipple()`/`fill_halftone()`'s `color` and
+`fill_scatter()`'s `colors` each recycle a vector deterministically across
+the scattered dots/stamps, `fill_scatter()`'s `NULL` default still colouring
+every stamp from `unit`'s own style), `fill_scribble()` (wandering lines
+built from random integer-frequency sine harmonics via the internal
 `scribble_lines()` helper -- periodic by construction, so tiles with no
 seam; `direction` is fixed to `"horizontal"` or `"vertical"` only, not an
-arbitrary angle -- see its "Known limitation" docs section),
+arbitrary angle -- see its "Known limitation" docs section; `color`
+recycles across the `n_lines` wandering lines),
 `fill_noise()` (a rasterised `ambient` simplex/fractal field, sampled on a
 torus for seamless tiling),
 `fill_marble()`/`fill_flow()` (variants of `fill_noise()` sharing its
@@ -539,9 +547,52 @@ horizontal/vertical direction doesn't track a curved path's own tangent),
 `fill_image()` (a caller-supplied raster, letterboxed by
 default to preserve its own pixel aspect ratio), `fill_gradient()`
 (linear/radial via `grid::linearGradient()`/`radialGradient()`), and
-`fill_vignette()` (a colour faded via a `grid::as.mask()` alpha mask --
-the only helper using masks). All but `fill_solid()` return an object
-from `grid::pattern()`, sharing the base S3 class `"GridPattern"`.
+`fill_vignette()` (colour faded via a `grid::as.mask()` alpha mask --
+the only helper using masks; `color` blends radially across two or more
+colours before that mask is applied). All but `fill_solid()` return an
+object from `grid::pattern()`, sharing the base S3 class `"GridPattern"`.
+
+**Colour-vector generalization.** `fill_noise()`, `fill_flow()`,
+`fill_marble()`, `fill_checker()`, `fill_stripe()`, `fill_vignette()`,
+`fill_stipple()`, `fill_halftone()`, `fill_scribble()`, `fill_crosshatch()`,
+and `fill_scatter()` all accept a vector of colours (an arbitrary-length
+`colors` argument for `fill_checker()`/`fill_marble()`/`fill_stripe()`,
+replacing their old `color1`/`color2` pair -- a breaking rename with no
+deprecation shim, since this is a pre-1.0 package with no other consumers
+in this workspace; a widened `color`/`colors` accepting one *or more*
+colours everywhere else, fully backward compatible with a single string).
+Two distinct generalization patterns are used, matching what each helper's
+existing multiplicity already was:
+
+- **Discrete repeated elements** (`fill_stipple()`/`fill_halftone()`'s
+  dots, `fill_scribble()`'s wandering lines, `fill_crosshatch()`'s two
+  hatch lines, `fill_scatter()`'s stamps) recycle the colour vector
+  deterministically, in order (`rep_len()`), across the existing elements
+  -- no new randomness, so seed-based reproducibility tests are
+  unaffected.
+- **Continuous fields/blends** (`fill_noise()`/`fill_flow()`'s raster,
+  `fill_marble()`'s banding, `fill_vignette()`'s radial fade) blend
+  through `grDevices::colorRamp()` (or, for `fill_vignette()`, a genuine
+  `grid::radialGradient()`) driven by the same scalar value the old
+  two-colour/single-colour version already computed, rather than a manual
+  linear interpolation. `fill_noise()`/`fill_flow()` share this via one
+  new internal helper, `noise_to_pixels()`: for exactly one colour it
+  reproduces their original alpha-fade-to-transparent behavior bit for
+  bit; for two or more, hue blends across the ramp while `alpha` is held
+  flat (a fading multi-hue blend can't also fade to transparent without
+  one colour vanishing arbitrarily before the others).
+- **`fill_checker()`** doesn't fit either pattern cleanly -- a
+  checkerboard's cell count and colour count aren't independent concepts
+  -- so its `n x n` grid grows with `length(colors)` instead: colour index
+  at 0-based cell `(row, col)` is `((row + col) %% n) + 1`, which
+  reproduces the original 2x2 diagonal arrangement exactly for two
+  colours. Three or more colours (a 3x3+ grid) can trigger the known
+  multi-shape pattern-tile rendering risk described below -- see the
+  "Known rendering risk" bullet in "Gotchas worth remembering".
+
+Shared validation for all of these lives in the internal
+`validate_colors(colors, arg_name, min_length = 1)`, alongside
+`validate_fill_args()` (see below).
 
 The unifying design constraint across all of them: `grid::pattern()`
 tiles are sized as a fraction of the *target polygon's own bounding box*,
@@ -564,7 +615,9 @@ corrections are needed depending on what's drawn:
   drawn in plain `"npc"` inside it needs no further correction.
 
 Shared argument validation lives in the internal `validate_fill_args()`
-(spacing/aspect, with an optional angle check via `angle = NULL`).
+(spacing/aspect, with an optional angle check via `angle = NULL`) and
+`validate_colors()` (a character vector of at least `min_length`, no `NA`s
+-- see "Colour-vector generalization" above).
 
 ### Compositional effects: the `effect_*()` family
 
@@ -793,6 +846,13 @@ full debugging narrative):
   on the affected functions themselves (`fill_stipple()`'s "Known
   rendering risk" section); no default was found that's provably safe,
   since `fill_stipple()`'s whole purpose requires genuine tile repetition.
+  `fill_checker()`'s colour-vector generalization hit the same issue for
+  the first time when its checkerboard grid grew past 2x2 (the original
+  2x2/4-rectangle tile always rendered fine; a `colors` vector of length 3
+  or more, and its correspondingly larger grid, can collapse to a single
+  solid colour at the default `spacing` -- confirmed by re-rendering with
+  `spacing = 1`, where the same content renders correctly). Documented on
+  `fill_checker()` itself alongside `fill_stipple()`'s existing note.
 - **`new_property(class = class_numeric, default = NULL)` does not store
   a literal `NULL`.** S7 treats a bare `default = NULL` on a property spec
   as "no default was given" rather than the value `NULL`, silently

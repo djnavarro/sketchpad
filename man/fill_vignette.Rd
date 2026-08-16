@@ -13,7 +13,11 @@ fill_vignette(
 )
 }
 \arguments{
-\item{color}{Fill colour at the tile's centre. Default \code{"black"}.}
+\item{color}{One or more fill colours, blended from the tile's centre
+outward. A single colour (the default) is a solid fade, exactly as
+before this argument accepted a vector; two or more blend via a
+\code{grid::radialGradient()} before the same alpha mask is applied. Default
+\code{"black"}.}
 
 \item{background}{Fill colour revealed as \code{color} fades out, or \code{NA} for
 true transparency (showing whatever is drawn behind the target shape).
@@ -33,12 +37,14 @@ A pattern object as returned by \code{\link[grid:pattern]{grid::pattern()}}, sui
 use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 }
 \description{
-\code{fill_vignette()} builds a \code{\link[grid:pattern]{grid::pattern()}} fill value that fades a
+\code{fill_vignette()} builds a \code{\link[grid:pattern]{grid::pattern()}} fill value that fades
 colour out towards the edges of each tile, using \code{\link[grid:as.mask]{grid::as.mask()}} --
 the one \code{grid} capability the rest of the \verb{fill_*()} family doesn't
-touch. A solid \code{color} layer is masked by a radial alpha mask (opaque at
-the tile centre, fully transparent at its edge), optionally revealing a
-solid \code{background} layer underneath rather than true transparency.
+touch. A \code{color} layer (solid for a single colour, or a
+\code{grid::radialGradient()} blend for two or more) is masked by a radial
+alpha mask (opaque at the tile centre, fully transparent at its edge),
+optionally revealing a solid \code{background} layer underneath rather than
+true transparency.
 }
 \details{
 As with \code{\link[=fill_gradient]{fill_gradient()}}, the fade shape is kept circular by correcting
@@ -65,6 +71,9 @@ draw(shape_circle(fill = fill_vignette(color = "black")))
 # a non-NA background reveals a solid colour underneath the fade,
 # instead of true transparency
 draw(shape_circle(fill = fill_vignette(color = "steelblue", background = "white")))
+
+# two or more colours blend radially before fading via the alpha mask
+draw(shape_circle(fill = fill_vignette(color = c("goldenrod", "steelblue"))))
 
 }
 \seealso{

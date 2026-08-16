@@ -82,6 +82,27 @@ validate_fill_args <- function(angle, spacing, aspect) {
   }
 }
 
+#' Validate a `fill_*()` helper's colour vector argument
+#'
+#' Internal helper shared by every `fill_*()` constructor accepting a colour
+#' vector (as opposed to always requiring a single colour) -- checks that
+#' `colors` is a character vector of at least `min_length` with no `NA`
+#' entries.
+#'
+#' @param colors The argument to validate.
+#' @param arg_name The argument's name, used in the error message.
+#' @param min_length Minimum allowed length. Default `1`.
+#' @noRd
+validate_colors <- function(colors, arg_name, min_length = 1) {
+  if (!is.character(colors) || length(colors) < min_length || anyNA(colors)) {
+    if (min_length <= 1) {
+      rlang::abort(paste0(arg_name, " must be a character vector with at least one colour"))
+    } else {
+      rlang::abort(paste0(arg_name, " must be a character vector of at least length ", min_length))
+    }
+  }
+}
+
 #' Tile dimensions that render a corner-to-corner diagonal at a given angle
 #'
 #' Internal helper. See [fill_hatch()] details for why the rendered angle of
@@ -230,6 +251,10 @@ fill_hatch <- function(color = "black",
 #' coincide, so this case is handled separately by drawing a horizontal line
 #' and a vertical line instead (a simple grid).
 #'
+#' @param color One or more line colours. A vector of length 2 colours the
+#'   two lines independently; a single colour (the default) colours both the
+#'   same, matching the original behaviour. Longer vectors are recycled to
+#'   length 2. Default `"black"`.
 #' @inheritParams fill_hatch
 #'
 #' @return A pattern object as returned by [grid::pattern()], suitable for
@@ -246,6 +271,9 @@ fill_hatch <- function(color = "black",
 #' # symmetric about the horizontal axis but not at right angles
 #' draw(shape_circle(fill = fill_crosshatch(angle = 20, spacing = 0.12)))
 #'
+#' # a two-colour vector colours the two lines independently
+#' draw(shape_circle(fill = fill_crosshatch(color = c("steelblue", "tomato"), angle = 45)))
+#'
 #' @family fill helpers
 #' @export
 fill_crosshatch <- function(color = "black",
@@ -255,9 +283,11 @@ fill_crosshatch <- function(color = "black",
                              linewidth = 1,
                              extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
+  validate_colors(color, "color")
   if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
     rlang::abort("linewidth must be a single positive number")
   }
+  line_colors <- rep_len(color, 2)
 
   # a multiple of 90 degrees: the mirrored diagonals would coincide, so draw
   # a horizontal + vertical grid instead
@@ -267,12 +297,12 @@ fill_crosshatch <- function(color = "black",
         grid::segmentsGrob(
           x0 = 0, y0 = 0.5, x1 = 1, y1 = 0.5,
           default.units = "npc",
-          gp = grid::gpar(col = color, lwd = linewidth)
+          gp = grid::gpar(col = line_colors[1], lwd = linewidth)
         ),
         grid::segmentsGrob(
           x0 = 0.5, y0 = 0, x1 = 0.5, y1 = 1,
           default.units = "npc",
-          gp = grid::gpar(col = color, lwd = linewidth)
+          gp = grid::gpar(col = line_colors[2], lwd = linewidth)
         )
       )
     )
@@ -287,12 +317,12 @@ fill_crosshatch <- function(color = "black",
       grid::segmentsGrob(
         x0 = 0, y0 = 0, x1 = 1, y1 = 1,
         default.units = "npc",
-        gp = grid::gpar(col = color, lwd = linewidth)
+        gp = grid::gpar(col = line_colors[1], lwd = linewidth)
       ),
       grid::segmentsGrob(
         x0 = 0, y0 = 1, x1 = 1, y1 = 0,
         default.units = "npc",
-        gp = grid::gpar(col = color, lwd = linewidth)
+        gp = grid::gpar(col = line_colors[2], lwd = linewidth)
       )
     )
   )
@@ -303,15 +333,34 @@ fill_crosshatch <- function(color = "black",
 #' Checkerboard pattern fill
 #'
 #' `fill_checker()` builds a [grid::pattern()] fill value that renders a
-#' two-colour checkerboard.
+#' checkerboard, generalized from two colours to an arbitrary palette.
 #'
 #' It's the cheapest member of the hatch family to build: a checkerboard
 #' square has no direction the way a hatch line does (compare
 #' [fill_hatch()]'s corner-to-corner diagonal, needed specifically to tile
-#' a *sloped* line seamlessly), so the tile content here is just four
+#' a *sloped* line seamlessly), so the tile content here is just a grid of
 #' plain quadrant rectangles -- the same two-colour-grid special case
 #' [fill_crosshatch()] already falls back to when `angle` is a multiple of
 #' 90 degrees, pulled out into its own helper.
+#'
+#' The tile is subdivided into an `n x n` grid, where `n = length(colors)`.
+#' The colour at grid cell `(row, col)` (0-indexed) is `colors[((row + col)
+#' %% n) + 1]` -- for the default two colours this reproduces the classic
+#' 2x2 checkerboard exactly; a longer `colors` vector grows the grid rather
+#' than adding a separate density argument, since a checkerboard's cell size
+#' and colour count aren't independent concepts here.
+#'
+#' @section Known rendering risk with three or more colours: The default
+#'   two-colour, four-rectangle tile has always rendered correctly, but
+#'   `colors` vectors of length 3 or more (a 3x3 or larger grid of
+#'   rectangles) were found, at the default `spacing`, to trigger the same
+#'   upstream `grid`/Cairo issue documented at [fill_stipple()]'s "Known
+#'   rendering risk" section -- several shapes inside a genuinely *repeated*
+#'   [grid::pattern()] tile can render distorted (here, collapsing to a
+#'   single solid colour instead of a grid), even though the same tile
+#'   content renders correctly as a single, non-repeated tile (`spacing =
+#'   1`). **Visually check rendered output** before relying on more than
+#'   two `colors` for anything beyond casual use.
 #'
 #' As with the other `fill_*()` helpers, [grid::pattern()] tiles are sized
 #' as a fraction of the target polygon's own bounding box rather than a
@@ -321,8 +370,7 @@ fill_crosshatch <- function(color = "black",
 #' squaring technique [fill_stipple()] uses for its dots -- so the default
 #' `aspect = 1` is only exact for a square bounding box.
 #'
-#' @param color1,color2 The two checker colours. Defaults `"black"` and
-#'   `"white"`.
+#' @param colors Two or more checker colours. Default `c("black", "white")`.
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
 #'   box. Must be a positive number. Default `0.2`.
 #' @inheritParams fill_hatch
@@ -331,39 +379,43 @@ fill_crosshatch <- function(color = "black",
 #'   use as the `fill` argument to [grid::gpar()].
 #'
 #' @examples
-#' draw(shape_circle(fill = fill_checker(color1 = "black", color2 = "white")))
+#' draw(shape_circle(fill = fill_checker(colors = c("black", "white"))))
 #'
 #' # a coarser, differently-coloured checkerboard
-#' draw(shape_circle(fill = fill_checker(color1 = "steelblue", color2 = "white", spacing = 0.4)))
+#' draw(shape_circle(fill = fill_checker(colors = c("steelblue", "white"), spacing = 0.4)))
+#'
+#' # three or more colours grow the grid rather than alternating just two;
+#' # spacing = 1 avoids the tile-repetition rendering risk noted above
+#' draw(shape_circle(fill = fill_checker(colors = c("steelblue", "white", "tomato"), spacing = 1)))
 #'
 #' @family fill helpers
 #' @export
-fill_checker <- function(color1 = "black",
-                          color2 = "white",
+fill_checker <- function(colors = c("black", "white"),
                           spacing = 0.2,
                           aspect = 1,
                           extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
-  if (!is.character(color1) || length(color1) != 1) {
-    rlang::abort("color1 must be a single string")
-  }
-  if (!is.character(color2) || length(color2) != 1) {
-    rlang::abort("color2 must be a single string")
-  }
+  validate_colors(colors, "colors", min_length = 2)
 
+  n <- length(colors)
+  cell <- 1 / n
+  cells <- expand.grid(row = seq(0, n - 1), col = seq(0, n - 1))
   quadrant <- function(x, y, color) {
     grid::rectGrob(
-      x = x, y = y, width = 0.5, height = 0.5,
+      x = x, y = y, width = cell, height = cell,
       default.units = "npc",
       gp = grid::gpar(fill = color, col = NA)
     )
   }
-  content <- grid::grobTree(
-    grid::gList(
-      quadrant(0.25, 0.75, color1), quadrant(0.75, 0.75, color2),
-      quadrant(0.25, 0.25, color2), quadrant(0.75, 0.25, color1)
+  rects <- purrr::pmap(cells, function(row, col) {
+    color_index <- ((row + col) %% n) + 1
+    quadrant(
+      x = (col + 0.5) * cell,
+      y = 1 - (row + 0.5) * cell,
+      color = colors[color_index]
     )
-  )
+  })
+  content <- grid::grobTree(do.call(grid::gList, rects))
 
   grid::pattern(content, width = spacing, height = spacing * aspect, extend = extend)
 }
@@ -403,7 +455,10 @@ fill_checker <- function(color1 = "black",
 #'   [fill_halftone()], which share this risk) for anything beyond casual
 #'   use, especially on unfamiliar R/`grid`/graphics-device versions.
 #'
-#' @param color Dot colour. Default `"black"`.
+#' @param color One or more dot colours. A vector shorter than `n` is
+#'   recycled (in order, not randomly) across the scattered dots -- a single
+#'   colour (the default) colours every dot the same, matching the original
+#'   behaviour. Default `"black"`.
 #' @param radius Dot radius, as a `"npc"` fraction of the tile. Must be a
 #'   positive number. Default `0.15`.
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
@@ -422,6 +477,9 @@ fill_checker <- function(color1 = "black",
 #' # more, smaller dots per tile give a denser stipple
 #' draw(shape_circle(fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)))
 #'
+#' # a colour vector is recycled across the dots
+#' draw(shape_circle(fill = fill_stipple(color = c("steelblue", "tomato"), n = 8L, seed = 2091L)))
+#'
 #' @family fill helpers
 #' @export
 fill_stipple <- function(color = "black",
@@ -432,6 +490,7 @@ fill_stipple <- function(color = "black",
                           seed = 1L,
                           extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
+  validate_colors(color, "color")
   if (!is.numeric(radius) || length(radius) != 1 || radius <= 0) {
     rlang::abort("radius must be a single positive number")
   }
@@ -451,12 +510,13 @@ fill_stipple <- function(color = "black",
       y <- stats::runif(n, radius, 1 - radius)
     }
   )
+  dot_colors <- rep_len(color, n)
 
-  dots <- purrr::map2(x, y, function(cx, cy) {
+  dots <- purrr::pmap(list(x, y, dot_colors), function(cx, cy, cc) {
     grid::circleGrob(
       x = cx, y = cy, r = radius,
       default.units = "npc",
-      gp = grid::gpar(col = NA, fill = color)
+      gp = grid::gpar(col = NA, fill = cc)
     )
   })
   content <- grid::grobTree(do.call(grid::gList, dots))
@@ -531,6 +591,10 @@ fill_stipple <- function(color = "black",
 #'   integer. Default `6L`.
 #' @param size `unit`'s rescaled size, as a `"npc"` fraction of the tile.
 #'   Must be a number strictly between `0` and `1`. Default `0.2`.
+#' @param colors `NULL`, or one or more colours overriding `unit@style@color`
+#'   for each stamp, recycled (in order, not randomly) across the `n`
+#'   copies. `NULL` (the default) colours every stamp from `unit`'s own
+#'   style, as before this argument existed.
 #' @param seed Integer seed for the scatter positions. Default `1L`.
 #' @param spacing Tile size, as a fraction of the target's bounding box.
 #'   Must be a positive number. Default `1` (one tile spans the whole
@@ -553,11 +617,17 @@ fill_stipple <- function(color = "black",
 #'   fill = fill_scatter(unit = shape_polygon(n = 3L, fill = "steelblue"), n = 10L, size = 0.2)
 #' ))
 #'
+#' # a colors vector overrides unit's own style colour, recycled per stamp
+#' draw(shape_circle(
+#'   fill = fill_scatter(colors = c("steelblue", "tomato", "goldenrod"), n = 9L, size = 0.15)
+#' ))
+#'
 #' @family fill helpers
 #' @export
 fill_scatter <- function(unit = shape_circle(radius = 1),
                           n = 6L,
                           size = 0.2,
+                          colors = NULL,
                           spacing = 1,
                           aspect = 1,
                           seed = 1L,
@@ -571,6 +641,9 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
   }
   if (!is.numeric(n) || length(n) != 1 || n < 1 || n != round(n)) {
     rlang::abort("n must be a single positive integer")
+  }
+  if (!is.null(colors)) {
+    validate_colors(colors, "colors")
   }
   if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
     rlang::abort("seed must be a single integer")
@@ -602,12 +675,14 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
     }
   )
 
-  stamps <- purrr::map2(cx, cy, function(ccx, ccy) {
+  stamp_colors <- if (is.null(colors)) rep(unit@style@color, n) else rep_len(colors, n)
+
+  stamps <- purrr::pmap(list(cx, cy, stamp_colors), function(ccx, ccy, ccol) {
     grid::polygonGrob(
       x = norm_x + ccx, y = norm_y + ccy,
       default.units = "npc",
       gp = grid::gpar(
-        col = unit@style@color,
+        col = ccol,
         fill = unit@style@fill,
         lwd = unit@style@linewidth
       )
@@ -657,6 +732,9 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
 #' # a wider radius range gives more size contrast between dots
 #' draw(shape_circle(fill = fill_halftone(radius = c(0.02, 0.22), n = 6L, seed = 3187L)))
 #'
+#' # a colour vector is recycled across the dots, as in fill_stipple()
+#' draw(shape_circle(fill = fill_halftone(color = c("steelblue", "tomato"), n = 8L, seed = 3187L)))
+#'
 #' @family fill helpers
 #' @export
 fill_halftone <- function(color = "black",
@@ -667,6 +745,7 @@ fill_halftone <- function(color = "black",
                            seed = 1L,
                            extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
+  validate_colors(color, "color")
   if (!is.numeric(radius) || length(radius) != 2 || any(radius <= 0)) {
     rlang::abort("radius must be a length-2 vector of positive numbers")
   }
@@ -692,12 +771,13 @@ fill_halftone <- function(color = "black",
       r <- stats::runif(n, radius[1], radius[2])
     }
   )
+  dot_colors <- rep_len(color, n)
 
-  dots <- purrr::pmap(list(x, y, r), function(cx, cy, cr) {
+  dots <- purrr::pmap(list(x, y, r, dot_colors), function(cx, cy, cr, cc) {
     grid::circleGrob(
       x = cx, y = cy, r = cr,
       default.units = "npc",
-      gp = grid::gpar(col = NA, fill = color)
+      gp = grid::gpar(col = NA, fill = cc)
     )
   })
   content <- grid::grobTree(do.call(grid::gList, dots))
@@ -795,7 +875,10 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #'   no `angle` argument. Revisit if a real sketch needs an arbitrary
 #'   angle.
 #'
-#' @param color Line colour. Default `"black"`.
+#' @param color One or more line colours. A vector shorter than `n_lines` is
+#'   recycled (in order, not randomly) across the wandering lines -- a
+#'   single colour (the default) colours every line the same, matching the
+#'   original behaviour. Default `"black"`.
 #' @param direction Either `"horizontal"` (lines run left-right) or
 #'   `"vertical"` (lines run top-bottom). Default `"horizontal"`.
 #' @param n_lines Number of wandering lines per tile. Must be a positive
@@ -828,6 +911,11 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #'   fill = fill_scribble(n_lines = 6L, n_harmonics = 6L, amplitude = 0.6, seed = 6602L)
 #' ))
 #'
+#' # a colour vector is recycled across the wandering lines
+#' draw(shape_circle(
+#'   fill = fill_scribble(color = c("steelblue", "tomato"), n_lines = 4L, seed = 6602L)
+#' ))
+#'
 #' @family fill helpers
 #' @export
 fill_scribble <- function(color = "black",
@@ -858,9 +946,7 @@ fill_scribble <- function(color = "black",
         resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
   }
-  if (!is.character(color) || length(color) != 1) {
-    rlang::abort("color must be a single string")
-  }
+  validate_colors(color, "color")
   if (!is.numeric(linewidth) || length(linewidth) != 1 || linewidth <= 0) {
     rlang::abort("linewidth must be a single positive number")
   }
@@ -875,8 +961,9 @@ fill_scribble <- function(color = "black",
     resolution = round(resolution),
     seed = seed
   )
+  line_colors <- rep_len(color, round(n_lines))
 
-  strokes <- lapply(lines, function(ln) {
+  strokes <- purrr::map2(lines, line_colors, function(ln, cc) {
     if (direction == "horizontal") {
       x <- ln$along
       y <- ln$across
@@ -886,7 +973,7 @@ fill_scribble <- function(color = "black",
     }
     grid::linesGrob(
       x = x, y = y, default.units = "npc",
-      gp = grid::gpar(col = color, lwd = linewidth)
+      gp = grid::gpar(col = cc, lwd = linewidth)
     )
   })
   content <- grid::grobTree(do.call(grid::gList, strokes))
@@ -949,6 +1036,33 @@ torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
   )
 }
 
+#' Map a normalized noise field to pixel colour strings
+#'
+#' Internal helper shared by [fill_noise()] and [fill_flow()]. A single
+#' `color` fades in opacity from fully transparent to `alpha` across the
+#' field's own range -- the exact original behavior of both functions,
+#' before they accepted a colour vector. Two or more `color`s instead blend
+#' across a `grDevices::colorRamp()` built from them, driven by the same
+#' normalized field value, with `alpha` applied as a flat opacity -- a
+#' fading multi-hue blend can't also fade to fully transparent without one
+#' colour vanishing arbitrarily before the others.
+#'
+#' @param value01 The noise field, already normalized to `[0, 1]`.
+#' @param color A character vector of one or more colours.
+#' @param alpha As in [fill_noise()].
+#' @return A character vector of colour strings the same length as `value01`.
+#' @noRd
+noise_to_pixels <- function(value01, color, alpha) {
+  if (length(color) == 1) {
+    rgb <- grDevices::col2rgb(color) / 255
+    grDevices::rgb(rgb["red", ], rgb["green", ], rgb["blue", ], alpha = value01 * alpha)
+  } else {
+    ramp <- grDevices::colorRamp(color)
+    rgb <- ramp(value01) / 255
+    grDevices::rgb(rgb[, 1], rgb[, 2], rgb[, 3], alpha = alpha)
+  }
+}
+
 #' Simplex/fractal noise texture fill
 #'
 #' `fill_noise()` builds a [grid::pattern()] fill value from a rasterised
@@ -982,13 +1096,19 @@ torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
 #' far subtler than the tile-edge mismatch [fill_hatch()] has to actively
 #' avoid.
 #'
-#' @param color Fill colour. Default `"black"`.
+#' @param color One or more fill colours. A single colour (the default)
+#'   fades in opacity from fully transparent to `alpha`, exactly as before
+#'   this argument accepted a vector. Two or more colours instead blend
+#'   across a `grDevices::colorRamp()` built from them, driven by the noise
+#'   value, with `alpha` applied as a flat opacity across the whole fill
+#'   (see the internal `noise_to_pixels()` helper). Default `"black"`.
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
 #'   box. Must be a positive number. Default `0.5`.
 #' @param resolution Raster resolution (pixels per tile edge). Must be a
 #'   positive integer of at least `2L`. Default `32L`.
-#' @param alpha Maximum opacity, at the noise field's peak. Must be a number
-#'   in `(0, 1]`. Default `1`.
+#' @param alpha Opacity. For a single `color`, the maximum opacity at the
+#'   noise field's peak; for two or more, a flat opacity applied uniformly.
+#'   Must be a number in `(0, 1]`. Default `1`.
 #' @param frequency Noise frequency, as in [shape_blob()]. Must be non-negative.
 #'   Default `1`.
 #' @param octaves Number of noise octaves, as in [shape_blob()]. Must be a
@@ -1009,6 +1129,9 @@ torus_noise <- function(theta_u, theta_v, frequency, octaves, seed) {
 #' # a lower alpha lets the shape's own outline/background show through more
 #' draw(shape_circle(fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)))
 #'
+#' # two or more colours blend across the field instead of fading to transparent
+#' draw(shape_circle(fill = fill_noise(color = c("steelblue", "white", "tomato"), seed = 8843L)))
+#'
 #' @family fill helpers
 #' @export
 fill_noise <- function(color = "black",
@@ -1021,9 +1144,7 @@ fill_noise <- function(color = "black",
                         seed = 1L,
                         extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
-  if (!is.character(color) || length(color) != 1) {
-    rlang::abort("color must be a single string")
-  }
+  validate_colors(color, "color")
   if (!is.numeric(resolution) || length(resolution) != 1 ||
         resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
@@ -1047,12 +1168,11 @@ fill_noise <- function(color = "black",
   # in (u, v), so the field is exactly periodic and tiles with no seam
   grid_uv <- torus_grid(resolution)
 
-  noise <- torus_noise(grid_uv$theta_u, grid_uv$theta_v, frequency, octaves, seed) |>
-    ambient::normalize(to = c(0, alpha))
+  value01 <- torus_noise(grid_uv$theta_u, grid_uv$theta_v, frequency, octaves, seed) |>
+    ambient::normalize(to = c(0, 1))
 
-  rgb <- grDevices::col2rgb(color) / 255
   pixels <- matrix(
-    grDevices::rgb(rgb["red", ], rgb["green", ], rgb["blue", ], alpha = noise),
+    noise_to_pixels(value01, color, alpha),
     nrow = resolution, ncol = resolution
   )
   raster <- grid::rasterGrob(
@@ -1082,17 +1202,17 @@ fill_noise <- function(color = "black",
 #' the combined result still tiles with no seam.
 #'
 #' Unlike [fill_noise()] (opacity of one colour), the banding is rendered
-#' as a blend between `color1` and `color2`, since a marble texture's
-#' visual interest is the veining pattern itself rather than a fade to
-#' transparency.
+#' as a blend across `colors` via `grDevices::colorRamp()`, since a marble
+#' texture's visual interest is the veining pattern itself rather than a
+#' fade to transparency.
 #'
 #' [fill_noise()]'s own faint tile-boundary rasterization seam (see its
 #' details) can be more noticeable here: `sin()` turns a small mismatch in
 #' the turbulence field into a visibly sharper edge in a band than the
 #' same mismatch would produce in a plain opacity fade.
 #'
-#' @param color1,color2 The two colours blended across each band. Defaults
-#'   `"white"` and `"black"`.
+#' @param colors Two or more colours blended across each band, in order,
+#'   via `grDevices::colorRamp()`. Default `c("white", "black")`.
 #' @param stripes Number of bands running around the tile's `u` axis before
 #'   turbulence displacement. Must be a positive integer. Default `3L`.
 #' @param warp Turbulence amplitude, in radians of displacement along the
@@ -1112,13 +1232,17 @@ fill_noise <- function(color = "black",
 #'
 #' # a different colour pair changes the veining's contrast entirely
 #' draw(shape_circle(
-#'   fill = fill_marble(color1 = "black", color2 = "goldenrod", stripes = 4L, seed = 1274L)
+#'   fill = fill_marble(colors = c("black", "goldenrod"), stripes = 4L, seed = 1274L)
+#' ))
+#'
+#' # three or more colours blend across the band in sequence
+#' draw(shape_circle(
+#'   fill = fill_marble(colors = c("black", "goldenrod", "white"), stripes = 4L, seed = 1274L)
 #' ))
 #'
 #' @family fill helpers
 #' @export
-fill_marble <- function(color1 = "white",
-                         color2 = "black",
+fill_marble <- function(colors = c("white", "black"),
                          spacing = 0.5,
                          aspect = 1,
                          resolution = 32L,
@@ -1129,12 +1253,7 @@ fill_marble <- function(color1 = "white",
                          seed = 1L,
                          extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
-  if (!is.character(color1) || length(color1) != 1) {
-    rlang::abort("color1 must be a single string")
-  }
-  if (!is.character(color2) || length(color2) != 1) {
-    rlang::abort("color2 must be a single string")
-  }
+  validate_colors(colors, "colors", min_length = 2)
   if (!is.numeric(resolution) || length(resolution) != 1 ||
         resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
@@ -1167,14 +1286,10 @@ fill_marble <- function(color1 = "white",
   # the whole expression periodic in both tile directions -- see details
   value <- (sin(grid_uv$theta_u * round(stripes) + warp * turbulence) + 1) / 2
 
-  rgb1 <- grDevices::col2rgb(color1) / 255
-  rgb2 <- grDevices::col2rgb(color2) / 255
+  ramp <- grDevices::colorRamp(colors)
+  rgb <- ramp(value) / 255
   pixels <- matrix(
-    grDevices::rgb(
-      rgb1["red", ] * (1 - value) + rgb2["red", ] * value,
-      rgb1["green", ] * (1 - value) + rgb2["green", ] * value,
-      rgb1["blue", ] * (1 - value) + rgb2["blue", ] * value
-    ),
+    grDevices::rgb(rgb[, 1], rgb[, 2], rgb[, 3]),
     nrow = resolution, ncol = resolution
   )
   raster <- grid::rasterGrob(
@@ -1235,6 +1350,9 @@ fill_marble <- function(color1 = "white",
 #' draw(shape_circle(fill = fill_flow(warp = 0, seed = 9350L)))
 #' draw(shape_circle(fill = fill_flow(warp = 6, seed = 9350L)))
 #'
+#' # two or more colours blend across the field, as in fill_noise()
+#' draw(shape_circle(fill = fill_flow(color = c("steelblue", "white", "tomato"), seed = 9350L)))
+#'
 #' @family fill helpers
 #' @export
 fill_flow <- function(color = "black",
@@ -1250,9 +1368,7 @@ fill_flow <- function(color = "black",
                        seed = 1L,
                        extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
-  if (!is.character(color) || length(color) != 1) {
-    rlang::abort("color must be a single string")
-  }
+  validate_colors(color, "color")
   if (!is.numeric(resolution) || length(resolution) != 1 ||
         resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
@@ -1293,12 +1409,11 @@ fill_flow <- function(color = "black",
   warp_v <- torus_noise(grid_uv$theta_u, grid_uv$theta_v, warp_frequency, warp_octaves, seed + 200003L) |>
     ambient::normalize(to = c(-1, 1)) * warp
 
-  noise <- torus_noise(grid_uv$theta_u + warp_u, grid_uv$theta_v + warp_v, frequency, octaves, seed) |>
-    ambient::normalize(to = c(0, alpha))
+  value01 <- torus_noise(grid_uv$theta_u + warp_u, grid_uv$theta_v + warp_v, frequency, octaves, seed) |>
+    ambient::normalize(to = c(0, 1))
 
-  rgb <- grDevices::col2rgb(color) / 255
   pixels <- matrix(
-    grDevices::rgb(rgb["red", ], rgb["green", ], rgb["blue", ], alpha = noise),
+    noise_to_pixels(value01, color, alpha),
     nrow = resolution, ncol = resolution
   )
   raster <- grid::rasterGrob(
@@ -1327,8 +1442,9 @@ fill_flow <- function(color = "black",
 #' to clash with the curve.
 #'
 #' @inheritParams fill_noise
-#' @param color Fill colour. Default `"gray15"` (lighter than
-#'   [fill_noise()]'s own `"black"` default, closer to a charcoal tone).
+#' @param color One or more fill colours, as in [fill_noise()]. Default
+#'   `"gray15"` (lighter than [fill_noise()]'s own `"black"` default, closer
+#'   to a charcoal tone).
 #' @param spacing Baseline tile size, as a fraction of the target's
 #'   bounding box. Must be a positive number. Default `0.25` (finer than
 #'   [fill_noise()]'s own `0.5` default, for denser grain).
@@ -1599,12 +1715,14 @@ fill_gradient <- function(colors = c("white", "black"),
 
 #' Vignette fill
 #'
-#' `fill_vignette()` builds a [grid::pattern()] fill value that fades a
+#' `fill_vignette()` builds a [grid::pattern()] fill value that fades
 #' colour out towards the edges of each tile, using [grid::as.mask()] --
 #' the one `grid` capability the rest of the `fill_*()` family doesn't
-#' touch. A solid `color` layer is masked by a radial alpha mask (opaque at
-#' the tile centre, fully transparent at its edge), optionally revealing a
-#' solid `background` layer underneath rather than true transparency.
+#' touch. A `color` layer (solid for a single colour, or a
+#' `grid::radialGradient()` blend for two or more) is masked by a radial
+#' alpha mask (opaque at the tile centre, fully transparent at its edge),
+#' optionally revealing a solid `background` layer underneath rather than
+#' true transparency.
 #'
 #' As with [fill_gradient()], the fade shape is kept circular by correcting
 #' the *tile* to be physically square via `aspect` (the target's
@@ -1624,7 +1742,11 @@ fill_gradient <- function(colors = c("white", "black"),
 #' all in this nested tile context (silently ignored, regardless of
 #' explicitness), so `fill_vignette()` only offers the alpha variant.
 #'
-#' @param color Fill colour at the tile's centre. Default `"black"`.
+#' @param color One or more fill colours, blended from the tile's centre
+#'   outward. A single colour (the default) is a solid fade, exactly as
+#'   before this argument accepted a vector; two or more blend via a
+#'   `grid::radialGradient()` before the same alpha mask is applied. Default
+#'   `"black"`.
 #' @param background Fill colour revealed as `color` fades out, or `NA` for
 #'   true transparency (showing whatever is drawn behind the target shape).
 #'   Default `NA`.
@@ -1645,6 +1767,9 @@ fill_gradient <- function(colors = c("white", "black"),
 #' # instead of true transparency
 #' draw(shape_circle(fill = fill_vignette(color = "steelblue", background = "white")))
 #'
+#' # two or more colours blend radially before fading via the alpha mask
+#' draw(shape_circle(fill = fill_vignette(color = c("goldenrod", "steelblue"))))
+#'
 #' @family fill helpers
 #' @export
 fill_vignette <- function(color = "black",
@@ -1653,23 +1778,31 @@ fill_vignette <- function(color = "black",
                            aspect = 1,
                            extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
-  if (!is.character(color) || length(color) != 1) {
-    rlang::abort("color must be a single string")
-  }
+  validate_colors(color, "color")
   if (length(background) != 1 || !(is.na(background) || is.character(background))) {
     rlang::abort("background must be a single string, or NA")
   }
 
+  # the mask only ever extracts alpha, not hue, so color[1] alone is enough
+  # to build it regardless of how many colours color itself holds
   mask_grob <- grid::circleGrob(
     x = 0.5, y = 0.5, r = 0.5,
-    gp = grid::gpar(fill = grid::radialGradient(colours = c(color, "transparent")), col = NA)
+    gp = grid::gpar(fill = grid::radialGradient(colours = c(color[1], "transparent")), col = NA)
   )
+  fg_fill <- if (length(color) == 1) {
+    color
+  } else {
+    grid::radialGradient(
+      colours = color,
+      cx1 = 0.5, cy1 = 0.5, r1 = 0, cx2 = 0.5, cy2 = 0.5, r2 = 0.5
+    )
+  }
   fg <- grid::gTree(
     children = grid::gList(
       grid::rectGrob(
         x = 0.5, y = 0.5, width = 1, height = 1,
         default.units = "npc",
-        gp = grid::gpar(fill = color, col = NA)
+        gp = grid::gpar(fill = fg_fill, col = NA)
       )
     ),
     vp = grid::viewport(mask = grid::as.mask(mask_grob, type = "alpha"))
@@ -1692,7 +1825,8 @@ fill_vignette <- function(color = "black",
 #' Striped pattern fill
 #'
 #' `fill_stripe()` builds a [grid::pattern()] fill value that renders
-#' repeating solid bands of two colours, at a given `angle`.
+#' repeating solid bands, at a given `angle`, generalized from two colours
+#' to an arbitrary palette.
 #'
 #' Unlike [fill_hatch()], this doesn't use the corner-to-corner-diagonal
 #' tile-shape technique at all -- because a *filled* band, unlike a thin
@@ -1701,24 +1835,25 @@ fill_vignette <- function(color = "black",
 #' single diagonal split of a tile turns out not to tile seamlessly at an
 #' arbitrary angle the way a thin hatch line does. Instead, `fill_stripe()`
 #' sidesteps [grid::pattern()]'s tile-copy repetition altogether: the
-#' stripe angle and period come from a short two-colour
-#' [grid::linearGradient()] with hard colour stops (no smooth transition)
-#' and `extend = "repeat"`, which repeats *itself* continuously along its
-#' own axis -- a fundamentally different (and for this purpose, simpler)
-#' mechanism than tiling a rasterised copy. [grid::pattern()] is still used
-#' around this gradient, but only once, as a single square (aspect-
-#' corrected) tile spanning the whole target shape, exactly as
-#' [fill_gradient()] does by default -- not to create repetition, which the
-#' gradient already provides.
+#' stripe angle and period come from a [grid::linearGradient()] with hard
+#' colour stops (no smooth transition) and `extend = "repeat"`, which
+#' repeats *itself* continuously along its own axis -- a fundamentally
+#' different (and for this purpose, simpler) mechanism than tiling a
+#' rasterised copy. [grid::pattern()] is still used around this gradient,
+#' but only once, as a single square (aspect-corrected) tile spanning the
+#' whole target shape, exactly as [fill_gradient()] does by default -- not
+#' to create repetition, which the gradient already provides.
 #'
-#' @param color1,color2 The two stripe colours. Defaults `"black"` and
-#'   `"white"`.
-#' @param width Fraction of each stripe period that is `color1` (the rest
-#'   is `color2`). Must be a number strictly between `0` and `1`. Default
-#'   `0.5` (equal bands).
-#' @param spacing One stripe period (`color1` band plus `color2` band), as
-#'   a fraction of the target's bounding box. Must be a positive number.
-#'   Default `0.2`.
+#' Each of the `n = length(colors)` colours gets an equal-width band by
+#' default (`1/n` of the period); there's no separate argument for unequal
+#' bands -- repeat a colour in `colors` instead (e.g. `c("steelblue",
+#' "steelblue", "white")` gives a 2:1 ratio between the two colours), which
+#' reuses the same recycling mechanism rather than adding a second one.
+#'
+#' @param colors Two or more stripe colours, one equal-width band each (see
+#'   details for biasing band widths). Default `c("black", "white")`.
+#' @param spacing One full period through all of `colors`, as a fraction of
+#'   the target's bounding box. Must be a positive number. Default `0.2`.
 #' @param extend Passed to the inner [grid::linearGradient()], controlling
 #'   what happens beyond the colour stops -- *not* to the outer
 #'   [grid::pattern()] call, which always uses `extend = "repeat"` (see
@@ -1731,37 +1866,35 @@ fill_vignette <- function(color = "black",
 #' @examples
 #' draw(shape_circle(fill = fill_stripe(angle = 30)))
 #'
-#' # width shifts the balance between the two colours within each period
-#' draw(shape_circle(fill = fill_stripe(color1 = "steelblue", color2 = "white", width = 0.25)))
+#' # repeating a colour biases the band widths, rather than a separate argument
+#' draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "steelblue", "white"))))
 #'
 #' # narrower spacing gives more, thinner stripes
 #' draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
 #'
+#' # three or more colours repeat through the same period
+#' draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "white", "tomato"), angle = 30)))
+#'
 #' @family fill helpers
 #' @export
-fill_stripe <- function(color1 = "black",
-                         color2 = "white",
+fill_stripe <- function(colors = c("black", "white"),
                          angle = 45,
-                         width = 0.5,
                          spacing = 0.2,
                          aspect = 1,
                          extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
-  if (!is.character(color1) || length(color1) != 1) {
-    rlang::abort("color1 must be a single string")
-  }
-  if (!is.character(color2) || length(color2) != 1) {
-    rlang::abort("color2 must be a single string")
-  }
-  if (!is.numeric(width) || length(width) != 1 || width <= 0 || width >= 1) {
-    rlang::abort("width must be a single number strictly between 0 and 1")
-  }
+  validate_colors(colors, "colors", min_length = 2)
+
+  n <- length(colors)
+  bounds <- seq(0, 1, length.out = n + 1)
+  band_colors <- rep(colors, each = 2)
+  stops <- as.vector(rbind(bounds[-(n + 1)], bounds[-1]))
 
   theta <- angle * pi / 180
   half <- spacing / 2
   gradient <- grid::linearGradient(
-    colours = c(color1, color1, color2, color2),
-    stops = c(0, width, width, 1),
+    colours = band_colors,
+    stops = stops,
     x1 = 0.5 - half * cos(theta), y1 = 0.5 - half * sin(theta),
     x2 = 0.5 + half * cos(theta), y2 = 0.5 + half * sin(theta),
     extend = extend

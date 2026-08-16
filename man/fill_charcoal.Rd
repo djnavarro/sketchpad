@@ -17,8 +17,9 @@ fill_charcoal(
 )
 }
 \arguments{
-\item{color}{Fill colour. Default \code{"gray15"} (lighter than
-\code{\link[=fill_noise]{fill_noise()}}'s own \code{"black"} default, closer to a charcoal tone).}
+\item{color}{One or more fill colours, as in \code{\link[=fill_noise]{fill_noise()}}. Default
+\code{"gray15"} (lighter than \code{\link[=fill_noise]{fill_noise()}}'s own \code{"black"} default, closer
+to a charcoal tone).}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's
 bounding box. Must be a positive number. Default \code{0.25} (finer than
@@ -30,8 +31,9 @@ Must be a positive number. Default \code{1} (a square bounding box).}
 \item{resolution}{Raster resolution (pixels per tile edge). Must be a
 positive integer of at least \code{2L}. Default \code{32L}.}
 
-\item{alpha}{Maximum opacity, at the noise field's peak. Must be a number
-in \verb{(0, 1]}. Default \code{1}.}
+\item{alpha}{Opacity. For a single \code{color}, the maximum opacity at the
+noise field's peak; for two or more, a flat opacity applied uniformly.
+Must be a number in \verb{(0, 1]}. Default \code{1}.}
 
 \item{frequency}{Noise frequency, as in \code{\link[=shape_blob]{shape_blob()}}. Must be
 non-negative. Default \code{4} (finer detail than \code{\link[=fill_noise]{fill_noise()}}'s own

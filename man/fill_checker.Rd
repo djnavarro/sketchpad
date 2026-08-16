@@ -5,16 +5,14 @@
 \title{Checkerboard pattern fill}
 \usage{
 fill_checker(
-  color1 = "black",
-  color2 = "white",
+  colors = c("black", "white"),
   spacing = 0.2,
   aspect = 1,
   extend = "repeat"
 )
 }
 \arguments{
-\item{color1, color2}{The two checker colours. Defaults \code{"black"} and
-\code{"white"}.}
+\item{colors}{Two or more checker colours. Default \code{c("black", "white")}.}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's bounding
 box. Must be a positive number. Default \code{0.2}.}
@@ -30,16 +28,34 @@ use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 }
 \description{
 \code{fill_checker()} builds a \code{\link[grid:pattern]{grid::pattern()}} fill value that renders a
-two-colour checkerboard.
+checkerboard, generalized from two colours to an arbitrary palette.
 }
 \details{
 It's the cheapest member of the hatch family to build: a checkerboard
 square has no direction the way a hatch line does (compare
 \code{\link[=fill_hatch]{fill_hatch()}}'s corner-to-corner diagonal, needed specifically to tile
-a \emph{sloped} line seamlessly), so the tile content here is just four
+a \emph{sloped} line seamlessly), so the tile content here is just a grid of
 plain quadrant rectangles -- the same two-colour-grid special case
 \code{\link[=fill_crosshatch]{fill_crosshatch()}} already falls back to when \code{angle} is a multiple of
 90 degrees, pulled out into its own helper.
+
+The tile is subdivided into an \verb{n x n} grid, where \code{n = length(colors)}.
+The colour at grid cell \verb{(row, col)} (0-indexed) is \code{colors[((row + col) \%\% n) + 1]} -- for the default two colours this reproduces the classic
+2x2 checkerboard exactly; a longer \code{colors} vector grows the grid rather
+than adding a separate density argument, since a checkerboard's cell size
+and colour count aren't independent concepts here.
+}
+\section{Known rendering risk with three or more colours}{
+ The default
+two-colour, four-rectangle tile has always rendered correctly, but
+\code{colors} vectors of length 3 or more (a 3x3 or larger grid of
+rectangles) were found, at the default \code{spacing}, to trigger the same
+upstream \code{grid}/Cairo issue documented at \code{\link[=fill_stipple]{fill_stipple()}}'s "Known
+rendering risk" section -- several shapes inside a genuinely \emph{repeated}
+\code{\link[grid:pattern]{grid::pattern()}} tile can render distorted (here, collapsing to a
+single solid colour instead of a grid), even though the same tile
+content renders correctly as a single, non-repeated tile (\code{spacing = 1}). \strong{Visually check rendered output} before relying on more than
+two \code{colors} for anything beyond casual use.
 
 As with the other \verb{fill_*()} helpers, \code{\link[grid:pattern]{grid::pattern()}} tiles are sized
 as a fraction of the target polygon's own bounding box rather than a
@@ -49,11 +65,16 @@ width-to-height ratio as \code{aspect} to correct for this -- the same tile-
 squaring technique \code{\link[=fill_stipple]{fill_stipple()}} uses for its dots -- so the default
 \code{aspect = 1} is only exact for a square bounding box.
 }
+
 \examples{
-draw(shape_circle(fill = fill_checker(color1 = "black", color2 = "white")))
+draw(shape_circle(fill = fill_checker(colors = c("black", "white"))))
 
 # a coarser, differently-coloured checkerboard
-draw(shape_circle(fill = fill_checker(color1 = "steelblue", color2 = "white", spacing = 0.4)))
+draw(shape_circle(fill = fill_checker(colors = c("steelblue", "white"), spacing = 0.4)))
+
+# three or more colours grow the grid rather than alternating just two;
+# spacing = 1 avoids the tile-repetition rendering risk noted above
+draw(shape_circle(fill = fill_checker(colors = c("steelblue", "white", "tomato"), spacing = 1)))
 
 }
 \seealso{

@@ -5,29 +5,22 @@
 \title{Striped pattern fill}
 \usage{
 fill_stripe(
-  color1 = "black",
-  color2 = "white",
+  colors = c("black", "white"),
   angle = 45,
-  width = 0.5,
   spacing = 0.2,
   aspect = 1,
   extend = "repeat"
 )
 }
 \arguments{
-\item{color1, color2}{The two stripe colours. Defaults \code{"black"} and
-\code{"white"}.}
+\item{colors}{Two or more stripe colours, one equal-width band each (see
+details for biasing band widths). Default \code{c("black", "white")}.}
 
 \item{angle}{Hatch angle in degrees, measured counterclockwise from the
 positive x-axis. Default \code{45}.}
 
-\item{width}{Fraction of each stripe period that is \code{color1} (the rest
-is \code{color2}). Must be a number strictly between \code{0} and \code{1}. Default
-\code{0.5} (equal bands).}
-
-\item{spacing}{One stripe period (\code{color1} band plus \code{color2} band), as
-a fraction of the target's bounding box. Must be a positive number.
-Default \code{0.2}.}
+\item{spacing}{One full period through all of \code{colors}, as a fraction of
+the target's bounding box. Must be a positive number. Default \code{0.2}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
 Must be a positive number. Default \code{1} (a square bounding box).}
@@ -43,7 +36,8 @@ use as the \code{fill} argument to \code{\link[grid:gpar]{grid::gpar()}}.
 }
 \description{
 \code{fill_stripe()} builds a \code{\link[grid:pattern]{grid::pattern()}} fill value that renders
-repeating solid bands of two colours, at a given \code{angle}.
+repeating solid bands, at a given \code{angle}, generalized from two colours
+to an arbitrary palette.
 }
 \details{
 Unlike \code{\link[=fill_hatch]{fill_hatch()}}, this doesn't use the corner-to-corner-diagonal
@@ -53,24 +47,31 @@ neighbour, not just the points where a thin line happens to cross, a
 single diagonal split of a tile turns out not to tile seamlessly at an
 arbitrary angle the way a thin hatch line does. Instead, \code{fill_stripe()}
 sidesteps \code{\link[grid:pattern]{grid::pattern()}}'s tile-copy repetition altogether: the
-stripe angle and period come from a short two-colour
-\code{\link[grid:linearGradient]{grid::linearGradient()}} with hard colour stops (no smooth transition)
-and \code{extend = "repeat"}, which repeats \emph{itself} continuously along its
-own axis -- a fundamentally different (and for this purpose, simpler)
-mechanism than tiling a rasterised copy. \code{\link[grid:pattern]{grid::pattern()}} is still used
-around this gradient, but only once, as a single square (aspect-
-corrected) tile spanning the whole target shape, exactly as
-\code{\link[=fill_gradient]{fill_gradient()}} does by default -- not to create repetition, which the
-gradient already provides.
+stripe angle and period come from a \code{\link[grid:linearGradient]{grid::linearGradient()}} with hard
+colour stops (no smooth transition) and \code{extend = "repeat"}, which
+repeats \emph{itself} continuously along its own axis -- a fundamentally
+different (and for this purpose, simpler) mechanism than tiling a
+rasterised copy. \code{\link[grid:pattern]{grid::pattern()}} is still used around this gradient,
+but only once, as a single square (aspect-corrected) tile spanning the
+whole target shape, exactly as \code{\link[=fill_gradient]{fill_gradient()}} does by default -- not
+to create repetition, which the gradient already provides.
+
+Each of the \code{n = length(colors)} colours gets an equal-width band by
+default (\code{1/n} of the period); there's no separate argument for unequal
+bands -- repeat a colour in \code{colors} instead (e.g. \code{c("steelblue", "steelblue", "white")} gives a 2:1 ratio between the two colours), which
+reuses the same recycling mechanism rather than adding a second one.
 }
 \examples{
 draw(shape_circle(fill = fill_stripe(angle = 30)))
 
-# width shifts the balance between the two colours within each period
-draw(shape_circle(fill = fill_stripe(color1 = "steelblue", color2 = "white", width = 0.25)))
+# repeating a colour biases the band widths, rather than a separate argument
+draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "steelblue", "white"))))
 
 # narrower spacing gives more, thinner stripes
 draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
+
+# three or more colours repeat through the same period
+draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "white", "tomato"), angle = 30)))
 
 }
 \seealso{

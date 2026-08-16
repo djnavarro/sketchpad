@@ -15,7 +15,10 @@ fill_halftone(
 )
 }
 \arguments{
-\item{color}{Dot colour. Default \code{"black"}.}
+\item{color}{One or more dot colours. A vector shorter than \code{n} is
+recycled (in order, not randomly) across the scattered dots -- a single
+colour (the default) colours every dot the same, matching the original
+behaviour. Default \code{"black"}.}
 
 \item{radius}{Dot radius range, as a length-2 numeric vector giving the
 \code{"npc"}-fraction-of-tile minimum and maximum (a dot's actual radius is
@@ -68,6 +71,9 @@ draw(shape_circle(fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)))
 
 # a wider radius range gives more size contrast between dots
 draw(shape_circle(fill = fill_halftone(radius = c(0.02, 0.22), n = 6L, seed = 3187L)))
+
+# a colour vector is recycled across the dots, as in fill_stipple()
+draw(shape_circle(fill = fill_halftone(color = c("steelblue", "tomato"), n = 8L, seed = 3187L)))
 
 }
 \seealso{

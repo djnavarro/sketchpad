@@ -15,7 +15,10 @@ fill_stipple(
 )
 }
 \arguments{
-\item{color}{Dot colour. Default \code{"black"}.}
+\item{color}{One or more dot colours. A vector shorter than \code{n} is
+recycled (in order, not randomly) across the scattered dots -- a single
+colour (the default) colours every dot the same, matching the original
+behaviour. Default \code{"black"}.}
 
 \item{radius}{Dot radius, as a \code{"npc"} fraction of the tile. Must be a
 positive number. Default \code{0.15}.}
@@ -79,6 +82,9 @@ draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
 
 # more, smaller dots per tile give a denser stipple
 draw(shape_circle(fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)))
+
+# a colour vector is recycled across the dots
+draw(shape_circle(fill = fill_stipple(color = c("steelblue", "tomato"), n = 8L, seed = 2091L)))
 
 }
 \seealso{

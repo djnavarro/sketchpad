@@ -20,7 +20,12 @@ fill_flow(
 )
 }
 \arguments{
-\item{color}{Fill colour. Default \code{"black"}.}
+\item{color}{One or more fill colours. A single colour (the default)
+fades in opacity from fully transparent to \code{alpha}, exactly as before
+this argument accepted a vector. Two or more colours instead blend
+across a \code{grDevices::colorRamp()} built from them, driven by the noise
+value, with \code{alpha} applied as a flat opacity across the whole fill
+(see the internal \code{noise_to_pixels()} helper). Default \code{"black"}.}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's bounding
 box. Must be a positive number. Default \code{0.5}.}
@@ -31,8 +36,9 @@ Must be a positive number. Default \code{1} (a square bounding box).}
 \item{resolution}{Raster resolution (pixels per tile edge). Must be a
 positive integer of at least \code{2L}. Default \code{32L}.}
 
-\item{alpha}{Maximum opacity, at the noise field's peak. Must be a number
-in \verb{(0, 1]}. Default \code{1}.}
+\item{alpha}{Opacity. For a single \code{color}, the maximum opacity at the
+noise field's peak; for two or more, a flat opacity applied uniformly.
+Must be a number in \verb{(0, 1]}. Default \code{1}.}
 
 \item{warp}{Warp amplitude, in radians of angular displacement. Must be
 a non-negative number. Default \code{2}.}
@@ -96,6 +102,9 @@ draw(shape_circle(fill = fill_flow(warp = 3, seed = 9350L)))
 # reduces to plain fill_noise()
 draw(shape_circle(fill = fill_flow(warp = 0, seed = 9350L)))
 draw(shape_circle(fill = fill_flow(warp = 6, seed = 9350L)))
+
+# two or more colours blend across the field, as in fill_noise()
+draw(shape_circle(fill = fill_flow(color = c("steelblue", "white", "tomato"), seed = 9350L)))
 
 }
 \seealso{

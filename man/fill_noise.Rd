@@ -17,7 +17,12 @@ fill_noise(
 )
 }
 \arguments{
-\item{color}{Fill colour. Default \code{"black"}.}
+\item{color}{One or more fill colours. A single colour (the default)
+fades in opacity from fully transparent to \code{alpha}, exactly as before
+this argument accepted a vector. Two or more colours instead blend
+across a \code{grDevices::colorRamp()} built from them, driven by the noise
+value, with \code{alpha} applied as a flat opacity across the whole fill
+(see the internal \code{noise_to_pixels()} helper). Default \code{"black"}.}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's bounding
 box. Must be a positive number. Default \code{0.5}.}
@@ -28,8 +33,9 @@ Must be a positive number. Default \code{1} (a square bounding box).}
 \item{resolution}{Raster resolution (pixels per tile edge). Must be a
 positive integer of at least \code{2L}. Default \code{32L}.}
 
-\item{alpha}{Maximum opacity, at the noise field's peak. Must be a number
-in \verb{(0, 1]}. Default \code{1}.}
+\item{alpha}{Opacity. For a single \code{color}, the maximum opacity at the
+noise field's peak; for two or more, a flat opacity applied uniformly.
+Must be a number in \verb{(0, 1]}. Default \code{1}.}
 
 \item{frequency}{Noise frequency, as in \code{\link[=shape_blob]{shape_blob()}}. Must be non-negative.
 Default \code{1}.}
@@ -87,6 +93,9 @@ draw(shape_circle(fill = fill_noise(frequency = 4, octaves = 4L, seed = 8843L)))
 
 # a lower alpha lets the shape's own outline/background show through more
 draw(shape_circle(fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)))
+
+# two or more colours blend across the field instead of fading to transparent
+draw(shape_circle(fill = fill_noise(color = c("steelblue", "white", "tomato"), seed = 8843L)))
 
 }
 \seealso{

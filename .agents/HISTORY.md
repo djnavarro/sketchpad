@@ -2002,3 +2002,68 @@ along the way, now fixed as part of this pass:
 
 No class/behavior changes beyond the four bug fixes above; this was
 documentation content work, not an API change.
+
+## Generalizing `fill_*()` helpers to accept colour vectors
+
+Twelve of the seventeen `fill_*()` constructors previously took either a
+single `color` or a fixed `color1`/`color2` pair. Audited the whole family
+and generalized each candidate to accept an arbitrary-length colour
+vector, using whichever of two patterns matched the helper's existing
+multiplicity (see `AGENTS.md`'s "Colour-vector generalization" note for
+the current-state summary): discrete repeated elements (dots, lines,
+stamps) recycle the vector deterministically via `rep_len()`; continuous
+fields/blends (rasters, banding, radial fades) interpolate through
+`grDevices::colorRamp()` (or a genuine `grid::radialGradient()` for
+`fill_vignette()`).
+
+**Breaking rename, no deprecation shim.** `fill_checker()`, `fill_marble()`,
+and `fill_stripe()` had `color1`/`color2` pairs; these became a single
+`colors` argument (minimum length 2) rather than keeping the pair as a
+backward-compatible alias alongside a new vector argument, since carrying
+three ways to specify colour would have added more accretion than the
+package's pre-1.0, no-deprecation-period convention (already established
+at the earlier "Renaming the shape/curve family" rename entry) calls for.
+The one other in-package call site using the old names
+(`shape_polygon()`'s own `@examples`) was updated in the same pass.
+`fill_stripe()` also dropped its `width` argument (only meaningful for
+exactly two colours) in favor of biasing band widths by repeating a
+colour in `colors` -- one recycling mechanism instead of two.
+
+**`fill_noise()`/`fill_flow()` fork behavior by vector length**, via a new
+shared internal helper, `noise_to_pixels()`: a single colour reproduces
+the original alpha-fade-to-transparent behavior bit for bit (byte-for-byte
+backward compatible); two or more blend hue across a `colorRamp()` while
+`alpha` is held flat, since a fading multi-hue blend can't also fade to
+transparent without one colour vanishing arbitrarily before the others.
+`fill_charcoal()` (a `fill_noise()` preset) inherited this for free.
+`fill_scatter()` gained an additive `colors = NULL` argument (recycled
+across stamps, overriding the scattered `unit`'s own style colour) rather
+than a rename, since it previously had no colour argument of its own at
+all.
+
+Added one new shared validator, `validate_colors(colors, arg_name,
+min_length = 1)`, alongside the existing `validate_fill_args()`, replacing
+the repeated single-string checks previously duplicated across the family.
+
+**Found a new instance of the already-known multi-shape pattern-tile
+rendering bug.** `fill_checker()`'s generalization grows its checkerboard
+from a fixed 2x2 grid to `n x n` (`n = length(colors)`), colour index at
+0-based cell `(row, col)` being `((row + col) %% n) + 1` -- verified by
+hand to reproduce the original 2x2 diagonal arrangement exactly for two
+colours. Rendering a 3-colour (3x3, 9-rectangle) case at the default
+`spacing` produced a single solid colour instead of a grid; re-rendering
+with `spacing = 1` (no tile repetition) showed the grid was actually
+correct, confirming this is the same upstream `grid`/Cairo multi-shape
+tile issue already documented at `fill_stipple()`'s "Known rendering risk"
+section, now newly triggered by a 2x2 tile growing past its previous
+size. Documented on `fill_checker()` itself with the same section
+convention, and its own three-colour `@examples` line switched to
+`spacing = 1` to actually demonstrate correctly-rendered output rather
+than the collapsed/broken default.
+
+Verified visually (not just via `testthat`, since the grid-tile-repetition
+bug above only manifests at actual device render time, not in the
+pattern object's own structure) that `fill_checker()`, `fill_marble()`,
+`fill_noise()`, `fill_stripe()`, and `fill_vignette()` all render multi-
+colour output as designed. Package checks cleanly (0 errors/warnings/
+notes) after the change.

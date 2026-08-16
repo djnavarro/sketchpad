@@ -8,6 +8,7 @@ fill_scatter(
   unit = shape_circle(radius = 1),
   n = 6L,
   size = 0.2,
+  colors = NULL,
   spacing = 1,
   aspect = 1,
   seed = 1L,
@@ -23,6 +24,11 @@ integer. Default \code{6L}.}
 
 \item{size}{\code{unit}'s rescaled size, as a \code{"npc"} fraction of the tile.
 Must be a number strictly between \code{0} and \code{1}. Default \code{0.2}.}
+
+\item{colors}{\code{NULL}, or one or more colours overriding \code{unit@style@color}
+for each stamp, recycled (in order, not randomly) across the \code{n}
+copies. \code{NULL} (the default) colours every stamp from \code{unit}'s own
+style, as before this argument existed.}
 
 \item{spacing}{Tile size, as a fraction of the target's bounding box.
 Must be a positive number. Default \code{1} (one tile spans the whole
@@ -102,6 +108,11 @@ draw(shape_circle(
 # any small drawable works as the scattered unit, e.g. a triangle
 draw(shape_circle(
   fill = fill_scatter(unit = shape_polygon(n = 3L, fill = "steelblue"), n = 10L, size = 0.2)
+))
+
+# a colors vector overrides unit's own style colour, recycled per stamp
+draw(shape_circle(
+  fill = fill_scatter(colors = c("steelblue", "tomato", "goldenrod"), n = 9L, size = 0.15)
 ))
 
 }

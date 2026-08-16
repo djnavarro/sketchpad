@@ -49,7 +49,7 @@ than 1 raise an error.
 \examples{
 draw(shape_polygon(radius = 1, n = 3L))
 draw(shape_polygon(x = 1, y = 1, radius = 0.5, n = 8L, color = "darkred"))
-draw(shape_polygon(n = 5L, fill = fill_stripe(color1 = "white", color2 = "grey30")))
+draw(shape_polygon(n = 5L, fill = fill_stripe(colors = c("white", "grey30"))))
 
 # rotating a low-n polygon reorients its vertices
 draw(shape_polygon(n = 4L, trans = trans_rotate(pi / 4)))
