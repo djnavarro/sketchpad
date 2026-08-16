@@ -196,3 +196,12 @@ Functions returning a plain character vector of colours, for use in
   : Colour palette from a linear cosine formula
 - [`palette_manual()`](https://sketchpad.djnavarro.net/reference/palette_manual.md)
   : Colour palette drawn from a curated collection
+
+## Export tools
+
+Save a `drawable` or `sketch` directly to an image file.
+
+- [`save_png()`](https://sketchpad.djnavarro.net/reference/save_png.md)
+  [`save_svg()`](https://sketchpad.djnavarro.net/reference/save_png.md)
+  [`save_pdf()`](https://sketchpad.djnavarro.net/reference/save_png.md)
+  : Save a drawable or sketch to an image file
