@@ -29,15 +29,17 @@ pak::pak("djnavarro/sketchpad")
 
 library(sketchpad)
 
-values <- tibble::tibble(
+palette <- c(
+  "#e50000", "#ff8d00", "#ffee00", 
+  "#028121", "#004cff", "#770088"
+)
+draw(shape_blobs(
   x = cos(seq(0, pi * 5 / 3, length.out = 6)),
   y = sin(seq(0, pi * 5 / 3, length.out = 6)),
   n = 500L,
-  fill = c("#e50000", "#ff8d00", "#ffee00", "#028121", "#004cff", "#770088"),
-  color = fill
-)
-blobs <- purrr::pmap(values, shape_blob)
-blobs |> sketch() |> draw()
+  fill = palette,
+  color = palette
+))
 ```
 
 ![](reference/figures/README-ring-of-blobs-1.png)
