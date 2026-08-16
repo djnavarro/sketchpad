@@ -5,14 +5,14 @@
 \title{Checkerboard pattern fill}
 \usage{
 fill_checker(
-  colors = c("black", "white"),
+  color = c("black", "white"),
   spacing = 0.2,
   aspect = 1,
   extend = "repeat"
 )
 }
 \arguments{
-\item{colors}{Two or more checker colours. Default \code{c("black", "white")}.}
+\item{color}{Two or more checker colours. Default \code{c("black", "white")}.}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's bounding
 box. Must be a positive number. Default \code{0.2}.}
@@ -39,23 +39,23 @@ plain quadrant rectangles -- the same two-colour-grid special case
 \code{\link[=fill_crosshatch]{fill_crosshatch()}} already falls back to when \code{angle} is a multiple of
 90 degrees, pulled out into its own helper.
 
-The tile is subdivided into an \verb{n x n} grid, where \code{n = length(colors)}.
-The colour at grid cell \verb{(row, col)} (0-indexed) is \code{colors[((row + col) \%\% n) + 1]} -- for the default two colours this reproduces the classic
-2x2 checkerboard exactly; a longer \code{colors} vector grows the grid rather
+The tile is subdivided into an \verb{n x n} grid, where \code{n = length(color)}.
+The colour at grid cell \verb{(row, col)} (0-indexed) is \code{color[((row + col) \%\% n) + 1]} -- for the default two colours this reproduces the classic
+2x2 checkerboard exactly; a longer \code{color} vector grows the grid rather
 than adding a separate density argument, since a checkerboard's cell size
 and colour count aren't independent concepts here.
 }
 \section{Known rendering risk with three or more colours}{
  The default
 two-colour, four-rectangle tile has always rendered correctly, but
-\code{colors} vectors of length 3 or more (a 3x3 or larger grid of
+\code{color} vectors of length 3 or more (a 3x3 or larger grid of
 rectangles) were found, at the default \code{spacing}, to trigger the same
 upstream \code{grid}/Cairo issue documented at \code{\link[=fill_stipple]{fill_stipple()}}'s "Known
 rendering risk" section -- several shapes inside a genuinely \emph{repeated}
 \code{\link[grid:pattern]{grid::pattern()}} tile can render distorted (here, collapsing to a
 single solid colour instead of a grid), even though the same tile
 content renders correctly as a single, non-repeated tile (\code{spacing = 1}). \strong{Visually check rendered output} before relying on more than
-two \code{colors} for anything beyond casual use.
+two \code{color}s for anything beyond casual use.
 
 As with the other \verb{fill_*()} helpers, \code{\link[grid:pattern]{grid::pattern()}} tiles are sized
 as a fraction of the target polygon's own bounding box rather than a
@@ -67,14 +67,14 @@ squaring technique \code{\link[=fill_stipple]{fill_stipple()}} uses for its dots
 }
 
 \examples{
-draw(shape_circle(fill = fill_checker(colors = c("black", "white"))))
+draw(shape_circle(fill = fill_checker(color = c("black", "white"))))
 
 # a coarser, differently-coloured checkerboard
-draw(shape_circle(fill = fill_checker(colors = c("steelblue", "white"), spacing = 0.4)))
+draw(shape_circle(fill = fill_checker(color = c("steelblue", "white"), spacing = 0.4)))
 
 # three or more colours grow the grid rather than alternating just two;
 # spacing = 1 avoids the tile-repetition rendering risk noted above
-draw(shape_circle(fill = fill_checker(colors = c("steelblue", "white", "tomato"), spacing = 1)))
+draw(shape_circle(fill = fill_checker(color = c("steelblue", "white", "tomato"), spacing = 1)))
 
 }
 \seealso{

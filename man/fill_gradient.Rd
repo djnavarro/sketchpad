@@ -5,7 +5,7 @@
 \title{Gradient fill}
 \usage{
 fill_gradient(
-  colors = c("white", "black"),
+  color = c("white", "black"),
   type = c("linear", "radial"),
   angle = 45,
   stops = NULL,
@@ -15,7 +15,7 @@ fill_gradient(
 )
 }
 \arguments{
-\item{colors}{Two or more colours to interpolate between.}
+\item{color}{Two or more colours to interpolate between.}
 
 \item{type}{Either \code{"linear"} or \code{"radial"}. Default \code{"linear"}.}
 
@@ -23,7 +23,7 @@ fill_gradient(
 (ignored for \code{"radial"}). Default \code{45}.}
 
 \item{stops}{Colour stop positions, as a numeric vector the same length
-as \code{colors}, or \code{NULL} to space them evenly (the default used by
+as \code{color}, or \code{NULL} to space them evenly (the default used by
 \code{\link[grid:linearGradient]{grid::linearGradient()}}/\code{\link[grid:radialGradient]{grid::radialGradient()}}). Default \code{NULL}.}
 
 \item{spacing}{Tile size, as a fraction of the target's bounding box.

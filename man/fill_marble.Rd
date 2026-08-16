@@ -5,7 +5,7 @@
 \title{Marbled, veined texture fill}
 \usage{
 fill_marble(
-  colors = c("white", "black"),
+  color = c("white", "black"),
   spacing = 0.5,
   aspect = 1,
   resolution = 32L,
@@ -18,7 +18,7 @@ fill_marble(
 )
 }
 \arguments{
-\item{colors}{Two or more colours blended across each band, in order,
+\item{color}{Two or more colours blended across each band, in order,
 via \code{grDevices::colorRamp()}. Default \code{c("white", "black")}.}
 
 \item{spacing}{Baseline tile size, as a fraction of the target's bounding
@@ -70,7 +70,7 @@ function to another (here, inside a further \code{sin()}) stays periodic, so
 the combined result still tiles with no seam.
 
 Unlike \code{\link[=fill_noise]{fill_noise()}} (opacity of one colour), the banding is rendered
-as a blend across \code{colors} via \code{grDevices::colorRamp()}, since a marble
+as a blend across \code{color} via \code{grDevices::colorRamp()}, since a marble
 texture's visual interest is the veining pattern itself rather than a
 fade to transparency.
 
@@ -87,12 +87,12 @@ draw(shape_circle(fill = fill_marble(stripes = 8L, warp = 8, seed = 1274L)))
 
 # a different colour pair changes the veining's contrast entirely
 draw(shape_circle(
-  fill = fill_marble(colors = c("black", "goldenrod"), stripes = 4L, seed = 1274L)
+  fill = fill_marble(color = c("black", "goldenrod"), stripes = 4L, seed = 1274L)
 ))
 
 # three or more colours blend across the band in sequence
 draw(shape_circle(
-  fill = fill_marble(colors = c("black", "goldenrod", "white"), stripes = 4L, seed = 1274L)
+  fill = fill_marble(color = c("black", "goldenrod", "white"), stripes = 4L, seed = 1274L)
 ))
 
 }

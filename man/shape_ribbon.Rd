@@ -81,7 +81,7 @@ draw(shape_ribbon(
 
 draw(shape_ribbon(
   x = 0, y = 0, xend = 2, yend = 0, width = 0.4,
-  fill = fill_gradient(colors = c("steelblue", "white"))
+  fill = fill_gradient(color = c("steelblue", "white"))
 ))
 
 draw(shape_ribbons(x = 1:3, y = 0, xend = 2:4, yend = 1, width = 0.3))

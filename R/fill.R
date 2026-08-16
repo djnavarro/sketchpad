@@ -343,16 +343,16 @@ fill_crosshatch <- function(color = "black",
 #' [fill_crosshatch()] already falls back to when `angle` is a multiple of
 #' 90 degrees, pulled out into its own helper.
 #'
-#' The tile is subdivided into an `n x n` grid, where `n = length(colors)`.
-#' The colour at grid cell `(row, col)` (0-indexed) is `colors[((row + col)
+#' The tile is subdivided into an `n x n` grid, where `n = length(color)`.
+#' The colour at grid cell `(row, col)` (0-indexed) is `color[((row + col)
 #' %% n) + 1]` -- for the default two colours this reproduces the classic
-#' 2x2 checkerboard exactly; a longer `colors` vector grows the grid rather
+#' 2x2 checkerboard exactly; a longer `color` vector grows the grid rather
 #' than adding a separate density argument, since a checkerboard's cell size
 #' and colour count aren't independent concepts here.
 #'
 #' @section Known rendering risk with three or more colours: The default
 #'   two-colour, four-rectangle tile has always rendered correctly, but
-#'   `colors` vectors of length 3 or more (a 3x3 or larger grid of
+#'   `color` vectors of length 3 or more (a 3x3 or larger grid of
 #'   rectangles) were found, at the default `spacing`, to trigger the same
 #'   upstream `grid`/Cairo issue documented at [fill_stipple()]'s "Known
 #'   rendering risk" section -- several shapes inside a genuinely *repeated*
@@ -360,7 +360,7 @@ fill_crosshatch <- function(color = "black",
 #'   single solid colour instead of a grid), even though the same tile
 #'   content renders correctly as a single, non-repeated tile (`spacing =
 #'   1`). **Visually check rendered output** before relying on more than
-#'   two `colors` for anything beyond casual use.
+#'   two `color`s for anything beyond casual use.
 #'
 #' As with the other `fill_*()` helpers, [grid::pattern()] tiles are sized
 #' as a fraction of the target polygon's own bounding box rather than a
@@ -370,7 +370,7 @@ fill_crosshatch <- function(color = "black",
 #' squaring technique [fill_stipple()] uses for its dots -- so the default
 #' `aspect = 1` is only exact for a square bounding box.
 #'
-#' @param colors Two or more checker colours. Default `c("black", "white")`.
+#' @param color Two or more checker colours. Default `c("black", "white")`.
 #' @param spacing Baseline tile size, as a fraction of the target's bounding
 #'   box. Must be a positive number. Default `0.2`.
 #' @inheritParams fill_hatch
@@ -379,25 +379,25 @@ fill_crosshatch <- function(color = "black",
 #'   use as the `fill` argument to [grid::gpar()].
 #'
 #' @examples
-#' draw(shape_circle(fill = fill_checker(colors = c("black", "white"))))
+#' draw(shape_circle(fill = fill_checker(color = c("black", "white"))))
 #'
 #' # a coarser, differently-coloured checkerboard
-#' draw(shape_circle(fill = fill_checker(colors = c("steelblue", "white"), spacing = 0.4)))
+#' draw(shape_circle(fill = fill_checker(color = c("steelblue", "white"), spacing = 0.4)))
 #'
 #' # three or more colours grow the grid rather than alternating just two;
 #' # spacing = 1 avoids the tile-repetition rendering risk noted above
-#' draw(shape_circle(fill = fill_checker(colors = c("steelblue", "white", "tomato"), spacing = 1)))
+#' draw(shape_circle(fill = fill_checker(color = c("steelblue", "white", "tomato"), spacing = 1)))
 #'
 #' @family fill helpers
 #' @export
-fill_checker <- function(colors = c("black", "white"),
+fill_checker <- function(color = c("black", "white"),
                           spacing = 0.2,
                           aspect = 1,
                           extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
-  validate_colors(colors, "colors", min_length = 2)
+  validate_colors(color, "color", min_length = 2)
 
-  n <- length(colors)
+  n <- length(color)
   cell <- 1 / n
   cells <- expand.grid(row = seq(0, n - 1), col = seq(0, n - 1))
   quadrant <- function(x, y, color) {
@@ -412,7 +412,7 @@ fill_checker <- function(colors = c("black", "white"),
     quadrant(
       x = (col + 0.5) * cell,
       y = 1 - (row + 0.5) * cell,
-      color = colors[color_index]
+      color = color[color_index]
     )
   })
   content <- grid::grobTree(do.call(grid::gList, rects))
@@ -591,7 +591,7 @@ fill_stipple <- function(color = "black",
 #'   integer. Default `6L`.
 #' @param size `unit`'s rescaled size, as a `"npc"` fraction of the tile.
 #'   Must be a number strictly between `0` and `1`. Default `0.2`.
-#' @param colors `NULL`, or one or more colours overriding `unit@style@color`
+#' @param color `NULL`, or one or more colours overriding `unit@style@color`
 #'   for each stamp, recycled (in order, not randomly) across the `n`
 #'   copies. `NULL` (the default) colours every stamp from `unit`'s own
 #'   style, as before this argument existed.
@@ -617,9 +617,9 @@ fill_stipple <- function(color = "black",
 #'   fill = fill_scatter(unit = shape_polygon(n = 3L, fill = "steelblue"), n = 10L, size = 0.2)
 #' ))
 #'
-#' # a colors vector overrides unit's own style colour, recycled per stamp
+#' # a color vector overrides unit's own style colour, recycled per stamp
 #' draw(shape_circle(
-#'   fill = fill_scatter(colors = c("steelblue", "tomato", "goldenrod"), n = 9L, size = 0.15)
+#'   fill = fill_scatter(color = c("steelblue", "tomato", "goldenrod"), n = 9L, size = 0.15)
 #' ))
 #'
 #' @family fill helpers
@@ -627,7 +627,7 @@ fill_stipple <- function(color = "black",
 fill_scatter <- function(unit = shape_circle(radius = 1),
                           n = 6L,
                           size = 0.2,
-                          colors = NULL,
+                          color = NULL,
                           spacing = 1,
                           aspect = 1,
                           seed = 1L,
@@ -642,8 +642,8 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
   if (!is.numeric(n) || length(n) != 1 || n < 1 || n != round(n)) {
     rlang::abort("n must be a single positive integer")
   }
-  if (!is.null(colors)) {
-    validate_colors(colors, "colors")
+  if (!is.null(color)) {
+    validate_colors(color, "color")
   }
   if (!is.numeric(seed) || length(seed) != 1 || seed != round(seed)) {
     rlang::abort("seed must be a single integer")
@@ -675,7 +675,7 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
     }
   )
 
-  stamp_colors <- if (is.null(colors)) rep(unit@style@color, n) else rep_len(colors, n)
+  stamp_colors <- if (is.null(color)) rep(unit@style@color, n) else rep_len(color, n)
 
   stamps <- purrr::pmap(list(cx, cy, stamp_colors), function(ccx, ccy, ccol) {
     grid::polygonGrob(
@@ -1202,7 +1202,7 @@ fill_noise <- function(color = "black",
 #' the combined result still tiles with no seam.
 #'
 #' Unlike [fill_noise()] (opacity of one colour), the banding is rendered
-#' as a blend across `colors` via `grDevices::colorRamp()`, since a marble
+#' as a blend across `color` via `grDevices::colorRamp()`, since a marble
 #' texture's visual interest is the veining pattern itself rather than a
 #' fade to transparency.
 #'
@@ -1211,7 +1211,7 @@ fill_noise <- function(color = "black",
 #' the turbulence field into a visibly sharper edge in a band than the
 #' same mismatch would produce in a plain opacity fade.
 #'
-#' @param colors Two or more colours blended across each band, in order,
+#' @param color Two or more colours blended across each band, in order,
 #'   via `grDevices::colorRamp()`. Default `c("white", "black")`.
 #' @param stripes Number of bands running around the tile's `u` axis before
 #'   turbulence displacement. Must be a positive integer. Default `3L`.
@@ -1232,17 +1232,17 @@ fill_noise <- function(color = "black",
 #'
 #' # a different colour pair changes the veining's contrast entirely
 #' draw(shape_circle(
-#'   fill = fill_marble(colors = c("black", "goldenrod"), stripes = 4L, seed = 1274L)
+#'   fill = fill_marble(color = c("black", "goldenrod"), stripes = 4L, seed = 1274L)
 #' ))
 #'
 #' # three or more colours blend across the band in sequence
 #' draw(shape_circle(
-#'   fill = fill_marble(colors = c("black", "goldenrod", "white"), stripes = 4L, seed = 1274L)
+#'   fill = fill_marble(color = c("black", "goldenrod", "white"), stripes = 4L, seed = 1274L)
 #' ))
 #'
 #' @family fill helpers
 #' @export
-fill_marble <- function(colors = c("white", "black"),
+fill_marble <- function(color = c("white", "black"),
                          spacing = 0.5,
                          aspect = 1,
                          resolution = 32L,
@@ -1253,7 +1253,7 @@ fill_marble <- function(colors = c("white", "black"),
                          seed = 1L,
                          extend = "repeat") {
   validate_fill_args(NULL, spacing, aspect)
-  validate_colors(colors, "colors", min_length = 2)
+  validate_colors(color, "color", min_length = 2)
   if (!is.numeric(resolution) || length(resolution) != 1 ||
         resolution < 2 || resolution != round(resolution)) {
     rlang::abort("resolution must be a single integer of at least 2")
@@ -1286,7 +1286,7 @@ fill_marble <- function(colors = c("white", "black"),
   # the whole expression periodic in both tile directions -- see details
   value <- (sin(grid_uv$theta_u * round(stripes) + warp * turbulence) + 1) / 2
 
-  ramp <- grDevices::colorRamp(colors)
+  ramp <- grDevices::colorRamp(color)
   rgb <- ramp(value) / 255
   pixels <- matrix(
     grDevices::rgb(rgb[, 1], rgb[, 2], rgb[, 3]),
@@ -1631,12 +1631,12 @@ fill_image <- function(image,
 #' is invisibly clipped away by the target's own outline. Set `spacing < 1`
 #' for a repeating pattern of small gradient motifs instead.
 #'
-#' @param colors Two or more colours to interpolate between.
+#' @param color Two or more colours to interpolate between.
 #' @param type Either `"linear"` or `"radial"`. Default `"linear"`.
 #' @param angle Gradient direction in degrees, for `type = "linear"` only
 #'   (ignored for `"radial"`). Default `45`.
 #' @param stops Colour stop positions, as a numeric vector the same length
-#'   as `colors`, or `NULL` to space them evenly (the default used by
+#'   as `color`, or `NULL` to space them evenly (the default used by
 #'   [grid::linearGradient()]/[grid::radialGradient()]). Default `NULL`.
 #' @param spacing Tile size, as a fraction of the target's bounding box.
 #'   Must be a positive number. Default `1` (one tile spans the whole
@@ -1664,7 +1664,7 @@ fill_image <- function(image,
 #'
 #' @family fill helpers
 #' @export
-fill_gradient <- function(colors = c("white", "black"),
+fill_gradient <- function(color = c("white", "black"),
                            type = c("linear", "radial"),
                            angle = 45,
                            stops = NULL,
@@ -1673,17 +1673,17 @@ fill_gradient <- function(colors = c("white", "black"),
                            extend = "pad") {
   type <- match.arg(type)
   validate_fill_args(NULL, spacing, aspect)
-  if (!is.character(colors) || length(colors) < 2) {
-    rlang::abort("colors must be a character vector of at least length 2")
+  if (!is.character(color) || length(color) < 2) {
+    rlang::abort("color must be a character vector of at least length 2")
   }
-  if (!is.null(stops) && (!is.numeric(stops) || length(stops) != length(colors))) {
-    rlang::abort("stops must be NULL, or a numeric vector the same length as colors")
+  if (!is.null(stops) && (!is.numeric(stops) || length(stops) != length(color))) {
+    rlang::abort("stops must be NULL, or a numeric vector the same length as color")
   }
   if (!is.numeric(angle) || length(angle) != 1) {
     rlang::abort("angle must be a single number")
   }
 
-  gradient_args <- list(colours = colors, extend = extend)
+  gradient_args <- list(colours = color, extend = extend)
   if (!is.null(stops)) {
     gradient_args$stops <- stops
   }
@@ -1844,15 +1844,15 @@ fill_vignette <- function(color = "black",
 #' whole target shape, exactly as [fill_gradient()] does by default -- not
 #' to create repetition, which the gradient already provides.
 #'
-#' Each of the `n = length(colors)` colours gets an equal-width band by
+#' Each of the `n = length(color)` colours gets an equal-width band by
 #' default (`1/n` of the period); there's no separate argument for unequal
-#' bands -- repeat a colour in `colors` instead (e.g. `c("steelblue",
+#' bands -- repeat a colour in `color` instead (e.g. `c("steelblue",
 #' "steelblue", "white")` gives a 2:1 ratio between the two colours), which
 #' reuses the same recycling mechanism rather than adding a second one.
 #'
-#' @param colors Two or more stripe colours, one equal-width band each (see
+#' @param color Two or more stripe colours, one equal-width band each (see
 #'   details for biasing band widths). Default `c("black", "white")`.
-#' @param spacing One full period through all of `colors`, as a fraction of
+#' @param spacing One full period through all of `color`, as a fraction of
 #'   the target's bounding box. Must be a positive number. Default `0.2`.
 #' @param extend Passed to the inner [grid::linearGradient()], controlling
 #'   what happens beyond the colour stops -- *not* to the outer
@@ -1867,27 +1867,27 @@ fill_vignette <- function(color = "black",
 #' draw(shape_circle(fill = fill_stripe(angle = 30)))
 #'
 #' # repeating a colour biases the band widths, rather than a separate argument
-#' draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "steelblue", "white"))))
+#' draw(shape_circle(fill = fill_stripe(color = c("steelblue", "steelblue", "white"))))
 #'
 #' # narrower spacing gives more, thinner stripes
 #' draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
 #'
 #' # three or more colours repeat through the same period
-#' draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "white", "tomato"), angle = 30)))
+#' draw(shape_circle(fill = fill_stripe(color = c("steelblue", "white", "tomato"), angle = 30)))
 #'
 #' @family fill helpers
 #' @export
-fill_stripe <- function(colors = c("black", "white"),
+fill_stripe <- function(color = c("black", "white"),
                          angle = 45,
                          spacing = 0.2,
                          aspect = 1,
                          extend = "repeat") {
   validate_fill_args(angle, spacing, aspect)
-  validate_colors(colors, "colors", min_length = 2)
+  validate_colors(color, "color", min_length = 2)
 
-  n <- length(colors)
+  n <- length(color)
   bounds <- seq(0, 1, length.out = n + 1)
-  band_colors <- rep(colors, each = 2)
+  band_colors <- rep(color, each = 2)
   stops <- as.vector(rbind(bounds[-(n + 1)], bounds[-1]))
 
   theta <- angle * pi / 180

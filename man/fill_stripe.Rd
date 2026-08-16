@@ -5,7 +5,7 @@
 \title{Striped pattern fill}
 \usage{
 fill_stripe(
-  colors = c("black", "white"),
+  color = c("black", "white"),
   angle = 45,
   spacing = 0.2,
   aspect = 1,
@@ -13,13 +13,13 @@ fill_stripe(
 )
 }
 \arguments{
-\item{colors}{Two or more stripe colours, one equal-width band each (see
+\item{color}{Two or more stripe colours, one equal-width band each (see
 details for biasing band widths). Default \code{c("black", "white")}.}
 
 \item{angle}{Hatch angle in degrees, measured counterclockwise from the
 positive x-axis. Default \code{45}.}
 
-\item{spacing}{One full period through all of \code{colors}, as a fraction of
+\item{spacing}{One full period through all of \code{color}, as a fraction of
 the target's bounding box. Must be a positive number. Default \code{0.2}.}
 
 \item{aspect}{Width-to-height ratio of the target polygon's bounding box.
@@ -56,22 +56,22 @@ but only once, as a single square (aspect-corrected) tile spanning the
 whole target shape, exactly as \code{\link[=fill_gradient]{fill_gradient()}} does by default -- not
 to create repetition, which the gradient already provides.
 
-Each of the \code{n = length(colors)} colours gets an equal-width band by
+Each of the \code{n = length(color)} colours gets an equal-width band by
 default (\code{1/n} of the period); there's no separate argument for unequal
-bands -- repeat a colour in \code{colors} instead (e.g. \code{c("steelblue", "steelblue", "white")} gives a 2:1 ratio between the two colours), which
+bands -- repeat a colour in \code{color} instead (e.g. \code{c("steelblue", "steelblue", "white")} gives a 2:1 ratio between the two colours), which
 reuses the same recycling mechanism rather than adding a second one.
 }
 \examples{
 draw(shape_circle(fill = fill_stripe(angle = 30)))
 
 # repeating a colour biases the band widths, rather than a separate argument
-draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "steelblue", "white"))))
+draw(shape_circle(fill = fill_stripe(color = c("steelblue", "steelblue", "white"))))
 
 # narrower spacing gives more, thinner stripes
 draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
 
 # three or more colours repeat through the same period
-draw(shape_circle(fill = fill_stripe(colors = c("steelblue", "white", "tomato"), angle = 30)))
+draw(shape_circle(fill = fill_stripe(color = c("steelblue", "white", "tomato"), angle = 30)))
 
 }
 \seealso{

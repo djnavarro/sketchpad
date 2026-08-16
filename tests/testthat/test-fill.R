@@ -92,9 +92,9 @@ test_that("fill_checker() validates its arguments", {
   expect_error(fill_checker(spacing = -1), "spacing")
   expect_error(fill_checker(aspect = 0), "aspect")
   expect_error(fill_checker(aspect = -1), "aspect")
-  expect_error(fill_checker(colors = 1), "colors")
-  expect_error(fill_checker(colors = "black"), "colors") # needs at least 2
-  expect_error(fill_checker(colors = NA_character_), "colors")
+  expect_error(fill_checker(color = 1), "color")
+  expect_error(fill_checker(color = "black"), "color") # needs at least 2
+  expect_error(fill_checker(color = NA_character_), "color")
 })
 
 test_that("fill_checker() works with a non-default aspect ratio", {
@@ -107,7 +107,7 @@ test_that("fill_checker() tile content has four quadrant rectangles for two colo
 })
 
 test_that("fill_checker() grid grows with the number of colours", {
-  children <- environment(fill_checker(colors = c("red", "white", "blue"))$f)$grob$children
+  children <- environment(fill_checker(color = c("red", "white", "blue"))$f)$grob$children
   expect_length(children, 9)
 })
 
@@ -121,9 +121,9 @@ test_that("fill_stripe() validates its arguments", {
   expect_error(fill_stripe(aspect = 0), "aspect")
   expect_error(fill_stripe(aspect = -1), "aspect")
   expect_error(fill_stripe(angle = c(1, 2)), "angle")
-  expect_error(fill_stripe(colors = 1), "colors")
-  expect_error(fill_stripe(colors = "black"), "colors") # needs at least 2
-  expect_error(fill_stripe(colors = NA_character_), "colors")
+  expect_error(fill_stripe(color = 1), "color")
+  expect_error(fill_stripe(color = "black"), "color") # needs at least 2
+  expect_error(fill_stripe(color = NA_character_), "color")
 })
 
 test_that("fill_stripe() works with a non-default aspect ratio", {
@@ -137,13 +137,13 @@ test_that("fill_stripe() tile content is filled with a hard-stop linear gradient
 })
 
 test_that("fill_stripe() uses equal-width bands for three or more colours", {
-  gradient <- environment(fill_stripe(colors = c("red", "white", "blue"))$f)$grob$gp$fill
+  gradient <- environment(fill_stripe(color = c("red", "white", "blue"))$f)$grob$gp$fill
   expect_identical(gradient$colours, c("red", "red", "white", "white", "blue", "blue"))
   expect_equal(gradient$stops, c(0, 1 / 3, 1 / 3, 2 / 3, 2 / 3, 1))
 })
 
 test_that("fill_stripe() biases band width by repeating a colour", {
-  gradient <- environment(fill_stripe(colors = c("red", "red", "blue"))$f)$grob$gp$fill
+  gradient <- environment(fill_stripe(color = c("red", "red", "blue"))$f)$grob$gp$fill
   expect_identical(gradient$colours, c("red", "red", "red", "red", "blue", "blue"))
 })
 
@@ -252,12 +252,12 @@ test_that("fill_scatter() is reproducible for a given seed", {
   expect_false(identical(extract_x(fill_a), extract_x(fill_c)))
 })
 
-test_that("fill_scatter() validates its colors argument", {
-  expect_error(fill_scatter(colors = 1), "colors")
-  expect_error(fill_scatter(colors = NA_character_), "colors")
+test_that("fill_scatter() validates its color argument", {
+  expect_error(fill_scatter(color = 1), "color")
+  expect_error(fill_scatter(color = NA_character_), "color")
 })
 
-test_that("fill_scatter() defaults to unit's own style colour when colors is NULL", {
+test_that("fill_scatter() defaults to unit's own style colour when color is NULL", {
   unit <- shape_circle(radius = 1, color = "forestgreen")
   fill <- fill_scatter(unit = unit, n = 3L)
   children <- environment(fill$f)$grob$children
@@ -265,9 +265,9 @@ test_that("fill_scatter() defaults to unit's own style colour when colors is NUL
   expect_true(all(cols == "forestgreen"))
 })
 
-test_that("fill_scatter() recycles a colors vector, overriding unit's own colour", {
+test_that("fill_scatter() recycles a color vector, overriding unit's own colour", {
   unit <- shape_circle(radius = 1, color = "forestgreen")
-  fill <- fill_scatter(unit = unit, n = 4L, colors = c("steelblue", "tomato"))
+  fill <- fill_scatter(unit = unit, n = 4L, color = c("steelblue", "tomato"))
   children <- environment(fill$f)$grob$children
   cols <- unname(purrr::map_chr(children, \(g) g$gp$col))
   expect_identical(cols, rep(c("steelblue", "tomato"), length.out = 4))
@@ -483,9 +483,9 @@ test_that("fill_marble() validates its arguments", {
   expect_error(fill_marble(spacing = -1), "spacing")
   expect_error(fill_marble(aspect = 0), "aspect")
   expect_error(fill_marble(aspect = -1), "aspect")
-  expect_error(fill_marble(colors = 1), "colors")
-  expect_error(fill_marble(colors = "black"), "colors") # needs at least 2
-  expect_error(fill_marble(colors = NA_character_), "colors")
+  expect_error(fill_marble(color = 1), "color")
+  expect_error(fill_marble(color = "black"), "color") # needs at least 2
+  expect_error(fill_marble(color = NA_character_), "color")
   expect_error(fill_marble(resolution = 1), "resolution")
   expect_error(fill_marble(resolution = 4.5), "resolution")
   expect_error(fill_marble(stripes = 0), "stripes")
@@ -510,15 +510,15 @@ test_that("fill_marble() is reproducible for a given seed", {
   expect_false(identical(extract_raster(fill_a), extract_raster(fill_c)))
 })
 
-test_that("fill_marble() uses only colors in its raster", {
-  fill <- fill_marble(colors = c("white", "black"), resolution = 8L)
+test_that("fill_marble() uses only color in its raster", {
+  fill <- fill_marble(color = c("white", "black"), resolution = 8L)
   raster <- environment(fill$f)$grob$raster
   channels <- t(grDevices::col2rgb(as.vector(raster)))
   expect_true(all(channels[, 1] == channels[, 2] & channels[, 2] == channels[, 3]))
 })
 
 test_that("fill_marble() blends across three or more colours", {
-  fill <- fill_marble(colors = c("red", "white", "blue"), resolution = 8L)
+  fill <- fill_marble(color = c("red", "white", "blue"), resolution = 8L)
   raster <- environment(fill$f)$grob$raster
   channels <- t(grDevices::col2rgb(as.vector(raster)))
   expect_gt(length(unique(channels[, "red"])), 1)
@@ -636,15 +636,15 @@ test_that("fill_gradient() validates its arguments", {
   expect_error(fill_gradient(spacing = -1), "spacing")
   expect_error(fill_gradient(aspect = 0), "aspect")
   expect_error(fill_gradient(aspect = -1), "aspect")
-  expect_error(fill_gradient(colors = "black"), "colors")
-  expect_error(fill_gradient(colors = 1), "colors")
+  expect_error(fill_gradient(color = "black"), "color")
+  expect_error(fill_gradient(color = 1), "color")
   expect_error(fill_gradient(stops = 0.5), "stops")
   expect_error(fill_gradient(angle = c(1, 2)), "angle")
   expect_error(fill_gradient(type = "diagonal"))
 })
 
 test_that("fill_gradient() accepts custom stops", {
-  fill <- fill_gradient(colors = c("red", "white", "blue"), stops = c(0, 0.2, 1))
+  fill <- fill_gradient(color = c("red", "white", "blue"), stops = c(0, 0.2, 1))
   expect_s3_class(fill, "GridPattern")
 })
 

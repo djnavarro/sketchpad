@@ -513,16 +513,16 @@ outline, since every `drawable` currently draws a closed
 `fill_hatch()`/`fill_crosshatch()` (diagonal hatching, sharing a
 tile-shape technique -- see below; `fill_crosshatch()`'s `color` accepts a
 vector recycled across its two lines), `fill_checker()` (a checkerboard
-generalized from two colours to an `n x n` grid, `n = length(colors)`),
-`fill_stripe()` (equal-width alternating bands, one per `colors` entry,
+generalized from two colours to an `n x n` grid, `n = length(color)`),
+`fill_stripe()` (equal-width alternating bands, one per `color` entry,
 via a self-repeating hard-stop `grid::linearGradient()`, not tile
-repetition -- repeat a colour in `colors` to bias band widths, rather than
+repetition -- repeat a colour in `color` to bias band widths, rather than
 a separate width argument),
 `fill_stipple()`/`fill_scatter()`/`fill_halftone()` (scattered dots /
 arbitrary drawables / randomised-radius dots, all seeded via
 `withr::with_seed()` like `shape_blob()`'s noise -- see "Known rendering risk"
 in `fill_stipple()`'s docs; `fill_stipple()`/`fill_halftone()`'s `color` and
-`fill_scatter()`'s `colors` each recycle a vector deterministically across
+`fill_scatter()`'s `color` each recycle a vector deterministically across
 the scattered dots/stamps, `fill_scatter()`'s `NULL` default still colouring
 every stamp from `unit`'s own style), `fill_scribble()` (wandering lines
 built from random integer-frequency sine harmonics via the internal
@@ -555,12 +555,15 @@ object from `grid::pattern()`, sharing the base S3 class `"GridPattern"`.
 **Colour-vector generalization.** `fill_noise()`, `fill_flow()`,
 `fill_marble()`, `fill_checker()`, `fill_stripe()`, `fill_vignette()`,
 `fill_stipple()`, `fill_halftone()`, `fill_scribble()`, `fill_crosshatch()`,
-and `fill_scatter()` all accept a vector of colours (an arbitrary-length
-`colors` argument for `fill_checker()`/`fill_marble()`/`fill_stripe()`,
-replacing their old `color1`/`color2` pair -- a breaking rename with no
-deprecation shim, since this is a pre-1.0 package with no other consumers
-in this workspace; a widened `color`/`colors` accepting one *or more*
-colours everywhere else, fully backward compatible with a single string).
+and `fill_scatter()` all accept a vector of colours via a single `color`
+argument -- named `colors` (plural) on `fill_checker()`/`fill_marble()`/
+`fill_stripe()`/`fill_gradient()` during initial development (replacing
+`fill_checker()`/`fill_marble()`/`fill_stripe()`'s older `color1`/`color2`
+pair), then renamed to `color` everywhere for consistency with every
+other `fill_*()` helper -- a breaking rename with no deprecation shim,
+since this is a pre-1.0 package with no other consumers in this
+workspace. Every `fill_*()` helper's colour-vector argument is `color`,
+fully backward compatible with a single string.
 Two distinct generalization patterns are used, matching what each helper's
 existing multiplicity already was:
 
@@ -583,7 +586,7 @@ existing multiplicity already was:
   one colour vanishing arbitrarily before the others).
 - **`fill_checker()`** doesn't fit either pattern cleanly -- a
   checkerboard's cell count and colour count aren't independent concepts
-  -- so its `n x n` grid grows with `length(colors)` instead: colour index
+  -- so its `n x n` grid grows with `length(color)` instead: colour index
   at 0-based cell `(row, col)` is `((row + col) %% n) + 1`, which
   reproduces the original 2x2 diagonal arrangement exactly for two
   colours. Three or more colours (a 3x3+ grid) can trigger the known
@@ -591,8 +594,10 @@ existing multiplicity already was:
   "Known rendering risk" bullet in "Gotchas worth remembering".
 
 Shared validation for all of these lives in the internal
-`validate_colors(colors, arg_name, min_length = 1)`, alongside
-`validate_fill_args()` (see below).
+`validate_colors(colors, arg_name, min_length = 1)` -- an internal
+helper, so its own `colors` formal doesn't need to match every caller's
+public `color` argument name, which is passed through as `arg_name` for
+the error message -- alongside `validate_fill_args()` (see below).
 
 The unifying design constraint across all of them: `grid::pattern()`
 tiles are sized as a fraction of the *target polygon's own bounding box*,
@@ -618,6 +623,53 @@ Shared argument validation lives in the internal `validate_fill_args()`
 (spacing/aspect, with an optional angle check via `angle = NULL`) and
 `validate_colors()` (a character vector of at least `min_length`, no `NA`s
 -- see "Colour-vector generalization" above).
+
+### The `palette_*()` colour-vector family
+
+`R/palette.R` holds two functions, unrelated to any `drawable`/S7 class:
+each returns a plain character vector of `n` hex colours, for use
+anywhere a `fill_*()` helper or `style()` already accepts a `color`
+vector.
+
+- **`palette_manual(n = NULL, index = 1L)`** selects one palette from
+  `manual_palettes`, an internal (`R/sysdata.rda`) vendored,
+  deduplicated copy of the curated palettes at
+  <https://github.com/djnavarro/palettes> (originally 5 CSVs of
+  5-colour hex palettes each; whole-row exact duplicates across the 5
+  files were dropped when vendoring, leaving 311 as of the 2026-08-16
+  vendoring pass -- see `data-raw/build_manual_palettes.R`, run by hand
+  to regenerate `manual_palettes` if the source repo changes, not part
+  of the normal package build). `n = NULL` (the default) returns the
+  selected palette's own colours (5, for every currently vendored
+  palette) unchanged; a supplied `n` interpolates via
+  `grDevices::colorRampPalette()`, so it can up- or down-sample freely.
+  An out-of-range `index` errors with the actual valid range spliced
+  into the message, rather than a docs-hardcoded count that could drift
+  if the vendored data is regenerated.
+- **`palette_cosine(n, base = NULL, seed = 1L)`** ports the "linear
+  cosine palette" technique described at
+  <https://blog.djnavarro.net/posts/2025-09-14_cosine-palettes/> (itself
+  a minor tweak on Iñigo Quilez's procedural-palette formula):
+  `f(t) = a + b * cos(2 * pi * (c * t + d))`, with `a = (0.5, 0.5, 0.5)`
+  fixed and `b`/`c`/`d` each an RGB triple sampled with replacement from
+  `base` (`NULL` defaults to `grDevices::colors(distinct = TRUE)`,
+  matching the blog). `seed` defaults to `1L` (always seeded, matching
+  this package's own convention -- e.g. `fill_stipple(seed = 1L)` --
+  rather than the blog's optional `NULL`), scoped via
+  `withr::with_seed()` exactly as `fill_stipple()`/`fill_scatter()`/
+  `fill_halftone()` already do. Faithfully carries over one quirk from
+  the source algorithm: resulting values are clamped only on the high
+  end (`pal[pal > 1] <- 1`); values below 0 are folded back with
+  `abs()` rather than clamped to 0, occasionally producing a colour
+  "reflected" around black rather than a flat black -- documented on
+  the function itself as intentional, not a bug.
+
+Both are ordinary functions (not S7 classes), so -- like
+`vectorize.R`/`effects.R` -- their exact `Collate` position doesn't
+actually matter; `R/palette.R` is collated right after `R/fill.R`
+purely for thematic grouping (colour-producing helpers). Neither has a
+vectorized plural form, since each already returns a vector of
+colours rather than a `drawable`.
 
 ### Compositional effects: the `effect_*()` family
 
@@ -848,7 +900,7 @@ full debugging narrative):
   since `fill_stipple()`'s whole purpose requires genuine tile repetition.
   `fill_checker()`'s colour-vector generalization hit the same issue for
   the first time when its checkerboard grid grew past 2x2 (the original
-  2x2/4-rectangle tile always rendered fine; a `colors` vector of length 3
+  2x2/4-rectangle tile always rendered fine; a `color` vector of length 3
   or more, and its correspondingly larger grid, can collapse to a single
   solid colour at the default `spacing` -- confirmed by re-rendering with
   `spacing = 1`, where the same content renders correctly). Documented on
@@ -902,6 +954,13 @@ full debugging narrative):
 - `R/fill.R` -- the `fill_*()` texture family, loaded first: no
   compile-time dependency on any other class, but `style.R` needs
   `fill_solid()` to exist for its own property default.
+- `R/palette.R` -- the `palette_*()` colour-vector family
+  (`palette_manual()`/`palette_cosine()`, see above). Ordinary
+  functions with no dependency on any class, collated right after
+  `fill.R` purely for thematic grouping -- like `vectorize.R`, its exact
+  `Collate` position doesn't actually matter. Uses the internal
+  `manual_palettes` object vendored into `R/sysdata.rda` via
+  `data-raw/build_manual_palettes.R`.
 - `R/noise_field.R` -- the `noise_field` class and `noise_sample()`
   generic, loaded right after `fill.R`: no compile-time dependency on any
   other class, but `shape_blob.R`/`shape_ribbon.R`/`shape_twist.R`
@@ -1004,7 +1063,8 @@ full debugging narrative):
   `.onLoad()` calling `S7::methods_register()`, and the
   `globalVariables("properties")` workaround.
 - `DESCRIPTION`'s `Collate` field pins the load order above explicitly
-  (fill -> noise_field -> noise_bridge -> trans -> style -> xy -> drawable
+  (fill -> palette -> noise_field -> noise_bridge -> trans -> style -> xy
+  -> drawable
   -> shape_bezier -> curve_bezier -> curve_line ->
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
   -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
@@ -1053,9 +1113,10 @@ full debugging narrative):
   `@family 0D points` for `points_raw()`; `@family fill helpers` for
   every `fill_*()` constructor; `@family noise helpers` for `noise_field`/
   `noise_bridge`/`noise_sample`; `@family transform helpers` for `trans`/
-  every `trans_*()` constructor. **Any new drawable, fill helper,
-  noise helper, or transform helper needs the matching `@family` tag
-  added alongside its `@export`.**
+  every `trans_*()` constructor; `@family palette helpers` for
+  `palette_manual()`/`palette_cosine()`. **Any new drawable, fill helper,
+  noise helper, transform helper, or palette helper needs the matching
+  `@family` tag added alongside its `@export`.**
 
 ## Development workflow
 

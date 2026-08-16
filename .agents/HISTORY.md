@@ -2067,3 +2067,29 @@ pattern object's own structure) that `fill_checker()`, `fill_marble()`,
 `fill_noise()`, `fill_stripe()`, and `fill_vignette()` all render multi-
 colour output as designed. Package checks cleanly (0 errors/warnings/
 notes) after the change.
+
+## `colors` -> `color` rename across `fill_checker()`/`fill_scatter()`/`fill_marble()`/`fill_gradient()`/`fill_stripe()`
+
+Fixed a naming inconsistency left over from the colour-vector
+generalization work above: `fill_checker()`, `fill_scatter()`,
+`fill_marble()`, `fill_gradient()`, and `fill_stripe()` had all ended up
+with a plural `colors` argument, while every other `fill_*()` helper
+accepting a colour vector (`fill_noise()`, `fill_flow()`,
+`fill_stipple()`, `fill_halftone()`, `fill_scribble()`, `fill_crosshatch()`,
+`fill_vignette()`) used the singular `color`. Renamed all five to `color`
+for consistency -- a breaking rename with no deprecation shim, same
+rationale as the earlier `color1`/`color2` -> `colors` rename (pre-1.0
+package, no other consumers in this workspace). Every `fill_*()` helper's
+colour-vector argument is now uniformly named `color`, singular or
+plural value alike.
+
+The internal `validate_colors(colors, arg_name, min_length = 1)`
+helper's own formal argument was left named `colors` -- it's not part of
+the public API, and every call site already passes its own `color`
+argument through positionally with `arg_name` supplying the right name
+for error messages, so there was nothing user-visible to fix there.
+
+Updated every affected function's roxygen docs (`@param`, prose,
+`@examples`) and `tests/testthat/test-fill.R`'s argument names and
+expected-error regexes to match. Package checks cleanly (0 errors/
+warnings/notes) after the change.

@@ -27,7 +27,7 @@
 #'
 #' draw(shape_ribbon(
 #'   x = 0, y = 0, xend = 2, yend = 0, width = 0.4,
-#'   fill = fill_gradient(colors = c("steelblue", "white"))
+#'   fill = fill_gradient(color = c("steelblue", "white"))
 #' ))
 #'
 #' @family 2D shapes
