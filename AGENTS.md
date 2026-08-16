@@ -228,6 +228,17 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
   approximation of a curve, so there's no reason to carry the same
   closing point `shape_circle`'s `seq(0, 2 * pi, ...)` formula
   incidentally produces.
+- **`shape_star`** -- centroid + `outer_radius`/`inner_radius` + `n`
+  (number of star points); `points` alternates `n` outer vertices (at
+  `outer_radius`) with `n` inner vertices (at `inner_radius`), evenly
+  spaced by angle (`2 * n` distinct vertices total, no closing repeat,
+  matching `shape_polygon`'s own convention). Structurally closest to
+  `shape_polygon` -- same centroid/radius/`n`/no-closing-repeat shape,
+  generalized to two alternating radii instead of one. `inner_radius = 0`
+  collapses every inner vertex onto the centroid (a sharp "asterisk"
+  outline); `inner_radius = outer_radius` degenerates to a regular
+  `2 * n`-gon, identical to `shape_polygon(radius = outer_radius, n = 2 *
+  n)`.
 - **`shape_ellipse`** -- like `shape_circle`, but with independent
   `x_radius`/`y_radius` properties instead of a single `radius`;
   `shape_circle` is the special case where both are equal (not
@@ -454,7 +465,7 @@ how the API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 
 Every closed (`geometry = "polygon"`) drawable's constructor shares the
 `shape_*` prefix (`shape_circle()`, `shape_rectangle()`/`shape_square()`,
-`shape_polygon()`, `shape_ellipse()`, `shape_wedge()`, `shape_blob()`,
+`shape_polygon()`, `shape_star()`, `shape_ellipse()`, `shape_wedge()`, `shape_blob()`,
 `shape_ribbon()`, `shape_twist()`, `shape_stroke()`, `shape_bezier()`,
 `shape_strokepath()` (a plain function wrapping `shape_stroke()`, not its
 own class -- see "Class hierarchy" above), and the trivial `shape_raw()`),
@@ -1089,7 +1100,8 @@ full debugging narrative):
 - `R/shape_bezier.R`, `R/curve_bezier.R`,
   `R/curve_line.R`, `R/curve_spiral.R`, `R/curve_scribble.R`,
   `R/shape_raw.R`, `R/curve_raw.R`, `R/points_raw.R`, `R/shape_circle.R`,
-  `R/shape_rectangle.R`, `R/shape_polygon.R`, `R/shape_ellipse.R`,
+  `R/shape_rectangle.R`, `R/shape_polygon.R`, `R/shape_star.R`,
+  `R/shape_ellipse.R`,
   `R/shape_wedge.R`, `R/curve_arc.R`, `R/shape_blob.R`, `R/shape_ribbon.R`,
   `R/shape_twist.R`, `R/curve_twist.R`, `R/shape_stroke.R` -- the concrete
   `drawable` subclasses, one file each (`shape_rectangle.R` also holds the
@@ -1192,7 +1204,8 @@ full debugging narrative):
   -> drawable
   -> shape_bezier -> curve_bezier -> curve_line ->
   curve_spiral -> curve_scribble -> shape_raw -> curve_raw -> points_raw
-  -> shape_circle -> shape_rectangle -> shape_polygon -> shape_ellipse ->
+  -> shape_circle -> shape_rectangle -> shape_polygon -> shape_star ->
+  shape_ellipse ->
   shape_wedge -> curve_arc -> shape_blob -> shape_ribbon -> shape_twist ->
   curve_twist -> shape_stroke -> shape_strokepath -> canvas -> sketch ->
   format -> vectorize -> effects

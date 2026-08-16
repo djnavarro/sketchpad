@@ -2321,3 +2321,35 @@ empty-point-set no-call-at-all case, both malformed-return-value error
 messages, threading through a drawable via `trans =`/`+`, `sketch + trans_fn`,
 composition into a `trans_chain` with every other trans-like class (both
 orders), and `trans_chain`'s validator accepting `trans_fn` in `steps`.
+
+## Added `shape_star()` (0.1 primitive shape)
+
+Rounds out the "additional primitive shapes" 0.1 candidate list (`star`
+was the last item outstanding -- `rectangle`/`square`/`polygon`/`ellipse`/
+`arc`/`wedge`/`line`/`spiral` were already covered by earlier
+constructors). Structurally closest to `shape_polygon()`: same
+centroid + radius + `n` + no-closing-repeat shape, generalized to two
+alternating radii (`outer_radius`/`inner_radius`) instead of one --
+`points` is `2 * n` vertices, alternating outer and inner, evenly spaced
+by angle starting at an outer vertex at angle `0` (matching
+`shape_polygon()`'s own vertex-at-angle-0 convention, so `trans_rotate()`
+reorients a star's tips the same way it reorients a low-`n` polygon's
+vertices).
+
+`inner_radius` (default `0.5`) mirrors `shape_wedge()`'s own
+`inner_radius` naming and validation (non-negative, no greater than
+`outer_radius`) rather than introducing new terminology. Two degenerate
+cases are documented rather than guarded against, since both are valid,
+useful shapes: `inner_radius = 0` collapses every inner vertex onto the
+centroid, giving a sharp "asterisk" outline; `inner_radius =
+outer_radius` degenerates to a regular `2 * n`-gon, exactly reproducing
+`shape_polygon(radius = outer_radius, n = 2 * n)`'s own points (verified
+in `tests/testthat/test-star.R`). `n` (number of star points, not
+vertices) has a minimum of `2`, more permissive than
+`shape_polygon()`'s minimum of `3` -- a 2-point star is a valid
+kite/bowtie-like closed shape, not a degenerate one, unlike a 2-sided
+"polygon".
+
+No separate `rotation` argument was added -- consistent with
+`shape_polygon()`, reorientation composes via `trans_rotate()` instead of
+a bespoke per-shape angle parameter.

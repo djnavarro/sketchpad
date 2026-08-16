@@ -18,6 +18,9 @@ the writeup.
 - Multiple sub-paths and holes per drawable
 - A `group` class
 
+(`star`, the last outstanding "additional primitive shapes" item, is now
+done -- see `.agents/HISTORY.md`.)
+
 **0.2:**
 - Multi-frame/animation export helpers (and interactivity/event handling,
   if ever reconsidered -- see "Explicitly flagged as possibly out of
@@ -95,17 +98,6 @@ The items below came out of a deliberate brainstorming pass over the
 package's current gaps, not a specific need that came up while building
 something else (contrast with the four items above). Each is a candidate
 to pick up, reject, or refine later -- none are scheduled.
-
-### Additional primitive shapes (0.1)
-
-`star`. (`rectangle`/`square` are now covered by `shape_rectangle()`/
-`shape_square()`; `polygon` is now covered by `shape_polygon()`;
-`ellipse` is now covered by `shape_ellipse()`; `arc`/`wedge` are now
-covered by `curve_arc()`/`shape_wedge()`, the latter now also covering
-an annulus segment/ring slice via `shape_wedge()`'s `inner_radius`
-argument -- see `.agents/HISTORY.md`. A bare open `line` and a `spiral`
-were also on this list -- both are now covered by `curve_line()`/
-`curve_spiral()`; see `.agents/HISTORY.md`.)
 
 ### Multiple sub-paths and holes per drawable (0.1)
 

@@ -96,6 +96,7 @@ Other 2D shapes:
 \code{\link[=shape_polygon]{shape_polygon()}},
 \code{\link[=shape_raw]{shape_raw()}},
 \code{\link[=shape_ribbon]{shape_ribbon()}},
+\code{\link[=shape_star]{shape_star()}},
 \code{\link[=shape_stroke]{shape_stroke()}},
 \code{\link[=shape_strokepath]{shape_strokepath()}},
 \code{\link[=shape_twist]{shape_twist()}},
