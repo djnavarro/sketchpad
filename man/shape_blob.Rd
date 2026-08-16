@@ -69,17 +69,30 @@ lengths greater than 1 raise an error. A shared \code{distortion}
 blob.
 }
 \examples{
-draw(shape_blob(radius = 1, range = 0.3, distortion = noise_field(seed = 4821L)))
+draw(shape_blob(
+  radius = 1,
+  range = 0.3,
+  distortion = noise_field(seed = 4821L)
+))
 
 # a larger range or lower frequency distortion gives a more irregular
 # outline; a higher frequency gives a bumpier, lumpier one
-draw(shape_blob(radius = 1, range = 0.6, distortion = noise_field(seed = 4821L)))
+draw(shape_blob(
+  radius = 1,
+  range = 0.6,
+  distortion = noise_field(seed = 4821L)
+))
 draw(shape_blob(
   radius = 1, range = 0.3,
   distortion = noise_field(frequency = 5, seed = 4821L)
 ))
 
-draw(shape_blob(radius = 1, range = 0.3, fill = fill_charcoal(), color = NA_character_))
+draw(shape_blob(
+  radius = 1,
+  range = 0.3,
+  fill = fill_charcoal(),
+  color = NA_character_
+))
 
 draw(shape_blobs(x = 1:3, radius = c(0.5, 1, 1.5), range = 0.2))
 
@@ -87,7 +100,11 @@ draw(shape_blobs(x = 1:3, radius = c(0.5, 1, 1.5), range = 0.2))
 # different noise_field()s varies it per blob instead
 draw(shape_blobs(
   x = 1:3, radius = 0.8, range = 0.3,
-  distortion = list(noise_field(seed = 1L), noise_field(seed = 2L), noise_field(seed = 3L))
+  distortion = list(
+    noise_field(seed = 1L),
+    noise_field(seed = 2L),
+    noise_field(seed = 3L)
+  )
 ))
 
 }

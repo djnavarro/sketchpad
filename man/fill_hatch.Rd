@@ -74,7 +74,11 @@ draw(shape_circle(fill = fill_hatch(angle = 0, spacing = 0.1)))
 # aspect corrects the rendered angle for a non-square bounding box --
 # without it, a 45 degree hatch looks skewed on a wide rectangle
 draw(shape_rectangle(width = 3, height = 1, fill = fill_hatch(angle = 45)))
-draw(shape_rectangle(width = 3, height = 1, fill = fill_hatch(angle = 45, aspect = 3)))
+draw(shape_rectangle(
+  width = 3,
+  height = 1,
+  fill = fill_hatch(angle = 45, aspect = 3)
+))
 
 }
 \seealso{

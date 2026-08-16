@@ -76,7 +76,11 @@
 #' # trans applies after a shape's own geometry/distortion is computed, so
 #' # shape_rectangle()'s centroid/width/height stay fixed -- only the final
 #' # rendered corners rotate
-#' draw(shape_rectangle(width = 1.5, height = 0.5, trans = trans_rotate(pi / 6)))
+#' draw(shape_rectangle(
+#'   width = 1.5,
+#'   height = 0.5,
+#'   trans = trans_rotate(pi / 6)
+#' ))
 #'
 #' @family core structure
 #' @export

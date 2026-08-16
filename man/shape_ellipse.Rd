@@ -61,11 +61,26 @@ than 1 raise an error.
 }
 \examples{
 draw(shape_ellipse(x_radius = 2, y_radius = 1))
-draw(shape_ellipse(x = 1, y = 1, x_radius = 0.5, y_radius = 1, n = 6L, color = "darkred"))
-draw(shape_ellipse(x_radius = 2, y_radius = 1, fill = fill_gradient(angle = 90)))
+draw(shape_ellipse(
+  x = 1,
+  y = 1,
+  x_radius = 0.5,
+  y_radius = 1,
+  n = 6L,
+  color = "darkred"
+))
+draw(shape_ellipse(
+  x_radius = 2,
+  y_radius = 1,
+  fill = fill_gradient(angle = 90)
+))
 
 # rotating an ellipse (rather than swapping its radii) tilts its axes
-draw(shape_ellipse(x_radius = 2, y_radius = 0.7, trans = trans_rotate(pi / 6)))
+draw(shape_ellipse(
+  x_radius = 2,
+  y_radius = 0.7,
+  trans = trans_rotate(pi / 6)
+))
 
 draw(shape_ellipses(x = 1:3, x_radius = c(0.5, 1, 1.5), y_radius = 0.5))
 draw(shape_ellipses(

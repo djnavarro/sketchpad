@@ -121,7 +121,12 @@ stroke_normals <- function(x, y) {
 #'
 #' # layer effect_tremor() on top for a hand-drawn ink look
 #' draw(effect_tremor(
-#'   shape_stroke(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), width = 0.2, fill_alpha = 0.4),
+#'   shape_stroke(
+#'     x = c(0, 1, 2, 3),
+#'     y = c(0, 1, 0, 1),
+#'     width = 0.2,
+#'     fill_alpha = 0.4
+#'   ),
 #'   layers = 4L
 #' ))
 #'

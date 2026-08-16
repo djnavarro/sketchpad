@@ -27,7 +27,9 @@
 #' draw(curve_spiral(radius_start = 0, radius_end = 1, turns = 4))
 #'
 #' # radius_start > radius_end spirals inward instead of outward
-#' draw(curve_spiral(radius_start = 1, radius_end = 0.1, turns = 5, linewidth = 2))
+#' draw(curve_spiral(
+#'   radius_start = 1, radius_end = 0.1, turns = 5, linewidth = 2
+#' ))
 #'
 #' # equal start/end radii retrace a circle -- rarely useful on its own,
 #' # but shows turns has no effect on shape when radius doesn't change

@@ -70,7 +70,9 @@ draw(shape_circle(fill = fill_vignette(color = "black")))
 
 # a non-NA background reveals a solid colour underneath the fade,
 # instead of true transparency
-draw(shape_circle(fill = fill_vignette(color = "steelblue", background = "white")))
+draw(shape_circle(
+  fill = fill_vignette(color = "steelblue", background = "white")
+))
 
 # two or more colours blend radially before fading via the alpha mask
 draw(shape_circle(fill = fill_vignette(color = c("goldenrod", "steelblue"))))

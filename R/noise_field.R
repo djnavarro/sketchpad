@@ -33,11 +33,23 @@
 #' # a noise_field's effect is easiest to see through a drawable that
 #' # samples it -- lower frequency gives broad, gentle undulation, higher
 #' # frequency a bumpier, more textured one
-#' draw(shape_blob(radius = 1, range = 0.4, distortion = noise_field(frequency = 0.5, seed = 4821L)))
-#' draw(shape_blob(radius = 1, range = 0.4, distortion = noise_field(frequency = 6, seed = 4821L)))
+#' draw(shape_blob(
+#'   radius = 1,
+#'   range = 0.4,
+#'   distortion = noise_field(frequency = 0.5, seed = 4821L)
+#' ))
+#' draw(shape_blob(
+#'   radius = 1,
+#'   range = 0.4,
+#'   distortion = noise_field(frequency = 6, seed = 4821L)
+#' ))
 #'
 #' # more octaves layer finer detail on top of the base frequency
-#' draw(shape_blob(radius = 1, range = 0.4, distortion = noise_field(octaves = 6L, seed = 4821L)))
+#' draw(shape_blob(
+#'   radius = 1,
+#'   range = 0.4,
+#'   distortion = noise_field(octaves = 6L, seed = 4821L)
+#' ))
 #'
 #' @family noise helpers
 #' @export
@@ -109,7 +121,12 @@ noise_field <- S7::new_class(
 #' # sampled values can drive a drawable's own geometry, e.g. shape_blob()'s
 #' # radius perturbation (see its `points` getter)
 #' angle <- seq(0, 2 * pi, length.out = 12)
-#' noise_sample(noise_field(seed = 4821L), x = cos(angle), y = sin(angle), to = c(0.8, 1.2))
+#' noise_sample(
+#'   noise_field(seed = 4821L),
+#'   x = cos(angle),
+#'   y = sin(angle),
+#'   to = c(0.8, 1.2)
+#' )
 #'
 #' @family noise helpers
 #' @export

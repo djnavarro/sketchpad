@@ -27,10 +27,20 @@ line onto an axis, reflect, then rotate back, e.g.
 reflects across a line through the origin at angle \code{theta}.
 }
 \examples{
-draw(shape_bezier(x = c(0, 0.5, 1), y = c(0, 1, 0.2), trans = trans_reflect(x = TRUE)))
+draw(shape_bezier(
+  x = c(0, 0.5, 1),
+  y = c(0, 1, 0.2),
+  trans = trans_reflect(x = TRUE)
+))
 
 # overlay the original (faded) with each reflected copy (solid)
-original <- shape_rectangle(x = 1, width = 1, height = 0.4, fill_alpha = 0.3, color_alpha = 0.3)
+original <- shape_rectangle(
+  x = 1,
+  width = 1,
+  height = 0.4,
+  fill_alpha = 0.3,
+  color_alpha = 0.3
+)
 draw(sketch() + original + (original + trans_reflect(x = TRUE)))
 draw(sketch() + original + (original + trans_reflect(y = TRUE)))
 

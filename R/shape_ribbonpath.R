@@ -76,7 +76,13 @@ validate_ribbonpath_path <- function(path) {
 #'   width = 0.2
 #' ))
 #' draw(shape_ribbonpath(
-#'   curve_twist(x = 0, y = 0, xend = 1, yend = 0, path_distortion = noise_bridge(seed = 7734L)),
+#'   curve_twist(
+#'     x = 0,
+#'     y = 0,
+#'     xend = 1,
+#'     yend = 0,
+#'     path_distortion = noise_bridge(seed = 7734L)
+#'   ),
 #'   width = 0.15
 #' ))
 #'

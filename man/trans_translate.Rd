@@ -26,7 +26,12 @@ transformed as \code{matrix \%*\% point}.
 draw(shape_square(side = 1, trans = trans_translate(2, 0)))
 
 # overlay the original (faded) with the translated copy (solid)
-original <- shape_rectangle(width = 1.5, height = 0.6, fill_alpha = 0.3, color_alpha = 0.3)
+original <- shape_rectangle(
+  width = 1.5,
+  height = 0.6,
+  fill_alpha = 0.3,
+  color_alpha = 0.3
+)
 draw(sketch() + original + (original + trans_translate(1, 0.5)))
 
 # composition order matters: translate-then-rotate differs from
@@ -34,8 +39,16 @@ draw(sketch() + original + (original + trans_translate(1, 0.5)))
 # final position visible (a lone shape otherwise always fills its own
 # auto-scaled frame)
 square <- shape_square(x = 1, side = 0.4)
-draw(square + trans_translate(1, 0) + trans_rotate(pi / 2), xlim = c(-1, 3), ylim = c(-1, 3))
-draw(square + trans_rotate(pi / 2) + trans_translate(1, 0), xlim = c(-1, 3), ylim = c(-1, 3))
+draw(
+  square + trans_translate(1, 0) + trans_rotate(pi / 2),
+  xlim = c(-1, 3),
+  ylim = c(-1, 3)
+)
+draw(
+  square + trans_rotate(pi / 2) + trans_translate(1, 0),
+  xlim = c(-1, 3),
+  ylim = c(-1, 3)
+)
 
 }
 \seealso{

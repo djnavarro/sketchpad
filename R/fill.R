@@ -53,7 +53,12 @@ fill_solid <- function(color = "black") {
 #'
 #' # still a closed outline: the edge from the last point back to the
 #' # first is drawn even though the interior isn't filled
-#' draw(shape_polygon(n = 5L, fill = fill_none(), color = "steelblue", linewidth = 3))
+#' draw(shape_polygon(
+#'   n = 5L,
+#'   fill = fill_none(),
+#'   color = "steelblue",
+#'   linewidth = 3
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -173,7 +178,11 @@ hatch_tile_dims <- function(theta, spacing, aspect) {
 #' # aspect corrects the rendered angle for a non-square bounding box --
 #' # without it, a 45 degree hatch looks skewed on a wide rectangle
 #' draw(shape_rectangle(width = 3, height = 1, fill = fill_hatch(angle = 45)))
-#' draw(shape_rectangle(width = 3, height = 1, fill = fill_hatch(angle = 45, aspect = 3)))
+#' draw(shape_rectangle(
+#'   width = 3,
+#'   height = 1,
+#'   fill = fill_hatch(angle = 45, aspect = 3)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -272,7 +281,9 @@ fill_hatch <- function(color = "black",
 #' draw(shape_circle(fill = fill_crosshatch(angle = 20, spacing = 0.12)))
 #'
 #' # a two-colour vector colours the two lines independently
-#' draw(shape_circle(fill = fill_crosshatch(color = c("steelblue", "tomato"), angle = 45)))
+#' draw(shape_circle(
+#'   fill = fill_crosshatch(color = c("steelblue", "tomato"), angle = 45)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -382,11 +393,15 @@ fill_crosshatch <- function(color = "black",
 #' draw(shape_circle(fill = fill_checker(color = c("black", "white"))))
 #'
 #' # a coarser, differently-coloured checkerboard
-#' draw(shape_circle(fill = fill_checker(color = c("steelblue", "white"), spacing = 0.4)))
+#' draw(shape_circle(
+#'   fill = fill_checker(color = c("steelblue", "white"), spacing = 0.4)
+#' ))
 #'
 #' # three or more colours grow the grid rather than alternating just two;
 #' # spacing = 1 avoids the tile-repetition rendering risk noted above
-#' draw(shape_circle(fill = fill_checker(color = c("steelblue", "white", "tomato"), spacing = 1)))
+#' draw(shape_circle(
+#'   fill = fill_checker(color = c("steelblue", "white", "tomato"), spacing = 1)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -475,10 +490,14 @@ fill_checker <- function(color = c("black", "white"),
 #' draw(shape_circle(fill = fill_stipple(n = 6L, seed = 2091L)))
 #'
 #' # more, smaller dots per tile give a denser stipple
-#' draw(shape_circle(fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)))
+#' draw(shape_circle(
+#'   fill = fill_stipple(n = 15L, radius = 0.06, spacing = 0.5, seed = 2091L)
+#' ))
 #'
 #' # a colour vector is recycled across the dots
-#' draw(shape_circle(fill = fill_stipple(color = c("steelblue", "tomato"), n = 8L, seed = 2091L)))
+#' draw(shape_circle(
+#'   fill = fill_stipple(color = c("steelblue", "tomato"), n = 8L, seed = 2091L)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -614,12 +633,20 @@ fill_stipple <- function(color = "black",
 #'
 #' # any small drawable works as the scattered unit, e.g. a triangle
 #' draw(shape_circle(
-#'   fill = fill_scatter(unit = shape_polygon(n = 3L, fill = "steelblue"), n = 10L, size = 0.2)
+#'   fill = fill_scatter(
+#'     unit = shape_polygon(n = 3L, fill = "steelblue"),
+#'     n = 10L,
+#'     size = 0.2
+#'   )
 #' ))
 #'
 #' # a color vector overrides unit's own style colour, recycled per stamp
 #' draw(shape_circle(
-#'   fill = fill_scatter(color = c("steelblue", "tomato", "goldenrod"), n = 9L, size = 0.15)
+#'   fill = fill_scatter(
+#'     color = c("steelblue", "tomato", "goldenrod"),
+#'     n = 9L,
+#'     size = 0.15
+#'   )
 #' ))
 #'
 #' @family fill helpers
@@ -727,13 +754,23 @@ fill_scatter <- function(unit = shape_circle(radius = 1),
 #'   use as the `fill` argument to [grid::gpar()].
 #'
 #' @examples
-#' draw(shape_circle(fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)))
+#' draw(shape_circle(
+#'   fill = fill_halftone(radius = c(0.05, 0.15), seed = 3187L)
+#' ))
 #'
 #' # a wider radius range gives more size contrast between dots
-#' draw(shape_circle(fill = fill_halftone(radius = c(0.02, 0.22), n = 6L, seed = 3187L)))
+#' draw(shape_circle(
+#'   fill = fill_halftone(radius = c(0.02, 0.22), n = 6L, seed = 3187L)
+#' ))
 #'
 #' # a colour vector is recycled across the dots, as in fill_stipple()
-#' draw(shape_circle(fill = fill_halftone(color = c("steelblue", "tomato"), n = 8L, seed = 3187L)))
+#' draw(shape_circle(
+#'   fill = fill_halftone(
+#'     color = c("steelblue", "tomato"),
+#'     n = 8L,
+#'     seed = 3187L
+#'   )
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -904,16 +941,27 @@ scribble_lines <- function(n_lines, n_harmonics, amplitude, resolution, seed) {
 #' draw(shape_circle(fill = fill_scribble(n_lines = 4L, seed = 6602L)))
 #'
 #' # direction = "vertical" runs the wandering lines top-to-bottom instead
-#' draw(shape_circle(fill = fill_scribble(n_lines = 4L, direction = "vertical", seed = 6602L)))
+#' draw(shape_circle(
+#'   fill = fill_scribble(n_lines = 4L, direction = "vertical", seed = 6602L)
+#' ))
 #'
 #' # more harmonics and higher amplitude give a more agitated scribble
 #' draw(shape_circle(
-#'   fill = fill_scribble(n_lines = 6L, n_harmonics = 6L, amplitude = 0.6, seed = 6602L)
+#'   fill = fill_scribble(
+#'     n_lines = 6L,
+#'     n_harmonics = 6L,
+#'     amplitude = 0.6,
+#'     seed = 6602L
+#'   )
 #' ))
 #'
 #' # a colour vector is recycled across the wandering lines
 #' draw(shape_circle(
-#'   fill = fill_scribble(color = c("steelblue", "tomato"), n_lines = 4L, seed = 6602L)
+#'   fill = fill_scribble(
+#'     color = c("steelblue", "tomato"),
+#'     n_lines = 4L,
+#'     seed = 6602L
+#'   )
 #' ))
 #'
 #' @family fill helpers
@@ -1124,13 +1172,19 @@ noise_to_pixels <- function(value01, color, alpha) {
 #' draw(shape_circle(fill = fill_noise(seed = 8843L)))
 #'
 #' # higher frequency/octaves give finer-grained texture
-#' draw(shape_circle(fill = fill_noise(frequency = 4, octaves = 4L, seed = 8843L)))
+#' draw(shape_circle(
+#'   fill = fill_noise(frequency = 4, octaves = 4L, seed = 8843L)
+#' ))
 #'
 #' # a lower alpha lets the shape's own outline/background show through more
-#' draw(shape_circle(fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)))
+#' draw(shape_circle(
+#'   fill = fill_noise(color = "steelblue", alpha = 0.5, seed = 8843L)
+#' ))
 #'
 #' # two or more colours blend across the field instead of fading to transparent
-#' draw(shape_circle(fill = fill_noise(color = c("steelblue", "white", "tomato"), seed = 8843L)))
+#' draw(shape_circle(
+#'   fill = fill_noise(color = c("steelblue", "white", "tomato"), seed = 8843L)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -1233,12 +1287,20 @@ fill_noise <- function(color = "black",
 #'
 #' # a different colour pair changes the veining's contrast entirely
 #' draw(shape_circle(
-#'   fill = fill_marble(color = c("black", "goldenrod"), stripes = 4L, seed = 1274L)
+#'   fill = fill_marble(
+#'     color = c("black", "goldenrod"),
+#'     stripes = 4L,
+#'     seed = 1274L
+#'   )
 #' ))
 #'
 #' # three or more colours blend across the band in sequence
 #' draw(shape_circle(
-#'   fill = fill_marble(color = c("black", "goldenrod", "white"), stripes = 4L, seed = 1274L)
+#'   fill = fill_marble(
+#'     color = c("black", "goldenrod", "white"),
+#'     stripes = 4L,
+#'     seed = 1274L
+#'   )
 #' ))
 #'
 #' @family fill helpers
@@ -1353,7 +1415,9 @@ fill_marble <- function(color = c("white", "black"),
 #' draw(shape_circle(fill = fill_flow(warp = 6, seed = 9350L)))
 #'
 #' # two or more colours blend across the field, as in fill_noise()
-#' draw(shape_circle(fill = fill_flow(color = c("steelblue", "white", "tomato"), seed = 9350L)))
+#' draw(shape_circle(
+#'   fill = fill_flow(color = c("steelblue", "white", "tomato"), seed = 9350L)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -1545,7 +1609,11 @@ fill_charcoal <- function(color = "gray15",
 #' # a non-square image, letterboxed (default) vs. stretched to fill the tile
 #' wide_img <- matrix(c("red", "white", "blue"), nrow = 1)
 #' draw(shape_rectangle(width = 2, height = 1, fill = fill_image(wide_img)))
-#' draw(shape_rectangle(width = 2, height = 1, fill = fill_image(wide_img, preserve_aspect = FALSE)))
+#' draw(shape_rectangle(
+#'   width = 2,
+#'   height = 1,
+#'   fill = fill_image(wide_img, preserve_aspect = FALSE)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -1660,11 +1728,15 @@ fill_image <- function(image,
 #'
 #' # three or more colours interpolate in sequence; angle rotates a linear
 #' # gradient's direction
-#' draw(shape_circle(fill = fill_gradient(c("yellow", "orange", "red"), angle = 90)))
+#' draw(shape_circle(
+#'   fill = fill_gradient(c("yellow", "orange", "red"), angle = 90)
+#' ))
 #'
 #' # spacing < 1 repeats the gradient as a small tiled motif instead of one
 #' # smooth sweep across the whole shape
-#' draw(shape_circle(fill = fill_gradient(c("white", "steelblue"), spacing = 0.3)))
+#' draw(shape_circle(
+#'   fill = fill_gradient(c("white", "steelblue"), spacing = 0.3)
+#' ))
 #'
 #' @family fill helpers
 #' @export
@@ -1769,7 +1841,9 @@ fill_gradient <- function(color = c("white", "black"),
 #'
 #' # a non-NA background reveals a solid colour underneath the fade,
 #' # instead of true transparency
-#' draw(shape_circle(fill = fill_vignette(color = "steelblue", background = "white")))
+#' draw(shape_circle(
+#'   fill = fill_vignette(color = "steelblue", background = "white")
+#' ))
 #'
 #' # two or more colours blend radially before fading via the alpha mask
 #' draw(shape_circle(fill = fill_vignette(color = c("goldenrod", "steelblue"))))
@@ -1871,13 +1945,17 @@ fill_vignette <- function(color = "black",
 #' draw(shape_circle(fill = fill_stripe(angle = 30)))
 #'
 #' # repeating a colour biases the band widths, rather than a separate argument
-#' draw(shape_circle(fill = fill_stripe(color = c("steelblue", "steelblue", "white"))))
+#' draw(shape_circle(
+#'   fill = fill_stripe(color = c("steelblue", "steelblue", "white"))
+#' ))
 #'
 #' # narrower spacing gives more, thinner stripes
 #' draw(shape_circle(fill = fill_stripe(angle = 90, spacing = 0.08)))
 #'
 #' # three or more colours repeat through the same period
-#' draw(shape_circle(fill = fill_stripe(color = c("steelblue", "white", "tomato"), angle = 30)))
+#' draw(shape_circle(
+#'   fill = fill_stripe(color = c("steelblue", "white", "tomato"), angle = 30)
+#' ))
 #'
 #' @family fill helpers
 #' @export

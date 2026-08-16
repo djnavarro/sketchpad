@@ -72,7 +72,9 @@ draw(shape_circle(fill = fill_crosshatch(angle = 0, spacing = 0.15)))
 draw(shape_circle(fill = fill_crosshatch(angle = 20, spacing = 0.12)))
 
 # a two-colour vector colours the two lines independently
-draw(shape_circle(fill = fill_crosshatch(color = c("steelblue", "tomato"), angle = 45)))
+draw(shape_circle(
+  fill = fill_crosshatch(color = c("steelblue", "tomato"), angle = 45)
+))
 
 }
 \seealso{

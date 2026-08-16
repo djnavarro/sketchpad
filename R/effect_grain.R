@@ -66,7 +66,12 @@
 #'
 #' # a non-NA background reveals a solid colour underneath the grain,
 #' # instead of true transparency
-#' draw(effect_grain(template, color = "gray5", alpha = 0.85, background = "gray30"))
+#' draw(effect_grain(
+#'   template,
+#'   color = "gray5",
+#'   alpha = 0.85,
+#'   background = "gray30"
+#' ))
 #'
 #' # a coarser grain field (lower frequency) reads less like paper texture
 #' # and more like a mottled brushstroke

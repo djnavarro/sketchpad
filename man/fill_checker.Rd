@@ -70,11 +70,15 @@ squaring technique \code{\link[=fill_stipple]{fill_stipple()}} uses for its dots
 draw(shape_circle(fill = fill_checker(color = c("black", "white"))))
 
 # a coarser, differently-coloured checkerboard
-draw(shape_circle(fill = fill_checker(color = c("steelblue", "white"), spacing = 0.4)))
+draw(shape_circle(
+  fill = fill_checker(color = c("steelblue", "white"), spacing = 0.4)
+))
 
 # three or more colours grow the grid rather than alternating just two;
 # spacing = 1 avoids the tile-repetition rendering risk noted above
-draw(shape_circle(fill = fill_checker(color = c("steelblue", "white", "tomato"), spacing = 1)))
+draw(shape_circle(
+  fill = fill_checker(color = c("steelblue", "white", "tomato"), spacing = 1)
+))
 
 }
 \seealso{

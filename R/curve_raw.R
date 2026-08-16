@@ -26,7 +26,10 @@
 #'
 #' # useful for "freezing" a wandering path's own computed points
 #' frozen <- S7::convert(
-#'   curve_twist(x = 0, y = 0, xend = 1, yend = 0, path_distortion = noise_bridge(seed = 99L)),
+#'   curve_twist(
+#'     x = 0, y = 0, xend = 1, yend = 0,
+#'     path_distortion = noise_bridge(seed = 99L)
+#'   ),
 #'   curve_raw
 #' )
 #' draw(frozen)

@@ -100,14 +100,21 @@ draw(curve_twist(
 ))
 
 # curve_twist() is shape_twist()'s backbone alone, with no ribbon width
-draw(shape_twist(x = 0, y = 0, xend = 1, yend = 0, path_distortion = noise_bridge(seed = 7734L)))
+draw(shape_twist(
+  x = 0, y = 0, xend = 1, yend = 0,
+  path_distortion = noise_bridge(seed = 7734L)
+))
 
 draw(curve_twists(x = 1:3, y = 0, xend = 2:4, yend = 1))
 
 # a bundle of independently-wandering strands between the same endpoints
 draw(curve_twists(
   x = 0, y = 0, xend = 3, yend = 0,
-  path_distortion = list(noise_bridge(seed = 1L), noise_bridge(seed = 2L), noise_bridge(seed = 3L))
+  path_distortion = list(
+    noise_bridge(seed = 1L),
+    noise_bridge(seed = 2L),
+    noise_bridge(seed = 3L)
+  )
 ))
 
 }

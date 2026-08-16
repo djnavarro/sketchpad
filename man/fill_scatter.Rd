@@ -107,12 +107,20 @@ draw(shape_circle(
 
 # any small drawable works as the scattered unit, e.g. a triangle
 draw(shape_circle(
-  fill = fill_scatter(unit = shape_polygon(n = 3L, fill = "steelblue"), n = 10L, size = 0.2)
+  fill = fill_scatter(
+    unit = shape_polygon(n = 3L, fill = "steelblue"),
+    n = 10L,
+    size = 0.2
+  )
 ))
 
 # a color vector overrides unit's own style colour, recycled per stamp
 draw(shape_circle(
-  fill = fill_scatter(color = c("steelblue", "tomato", "goldenrod"), n = 9L, size = 0.15)
+  fill = fill_scatter(
+    color = c("steelblue", "tomato", "goldenrod"),
+    n = 9L,
+    size = 0.15
+  )
 ))
 
 }
