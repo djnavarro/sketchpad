@@ -344,14 +344,9 @@ S7::method(draw, group) <- function(object, xlim = NULL, ylim = NULL, ...) {
     )
   }
 
-  # a fresh page is started before building the viewport, since
-  # equal_aspect_viewport() measures the current device's own aspect
-  # ratio and needs that measurement taken against the whole,
-  # freshly-cleared device rather than whatever viewport happened to be
-  # active beforehand
-  grid::grid.newpage()
   vp <- equal_aspect_viewport(xlim, ylim)
 
+  grid::grid.newpage()
   for (s in shapes) {
     grid::grid.draw(geometry_grob(s@points, s@style, s@geometry, vp, bbox_aspect(s)))
   }
