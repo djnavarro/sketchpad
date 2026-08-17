@@ -17,7 +17,16 @@ errors).
 ## Usage
 
 ``` r
-save_png(object, filename, width = 7, height = 7, dpi = 300, bg = "white", ...)
+save_png(
+  object,
+  filename,
+  width = 7,
+  height = 7,
+  dpi = 300,
+  bg = "white",
+  units = "in",
+  ...
+)
 
 save_svg(object, filename, width = 7, height = 7, bg = "white", ...)
 
@@ -37,7 +46,9 @@ save_pdf(object, filename, width = 7, height = 7, bg = "white", ...)
 
 - width, height:
 
-  Image dimensions in inches. Default `7`.
+  Image dimensions, in `units` for `save_png()` (default inches) or
+  always in inches for `save_svg()`/`save_pdf()`, which have no `units`
+  argument of their own. Default `7`.
 
 - dpi:
 
@@ -58,6 +69,15 @@ save_pdf(object, filename, width = 7, height = 7, bg = "white", ...)
   [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md)
   background shows `bg` through any of its own shapes that don't fully
   cover the page.
+
+- units:
+
+  One of `"in"` (the default), `"cm"`, `"mm"`, or `"px"`, forwarded to
+  [`grDevices::png()`](https://rdrr.io/r/grDevices/png.html)'s own
+  `units` argument – only meaningful for `save_png()`;
+  `save_svg()`/`save_pdf()` have no `units` argument, since
+  [`grDevices::svg()`](https://rdrr.io/r/grDevices/cairo.html)/[`grDevices::pdf()`](https://rdrr.io/r/grDevices/pdf.html)
+  always take `width`/`height` in inches.
 
 - ...:
 
