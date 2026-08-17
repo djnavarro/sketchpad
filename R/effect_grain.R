@@ -140,18 +140,24 @@ effect_grain <- S7::new_class(
 #'
 #' @param object An [effect_grain] object.
 #' @param outline `object@outline`, precomputed by the caller.
-#' @param vp The shared [grid::viewport()] `draw()` built for this object.
+#' @param xlim,ylim The shared viewport's own axis limits, as resolved by
+#'   `draw(effect_grain)` -- may differ from `outline`'s own point range
+#'   if an explicit `xlim`/`ylim` was passed to `draw()`. The raster
+#'   content itself is still always sized to `outline`'s own bounding
+#'   box, computed locally below; `xlim`/`ylim` here are only used to
+#'   build the masked viewport's own scale, matching the unmasked
+#'   viewport `draw(effect_grain)` would otherwise have used.
 #' @return A [grid::gTree()].
 #' @noRd
-effect_grain_grob <- function(object, outline, vp) {
-  xlim <- range(outline@x)
-  ylim <- range(outline@y)
-  x_width <- xlim[2] - xlim[1]
-  y_width <- ylim[2] - ylim[1]
+effect_grain_grob <- function(object, outline, xlim, ylim) {
+  outline_xlim <- range(outline@x)
+  outline_ylim <- range(outline@y)
+  x_width <- outline_xlim[2] - outline_xlim[1]
+  y_width <- outline_ylim[2] - outline_ylim[1]
 
   res <- object@resolution
-  px <- seq(xlim[1], xlim[2], length.out = res)
-  py <- seq(ylim[1], ylim[2], length.out = res)
+  px <- seq(outline_xlim[1], outline_xlim[2], length.out = res)
+  py <- seq(outline_ylim[1], outline_ylim[2], length.out = res)
   grid_xy <- expand.grid(y = py, x = px)
   grain <- noise_sample(object@grain, x = grid_xy$x, y = grid_xy$y, to = c(0, object@alpha))
 
@@ -162,7 +168,7 @@ effect_grain_grob <- function(object, outline, vp) {
   )
   raster_grob <- grid::rasterGrob(
     pixels,
-    x = mean(xlim), y = mean(ylim),
+    x = mean(outline_xlim), y = mean(outline_ylim),
     width = x_width, height = y_width,
     default.units = "native", interpolate = TRUE
   )
@@ -176,19 +182,19 @@ effect_grain_grob <- function(object, outline, vp) {
     default.units = "native",
     gp = grid::gpar(fill = "black", col = NA)
   )
-  # a viewport identical to `vp` (same scale/aspect), plus the outline's
-  # own mask -- content pushed into it is clipped to the exact stroke
-  # silhouette rather than a rectangular/circular tile
-  masked_vp <- grid::viewport(
-    xscale = vp$xscale, yscale = vp$yscale,
-    width = vp$width, height = vp$height,
+  # the same equal_aspect_viewport() every other draw() method uses (same
+  # scale/aspect the unmasked viewport would have had), plus the
+  # outline's own mask -- content pushed into it is clipped to the exact
+  # stroke silhouette rather than a rectangular/circular tile
+  masked_vp <- equal_aspect_viewport(
+    xlim, ylim,
     mask = grid::as.mask(mask_grob, type = "alpha")
   )
 
   content <- list(raster_grob)
   if (!is.na(object@background)) {
     bg_grob <- grid::rectGrob(
-      x = mean(xlim), y = mean(ylim), width = x_width, height = y_width,
+      x = mean(outline_xlim), y = mean(outline_ylim), width = x_width, height = y_width,
       default.units = "native",
       gp = grid::gpar(fill = object@background, col = NA)
     )
@@ -205,15 +211,7 @@ S7::method(draw, effect_grain) <- function(object, xlim = NULL, ylim = NULL, ...
 
   if (is.null(xlim)) xlim <- range(outline@x)
   if (is.null(ylim)) ylim <- range(outline@y)
-  x_width <- xlim[2] - xlim[1]
-  y_width <- ylim[2] - ylim[1]
-  vp <- grid::viewport(
-    xscale = xlim,
-    yscale = ylim,
-    width  = grid::unit(min(1, x_width / y_width), "snpc"),
-    height = grid::unit(min(1, y_width / x_width), "snpc")
-  )
 
   grid::grid.newpage()
-  grid::grid.draw(effect_grain_grob(object, outline, vp))
+  grid::grid.draw(effect_grain_grob(object, outline, xlim, ylim))
 }

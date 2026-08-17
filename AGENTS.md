@@ -1143,11 +1143,25 @@ effect_grain)` (`R/effect_grain.R`, collated right after `draw.R` so the
 `draw` generic already exists to register against), built directly from
 `grid::rasterGrob()`/`grid::pathGrob()`/`grid::as.mask()`/
 `grid::gTree()` rather than reusing `geometry_grob()`.
-Its masked viewport reuses the same `xscale`/`yscale`/`width`/`height`
-as the shared drawing viewport `draw()` already built for it (read back
-via `vp$xscale` etc., since `grid::viewport()` objects support
-list-style `$` access), so the mask's own "native" coordinates line up
-with the raster's exactly.
+Its masked viewport is built via the same `equal_aspect_viewport()`
+helper every other `draw()` method uses (`R/draw.R`), passing its own
+`mask` through via that helper's `...` -- rather than duplicating
+`equal_aspect_viewport()`'s whole `"snpc"`-based formula the way it
+briefly did (see `.agents/HISTORY.md`) or trying to read `xscale`/
+`width`/etc. back off `equal_aspect_viewport()`'s own return value, which
+doesn't work: that return value is a `grid::vpStack()` of two nested
+viewports, not a single flat one, so it has no top-level `$xscale`
+of its own to read (confirmed directly -- `vpStack$xscale` is silently
+`NULL`, not an error). `effect_grain_grob()` therefore takes the shared
+viewport's own `xlim`/`ylim` as plain arguments (rather than a
+pre-built `vp`) and calls `equal_aspect_viewport(xlim, ylim, mask =
+...)` itself to build the masked viewport, keeping it identical in
+scale/aspect to the unmasked viewport `draw(effect_grain)` would
+otherwise have used, while the raster/background content is still
+sized from `outline`'s own bounding box (a separate, usually-but-not-
+necessarily-equal quantity, computed locally inside
+`effect_grain_grob()` -- distinct if an explicit `xlim`/`ylim` narrower
+or wider than `outline`'s own point range was passed to `draw()`).
 
 ## Gotchas worth remembering
 

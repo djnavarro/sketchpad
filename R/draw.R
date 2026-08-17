@@ -222,9 +222,13 @@ geometry_grob <- function(points, sty, geometry, vp, aspect) {
 #'   `draw(sketch)` has a `canvas@clip` setting of its own to forward
 #'   here; `draw(drawable)`/`draw(group)` have no clip concept and always
 #'   use the default.
+#' @param ... Forwarded to the inner [grid::viewport()] -- e.g.
+#'   `effect_grain_grob()` (`R/effect_grain.R`) passes its own `mask`
+#'   through this way, rather than duplicating this whole function just
+#'   to add one extra `viewport()` argument.
 #' @return A [grid::vpStack()] of two [grid::viewport()]s.
 #' @noRd
-equal_aspect_viewport <- function(xlim, ylim, clip = "off") {
+equal_aspect_viewport <- function(xlim, ylim, clip = "off", ...) {
   x_width <- xlim[2] - xlim[1]
   y_width <- ylim[2] - ylim[1]
   outer_vp <- grid::viewport(
@@ -240,7 +244,8 @@ equal_aspect_viewport <- function(xlim, ylim, clip = "off") {
     layout.pos.col = 1,
     xscale = xlim,
     yscale = ylim,
-    clip   = clip
+    clip   = clip,
+    ...
   )
   grid::vpStack(outer_vp, inner_vp)
 }

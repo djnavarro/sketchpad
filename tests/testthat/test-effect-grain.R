@@ -58,7 +58,6 @@ test_that("draw() renders an effect_grain() with a background colour without err
 test_that("effect_grain_grob()'s mask is built from outline@id via pathGrob()/evenodd", {
   ss <- shape_stroke(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1), width = 0.3, n = 20L)
   eg <- effect_grain(ss, resolution = 8L)
-  vp <- grid::viewport(xscale = range(eg@outline@x), yscale = range(eg@outline@y))
-  g <- effect_grain_grob(eg, eg@outline, vp)
+  g <- effect_grain_grob(eg, eg@outline, range(eg@outline@x), range(eg@outline@y))
   expect_true(inherits(g, "gTree"))
 })
