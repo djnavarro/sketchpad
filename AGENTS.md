@@ -781,31 +781,48 @@ Every `drawable` is drawn as a single grob (its type chosen by
 internal `equal_aspect_viewport(xlim, ylim, clip = "off")` helper
 (`R/draw.R`), shared by `draw(drawable)`/`draw(sketch)` (`R/draw.R`) and
 `draw(group)` (`R/group.R`) – one shared implementation rather than
-three copies of the same viewport-construction code (an earlier,
-duplicated version of this code was factored into this helper
-specifically to fix the bug described next). It sizes `width`/`height`
-in `"npc"` units against the *device’s own measured aspect ratio*
-(`device_aspect`, via
+three copies of the same viewport-construction code. It sizes
+`width`/`height` via `"snpc"` units (a fraction of
+`min(device_width, device_height)`, applied to *both* axes) so a 1:1
+aspect ratio between `xlim`/`ylim` is preserved regardless of the
+device’s own aspect ratio. This caps the render at a square inscribed in
+the device even along the axis that isn’t the limiting dimension,
+leaving a white border whenever the device isn’t itself square – a
+deliberate, known tradeoff (see the reverted attempt below), not an
+oversight. `draw(sketch)` computes one shared viewport/axis-range across
+every shape’s points, then draws each shape’s grob into it in list order
+– later shapes are drawn on top.
+
+A later attempt replaced `"snpc"` with plain `"npc"` units sized against
+the device’s own *measured* aspect ratio (`device_aspect`, via
 [`grid::convertWidth()`](https://rdrr.io/r/grid/grid.convert.html)/[`grid::convertHeight()`](https://rdrr.io/r/grid/grid.convert.html)
-against `unit(1, "npc")` – i.e. the full current viewport) rather than a
-fixed number, so the render fills as much of the device as a 1:1 data
-aspect ratio allows: `min(1, data_aspect / device_aspect)` for `width`,
-`min(1, device_aspect / data_aspect)` for `height`, where
-`data_aspect = (xlim[2] - xlim[1]) / (ylim[2] - ylim[1])`. Every caller
-calls [`grid::grid.newpage()`](https://rdrr.io/r/grid/grid.newpage.html)
-*before* `equal_aspect_viewport()`, not after – the device-aspect
-measurement needs to be taken against the whole, freshly-cleared device,
-not whatever viewport happened to be active beforehand. An earlier
-version sized `width`/`height` via `"snpc"` units instead (a fraction of
-`min(device_width, device_height)`, applied to *both* axes); this capped
-the render at a square inscribed in the device even along the axis that
-wasn’t the limiting dimension, producing a large, avoidable white border
-whenever the device wasn’t itself square – confirmed directly that even
-a device sized to exactly match `xlim`/`ylim`’s own aspect ratio still
-rendered bordered under that version. The two versions only coincide
-visually for a perfectly square device. `draw(sketch)` computes one
-shared viewport/axis-range across every shape’s points, then draws each
-shape’s grob into it in list order – later shapes are drawn on top.
+against `unit(1, "npc")`), so the render would fill the full device
+along whichever axis wasn’t the constraint, eliminating that white
+border. It was reverted: `device_aspect` is measured once, at
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)-call time,
+and baked directly into the returned viewport’s `width`/`height` as a
+plain number – correct only if the object is later rasterized on that
+same device. `pkgdown`’s own reference pages build `@examples` output
+this way (evaluating example code against one device, then materializing
+each recorded plot into a separately-sized thumbnail), and rebuilding
+the reference site with the `"npc"` version confirmed the failure
+directly: a regular pentagon
+([`shape_circle()`](https://sketchpad.djnavarro.net/reference/shape_circle.md)’s
+own example), a plain circular arc
+([`curve_arc()`](https://sketchpad.djnavarro.net/reference/curve_arc.md)),
+and a wedge
+([`shape_wedge()`](https://sketchpad.djnavarro.net/reference/shape_wedge.md))
+all rendered visibly non-circular once the baked-in `device_aspect` no
+longer matched the device the thumbnail was actually saved at.
+`"snpc"`’s own coefficient (`x_width / y_width`, the *data’s* own aspect
+ratio) has no such dependency, since `"snpc"` itself – unlike a bare
+`"npc"` fraction – already guarantees a 1:1 aspect ratio no matter which
+device ultimately rasterizes it. **Any future attempt to fill more of a
+non-square device than `"snpc"` allows must not depend on measuring the
+rendering device at
+[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)-call
+time** – that measurement is not guaranteed to match the device the
+returned viewport is eventually drawn on.
 
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) itself
 needs no special-casing for pattern/gradient fills:
@@ -1579,6 +1596,27 @@ full debugging narrative):
   warning built on this was implemented and then reverted for exactly
   this reason (see HISTORY.md); don’t re-attempt a capability check on
   this API without first finding a more reliable signal.
+- **A viewport’s size cannot depend on measuring the device active when
+  it’s *constructed*, if that viewport might later be rasterized on a
+  different device than the one active at that moment.**
+  `equal_aspect_viewport()` (`R/draw.R`) briefly measured the real
+  device’s aspect ratio via
+  [`grid::convertWidth()`](https://rdrr.io/r/grid/grid.convert.html)/[`grid::convertHeight()`](https://rdrr.io/r/grid/grid.convert.html)
+  to fill more of a non-square device than `"snpc"` units alone allow.
+  This baked a plain numeric fraction (derived from whatever device was
+  active at
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) time)
+  directly into the returned viewport’s `width`/`height` – correct only
+  as long as that same device is what the object is eventually
+  rasterized on. `pkgdown`’s own reference-page build evaluates
+  `@examples` code against one device, then materializes each recorded
+  plot into a separately-sized thumbnail, and rebuilding the reference
+  site with this version confirmed the failure directly: circles, arcs,
+  and wedges all rendered visibly non-circular once the baked-in aspect
+  ratio no longer matched the thumbnail’s own device. Reverted back to
+  `"snpc"` units, whose own coefficient depends only on the *data’s*
+  aspect ratio, not the device’s, and so stays correct however the
+  viewport is finally drawn.
 
 ## Structure
 
