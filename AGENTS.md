@@ -777,12 +777,35 @@ pattern\*\*, not get its own standalone topic.
 
 Every `drawable` is drawn as a single grob (its type chosen by
 `geometry` – see `geometry_grob()` above) inside a
-[`grid::viewport()`](https://rdrr.io/r/grid/viewport.html) with
-equal-axis scaling (`width`/`height` set via `"snpc"` units so a 1:1
-aspect ratio is preserved regardless of the device’s own aspect ratio).
-`draw(sketch)` computes one shared viewport/axis-range across every
-shape’s points, then draws each shape’s grob into it in list order –
-later shapes are drawn on top.
+[`grid::viewport()`](https://rdrr.io/r/grid/viewport.html) built by the
+internal `equal_aspect_viewport(xlim, ylim, clip = "off")` helper
+(`R/draw.R`), shared by `draw(drawable)`/`draw(sketch)` (`R/draw.R`) and
+`draw(group)` (`R/group.R`) – one shared implementation rather than
+three copies of the same viewport-construction code (an earlier,
+duplicated version of this code was factored into this helper
+specifically to fix the bug described next). It sizes `width`/`height`
+in `"npc"` units against the *device’s own measured aspect ratio*
+(`device_aspect`, via
+[`grid::convertWidth()`](https://rdrr.io/r/grid/grid.convert.html)/[`grid::convertHeight()`](https://rdrr.io/r/grid/grid.convert.html)
+against `unit(1, "npc")` – i.e. the full current viewport) rather than a
+fixed number, so the render fills as much of the device as a 1:1 data
+aspect ratio allows: `min(1, data_aspect / device_aspect)` for `width`,
+`min(1, device_aspect / data_aspect)` for `height`, where
+`data_aspect = (xlim[2] - xlim[1]) / (ylim[2] - ylim[1])`. Every caller
+calls [`grid::grid.newpage()`](https://rdrr.io/r/grid/grid.newpage.html)
+*before* `equal_aspect_viewport()`, not after – the device-aspect
+measurement needs to be taken against the whole, freshly-cleared device,
+not whatever viewport happened to be active beforehand. An earlier
+version sized `width`/`height` via `"snpc"` units instead (a fraction of
+`min(device_width, device_height)`, applied to *both* axes); this capped
+the render at a square inscribed in the device even along the axis that
+wasn’t the limiting dimension, producing a large, avoidable white border
+whenever the device wasn’t itself square – confirmed directly that even
+a device sized to exactly match `xlim`/`ylim`’s own aspect ratio still
+rendered bordered under that version. The two versions only coincide
+visually for a perfectly square device. `draw(sketch)` computes one
+shared viewport/axis-range across every shape’s points, then draws each
+shape’s grob into it in list order – later shapes are drawn on top.
 
 [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) itself
 needs no special-casing for pattern/gradient fills:
@@ -1715,8 +1738,10 @@ full debugging narrative):
   `Collate` position doesn’t actually matter, since it’s an ordinary
   function, not an S7 class.
 - `R/draw.R` – the `draw` generic and its methods for `drawable` and
-  `sketch`, plus the `class_any` catch-all, and the internal
-  `require_shapes_for_limits()` helper shared with `draw(group)`.
+  `sketch`, plus the `class_any` catch-all, the internal
+  `equal_aspect_viewport()` helper shared with `draw(group)`
+  (`R/group.R`, see “Rendering model” above), and the internal
+  `require_shapes_for_limits()` helper also shared with `draw(group)`.
 - `R/group.R` – the `group` class (see “Class hierarchy” above): three
   `+` methods for accumulating members (`(group, drawable)`,
   `(group, group)`) and setting a style override (`(group, style)`),
@@ -1847,11 +1872,16 @@ full debugging narrative):
   the `properties` NOTE workaround above.
 - Tests live in `tests/testthat/`, one file per drawable/concern
   (`test-drawable.R`, `test-bezier.R`, …).
-- `README.Rmd` holds four worked examples (ring of blobs, scattered
-  blobs, ribbons, twists), each a direct port of an `example_0N.R`
-  script from the `sketches` repo; `devtools::build_readme()`
-  regenerates `README.md` and the figures under `man/figures/`. Re-run
-  it after any change that would alter one of the four examples’ output.
+- `README.Rmd` holds one worked example (`ring-of-blobs`, a direct port
+  of an `example_0N.R` script from the `sketches` repo);
+  `devtools::build_readme()` regenerates `README.md` and the figure
+  under `man/figures/` (`README-ring-of-blobs-1.png`). Re-run it after
+  any change that would alter that example’s output. README.Rmd
+  previously held three more examples (scattered blobs, ribbons,
+  twists); when a worked example is removed from `README.Rmd`, delete
+  its own `man/figures/README-<name>-1.png` too, rather than leaving it
+  orphaned – `devtools::build_readme()` does not clean up figures for
+  chunks that no longer exist.
 
 ## Keeping this documentation current
 
