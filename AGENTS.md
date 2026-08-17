@@ -1556,11 +1556,16 @@ full debugging narrative):
   above.
 - Tests live in `tests/testthat/`, one file per drawable/concern
   (`test-drawable.R`, `test-bezier.R`, ...).
-- `README.Rmd` holds four worked examples (ring of blobs, scattered
-  blobs, ribbons, twists), each a direct port of an `example_0N.R` script
-  from the `sketches` repo; `devtools::build_readme()` regenerates
-  `README.md` and the figures under `man/figures/`. Re-run it after any
-  change that would alter one of the four examples' output.
+- `README.Rmd` holds one worked example (`ring-of-blobs`, a direct port
+  of an `example_0N.R` script from the `sketches` repo);
+  `devtools::build_readme()` regenerates `README.md` and the figure
+  under `man/figures/` (`README-ring-of-blobs-1.png`). Re-run it after
+  any change that would alter that example's output. README.Rmd
+  previously held three more examples (scattered blobs, ribbons,
+  twists); when a worked example is removed from `README.Rmd`, delete
+  its own `man/figures/README-<name>-1.png` too, rather than leaving it
+  orphaned -- `devtools::build_readme()` does not clean up figures for
+  chunks that no longer exist.
 
 ## Keeping this documentation current
 
