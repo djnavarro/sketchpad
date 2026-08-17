@@ -1,6 +1,6 @@
 #' A fanned bristle/dry-brush effect along a path
 #'
-#' `effect_bristle()` builds a [sketch] of `n_bristles` copies of a
+#' `effect_bristle()` builds a [group] of `n_bristles` copies of a
 #' template drawable, fanned out perpendicular to its own backbone path.
 #'
 #' Like [effect_tremor()], no single drawable can express this by itself,
@@ -57,7 +57,7 @@
 #'   Must be at least `2`. Default `100L`.
 #' @param seed Integer seed for the per-bristle randomization and wobble.
 #'   Default `1L`.
-#' @return A [sketch] containing `n_bristles` drawables.
+#' @return A [group] containing `n_bristles` drawables.
 #'
 #' @examples
 #' t <- seq(0, 8, length.out = 200)
@@ -137,5 +137,5 @@ effect_bristle <- function(object,
     )[[1]]
   })
 
-  sketch(shapes = shapes)
+  group(shapes = shapes)
 }

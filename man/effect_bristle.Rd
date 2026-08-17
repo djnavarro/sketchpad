@@ -51,10 +51,10 @@ Must be at least \code{2}. Default \code{100L}.}
 Default \code{1L}.}
 }
 \value{
-A \link{sketch} containing \code{n_bristles} drawables.
+A \link{group} containing \code{n_bristles} drawables.
 }
 \description{
-\code{effect_bristle()} builds a \link{sketch} of \code{n_bristles} copies of a
+\code{effect_bristle()} builds a \link{group} of \code{n_bristles} copies of a
 template drawable, fanned out perpendicular to its own backbone path.
 }
 \details{

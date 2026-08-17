@@ -1,6 +1,6 @@
 #' Layer jittered copies of a drawable for a hand-drawn look
 #'
-#' `effect_tremor()` builds a [sketch] of `layers` such copies: each is a
+#' `effect_tremor()` builds a [group] of `layers` such copies: each is a
 #' copy of `object` (via [S7::set_props()]) with its `x`/`y` displaced by
 #' smooth, seed-offset simplex noise sampled along the path's own
 #' normalized arc-length.
@@ -44,7 +44,7 @@
 #'   values give a slower, smoother wobble; higher values a jumpier one.
 #'   Must be non-negative. Default `0.5`.
 #' @param seed Integer seed for the jitter noise. Default `1L`.
-#' @return A [sketch] containing `layers` drawables.
+#' @return A [group] containing `layers` drawables.
 #'
 #' @examples
 #' template <- curve_line(x = c(0, 1, 2, 3), y = c(0, 1, 0, 1))
@@ -102,5 +102,5 @@ effect_tremor <- function(object,
     ) * jitter
     S7::set_props(object, x = x + dx, y = y + dy)
   })
-  sketch(shapes = shapes)
+  group(shapes = shapes)
 }

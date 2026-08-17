@@ -1,6 +1,6 @@
-test_that("effect_bristle() returns a sketch with the requested number of bristles", {
+test_that("effect_bristle() returns a group with the requested number of bristles", {
   sk <- effect_bristle(shape_stroke(x = c(0, 1, 2), y = c(0, 1, 0), width = 0.05), n_bristles = 5L)
-  expect_s3_class(sk, "sketchpad::sketch")
+  expect_s3_class(sk, "sketchpad::group")
   expect_length(sk, 5)
 })
 
@@ -81,7 +81,7 @@ test_that("effect_bristle() requires a pathlike object with a width property", {
   expect_error(effect_bristle(curve_line(x = c(0, 1), y = c(0, 1))), "`width`")
 })
 
-test_that("draw() renders an effect_bristle() sketch without error", {
+test_that("draw() renders an effect_bristle() group without error", {
   sk <- effect_bristle(shape_stroke(x = c(0, 1, 2), y = c(0, 1, 0), width = 0.05))
   expect_no_error(draw(sk))
 })

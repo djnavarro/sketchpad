@@ -32,10 +32,10 @@ Must be non-negative. Default \code{0.5}.}
 \item{seed}{Integer seed for the jitter noise. Default \code{1L}.}
 }
 \value{
-A \link{sketch} containing \code{layers} drawables.
+A \link{group} containing \code{layers} drawables.
 }
 \description{
-\code{effect_tremor()} builds a \link{sketch} of \code{layers} such copies: each is a
+\code{effect_tremor()} builds a \link{group} of \code{layers} such copies: each is a
 copy of \code{object} (via \code{\link[S7:set_props]{S7::set_props()}}) with its \code{x}/\code{y} displaced by
 smooth, seed-offset simplex noise sampled along the path's own
 normalized arc-length.

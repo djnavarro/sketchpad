@@ -1,6 +1,6 @@
-test_that("effect_tremor() returns a sketch with the requested number of layers", {
+test_that("effect_tremor() returns a group with the requested number of layers", {
   sk <- effect_tremor(curve_line(x = c(0, 1, 2), y = c(0, 1, 0)), layers = 3L)
-  expect_s3_class(sk, "sketchpad::sketch")
+  expect_s3_class(sk, "sketchpad::group")
   expect_length(sk, 3)
 })
 
@@ -65,7 +65,7 @@ test_that("effect_tremor() validates its arguments", {
   expect_error(effect_tremor(shape_ribbon(x = 0, y = 0, xend = 1, yend = 1)), "pathlike")
 })
 
-test_that("draw() renders an effect_tremor() sketch without error", {
+test_that("draw() renders an effect_tremor() group without error", {
   sk <- effect_tremor(curve_line(x = c(0, 1, 2), y = c(0, 1, 0)))
   expect_no_error(draw(sk))
 })
