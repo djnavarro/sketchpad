@@ -152,60 +152,97 @@ geometry_grob <- function(points, sty, geometry, vp, aspect) {
 #' Build an equal-aspect-ratio viewport for a shared xlim/ylim
 #'
 #' Internal helper shared by `draw(drawable)`/`draw(sketch)` (below) and
-#' `draw(group)` (`R/group.R`): builds the single [grid::viewport()] each
-#' of them draws its shape(s) into, sized via `"snpc"` units (a fraction
-#' of `min(device_width, device_height)`, applied to both axes) so a 1:1
-#' aspect ratio between `xlim`/`ylim` is preserved regardless of the
-#' device's own aspect ratio. Referencing this from `R/group.R`, which is
-#' collated later than this file, is safe since it's an ordinary
-#' function looked up at call time, not source time (the same reasoning
-#' `R/group.R`'s own docs already give for `format_prop_value()`).
+#' `draw(group)` (`R/group.R`): builds the single [grid::viewport()]
+#' (technically a [grid::vpStack()] of two, see below) each of them draws
+#' its shape(s) into, sized so a 1:1 aspect ratio between `xlim`/`ylim`
+#' is preserved -- as large as the current device allows, regardless of
+#' the device's own aspect ratio. Referencing this from `R/group.R`,
+#' which is collated later than this file, is safe since it's an
+#' ordinary function looked up at call time, not source time (the same
+#' reasoning `R/group.R`'s own docs already give for
+#' `format_prop_value()`). Whatever this returns is only ever assigned
+#' directly to a grob's own `vp` (in `geometry_grob()`, or as a
+#' `grid::rectGrob()`'s `vp` for a sketch's own background) -- never
+#' inspected via `vp$xscale`/similar -- so any object grid accepts as a
+#' single `vp` value works here.
 #'
-#' A later version briefly replaced `"snpc"` with plain `"npc"` units
-#' sized against the device's own *measured* aspect ratio (`device_aspect`,
-#' via [grid::convertWidth()]/[grid::convertHeight()] against `unit(1,
-#' "npc")`), so the render would fill the full device along whichever
-#' axis wasn't the constraint, rather than always being capped at a
-#' square inscribed in the device -- eliminating the `"snpc"` version's
-#' large, avoidable white border on a non-square device. That version was
-#' reverted: it measures `device_aspect` once, at `draw()` time, and
-#' bakes the resulting numeric fraction directly into the returned
-#' viewport's `width`/`height` -- correct only as long as the object is
-#' ultimately rasterized on that same device. `pkgdown`'s own reference
-#' pages build examples this way (evaluating the `@examples` code against
-#' one device, then materializing each recorded plot into a
-#' separately-sized thumbnail), and confirmed the failure directly: a
-#' regular pentagon, a plain circular arc, and a wedge all rendered
-#' visibly skewed (non-circular) once `equal_aspect_viewport()` baked in
-#' a `device_aspect` from a different device than the one the image was
-#' finally saved at. `"snpc"`'s own numeric coefficient
-#' (`x_width / y_width`, the data's own aspect ratio) has no such
-#' dependency -- it stays correct however and whenever the viewport is
-#' actually rasterized, since `"snpc"` itself (unlike a bare `"npc"`
-#' fraction) already guarantees a 1:1 aspect ratio no matter the
-#' rendering device's own shape. **Any future attempt to fill more of a
-#' non-square device than `"snpc"` allows must not depend on measuring
-#' the rendering device at `draw()`-call time** -- that measurement is
-#' not guaranteed to match the device the returned viewport is eventually
-#' drawn on.
+#' Two earlier versions of this function were tried and rejected before
+#' landing on this one:
+#'
+#' - Sizing `width`/`height` via `"snpc"` units (a fraction of
+#'   `min(device_width, device_height)`, applied to both axes) is always
+#'   *correct* -- `"snpc"` itself guarantees a 1:1 aspect ratio no matter
+#'   the rendering device's own shape -- but caps the render at a square
+#'   inscribed in the device even along the one axis that isn't the
+#'   limiting dimension, leaving a large, avoidable white border whenever
+#'   the device isn't itself square (confirmed directly: even a device
+#'   sized to exactly match `xlim`/`ylim`'s own aspect ratio still
+#'   rendered with a border under this version).
+#' - Replacing `"snpc"` with plain `"npc"` units sized against the
+#'   device's own *measured* aspect ratio (`device_aspect`, via
+#'   [grid::convertWidth()]/[grid::convertHeight()] against `unit(1,
+#'   "npc")`) fixed that border, but measures `device_aspect` once, at
+#'   `draw()`-call time, and bakes the resulting numeric fraction
+#'   directly into the returned viewport's `width`/`height` -- correct
+#'   only as long as the object is later rasterized on that same device.
+#'   `pkgdown`'s own reference pages build examples this way (evaluating
+#'   the `@examples` code against one device, then materializing each
+#'   recorded plot into a separately-sized thumbnail), and confirmed the
+#'   failure directly: a regular pentagon, a plain circular arc, and a
+#'   wedge all rendered visibly skewed (non-circular) once the baked-in
+#'   `device_aspect` no longer matched the device the thumbnail was
+#'   actually saved at.
+#'
+#' This version instead defers the whole aspect-vs-device-shape tradeoff
+#' to [grid::grid.layout()]'s own `respect = TRUE` mechanism, which grid
+#' itself resolves fresh at *every* render (not baked once as a plain
+#' number by this function) -- so it survives a record/replay cycle onto
+#' a differently-shaped device exactly the way `"snpc"` does, while still
+#' filling the device fully whenever the data's own aspect ratio allows
+#' it, matching what the rejected `"npc"` version achieved only for a
+#' single, fixed device. A `1 x 1` `grid.layout()` with its one cell's
+#' `widths`/`heights` set to `x_width`/`y_width` in `"null"` units and
+#' `respect = TRUE` tells grid to size that cell as large as possible
+#' inside its parent while preserving the `x_width:y_width` physical
+#' ratio between them -- exactly the same layout algorithm behind base
+#' graphics' own `asp` argument. A [grid::viewport()] with that layout is
+#' pushed as the outer half of a [grid::vpStack()]; the inner half is an
+#' ordinary [grid::viewport()] positioned at that layout's one cell
+#' (`layout.pos.row = 1, layout.pos.col = 1`) and carrying the actual
+#' `xscale`/`yscale`/`clip` content settings -- confirmed directly, via a
+#' record-on-one-device/replay-on-another test mirroring `pkgdown`'s own
+#' pipeline, that this combination renders undistorted (and replay-safe)
+#' on both a device matching `xlim`/`ylim`'s own aspect ratio (filling it
+#' completely, no border) and a mismatched one (letterboxed on whichever
+#' axis is the constraint, with no skew).
 #'
 #' @param xlim,ylim Length-2 numeric axis limits.
-#' @param clip `"on"` or `"off"`, forwarded to [grid::viewport()]'s own
-#'   `clip`. Default `"off"` -- only `draw(sketch)` has a `canvas@clip`
-#'   setting of its own to forward here; `draw(drawable)`/`draw(group)`
-#'   have no clip concept and always use the default.
-#' @return A [grid::viewport()].
+#' @param clip `"on"` or `"off"`, forwarded to the inner
+#'   [grid::viewport()]'s own `clip`. Default `"off"` -- only
+#'   `draw(sketch)` has a `canvas@clip` setting of its own to forward
+#'   here; `draw(drawable)`/`draw(group)` have no clip concept and always
+#'   use the default.
+#' @return A [grid::vpStack()] of two [grid::viewport()]s.
 #' @noRd
 equal_aspect_viewport <- function(xlim, ylim, clip = "off") {
   x_width <- xlim[2] - xlim[1]
   y_width <- ylim[2] - ylim[1]
-  grid::viewport(
+  outer_vp <- grid::viewport(
+    layout = grid::grid.layout(
+      nrow = 1, ncol = 1,
+      widths  = grid::unit(x_width, "null"),
+      heights = grid::unit(y_width, "null"),
+      respect = TRUE
+    )
+  )
+  inner_vp <- grid::viewport(
+    layout.pos.row = 1,
+    layout.pos.col = 1,
     xscale = xlim,
     yscale = ylim,
-    width  = grid::unit(min(1, x_width / y_width), "snpc"),
-    height = grid::unit(min(1, y_width / x_width), "snpc"),
     clip   = clip
   )
+  grid::vpStack(outer_vp, inner_vp)
 }
 
 #' Error out on an empty shapes list rather than silently drawing `Inf`

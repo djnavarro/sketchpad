@@ -680,44 +680,62 @@ section directly, since a key mismatch doesn't produce any warning at
 ### Rendering model
 
 Every `drawable` is drawn as a single grob (its type chosen by `geometry`
--- see `geometry_grob()` above) inside a `grid::viewport()` built by the
-internal `equal_aspect_viewport(xlim, ylim, clip = "off")` helper
-(`R/draw.R`), shared by `draw(drawable)`/`draw(sketch)` (`R/draw.R`) and
-`draw(group)` (`R/group.R`) -- one shared implementation rather than
-three copies of the same viewport-construction code. It sizes
-`width`/`height` via `"snpc"` units (a fraction of `min(device_width,
-device_height)`, applied to *both* axes) so a 1:1 aspect ratio between
-`xlim`/`ylim` is preserved regardless of the device's own aspect ratio.
-This caps the render at a square inscribed in the device even along the
-axis that isn't the limiting dimension, leaving a white border whenever
-the device isn't itself square -- a deliberate, known tradeoff (see the
-reverted attempt below), not an oversight. `draw(sketch)` computes one
-shared viewport/axis-range across every shape's points, then draws each
-shape's grob into it in list order -- later shapes are drawn on top.
+-- see `geometry_grob()` above) inside a viewport built by the internal
+`equal_aspect_viewport(xlim, ylim, clip = "off")` helper (`R/draw.R`),
+shared by `draw(drawable)`/`draw(sketch)` (`R/draw.R`) and `draw(group)`
+(`R/group.R`) -- one shared implementation rather than three copies of
+the same viewport-construction code. It returns a `grid::vpStack()` of
+two viewports: an outer one carrying a `grid::grid.layout()` (a single
+`nrow = 1, ncol = 1` cell, sized `x_width`/`y_width` in `"null"` units
+with `respect = TRUE`) and an inner one positioned at that layout's one
+cell and carrying the actual `xscale`/`yscale`/`clip`. `respect = TRUE`
+tells `grid` to size that one cell as large as possible inside its
+parent while preserving the physical `x_width:y_width` ratio between
+its `widths`/`heights` -- the same layout algorithm behind base
+graphics' own `asp` argument -- so the render fills the device fully
+whenever the data's own aspect ratio allows it, letterboxing only the
+constrained axis otherwise. Because `grid` resolves a `respect = TRUE`
+layout fresh at *every* render rather than once when the viewport is
+constructed, this stays correct even if the viewport is later replayed
+on a different device than the one active when `draw()` was called
+(e.g. via `grDevices::recordPlot()`/`replayPlot()`) -- confirmed
+directly with exactly that record-on-one-device/replay-on-another test.
+`draw(sketch)` computes one shared viewport/axis-range across every
+shape's points, then draws each shape's grob into it in list order --
+later shapes are drawn on top.
 
-A later attempt replaced `"snpc"` with plain `"npc"` units sized against
-the device's own *measured* aspect ratio (`device_aspect`, via
-`grid::convertWidth()`/`grid::convertHeight()` against `unit(1, "npc")`),
-so the render would fill the full device along whichever axis wasn't the
-constraint, eliminating that white border. It was reverted: `device_aspect`
-is measured once, at `draw()`-call time, and baked directly into the
-returned viewport's `width`/`height` as a plain number -- correct only if
-the object is later rasterized on that same device. `pkgdown`'s own
-reference pages build `@examples` output this way (evaluating example
-code against one device, then materializing each recorded plot into a
-separately-sized thumbnail), and rebuilding the reference site with the
-`"npc"` version confirmed the failure directly: a regular pentagon
-(`shape_circle()`'s own example), a plain circular arc (`curve_arc()`),
-and a wedge (`shape_wedge()`) all rendered visibly non-circular once the
-baked-in `device_aspect` no longer matched the device the thumbnail was
-actually saved at. `"snpc"`'s own coefficient (`x_width / y_width`, the
-*data's* own aspect ratio) has no such dependency, since `"snpc"` itself
--- unlike a bare `"npc"` fraction -- already guarantees a 1:1 aspect
-ratio no matter which device ultimately rasterizes it. **Any future
-attempt to fill more of a non-square device than `"snpc"` allows must
-not depend on measuring the rendering device at `draw()`-call time** --
-that measurement is not guaranteed to match the device the returned
-viewport is eventually drawn on.
+Two earlier versions were tried and rejected before this one. The
+first sized `width`/`height` via plain `"snpc"` units (a fraction of
+`min(device_width, device_height)`, applied to *both* axes) -- always
+correct (`"snpc"` itself guarantees a 1:1 aspect ratio no matter the
+device's own shape), but it caps the render at a square inscribed in
+the device even along the axis that isn't the limiting dimension,
+leaving a white border whenever the device isn't itself square (or even
+when it exactly matches `xlim`/`ylim`'s own aspect ratio). The second
+replaced `"snpc"` with plain `"npc"` units sized against the device's
+own *measured* aspect ratio (`device_aspect`, via
+`grid::convertWidth()`/`grid::convertHeight()` against `unit(1,
+"npc")`), fixing that border -- but `device_aspect` was measured once,
+at `draw()`-call time, and baked directly into the returned viewport's
+`width`/`height` as a plain number, correct only if the object was
+later rasterized on that same device. `pkgdown`'s own reference pages
+build `@examples` output this way (evaluating example code against one
+device, then materializing each recorded plot into a separately-sized
+thumbnail), and rebuilding the reference site with that version
+confirmed the failure directly: a regular pentagon (`shape_circle()`'s
+own example), a plain circular arc (`curve_arc()`), and a wedge
+(`shape_wedge()`) all rendered visibly non-circular once the baked-in
+`device_aspect` no longer matched the device the thumbnail was actually
+saved at. The `vpStack()`/`respect = TRUE` version above combines both
+versions' advantages -- full-device fill *and* replay safety -- by
+deferring the aspect-vs-device-shape resolution to `grid`'s own layout
+engine instead of computing and baking in a number itself. **Any future
+change to this viewport-sizing logic must not bake a number derived
+from measuring the rendering device at `draw()`-call time** -- that
+measurement is not guaranteed to match the device the returned viewport
+is eventually drawn on; prefer a mechanism `grid` itself re-resolves at
+every render, the way `respect = TRUE` layouts (and `"snpc"`/`"npc"`
+units themselves) already do.
 
 `draw()` itself needs no special-casing for pattern/gradient fills:
 `grid::gpar(fill = ...)` already accepts a colour string or a
@@ -1318,22 +1336,33 @@ full debugging narrative):
   first finding a more reliable signal.
 - **A viewport's size cannot depend on measuring the device active when
   it's *constructed*, if that viewport might later be rasterized on a
-  different device than the one active at that moment.** `equal_aspect_viewport()`
-  (`R/draw.R`) briefly measured the real device's aspect ratio via
-  `grid::convertWidth()`/`grid::convertHeight()` to fill more of a
-  non-square device than `"snpc"` units alone allow. This baked a plain
-  numeric fraction (derived from whatever device was active at `draw()`
-  time) directly into the returned viewport's `width`/`height` -- correct
-  only as long as that same device is what the object is eventually
-  rasterized on. `pkgdown`'s own reference-page build evaluates
-  `@examples` code against one device, then materializes each recorded
-  plot into a separately-sized thumbnail, and rebuilding the reference
-  site with this version confirmed the failure directly: circles, arcs,
-  and wedges all rendered visibly non-circular once the baked-in
-  aspect ratio no longer matched the thumbnail's own device. Reverted
-  back to `"snpc"` units, whose own coefficient depends only on the
-  *data's* aspect ratio, not the device's, and so stays correct however
-  the viewport is finally drawn.
+  different device than the one active at that moment -- but `grid`'s own
+  `respect = TRUE` layout mechanism is a legitimate way around this.**
+  `equal_aspect_viewport()` (`R/draw.R`) briefly measured the real
+  device's aspect ratio via `grid::convertWidth()`/`grid::convertHeight()`
+  to fill more of a non-square device than `"snpc"` units alone allow.
+  This baked a plain numeric fraction (derived from whatever device was
+  active at `draw()` time) directly into the returned viewport's
+  `width`/`height` -- correct only as long as that same device is what
+  the object is eventually rasterized on. `pkgdown`'s own reference-page
+  build evaluates `@examples` code against one device, then materializes
+  each recorded plot into a separately-sized thumbnail, and rebuilding
+  the reference site with this version confirmed the failure directly:
+  circles, arcs, and wedges all rendered visibly non-circular once the
+  baked-in aspect ratio no longer matched the thumbnail's own device.
+  A first fix reverted back to `"snpc"` units (whose own coefficient
+  depends only on the *data's* aspect ratio, not the device's, so it
+  stays correct however the viewport is finally drawn) -- correct, but
+  bringing back `"snpc"`'s own white-border limitation. The actual fix
+  was a `grid::vpStack()` of a `grid::grid.layout(respect = TRUE)`-based
+  outer viewport (sized `x_width`/`y_width` in `"null"` units) and an
+  inner `xscale`/`yscale` viewport positioned at that layout's one cell:
+  `respect = TRUE` layouts are resolved by `grid` fresh at every render,
+  not baked once by this package's own code, so they get the same
+  replay-safety as `"snpc"`/`"npc"` units themselves while still filling
+  the device fully whenever the data's own aspect ratio allows it --
+  confirmed directly with the same record-on-one-device/
+  replay-on-another test that caught the original regression.
 
 ## Structure
 
