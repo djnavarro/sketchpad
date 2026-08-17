@@ -49,10 +49,17 @@ validate_save_args <- function(object, filename, width, height) {
 #'
 #' @param object A [drawable] or [sketch] object.
 #' @param filename A single string, the path to write to.
-#' @param width,height Image dimensions in inches. Default `7`.
+#' @param width,height Image dimensions, in `units` for `save_png()` (default
+#'   inches) or always in inches for `save_svg()`/`save_pdf()`, which have no
+#'   `units` argument of their own. Default `7`.
 #' @param dpi Resolution in dots per inch. Only meaningful for
 #'   `save_png()` (a raster format); ignored by `save_svg()`/`save_pdf()`,
 #'   which are drawn at vector resolution. Default `300`.
+#' @param units One of `"in"` (the default), `"cm"`, `"mm"`, or `"px"`,
+#'   forwarded to [grDevices::png()]'s own `units` argument -- only
+#'   meaningful for `save_png()`; `save_svg()`/`save_pdf()` have no `units`
+#'   argument, since [grDevices::svg()]/[grDevices::pdf()] always take
+#'   `width`/`height` in inches.
 #' @param bg Background colour passed to the underlying device, e.g.
 #'   `"white"` (the default) or `"transparent"`. This is the device's own
 #'   page colour, independent of any [canvas()] `background` a `sketch`
@@ -76,12 +83,15 @@ validate_save_args <- function(object, filename, width, height) {
 #'
 #' @family export helpers
 #' @export
-save_png <- function(object, filename, width = 7, height = 7, dpi = 300, bg = "white", ...) {
+save_png <- function(object, filename, width = 7, height = 7, dpi = 300, bg = "white", units = "in", ...) {
   validate_save_args(object, filename, width, height)
   if (!is.numeric(dpi) || length(dpi) != 1 || dpi <= 0) {
     rlang::abort("`dpi` must be a single positive number.")
   }
-  grDevices::png(filename, width = width, height = height, units = "in", res = dpi, bg = bg)
+  if (!is.character(units) || length(units) != 1 || !units %in% c("in", "cm", "mm", "px")) {
+    rlang::abort('`units` must be one of "in", "cm", "mm", or "px".')
+  }
+  grDevices::png(filename, width = width, height = height, units = units, res = dpi, bg = bg)
   on.exit(grDevices::dev.off())
   draw(object, ...)
   invisible(filename)

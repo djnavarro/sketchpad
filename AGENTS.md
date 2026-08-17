@@ -971,18 +971,21 @@ purely through `S7::methods_register()` in `.onLoad()`.
 afterward via `on.exit(grDevices::dev.off())` registered *before*
 `draw()` runs, so the device is closed even if `draw()` itself errors.
 All three take an `object` (`drawable` or `sketch`), `filename`,
-`width`/`height` (always inches, including for `save_png()`, so a
-single shared `validate_save_args()` check is meaningful across every
-format), and `bg` (device page colour, default `"white"`, independent
+`width`/`height` (interpreted in `units` for `save_png()`, always
+inches for `save_svg()`/`save_pdf()`, which have no `units` concept of
+their own -- `validate_save_args()`'s own `width`/`height > 0` check is
+shared across every format regardless, since that part doesn't depend
+on units), and `bg` (device page colour, default `"white"`, independent
 of and composable with any `canvas()` background a `sketch` already
-carries). `save_png()` alone also takes `dpi` (default `300`, converted
-to pixels via `png()`'s own `units = "in", res = dpi`), since the two
-vector formats have no equivalent notion of resolution. `save_svg()`/
-`save_pdf()` document under `save_png()`'s own topic via `@rdname`, the
-same merged-topic pattern the plural `shape_*s()` constructors use (see
-above) -- each subsequent block has no title text of its own, the same
-minimal-block shape `shape_square()`'s own `@rdname`-merged block
-already uses.
+carries). `save_png()` alone also takes `dpi` (default `300`) and
+`units` (one of `"in"` (default)/`"cm"`/`"mm"`/`"px"`, forwarded
+directly to `grDevices::png()`'s own `units`/`res` arguments), since the
+two vector formats have no equivalent notion of resolution or pixel
+sizing. `save_svg()`/`save_pdf()` document under `save_png()`'s own
+topic via `@rdname`, the same merged-topic pattern the plural
+`shape_*s()` constructors use (see above) -- each subsequent block has
+no title text of its own, the same minimal-block shape
+`shape_square()`'s own `@rdname`-merged block already uses.
 
 ### The `palette_*()` colour-vector family
 

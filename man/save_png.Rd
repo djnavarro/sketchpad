@@ -6,7 +6,16 @@
 \alias{save_pdf}
 \title{Save a drawable or sketch to an image file}
 \usage{
-save_png(object, filename, width = 7, height = 7, dpi = 300, bg = "white", ...)
+save_png(
+  object,
+  filename,
+  width = 7,
+  height = 7,
+  dpi = 300,
+  bg = "white",
+  units = "in",
+  ...
+)
 
 save_svg(object, filename, width = 7, height = 7, bg = "white", ...)
 
@@ -17,7 +26,9 @@ save_pdf(object, filename, width = 7, height = 7, bg = "white", ...)
 
 \item{filename}{A single string, the path to write to.}
 
-\item{width, height}{Image dimensions in inches. Default \code{7}.}
+\item{width, height}{Image dimensions, in \code{units} for \code{save_png()} (default
+inches) or always in inches for \code{save_svg()}/\code{save_pdf()}, which have no
+\code{units} argument of their own. Default \code{7}.}
 
 \item{dpi}{Resolution in dots per inch. Only meaningful for
 \code{save_png()} (a raster format); ignored by \code{save_svg()}/\code{save_pdf()},
@@ -30,6 +41,12 @@ itself already carries -- the two compose, so a transparent \code{bg}
 here still shows an opaque \code{canvas()} background underneath, and vice
 versa a \code{sketch} with no \code{canvas()} background shows \code{bg} through
 any of its own shapes that don't fully cover the page.}
+
+\item{units}{One of \code{"in"} (the default), \code{"cm"}, \code{"mm"}, or \code{"px"},
+forwarded to \code{\link[grDevices:png]{grDevices::png()}}'s own \code{units} argument -- only
+meaningful for \code{save_png()}; \code{save_svg()}/\code{save_pdf()} have no \code{units}
+argument, since \code{\link[grDevices:svg]{grDevices::svg()}}/\code{\link[grDevices:pdf]{grDevices::pdf()}} always take
+\code{width}/\code{height} in inches.}
 
 \item{...}{Passed on to \code{\link[=draw]{draw()}}, e.g. \code{xlim}/\code{ylim}.}
 }
