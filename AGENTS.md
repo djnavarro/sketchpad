@@ -680,12 +680,34 @@ section directly, since a key mismatch doesn't produce any warning at
 ### Rendering model
 
 Every `drawable` is drawn as a single grob (its type chosen by `geometry`
--- see `geometry_grob()` above) inside a `grid::viewport()` with
-equal-axis scaling (`width`/`height` set via `"snpc"` units so a 1:1
-aspect ratio is preserved regardless of the device's own aspect ratio).
-`draw(sketch)` computes one shared viewport/axis-range across every
-shape's points, then draws each shape's grob into it in list order --
-later shapes are drawn on top.
+-- see `geometry_grob()` above) inside a `grid::viewport()` built by the
+internal `equal_aspect_viewport(xlim, ylim, clip = "off")` helper
+(`R/draw.R`), shared by `draw(drawable)`/`draw(sketch)` (`R/draw.R`) and
+`draw(group)` (`R/group.R`) -- one shared implementation rather than
+three copies of the same viewport-construction code (an earlier,
+duplicated version of this code was factored into this helper
+specifically to fix the bug described next). It sizes `width`/`height`
+in `"npc"` units against the *device's own measured aspect ratio*
+(`device_aspect`, via `grid::convertWidth()`/`grid::convertHeight()`
+against `unit(1, "npc")` -- i.e. the full current viewport) rather than
+a fixed number, so the render fills as much of the device as a 1:1 data
+aspect ratio allows: `min(1, data_aspect / device_aspect)` for `width`,
+`min(1, device_aspect / data_aspect)` for `height`, where `data_aspect
+= (xlim[2] - xlim[1]) / (ylim[2] - ylim[1])`. Every caller calls
+`grid::grid.newpage()` *before* `equal_aspect_viewport()`, not after --
+the device-aspect measurement needs to be taken against the whole,
+freshly-cleared device, not whatever viewport happened to be active
+beforehand. An earlier version sized `width`/`height` via `"snpc"`
+units instead (a fraction of `min(device_width, device_height)`,
+applied to *both* axes); this capped the render at a square inscribed
+in the device even along the axis that wasn't the limiting dimension,
+producing a large, avoidable white border whenever the device wasn't
+itself square -- confirmed directly that even a device sized to exactly
+match `xlim`/`ylim`'s own aspect ratio still rendered bordered under
+that version. The two versions only coincide visually for a perfectly
+square device. `draw(sketch)` computes one shared viewport/axis-range
+across every shape's points, then draws each shape's grob into it in
+list order -- later shapes are drawn on top.
 
 `draw()` itself needs no special-casing for pattern/gradient fills:
 `grid::gpar(fill = ...)` already accepts a colour string or a
@@ -1416,8 +1438,10 @@ full debugging narrative):
   `Collate` position doesn't actually matter, since it's an ordinary
   function, not an S7 class.
 - `R/draw.R` -- the `draw` generic and its methods for `drawable` and
-  `sketch`, plus the `class_any` catch-all, and the internal
-  `require_shapes_for_limits()` helper shared with `draw(group)`.
+  `sketch`, plus the `class_any` catch-all, the internal
+  `equal_aspect_viewport()` helper shared with `draw(group)`
+  (`R/group.R`, see "Rendering model" above), and the internal
+  `require_shapes_for_limits()` helper also shared with `draw(group)`.
 - `R/group.R` -- the `group` class (see "Class hierarchy" above): three
   `+` methods for accumulating members (`(group, drawable)`,
   `(group, group)`) and setting a style override (`(group, style)`), four

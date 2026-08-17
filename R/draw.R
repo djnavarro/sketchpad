@@ -149,6 +149,59 @@ geometry_grob <- function(points, sty, geometry, vp, aspect) {
   )
 }
 
+#' Build an equal-aspect-ratio viewport for a shared xlim/ylim
+#'
+#' Internal helper shared by `draw(drawable)`/`draw(sketch)` (below) and
+#' `draw(group)` (`R/group.R`): builds the single [grid::viewport()] each
+#' of them draws its shape(s) into, sized so a 1:1 aspect ratio between
+#' `xlim`/`ylim` is preserved -- as large as the current device allows,
+#' regardless of the device's own aspect ratio. Referencing this from
+#' `R/group.R`, which is collated later than this file, is safe since
+#' it's an ordinary function looked up at call time, not source time
+#' (the same reasoning `R/group.R`'s own docs already give for
+#' `format_prop_value()`).
+#'
+#' An earlier version sized `width`/`height` via `"snpc"` units, which
+#' are always a fraction of `min(device_width, device_height)` applied
+#' to *both* axes -- so the render could never exceed a square inscribed
+#' in the device, even along the one axis that wasn't the limiting
+#' dimension, leaving a large, avoidable white border whenever the
+#' device wasn't itself square (confirmed directly: even a device sized
+#' to exactly match `xlim`/`ylim`'s own aspect ratio still rendered with
+#' a border under the `"snpc"` version). This version instead measures
+#' the device's actual aspect ratio directly (`device_aspect`, via
+#' [grid::convertWidth()]/[grid::convertHeight()] against `unit(1,
+#' "npc")` -- i.e. the full current viewport, which every caller ensures
+#' is the whole, freshly-cleared device by calling [grid::grid.newpage()]
+#' before this function runs) and sizes `width`/`height` in plain
+#' `"npc"` units against *that*, so the render fills the full device
+#' along whichever axis isn't the constraint, with padding only on the
+#' other -- reducing to the same visual result as the `"snpc"` version
+#' only in the special case of a perfectly square device.
+#'
+#' @param xlim,ylim Length-2 numeric axis limits.
+#' @param clip `"on"` or `"off"`, forwarded to [grid::viewport()]'s own
+#'   `clip`. Default `"off"` -- only `draw(sketch)` has a `canvas@clip`
+#'   setting of its own to forward here; `draw(drawable)`/`draw(group)`
+#'   have no clip concept and always use the default.
+#' @return A [grid::viewport()].
+#' @noRd
+equal_aspect_viewport <- function(xlim, ylim, clip = "off") {
+  x_width <- xlim[2] - xlim[1]
+  y_width <- ylim[2] - ylim[1]
+  data_aspect <- x_width / y_width
+  device_aspect <-
+    grid::convertWidth(grid::unit(1, "npc"), "inches", valueOnly = TRUE) /
+    grid::convertHeight(grid::unit(1, "npc"), "inches", valueOnly = TRUE)
+  grid::viewport(
+    xscale = xlim,
+    yscale = ylim,
+    width  = grid::unit(min(1, data_aspect / device_aspect), "npc"),
+    height = grid::unit(min(1, device_aspect / data_aspect), "npc"),
+    clip   = clip
+  )
+}
+
 #' Error out on an empty shapes list rather than silently drawing `Inf`
 #'
 #' Internal helper shared by `draw(sketch)` and `draw(group)` (`R/group.R`):
@@ -181,24 +234,21 @@ require_shapes_for_limits <- function(shapes, xlim, ylim, context) {
 #' @export
 #' @noRd
 S7::method(draw, drawable) <- function(object, xlim = NULL, ylim = NULL, ...) {
-  # plotting area is a single viewport with equal-axis scaling
+  # plotting area is a single viewport with equal-axis scaling; a fresh
+  # page is started before building it, since equal_aspect_viewport()
+  # measures the current device's own aspect ratio and needs that
+  # measurement taken against the whole, freshly-cleared device rather
+  # than whatever viewport happened to be active beforehand
   if (is.null(xlim)) xlim <- range(object@points@x)
   if (is.null(ylim)) ylim <- range(object@points@y)
-  x_width <- xlim[2] - xlim[1]
-  y_width <- ylim[2] - ylim[1]
-  vp <- grid::viewport(
-    xscale = xlim,
-    yscale = ylim,
-    width  = grid::unit(min(1, x_width / y_width), "snpc"),
-    height = grid::unit(min(1, y_width / x_width), "snpc"),
-  )
+  grid::grid.newpage()
+  vp <- equal_aspect_viewport(xlim, ylim)
 
   # grob type depends on the drawable's geometry; sty@fill (a fill object)
   # is resolved against this drawable's own bounding-box aspect ratio
   grob <- geometry_grob(object@points, object@style, object@geometry, vp, bbox_aspect(object))
 
   # draw the grob
-  grid::grid.newpage()
   grid::grid.draw(grob)
 }
 
@@ -232,21 +282,21 @@ S7::method(draw, sketch) <- function(object, xlim = NULL, ylim = NULL, ...) {
   }
 
   # plotting area is a single viewport with equal-axis scaling; clip only
-  # takes effect when canvas@clip is TRUE (see canvas()'s docs)
-  x_width <- xlim[2] - xlim[1]
-  y_width <- ylim[2] - ylim[1]
-  vp <- grid::viewport(
-    xscale = xlim,
-    yscale = ylim,
-    width  = grid::unit(min(1, x_width / y_width), "snpc"),
-    height = grid::unit(min(1, y_width / x_width), "snpc"),
-    clip   = if (object@canvas@clip) "on" else "off"
+  # takes effect when canvas@clip is TRUE (see canvas()'s docs). A fresh
+  # page is started before building the viewport, since
+  # equal_aspect_viewport() measures the current device's own aspect
+  # ratio and needs that measurement taken against the whole,
+  # freshly-cleared device rather than whatever viewport happened to be
+  # active beforehand
+  grid::grid.newpage()
+  vp <- equal_aspect_viewport(
+    xlim, ylim,
+    clip = if (object@canvas@clip) "on" else "off"
   )
 
-  # draw the page, canvas background, then every shape's grob on top; the
+  # draw the canvas background, then every shape's grob on top; the
   # background has no single target drawable, so its own aspect comes from
   # the shared viewport's xlim/ylim instead of bbox_aspect()
-  grid::grid.newpage()
   bg <- resolve_fill(object@canvas@background, bbox_aspect_range(xlim, ylim))
   if (!(is.character(bg) && length(bg) == 1 && is.na(bg))) {
     grid::grid.draw(grid::rectGrob(gp = grid::gpar(fill = bg, col = NA), vp = vp))
