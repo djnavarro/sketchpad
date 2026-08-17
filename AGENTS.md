@@ -560,27 +560,69 @@ how the API got here, see
   edge onto the bare page. `sketch` stores one as its own `canvas`
   property, default
   [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md).
-- **`sketch`** – a list of `drawable`s (`shapes` property) plus a
-  `canvas` (background/framing settings, default
+- **`sketch`** – a list of `drawable`/`group` objects (`shapes`
+  property) plus a `canvas` (background/framing settings, default
   [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md)).
-  Built up with `sketch() + shape_circle() + shape_blob(...)`; the `+`
-  method requires an S7 method registration, not an S3 `` `+.sketch` ``
-  (see “Gotchas”). Uses a custom `constructor` (rather than S7’s
-  auto-generated one) purely so `canvas`’s default can be a pre-built
+  Built up with `sketch() + shape_circle() + shape_blob(...)` (or
+  `sketch() + a_group`); the `+` method requires an S7 method
+  registration, not an S3 `` `+.sketch` `` (see “Gotchas”). Uses a
+  custom `constructor` (rather than S7’s auto-generated one) purely so
+  `canvas`’s default can be a pre-built
   [`canvas()`](https://sketchpad.djnavarro.net/reference/canvas.md)
   object rather than an embedded property default – see “Gotchas”.
   `R/sketch.R` also holds two more `+` methods, overloading the same
   operator for a different purpose: `method(\`+\`, list(drawable,
   trans))`composes a [trans] onto a single drawable's own`@trans`, and`method(\`+\`,
-  list(sketch, trans))\` maps that same composition over every shape in
-  a sketch at once – see \[trans\] above.
+  list(sketch,
+  trans))`maps that same composition over every shape in a sketch at once -- see [trans] above.`method(\`+\`,
+  list(sketch,
+  group))`(`R/group.R`) is the fourth: it appends a whole`group`as a single element of`@shapes\`,
+  alongside any plain drawables already there.
+- **`group`** – not a `drawable`; a nested collection of `drawable`/
+  `group` objects (`shapes`) sharing one `trans` (default
+  [`trans_identity()`](https://sketchpad.djnavarro.net/reference/trans_identity.md))
+  and, optionally, one `style` override (`class_any` so a literal `NULL`
+  default – “no override” – is stored as a genuine `NULL` rather than
+  something S7 substitutes for “no default given”, the same
+  `xlim`/`ylim` treatment `canvas` already needs – see “Gotchas”).
+  `sketch` represents a whole canvas of independently-styled/-positioned
+  shapes; `group` instead represents several shapes meant to
+  move/restyle *as one unit* – typically the output of an `effect_*()`
+  function (see “Compositional effects” below), but also constructible
+  and composable by hand the same way a `sketch` is:
+  `group() + shape_circle() + shape_circle(x = 2)`. Built up and
+  transformed with the same `+` idiom as `drawable`/`sketch`:
+  `method(\`+\`, list(group, drawable))`/`method(\`+\`, list(group,
+  group))`accumulate members;`method(\`+\`, list(group,
+  ))`composes onto the group's own`@trans`(applied to every member as a unit at draw time, via the internal`compose_group_trans()`helper -- mirrors`compose_drawable_trans()`/`compose_sketch_trans()`in`R/sketch.R`) without touching any member's own`@trans`;`method(\`+\`,
+  list(group,
+  style))`replaces`@style`wholesale. A`group`can itself be added to a`sketch`(`method(\`+\`,
+  list(sketch,
+  group))`, see`sketch`above) or nested inside another`group`, and mixed freely with plain`drawable`s in either container --`group`'s own validator accepts a`shapes`list of`drawable`/`group`objects, exactly like`sketch`'s. When a`style`override is set, it's meant to replace every *descendant* drawable's own`@style`at draw time -- a nested`group`with no`style`of its own inherits its ancestor's override; a nested`group`that sets its own`style`keeps that instead (the nearest override wins, it does not stack). This cascade, plus the trans composition, is resolved by three internal helpers in`R/group.R`, not by`group`itself:`resolve_group\_
+  member()`turns one`shapes`element into a flat list of one or more plain drawables (a plain`drawable`becomes a single-element list, a copy with`@trans`composed as`<member@trans> +
+  ancestor_trans`-- member's own transform first, then every enclosing group's, outermost last -- and`@style`replaced by the nearest non-`NULL`ancestor override, if any; a`group`member recurses instead);`resolve_group(g,
+  ancestor_trans,
+  ancestor_style)`resolves`g`'s own`@trans`/`@style`against what's already accumulated from its enclosing groups, then maps`resolve_group_member()`over`<g@shapes>`and flattens the result;`flatten_shapes(shapes)`is the entry point shared by`draw(sketch)`and`draw(group)`, expanding every`group`element of a mixed`drawable`/`group`list (starting from an identity trans/no override, since neither has an ancestor at the top level) so the rest of`draw()`-- in particular`geometry_grob()`-- never needs to know a`sketch`/`group`can nest at all.`length()``` /`` ```\[\[``` ``/ `` ```\[``` `` work on a ```group`the same way they do on a`sketch`(list-like access to`@shapes`).`group`has its own`format()`/`print()`method, mirroring`format(sketch)`(see "`print()`/`format()\`
+  methods” below).
 - **[`draw()`](https://sketchpad.djnavarro.net/reference/draw.md)** – S7
   generic, `dispatch_args = "object"`. Methods for `drawable` (single
-  shape) and `sketch` (renders every shape into one shared, equal-aspect
-  viewport); a catch-all method on `class_any` warns and returns
-  `invisible(NULL)` for anything else. `xlim`/`ylim` default to
-  `object@canvas@xlim`/`@ylim` (for the `sketch` method only), falling
-  back to the range of the object’s own points when both are `NULL`; an
+  shape), `sketch`, and `group` (each of the latter two renders every
+  shape into one shared, equal-aspect viewport); a catch-all method on
+  `class_any` warns and returns `invisible(NULL)` for anything else.
+  `draw(sketch)`/`draw(group)` both start by resolving their own mixed
+  `drawable`/`group` `shapes` list down to plain drawables –
+  `draw(sketch)` via `flatten_shapes(object@shapes)` (no ancestor
+  trans/style, since a sketch has none of its own to apply),
+  `draw(group)` via `resolve_group(object)` (which *does* fold in
+  `object`‘s own `@trans`/`@style`, since a group being drawn directly
+  has no outer container to have already applied them) – so the rest of
+  each method only ever handles plain drawables. Both then share the
+  internal `require_shapes_for_limits()` helper (`R/draw.R`), erroring
+  clearly on an empty `shapes` list with no explicit `xlim`/`ylim` to
+  fall back to, rather than silently computing an `Inf`/`-Inf` range.
+  `xlim`/`ylim` default to `object@canvas@xlim`/`@ylim` (for the
+  `sketch` method only – `group` has no `canvas`), falling back to the
+  range of the resolved shapes’ own points when both are `NULL`; an
   explicit `xlim`/`ylim` argument to
   [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) itself
   always takes precedence over `canvas`’s own stored values. The
@@ -590,10 +632,10 @@ how the API got here, see
   shape (skipped entirely when `background` is the default
   [`fill_none()`](https://sketchpad.djnavarro.net/reference/fill_none.md)),
   and sets the shared viewport’s `clip` from `object@canvas@clip`.
-  `draw(drawable)` (the single-shape method) has no `canvas` concept –
-  background/clip are sketch-level only. Both methods build their grob
-  via the internal `geometry_grob()` helper (`R/draw.R`), which switches
-  on a drawable’s `geometry` property:
+  `draw(drawable)` (the single-shape method) and `draw(group)` have no
+  `canvas` concept – background/clip are sketch-level only. All three
+  methods build their grob via the internal `geometry_grob()` helper
+  (`R/draw.R`), which switches on a drawable’s `geometry` property:
   [`grid::pathGrob()`](https://rdrr.io/r/grid/grid.path.html) for
   `"polygon"`,
   [`grid::polylineGrob()`](https://rdrr.io/r/grid/grid.lines.html) for
@@ -1000,11 +1042,13 @@ Shared argument validation lives in the internal `validate_fill_args()`
 
 ### `print()`/`format()` methods
 
-`drawable` and `sketch` each have dedicated
-[`format()`](https://rdrr.io/r/base/format.html)/[`print()`](https://rdrr.io/r/base/print.html)
-methods (`R/format.R`), registered on base R’s own generics the same way
-`+`/ `convert()` already are (`S7::method(format, drawable) <- ...`,
-etc.) – picked up automatically by the existing
+`drawable`, `sketch`, and `group` each have dedicated
+[`format()`](https://rdrr.io/r/base/format.html)/
+[`print()`](https://rdrr.io/r/base/print.html) methods
+(`drawable`/`sketch` in `R/format.R`, `group` in `R/group.R` itself),
+registered on base R’s own generics the same way `+`/`convert()` already
+are (`S7::method(format, drawable) <- ...`, etc.) – picked up
+automatically by the existing
 [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/methods_register.html)
 call in `.onLoad()`, with no further registration needed. Each `print`
 method is a one-line `cat(format(x, ...), sep = "\n"); invisible(x)`
@@ -1038,6 +1082,17 @@ a `trans_warp` is `"warp"`; a `trans_chain` is `"chain (n steps)"`.
 singular/plural handled explicitly), each shape’s own class name in list
 order, and a short `canvas` summary (`background`/`clip`, via the same
 `format_prop_value()` helper).
+
+`format(group)` (`R/group.R`) mirrors `format(sketch)`: shape count
+(`"<group: n shapes>"`), each member’s own class name in list order (a
+nested `group` member prints as `"group"`, the same way any other member
+prints its own class), a `trans` summary via the shared
+`format_trans_summary()`, and a `style` summary – `"none"` when no
+override is set (the default), or the same `color`/`fill`/`linewidth`
+summary `format(drawable)` uses for its own `style` otherwise.
+Referencing `format_prop_value()`/`format_trans_summary()` from
+`R/group.R`, which is collated later than `R/format.R`, is safe since
+both are ordinary functions looked up at call time, not source time.
 
 As with `+`/`convert()`, each `method(format, ...)`/`method(print, ...)`
 assignment carries `#' @export`/`#' @noRd` for source-level readability
@@ -1181,13 +1236,13 @@ is `pathlike` but has no `width`).
 
 [`effect_tremor()`](https://sketchpad.djnavarro.net/reference/effect_tremor.md)
 (`R/effect_tremor.R`) is the first member of this family: a plain
-function (no S7 class) that composes several drawables into a `sketch`
+function (no S7 class) that composes several drawables into a `group`
 for a visual effect no single drawable can express by itself. It builds
 `layers` independently-jittered copies of `object`’s own path – each a
 `S7::set_props(object, x = ..., y = ...)` copy, displaced by smooth,
 seed-offset simplex noise sampled along the path’s own normalized
 arc-length (not raw `x`/`y` position, so the jitter’s shape doesn’t
-depend on the path’s own scale) – collected into one `sketch`. This
+depend on the path’s own scale) – collected into one `group`. This
 formalizes an ad hoc technique used, during
 [`shape_stroke()`](https://sketchpad.djnavarro.net/reference/shape_stroke.md)’s
 own development, to add a wobbling pencil-edge look on top of a stroke
@@ -1659,14 +1714,36 @@ full debugging narrative):
   `resample_by_length()` helpers); like `effect_tremor.R`, its exact
   `Collate` position doesn’t actually matter, since it’s an ordinary
   function, not an S7 class.
-- `R/draw.R` – the `draw` generic and its three methods (`drawable`,
-  `sketch`, and the `class_any` catch-all).
+- `R/draw.R` – the `draw` generic and its methods for `drawable` and
+  `sketch`, plus the `class_any` catch-all, and the internal
+  `require_shapes_for_limits()` helper shared with `draw(group)`.
+- `R/group.R` – the `group` class (see “Class hierarchy” above): three
+  `+` methods for accumulating members (`(group, drawable)`,
+  `(group, group)`) and setting a style override (`(group, style)`),
+  four more composing a transform onto `@trans` (one per
+  `trans`/`trans_warp`/ `trans_fn`/`trans_chain`, via the shared
+  `compose_group_trans()` helper), a fifth adding a `group` to a
+  `sketch` (`(sketch, group)`),
+  [`length()`](https://rdrr.io/r/base/length.html)/`` `[[` ``/`` `[` ``
+  for list-like access to `@shapes`, its own
+  [`format()`](https://rdrr.io/r/base/format.html)/[`print()`](https://rdrr.io/r/base/print.html)
+  methods, the internal `resolve_group_member()`/
+  `resolve_group()`/`flatten_shapes()` helpers, and its own
+  [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) method.
+  Collated right after `draw.R`, since registering `draw(group)` needs
+  the `draw` generic to already exist – unlike `vectorize.R`/
+  `effect_tremor.R`/`effect_bristle.R`, this file’s `Collate` position
+  *does* matter, for that reason. `draw(sketch)` (`R/draw.R`, collated
+  earlier) also calls this file’s `flatten_shapes()` at *call* time, not
+  source time, so the reverse dependency (`draw.R` -\> `group.R`) needs
+  no `Collate` ordering of its own.
 - `R/effect_grain.R` – the `effect_grain` class and its own
   [`draw()`](https://sketchpad.djnavarro.net/reference/draw.md) method
-  (see “Compositional effects” above). Collated right after `draw.R`,
-  since registering its method needs the `draw` generic to already
-  exist; unlike `vectorize.R`/`effect_tremor.R`/ `effect_bristle.R`,
-  this file’s `Collate` position *does* matter, for that reason.
+  (see “Compositional effects” above). Collated right after `group.R`,
+  since registering its method needs the `draw` generic to already exist
+  (true since `draw.R` itself, two files earlier); unlike
+  `vectorize.R`/`effect_tremor.R`/`effect_bristle.R`, this file’s
+  `Collate` position *does* matter, for that reason.
 - `R/convert.R` – the `convert(drawable, shape_raw)` method.
 - `R/save.R` –
   [`save_png()`](https://sketchpad.djnavarro.net/reference/save_png.md)/[`save_svg()`](https://sketchpad.djnavarro.net/reference/save_png.md)/[`save_pdf()`](https://sketchpad.djnavarro.net/reference/save_png.md),
@@ -1691,9 +1768,9 @@ full debugging narrative):
   shape_wedge -\> curve_arc -\> shape_blob -\> shape_ribbon -\>
   shape_twist -\> curve_twist -\> shape_stroke -\> shape_strokepath -\>
   canvas -\> sketch -\> format -\> vectorize -\> effects -\>
-  effect_tremor -\> effect_bristle -\> draw -\> effect_grain -\> convert
-  -\> save -\> sketchpad-package). **Any new drawable subclass must be
-  added to `Collate` after `drawable.R`**, or
+  effect_tremor -\> effect_bristle -\> draw -\> group -\> effect_grain
+  -\> convert -\> save -\> sketchpad-package). **Any new drawable
+  subclass must be added to `Collate` after `drawable.R`**, or
   `devtools::load_all()`/`R CMD check` will fail with an “object
   ‘drawable’ not found” error. Any new class that registers its own
   method on an *existing* generic (as `effect_grain` does for `draw`)

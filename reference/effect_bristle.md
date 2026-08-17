@@ -1,7 +1,7 @@
 # A fanned bristle/dry-brush effect along a path
 
 `effect_bristle()` builds a
-[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) of
+[group](https://sketchpad.djnavarro.net/reference/group.md) of
 `n_bristles` copies of a template drawable, fanned out perpendicular to
 its own backbone path.
 
@@ -77,8 +77,8 @@ effect_bristle(
 
 ## Value
 
-A [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing `n_bristles` drawables.
+A [group](https://sketchpad.djnavarro.net/reference/group.md) containing
+`n_bristles` drawables.
 
 ## Details
 

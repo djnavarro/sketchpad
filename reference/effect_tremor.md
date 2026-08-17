@@ -1,8 +1,8 @@
 # Layer jittered copies of a drawable for a hand-drawn look
 
 `effect_tremor()` builds a
-[sketch](https://sketchpad.djnavarro.net/reference/sketch.md) of
-`layers` such copies: each is a copy of `object` (via
+[group](https://sketchpad.djnavarro.net/reference/group.md) of `layers`
+such copies: each is a copy of `object` (via
 [`S7::set_props()`](https://rconsortium.github.io/S7/reference/props.html))
 with its `x`/`y` displaced by smooth, seed-offset simplex noise sampled
 along the path's own normalized arc-length.
@@ -56,8 +56,8 @@ effect_tremor(
 
 ## Value
 
-A [sketch](https://sketchpad.djnavarro.net/reference/sketch.md)
-containing `layers` drawables.
+A [group](https://sketchpad.djnavarro.net/reference/group.md) containing
+`layers` drawables.
 
 ## Details
 
